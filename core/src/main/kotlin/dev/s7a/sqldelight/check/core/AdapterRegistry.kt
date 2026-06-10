@@ -13,7 +13,7 @@ public class AdapterRegistry private constructor(
      * Finds the provider that should handle [version].
      */
     public fun find(version: String): SqlDelightAdapterProvider? =
-        providers.firstOrNull { provider -> version in provider.supportedVersions }
+        providers.firstOrNull { provider -> provider.supports(version) }
 
     public companion object {
         /**

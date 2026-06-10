@@ -11,7 +11,8 @@ This version establishes the first Gradle plugin and API surface for checking SQ
 - Added Gradle plugin `dev.s7a.sqldelight.check`.
 - Added tasks for check, lint, format, and write variants.
 - Added SQLDelight project detection for Gradle projects, including multiple databases.
-- Added a SQLDelight `2.3.2` adapter that delegates analysis to SQLDelight compiler APIs.
+- Added a SQLDelight `2.x` adapter for stable `2.0.x` through `2.4.x` releases that delegates analysis to SQLDelight
+  compiler APIs.
 - Added best-effort file and source range mapping for SQLDelight parser/compiler diagnostics.
 - Added stable API modules for diagnostics, rule sets, reporters, and SQLDelight adapters.
 - Added standard rules:

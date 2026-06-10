@@ -26,10 +26,21 @@ private const val SOURCE_FOLDER_CLASS = "app.cash.sqldelight.core.SqlDelightSour
  * Adapter provider for SQLDelight 2.3.2.
  */
 public class SqlDelight232AdapterProvider : SqlDelightAdapterProvider {
-    override val id: String = "sqldelight-2.3.2"
-    override val supportedVersions: Set<String> = setOf("2.3.2")
+    override val id: String = "sqldelight-2.x"
+    override val supportedVersions: Set<String> = setOf("2.0.x", "2.1.x", "2.2.x", "2.3.x", "2.4.x")
+
+    override fun supports(version: String): Boolean = SqlDelight2VersionSupport.supports(version)
 
     override fun create(): SqlDelightAdapter = SqlDelight232Adapter
+}
+
+private object SqlDelight2VersionSupport {
+    private val stableVersion = Regex("""^2\.(\d+)\.\d+$""")
+
+    fun supports(version: String): Boolean {
+        val minor = stableVersion.matchEntire(version)?.groupValues?.get(1)?.toIntOrNull() ?: return false
+        return minor in 0..4
+    }
 }
 
 private object SqlDelight232Adapter : SqlDelightAdapter {

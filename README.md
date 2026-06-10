@@ -9,8 +9,8 @@ delegates parsing and validation to SQLDelight, then runs sqldelight-check rule 
 
 sqldelight-check is pre-release. The repository is being prepared for `v0.1.0`.
 
-The initial release targets SQLDelight `2.3.2` and focuses on Gradle plugin usage. There is no standalone CLI. GitHub
-Actions usage should run the Gradle tasks and upload or annotate the generated reports.
+The initial release targets stable SQLDelight `2.0.x` through `2.4.x` and focuses on Gradle plugin usage. There is no
+standalone CLI. GitHub Actions usage should run the Gradle tasks and upload or annotate the generated reports.
 
 ## Install
 
@@ -225,7 +225,7 @@ sqldelight-check reads SQLDelight database tasks from Gradle and supports multip
 Dialect metadata is inferred from SQLDelight's dialect configuration and passed to rules as stable sqldelight-check API
 data.
 
-The `v0.1.0` adapter targets SQLDelight `2.3.2`.
+The `v0.1.0` adapter targets stable SQLDelight `2.0.x`, `2.1.x`, `2.2.x`, `2.3.x`, and `2.4.x`.
 
 ## Limitations
 

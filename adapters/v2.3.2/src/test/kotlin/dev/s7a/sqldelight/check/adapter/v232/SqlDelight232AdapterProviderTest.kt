@@ -18,6 +18,18 @@ import kotlin.test.assertTrue
  */
 class SqlDelight232AdapterProviderTest {
     @Test
+    fun `adapter declares stable sqldelight 2 compatibility range`() {
+        val provider = SqlDelight232AdapterProvider()
+
+        listOf("2.0.0", "2.0.2", "2.1.0", "2.2.1", "2.3.1", "2.3.2", "2.4.0").forEach { version ->
+            assertEquals(true, provider.supports(version), version)
+        }
+        listOf("2.0.0-rc02", "1.5.5", "3.0.0").forEach { version ->
+            assertEquals(false, provider.supports(version), version)
+        }
+    }
+
+    @Test
     fun `adapter returns sql diagnostics from sqldelight`() {
         val root = Files.createTempDirectory("sqldelight-check-adapter-test")
         val sourceRoot = root.resolve("src/main/sqldelight")

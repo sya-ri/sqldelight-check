@@ -56,6 +56,14 @@ public interface SqlDelightAdapterProvider {
     public val supportedVersions: Set<String>
 
     /**
+     * Returns whether this provider can analyze a project that uses [version].
+     *
+     * Provider implementations may override this when they support a compatibility range. The default keeps exact
+     * matching for simple adapters.
+     */
+    public fun supports(version: String): Boolean = version in supportedVersions
+
+    /**
      * Creates an adapter instance.
      */
     public fun create(): SqlDelightAdapter
