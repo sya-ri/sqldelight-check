@@ -1,6 +1,8 @@
 package dev.s7a.sqldelight.check.gradle
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
+import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
@@ -247,27 +249,27 @@ private enum class SqlDelightModule(
 
 private sealed interface KnownSqlDelightDialect {
     val displayName: String
-    val capabilities: Set<String>
+    val capabilities: Set<DialectCapability>
 
     data class SQLite(
         override val displayName: String,
     ) : KnownSqlDelightDialect {
-        override val capabilities: Set<String> = setOf("sqlite")
+        override val capabilities: Set<DialectCapability> = setOf(DialectCapabilities.SQLite)
     }
 
     data object MySql : KnownSqlDelightDialect {
         override val displayName: String = "MySQL"
-        override val capabilities: Set<String> = setOf("mysql")
+        override val capabilities: Set<DialectCapability> = setOf(DialectCapabilities.MySql)
     }
 
     data object PostgreSql : KnownSqlDelightDialect {
         override val displayName: String = "PostgreSQL"
-        override val capabilities: Set<String> = setOf("postgresql")
+        override val capabilities: Set<DialectCapability> = setOf(DialectCapabilities.PostgreSql)
     }
 
     data object Hsql : KnownSqlDelightDialect {
         override val displayName: String = "HSQL"
-        override val capabilities: Set<String> = setOf("hsql")
+        override val capabilities: Set<DialectCapability> = setOf(DialectCapabilities.Hsql)
     }
 
     companion object {

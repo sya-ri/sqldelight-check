@@ -148,7 +148,7 @@ private fun SqlDialect.toJsonDialect(): JsonDialect =
         artifact = artifact,
         version = version,
         implementationClass = implementationClass,
-        capabilities = capabilities.sorted(),
+        capabilities = capabilities.map { capability -> capability.id }.sorted(),
     )
 
 private fun Fix.toJsonFix(): JsonFix =

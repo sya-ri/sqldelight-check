@@ -14,6 +14,6 @@ public data class SqlDialect(
     public val version: String? = null,
     /** Implementation class name for custom dialects when available. */
     public val implementationClass: String? = null,
-    /** Capability names discovered or inferred for this dialect. */
-    public val capabilities: Set<String> = emptySet(),
+    /** Capabilities discovered or inferred for this dialect. */
+    public val capabilities: Set<DialectCapability> = emptySet(),
 )
