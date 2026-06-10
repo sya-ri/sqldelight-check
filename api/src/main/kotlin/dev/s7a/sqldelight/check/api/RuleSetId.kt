@@ -5,5 +5,6 @@ package dev.s7a.sqldelight.check.api
  */
 @JvmInline
 public value class RuleSetId(
+    /** Stable rule set ID value. */
     public val value: String,
 )
