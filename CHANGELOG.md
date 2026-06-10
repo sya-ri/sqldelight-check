@@ -49,7 +49,7 @@ This version establishes the first Gradle plugin and API surface for checking SQ
   - `standard:space-before-block-comment-end`
   - `standard:use-is-null`
 - Added safe fix application for write tasks.
-- Added JSON, SARIF, text, HTML, and Markdown reporters.
+- Added JSON, SARIF, text, navigable HTML, and GitHub Actions-friendly Markdown reporters.
 - Added external provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.
 - Added Qodana configuration and Gradle TestKit coverage for the plugin.
 

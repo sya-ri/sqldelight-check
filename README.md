@@ -109,8 +109,8 @@ Built-in reporters are installed with the Gradle plugin:
 - `json`
 - `sarif`
 - `text`
-- `html`
-- `markdown`
+- `html`: navigable diagnostics table for uploaded CI artifacts.
+- `markdown`: summary and diagnostics table suitable for GitHub Actions job summaries.
 
 Default report outputs are written under `build/reports/sqldelight-check/`. JSON, SARIF, and text are enabled by
 default. HTML and Markdown are available but disabled by default.
@@ -232,7 +232,6 @@ The `v0.1.0` adapter targets SQLDelight `2.3.2`.
 - There is no standalone CLI.
 - SQLDelight diagnostic source ranges are still coarse when SQLDelight reports parser/compiler failures.
 - `sqldelightLint` and `sqldelightFormat` currently share the same rule execution path.
-- HTML and Markdown reporters are intentionally simple in the initial release.
 
 ## Development
 
