@@ -32,7 +32,7 @@ reflection class-name strings, and `ServiceLoader` provider names are intentiona
 
 ## Implementation Notes
 
-- Keep SQL parsing and dialect validation inside SQLDelight adapters. Do not reimplement SQLDelight parsing in rules.
+- Keep SQL parsing and dialect validation inside SQLDelight's compiler/parser layer. Do not reimplement SQLDelight parsing in rules.
 - Public APIs need KDoc.
 - If a release-blocking compromise is necessary, leave a `FIXME` in code instead of hiding the issue in transient notes.
 - Use `.local/` for working notes and local reference clones. `.local/` is intentionally not committed.

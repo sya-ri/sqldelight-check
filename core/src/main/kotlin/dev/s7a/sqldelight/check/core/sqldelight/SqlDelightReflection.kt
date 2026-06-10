@@ -1,4 +1,4 @@
-package dev.s7a.sqldelight.check.adapter.v232
+package dev.s7a.sqldelight.check.core.sqldelight
 
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy

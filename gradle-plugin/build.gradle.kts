@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.Test
 import org.gradle.plugin.devel.tasks.PluginUnderTestMetadata
 
 plugins {
@@ -15,10 +16,15 @@ dependencies {
     implementation(project(":reporters:text"))
     implementation(project(":reporters:html"))
     implementation(project(":reporters:markdown"))
-    implementation(project(":adapters:v2.3.2"))
     compileOnly(kotlin("gradle-plugin-api"))
     testImplementation(kotlin("test"))
     testImplementation(gradleTestKit())
+}
+
+tasks.withType<Test>().configureEach {
+    val verifySnapshots = providers.gradleProperty("sqldelightCheck.verifySnapshots").orElse("false")
+    inputs.property("sqldelightCheck.verifySnapshots", verifySnapshots)
+    systemProperty("sqldelightCheck.verifySnapshots", verifySnapshots.get())
 }
 
 tasks.named<PluginUnderTestMetadata>("pluginUnderTestMetadata") {

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.adapter.spi.AnalysisInput
+import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.Diagnostic

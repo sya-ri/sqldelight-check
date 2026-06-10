@@ -1,8 +1,5 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.adapter.spi.AnalysisInput
-import dev.s7a.sqldelight.check.adapter.spi.AnalysisResult
-import dev.s7a.sqldelight.check.adapter.spi.SqlDelightAdapter
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
@@ -14,6 +11,7 @@ import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+import dev.s7a.sqldelight.check.core.sqldelight.SqlDelight2Analyzer
 
 /**
  * Resolved configuration for one rule after global and database-specific overrides are applied.
@@ -46,15 +44,11 @@ public class SqlDelightCheckEngine {
      */
     public fun run(
         inputs: List<AnalysisInput> = emptyList(),
-        adapter: SqlDelightAdapter? = null,
         ruleSetProviders: List<RuleSetProvider> = emptyList(),
         config: CheckConfig = CheckConfig(),
     ): List<Diagnostic> =
         inputs.flatMap { input ->
-            val analysisResult =
-                adapter
-                    ?.analyze(input)
-                    ?: AnalysisResult(files = input.files, diagnostics = emptyList())
+            val analysisResult = SqlDelight2Analyzer.analyze(input)
             analysisResult.diagnostics + runRules(input.database, analysisResult.files, ruleSetProviders, config)
         }
 

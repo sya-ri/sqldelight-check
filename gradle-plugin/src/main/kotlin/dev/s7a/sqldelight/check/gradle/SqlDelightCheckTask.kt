@@ -51,21 +51,11 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     private fun analyze(config: CheckConfig): AnalysisRunResult {
         val inputs = SqlDelightProjectResolver(project).resolve()
         val diagnostics =
-            inputs.flatMap { input ->
-                val provider =
-                    project
-                        .sqldelightCheckAdapterRegistry()
-                        .find(input.sqlDelightVersion)
-                        ?: throw GradleException(
-                            "No sqldelight-check adapter found for SQLDelight ${input.sqlDelightVersion}.",
-                        )
-                SqlDelightCheckEngine().run(
-                    inputs = listOf(input.analysisInput),
-                    adapter = provider.create(),
-                    ruleSetProviders = project.sqldelightCheckRuleRegistry().providers(),
-                    config = config,
-                )
-            }
+            SqlDelightCheckEngine().run(
+                inputs = inputs.map { input -> input.analysisInput },
+                ruleSetProviders = project.sqldelightCheckRuleRegistry().providers(),
+                config = config,
+            )
         return AnalysisRunResult(databaseCount = inputs.size, diagnostics = diagnostics)
     }
 

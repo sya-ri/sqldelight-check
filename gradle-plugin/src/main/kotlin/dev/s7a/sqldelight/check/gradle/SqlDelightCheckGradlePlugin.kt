@@ -1,12 +1,10 @@
 package dev.s7a.sqldelight.check.gradle
 
-import dev.s7a.sqldelight.check.core.AdapterRegistry
 import dev.s7a.sqldelight.check.core.ReporterRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
 import java.net.URLClassLoader
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
 
 /**
  * Gradle plugin entry point for sqldelight-check.
@@ -104,18 +102,7 @@ private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension)
             outputFile.convention(layout.buildDirectory.file("reports/sqldelight-check/report.$name"))
         }
     }
-    extensions.extraProperties["sqldelightCheckAdapterRegistry"] =
-        AdapterRegistry.load(SqlDelightCheckGradlePlugin::class.java.classLoader)
 }
-
-/**
- * Returns the adapter registry attached to this project.
- */
-internal fun Project.sqldelightCheckAdapterRegistry(): AdapterRegistry =
-    (this as ExtensionAware)
-        .extensions
-        .extraProperties
-        .get("sqldelightCheckAdapterRegistry") as AdapterRegistry
 
 /**
  * Returns the rule registry attached to this project.

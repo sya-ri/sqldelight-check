@@ -1,6 +1,6 @@
-package dev.s7a.sqldelight.check.adapter.v232
+package dev.s7a.sqldelight.check.core.sqldelight
 
-import dev.s7a.sqldelight.check.adapter.spi.AnalysisInput
+import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.api.SourceFile
 import java.io.File
 

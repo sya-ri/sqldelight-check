@@ -18,7 +18,6 @@ include(
     ":api",
     ":rule-api",
     ":reporter-api",
-    ":adapter-spi",
     ":core",
     ":rules:standard",
     ":reporters:json",
@@ -26,6 +25,5 @@ include(
     ":reporters:text",
     ":reporters:html",
     ":reporters:markdown",
-    ":adapters:v2.3.2",
     ":gradle-plugin",
 )

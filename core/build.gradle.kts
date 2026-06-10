@@ -7,6 +7,9 @@ dependencies {
     api(project(":api"))
     api(project(":rule-api"))
     api(project(":reporter-api"))
-    api(project(":adapter-spi"))
     testImplementation(kotlin("test"))
+    testRuntimeOnly(libs.sqldelight.gradle.plugin)
+    testRuntimeOnly(libs.sqldelight.compiler.env)
+    testRuntimeOnly(libs.sql.psi.environment)
+    testRuntimeOnly(libs.sqldelight.sqlite338.dialect)
 }

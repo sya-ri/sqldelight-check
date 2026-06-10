@@ -1,4 +1,4 @@
-package dev.s7a.sqldelight.check.adapter.v232
+package dev.s7a.sqldelight.check.core.sqldelight
 
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange

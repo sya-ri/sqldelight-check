@@ -132,6 +132,45 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `check task supports sqldelight snapshot versions when enabled`() {
+        if (!verifySnapshots) return
+
+        snapshotSqlDelight2Versions.forEach { version ->
+            val project =
+                testProject(
+                    buildScript =
+                        sqlDelightBuildScript(
+                            sqlDelightVersion = version,
+                            extraRepositories =
+                                """
+                                maven("$SQLDELIGHT_SNAPSHOT_REPOSITORY_URL")
+                                """.trimIndent(),
+                        ),
+                    settingsScript = snapshotSettingsScript(),
+                )
+            project.write(
+                "src/main/sqldelight/com/example/Player.sq",
+                """
+                CREATE TABLE player (
+                  id INTEGER NOT NULL PRIMARY KEY,
+                  name TEXT NOT NULL
+                );
+                """.trimIndent(),
+            )
+
+            val result =
+                try {
+                    project.run("sqldelightCheck")
+                } catch (failure: UnexpectedBuildFailure) {
+                    throw AssertionError("SQLDelight $version should be supported.", failure)
+                }
+
+            assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome, "SQLDelight $version should be supported.")
+            assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
+        }
+    }
+
+    @Test
     fun `check task fails after writing reports when sqldelight reports errors`() {
         val project =
             testProject(
@@ -378,6 +417,7 @@ class SqlDelightCheckGradlePluginTest {
      */
     private fun sqlDelightBuildScript(
         sqlDelightVersion: String = "2.3.2",
+        extraRepositories: String = "",
         extraConfiguration: String = "",
     ): String =
         """
@@ -389,6 +429,7 @@ class SqlDelightCheckGradlePluginTest {
 
         repositories {
             mavenCentral()
+            $extraRepositories
         }
 
         sqldelight {
@@ -405,17 +446,39 @@ class SqlDelightCheckGradlePluginTest {
         """.trimIndent()
 
     /**
+     * Returns a settings script that can resolve SQLDelight snapshot plugin markers.
+     */
+    private fun snapshotSettingsScript(): String =
+        """
+        pluginManagement {
+            repositories {
+                gradlePluginPortal()
+                maven("$SQLDELIGHT_SNAPSHOT_REPOSITORY_URL")
+            }
+        }
+
+        rootProject.name = "sqldelight-check-test"
+        """.trimIndent()
+
+    /**
      * Creates a temporary Gradle project for a TestKit run.
      */
-    private fun testProject(buildScript: String): TestProject {
+    private fun testProject(
+        buildScript: String,
+        settingsScript: String = """rootProject.name = "sqldelight-check-test"""",
+    ): TestProject {
         val directory = Files.createTempDirectory("sqldelight-check-gradle-plugin-test")
-        directory.resolve("settings.gradle.kts").writeText("""rootProject.name = "sqldelight-check-test"""")
+        directory.resolve("settings.gradle.kts").writeText(settingsScript)
         directory.resolve("build.gradle.kts").writeText(buildScript)
         return TestProject(directory)
     }
 
     private companion object {
+        private const val SQLDELIGHT_SNAPSHOT_REPOSITORY_URL = "https://central.sonatype.com/repository/maven-snapshots/"
+
         val stableSqlDelight2Versions = listOf("2.0.0", "2.0.2", "2.1.0", "2.2.1", "2.3.1", "2.3.2")
+        val snapshotSqlDelight2Versions = listOf("2.4.0-SNAPSHOT")
+        val verifySnapshots = System.getProperty("sqldelightCheck.verifySnapshots").toBoolean()
     }
 
     /**

@@ -19,8 +19,6 @@ version = "0.1.0"
 
 val publishedArtifacts =
     mapOf(
-        ":adapter-spi" to "sqldelight-check-adapter-spi",
-        ":adapters:v2.3.2" to "sqldelight-check-adapter-2-3-2",
         ":api" to "sqldelight-check-api",
         ":core" to "sqldelight-check-core",
         ":reporter-api" to "sqldelight-check-reporter-api",

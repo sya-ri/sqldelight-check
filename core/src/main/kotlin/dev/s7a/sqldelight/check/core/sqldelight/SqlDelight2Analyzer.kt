@@ -1,19 +1,24 @@
-package dev.s7a.sqldelight.check.adapter.v232
+package dev.s7a.sqldelight.check.core.sqldelight
 
-import dev.s7a.sqldelight.check.adapter.spi.AnalysisInput
-import dev.s7a.sqldelight.check.adapter.spi.AnalysisResult
-import dev.s7a.sqldelight.check.adapter.spi.SqlDelightAdapter
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.core.AnalysisInput
+import dev.s7a.sqldelight.check.core.AnalysisResult
 import java.io.File
+import java.lang.reflect.Constructor
+import java.lang.reflect.Method
 import java.net.URLClassLoader
 import java.nio.file.Files
 
 /**
- * SQLDelight adapter backed by SQLDelight 2.3.2 runtime classes.
+ * SQLDelight analyzer backed by SQLDelight 2.x runtime classes.
  */
-internal object SqlDelight232Adapter : SqlDelightAdapter {
-    override fun analyze(input: AnalysisInput): AnalysisResult {
+internal object SqlDelight2Analyzer {
+    fun analyze(input: AnalysisInput): AnalysisResult {
+        if (input.sourceFolders.isEmpty()) {
+            return AnalysisResult(files = input.files, diagnostics = emptyList())
+        }
+
         val packageName =
             input.packageName
                 ?: return AnalysisResult(
@@ -21,8 +26,12 @@ internal object SqlDelight232Adapter : SqlDelightAdapter {
                     diagnostics = listOf(input.errorDiagnostic("SQLDelight package name was not resolved.")),
                 )
 
-        if (input.sourceFolders.isEmpty()) {
-            return AnalysisResult(files = input.files, diagnostics = emptyList())
+        val sqlDelightVersion = input.sqlDelightVersion
+        if (sqlDelightVersion != null && !SqlDelight2VersionSupport.supports(sqlDelightVersion)) {
+            return AnalysisResult(
+                files = input.files,
+                diagnostics = listOf(input.errorDiagnostic("SQLDelight $sqlDelightVersion is not supported by sqldelight-check 0.1.0.")),
+            )
         }
 
         val diagnostics =
@@ -32,7 +41,7 @@ internal object SqlDelight232Adapter : SqlDelightAdapter {
                     packageName = packageName,
                 )
             }.getOrElse { failure ->
-                listOf(input.errorDiagnostic("SQLDelight 2.3.2 analysis failed: ${failure.message ?: failure::class.java.name}"))
+                listOf(input.errorDiagnostic("SQLDelight 2.x analysis failed: ${failure.message ?: failure::class.java.name}"))
             }
         return AnalysisResult(files = input.files, diagnostics = diagnostics)
     }
@@ -90,23 +99,10 @@ internal object SqlDelight232Adapter : SqlDelightAdapter {
             )
         val dialectClass = Class.forName(SQL_DELIGHT_DIALECT_CLASS, true, loader)
         val environmentClass = Class.forName(SQL_DELIGHT_ENVIRONMENT_CLASS, true, loader)
-        val environment =
-            environmentClass
-                .constructors
-                .first { constructor -> constructor.parameterCount == 7 }
-                .newInstance(
-                    properties,
-                    compilationUnit,
-                    false,
-                    dialectClass.cast(dialect),
-                    "sqldelight-check",
-                    input.sourceFolders,
-                    input.dependencyFolders,
-                )
+        val environment = environmentClass.newEnvironment(properties, compilationUnit, dialectClass.cast(dialect), input)
         val status =
             environmentClass
-                .methods
-                .first { method -> method.name == "generateSqlDelightFiles" && method.parameterCount == 1 }
+                .methodWithParameterCount("generateSqlDelightFiles", 1)
                 .invoke(environment, { _: String -> Unit })
 
         return when {
@@ -167,4 +163,61 @@ internal object SqlDelight232Adapter : SqlDelightAdapter {
             database = database,
         )
     }
+
+    private fun Class<*>.newEnvironment(
+        properties: Any,
+        compilationUnit: Any,
+        dialect: Any,
+        input: AnalysisInput,
+    ): Any {
+        val constructor =
+            constructors.firstOrNull { candidate -> candidate.parameterCount == 7 }
+                ?: constructors.firstOrNull { candidate -> candidate.parameterCount == 8 }
+                ?: error(
+                    "SQLDelight class $name does not expose a supported constructor. " +
+                        "Available constructors: ${constructors.joinToString { constructor -> constructor.signature() }}",
+                )
+        val arguments =
+            when (constructor.parameterCount) {
+                7 ->
+                    arrayOf(
+                        properties,
+                        compilationUnit,
+                        false,
+                        dialect,
+                        "sqldelight-check",
+                        input.sourceFolders,
+                        input.dependencyFolders,
+                    )
+                8 ->
+                    arrayOf(
+                        properties,
+                        compilationUnit,
+                        false,
+                        dialect,
+                        "sqldelight-check",
+                        emptySet<Any>(),
+                        input.sourceFolders,
+                        input.dependencyFolders,
+                    )
+                else -> error("Unsupported SQLDelightEnvironment constructor: ${constructor.signature()}")
+            }
+        return constructor.newInstance(*arguments)
+    }
+
+    private fun Class<*>.methodWithParameterCount(
+        name: String,
+        parameterCount: Int,
+    ): Method =
+        methods.firstOrNull { method -> method.name == name && method.parameterCount == parameterCount }
+            ?: error(
+                "SQLDelight class ${this.name} does not expose $name with $parameterCount argument(s). " +
+                    "Available methods: ${methods.joinToString { method -> method.signature() }}",
+            )
+
+    private fun Constructor<*>.signature(): String =
+        parameterTypes.joinToString(prefix = "(", postfix = ")") { type -> type.name }
+
+    private fun Method.signature(): String =
+        "$name${parameterTypes.joinToString(prefix = "(", postfix = ")") { type -> type.name }}"
 }

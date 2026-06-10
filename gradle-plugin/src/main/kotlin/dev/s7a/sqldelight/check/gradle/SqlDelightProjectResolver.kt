@@ -1,10 +1,10 @@
 package dev.s7a.sqldelight.check.gradle
 
-import dev.s7a.sqldelight.check.adapter.spi.AnalysisInput
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.core.AnalysisInput
 import java.io.File
 import java.nio.charset.StandardCharsets
 import org.gradle.api.Project
@@ -32,7 +32,7 @@ private val SQLDELIGHT_COMPILER_CLASSES =
 internal data class ResolvedSqlDelightInput(
     /** SQLDelight version used for this database. */
     val sqlDelightVersion: String,
-    /** Adapter input for sqldelight-check analysis. */
+    /** Core analysis input for sqldelight-check. */
     val analysisInput: AnalysisInput,
 )
 
@@ -78,6 +78,7 @@ internal class SqlDelightProjectResolver(
                 AnalysisInput(
                     database = DatabaseContext(name = databaseName, dialect = dialect),
                     files = sourceFiles,
+                    sqlDelightVersion = version,
                     packageName = packageName,
                     sourceFolders = localSourceFolders.map { folder -> folder.file },
                     dependencyFolders = dependencySourceFolders.map { folder -> folder.file },
