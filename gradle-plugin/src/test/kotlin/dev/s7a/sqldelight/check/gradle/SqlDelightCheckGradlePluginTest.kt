@@ -259,6 +259,81 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `write task does not apply unsafe fixes by default`() {
+        val project = testProject(sqlDelightBuildScript())
+        val path = "src/main/sqldelight/com/example/Player.sq"
+        val content =
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+
+            selectById:
+            SELECT *
+            FROM player
+            WHERE id=?;
+            """.trimIndent() + "\n"
+        project.write(path, content)
+
+        val result = project.run("sqldelightCheckWrite")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheckWrite")?.outcome)
+        assertEquals(content, project.file(path).readText())
+        assertContains(
+            project.file("build/reports/sqldelight-check/report.json").readText(),
+            """"ruleId":"standard:space-around-comparison-operators"""",
+        )
+    }
+
+    @Test
+    fun `write task applies unsafe fixes when enabled`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    """
+                    sqldelightCheck {
+                        write {
+                            unsafe.set(true)
+                        }
+                    }
+                    """.trimIndent(),
+                ),
+            )
+        val path = "src/main/sqldelight/com/example/Player.sq"
+        project.write(
+            path,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+
+            selectById:
+            SELECT *
+            FROM player
+            WHERE id=?;
+            """.trimIndent() + "\n",
+        )
+
+        val result = project.run("sqldelightCheckWrite")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheckWrite")?.outcome)
+        assertEquals(
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+
+            selectById:
+            SELECT *
+            FROM player
+            WHERE id = ?;
+            """.trimIndent() + "\n",
+            project.file(path).readText(),
+        )
+        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"diagnostics":0""")
+    }
+
+    @Test
     fun `check task loads external reporters from configuration`() {
         val project =
             testProject(
@@ -289,6 +364,34 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertEquals("external diagnostics=0 mode=ci", project.file("build/reports/sqldelight-check/external.txt").readText())
     }
+
+    /**
+     * Returns a build script with SQLDelight configured for the functional test project.
+     */
+    private fun sqlDelightBuildScript(extraConfiguration: String = ""): String =
+        """
+        plugins {
+            kotlin("jvm") version "2.4.0"
+            id("app.cash.sqldelight") version "2.3.2"
+            id("dev.s7a.sqldelight.check")
+        }
+
+        repositories {
+            mavenCentral()
+        }
+
+        sqldelight {
+            databases {
+                create("Database") {
+                    packageName.set("com.example")
+                    srcDirs("src/main/sqldelight")
+                    dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                }
+            }
+        }
+
+        $extraConfiguration
+        """.trimIndent()
 
     /**
      * Creates a temporary Gradle project for a TestKit run.
