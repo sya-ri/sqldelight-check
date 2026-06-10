@@ -9,6 +9,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import org.gradle.testkit.runner.GradleRunner
@@ -51,15 +52,20 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("printSqldelightCheckModel")
 
         assertEquals(SUCCESS, result.task(":printSqldelightCheckModel")?.outcome)
-        assertContains(result.output, "hasExtension=true")
-        assertContains(result.output, "hasRuleSetConfiguration=true")
-        assertContains(result.output, "hasReporterConfiguration=true")
-        assertContains(result.output, "task.sqldelightCheck=true")
-        assertContains(result.output, "task.sqldelightCheckWrite=true")
-        assertContains(result.output, "task.sqldelightLint=true")
-        assertContains(result.output, "task.sqldelightLintWrite=true")
-        assertContains(result.output, "task.sqldelightFormat=true")
-        assertContains(result.output, "task.sqldelightFormatWrite=true")
+        assertContentEquals(
+            listOf(
+                "hasExtension=true",
+                "hasRuleSetConfiguration=true",
+                "hasReporterConfiguration=true",
+                "task.sqldelightCheck=true",
+                "task.sqldelightCheckWrite=true",
+                "task.sqldelightLint=true",
+                "task.sqldelightLintWrite=true",
+                "task.sqldelightFormat=true",
+                "task.sqldelightFormatWrite=true",
+            ),
+            result.output.lines().filter { line -> line.startsWith("has") || line.startsWith("task.") },
+        )
     }
 
     @Test
