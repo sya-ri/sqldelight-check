@@ -17,6 +17,11 @@ internal data class SqlToken(
     val endOffset: Int,
 )
 
+internal data class SqlCharacter(
+    val value: Char,
+    val offset: Int,
+)
+
 internal fun String.rangeAtOffsets(
     startOffset: Int,
     endOffset: Int,
@@ -96,6 +101,26 @@ internal fun String.sqlTokens(): Sequence<SqlToken> =
                         index
                     }
                     else -> index + 1
+                }
+        }
+    }
+
+internal fun String.sqlCharacters(): Sequence<SqlCharacter> =
+    sequence {
+        var index = 0
+        while (index < length) {
+            index =
+                when {
+                    startsWith("--", index) -> skipLineComment(index)
+                    startsWith("/*", index) -> skipBlockComment(index)
+                    this@sqlCharacters[index] == '\'' -> skipQuoted(index, '\'')
+                    this@sqlCharacters[index] == '"' -> skipQuoted(index, '"')
+                    this@sqlCharacters[index] == '`' -> skipQuoted(index, '`')
+                    this@sqlCharacters[index] == '[' -> skipBracketQuoted(index)
+                    else -> {
+                        yield(SqlCharacter(value = this@sqlCharacters[index], offset = index))
+                        index + 1
+                    }
                 }
         }
     }

@@ -124,8 +124,18 @@ The initial standard rule set contains:
   fix: uppercase the keyword token.
 - `standard:line-ending-lf`: reports CRLF and CR line endings. Safe fix: replace them with LF.
 - `standard:max-blank-lines`: reports more than one consecutive blank line. Safe fix: remove extra blank lines.
+- `standard:no-consecutive-semicolons`: reports directly repeated semicolon tokens. Safe fix: remove extra semicolons.
+- `standard:no-leading-blank-lines`: reports blank lines before the first content line. Safe fix: remove them.
+- `standard:no-space-after-opening-parenthesis`: reports inline whitespace after `(`. Safe fix: remove it.
+- `standard:no-space-before-closing-parenthesis`: reports inline whitespace before `)`. Safe fix: remove it.
+- `standard:no-space-before-comma`: reports inline whitespace before `,`. Safe fix: remove it.
+- `standard:no-space-before-semicolon`: reports inline whitespace before `;`. Safe fix: remove it.
 - `standard:no-tab-indentation`: reports tabs in leading indentation. Safe fix: replace indentation tabs with spaces.
+- `standard:no-trailing-blank-lines`: reports blank lines after the last content line. Safe fix: remove them.
 - `standard:no-trailing-whitespace`: reports spaces or tabs at the end of a line. Safe fix: remove trailing whitespace.
+- `standard:space-after-comma`: reports missing or repeated inline spaces after `,`. Safe fix: use one space.
+- `standard:space-around-comparison-operators`: reports comparison operators without one space on both sides. Unsafe fix:
+  normalize inline spacing around the operator.
 
 Rules run after SQLDelight accepts the project input. SQLDelight parser and dialect behavior are not reimplemented by
 sqldelight-check.

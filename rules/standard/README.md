@@ -87,8 +87,35 @@ The standard rule set uses two safety levels:
 | `standard:keyword-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL keywords outside comments and quoted text. |
 | `standard:line-ending-lf` | Warning / Auto | Yes | Safe | Replace CRLF or CR line endings with LF. |
 | `standard:max-blank-lines` | Warning / Auto | Yes | Safe | Disallow more than one consecutive blank line. |
+| `standard:no-consecutive-semicolons` | Warning / Auto | Yes | Safe | Disallow directly repeated semicolon tokens. |
+| `standard:no-leading-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines before the first content line. |
+| `standard:no-space-after-opening-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `(`. |
+| `standard:no-space-before-closing-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `)`. |
+| `standard:no-space-before-comma` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `,`. |
+| `standard:no-space-before-semicolon` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `;`. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
+| `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
+| `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
+
+## SQLFluff References
+
+The initial standard rules are intentionally modeled after common sqlfluff layout, capitalisation, and structure rules,
+but they are not a compatibility layer for sqlfluff rule codes. sqldelight-check keeps its own IDs because the rule
+engine runs in SQLDelight projects, reports SQLDelight database metadata, and needs a stable API for custom rule sets.
+
+Useful sqlfluff concepts reflected here:
+
+- Capitalisation checks: `standard:keyword-case`.
+- Layout checks around commas, semicolons, parentheses, blank lines, and line endings: the `standard:no-*` spacing and
+  blank-line rules.
+- Structure checks for repeated semicolons: `standard:no-consecutive-semicolons`.
+
+Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
+dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
+the standard rule set favors source-text checks that can skip comments and quoted text without pretending to be a SQL
+parser.
 
 ## `standard:final-newline`
 
@@ -243,6 +270,288 @@ Fix behavior:
 - Removes extra blank lines after the first blank line in a run.
 - Treats whitespace-only lines as blank.
 - Safe to apply in write tasks.
+
+## `standard:no-leading-blank-lines`
+
+Reports blank lines before the first non-blank line in a file.
+
+SQLDelight files are often navigated by declaration names and generated query names. Leading whitespace makes file
+headers less predictable and adds noise to formatting diffs.
+
+Invalid:
+
+```sql
+
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Valid:
+
+```sql
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Fix behavior:
+
+- Removes all blank lines before the first non-blank line.
+- Does not report files that contain only blank lines.
+- Safe to apply in write tasks.
+
+## `standard:no-trailing-blank-lines`
+
+Reports blank lines after the last non-blank line in a file.
+
+This complements `standard:final-newline`: files should end with a single newline, not with visually empty trailing
+space. The rule preserves the newline that terminates the final content line and removes the extra blank area after it.
+
+Invalid:
+
+```sql
+SELECT 1;
+
+
+```
+
+Valid:
+
+```sql
+SELECT 1;
+```
+
+Fix behavior:
+
+- Removes blank or whitespace-only lines after the final content line.
+- Leaves the final newline itself to `standard:final-newline`.
+- Safe to apply in write tasks.
+
+## `standard:no-space-before-comma`
+
+Reports spaces and tabs before comma tokens outside comments and quoted text.
+
+Commas bind to the item before them in common SQL style. Keeping commas tight on the left also makes column lists,
+function arguments, and `VALUES` lists easier to scan.
+
+Invalid:
+
+```sql
+SELECT id , name
+FROM player;
+```
+
+Valid:
+
+```sql
+SELECT id, name
+FROM player;
+```
+
+Ignored:
+
+```sql
+-- SELECT id , name
+SELECT 'id , name';
+```
+
+Fix behavior:
+
+- Removes inline spaces and tabs immediately before `,`.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:space-after-comma`
+
+Reports commas that are not followed by exactly one inline space when another token follows on the same line.
+
+Invalid:
+
+```sql
+SELECT id,name
+FROM player;
+```
+
+Invalid:
+
+```sql
+SELECT id,   name
+FROM player;
+```
+
+Valid:
+
+```sql
+SELECT id, name
+FROM player;
+```
+
+Valid:
+
+```sql
+SELECT
+  id,
+  name
+FROM player;
+```
+
+Fix behavior:
+
+- Inserts one space after `,` when the next token is on the same line.
+- Collapses repeated spaces or tabs after `,` to one space.
+- Does not require a space before `)`, `]`, `}`, `;`, or another comma.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:no-space-before-semicolon`
+
+Reports spaces and tabs before semicolon tokens outside comments and quoted text.
+
+SQLDelight statements commonly use semicolons as terminators. Keeping the semicolon tight to the previous token avoids
+style drift between schema statements and named queries.
+
+Invalid:
+
+```sql
+SELECT 1 ;
+```
+
+Valid:
+
+```sql
+SELECT 1;
+```
+
+Fix behavior:
+
+- Removes inline spaces and tabs immediately before `;`.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:no-consecutive-semicolons`
+
+Reports directly repeated semicolon tokens outside comments and quoted text.
+
+This is a small structure rule inspired by sqlfluff's repeated-semicolon checks. In SQLDelight source, consecutive
+terminators normally represent accidental empty statements rather than useful syntax.
+
+Invalid:
+
+```sql
+SELECT 1;;
+```
+
+Valid:
+
+```sql
+SELECT 1;
+```
+
+Ignored:
+
+```sql
+-- SELECT 1;;
+SELECT ';;';
+```
+
+Fix behavior:
+
+- Removes extra adjacent semicolons and leaves the first semicolon.
+- Only targets directly adjacent semicolon runs such as `;;`.
+- Safe to apply in write tasks.
+
+## `standard:no-space-after-opening-parenthesis`
+
+Reports spaces and tabs immediately after `(` outside comments and quoted text.
+
+The rule is intentionally inline-only. It does not object to multiline layouts where the token after `(` starts on the
+next line; future formatter rules can handle indentation for those cases.
+
+Invalid:
+
+```sql
+SELECT COUNT( id)
+FROM player;
+```
+
+Valid:
+
+```sql
+SELECT COUNT(id)
+FROM player;
+```
+
+Fix behavior:
+
+- Removes inline spaces and tabs immediately after `(`.
+- Does not remove newlines.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:no-space-before-closing-parenthesis`
+
+Reports spaces and tabs immediately before `)` outside comments and quoted text.
+
+Invalid:
+
+```sql
+SELECT COUNT(id )
+FROM player;
+```
+
+Valid:
+
+```sql
+SELECT COUNT(id)
+FROM player;
+```
+
+Fix behavior:
+
+- Removes inline spaces and tabs immediately before `)`.
+- Does not remove newlines.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:space-around-comparison-operators`
+
+Reports comparison operators that do not have exactly one inline space on both sides.
+
+Covered operators:
+
+```text
+=, !=, <>, <, <=, >, >=
+```
+
+Invalid:
+
+```sql
+SELECT *
+FROM player
+WHERE id=1;
+```
+
+Valid:
+
+```sql
+SELECT *
+FROM player
+WHERE id = 1;
+```
+
+Fix behavior:
+
+- Replaces surrounding inline spaces or tabs with one space on each side.
+- Skips operators split across lines.
+- Skips comments, string literals, and quoted identifiers.
+- Marks fixes as `Unsafe`.
+
+Why unsafe:
+
+- SQL dialects have operator families beyond the common comparison set.
+- Some dialect-specific operators are visually similar to comparison operators.
+- The current rule uses source text rather than SQLDelight PSI, so users must opt in before write tasks apply fixes.
 
 ## `standard:keyword-case`
 

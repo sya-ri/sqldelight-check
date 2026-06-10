@@ -1,0 +1,91 @@
+package dev.s7a.sqldelight.check.rules.standard.rules
+
+import dev.s7a.sqldelight.check.api.FixSafety
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class SpaceAroundComparisonOperatorsRuleTest {
+    @Test
+    fun `reports unsafe fix in sq query parameter predicate`() {
+        val diagnostics =
+            SpaceAroundComparisonOperatorsRule().diagnostics(
+                """
+                selectById:
+                SELECT id, name
+                FROM player
+                WHERE id=?;
+                """.asSqlDelightFile(),
+            )
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        assertEquals(" = ", diagnostics.single().fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `supports greater than or equal operator in sq named query`() {
+        val diagnostics =
+            SpaceAroundComparisonOperatorsRule()
+                .diagnostics(
+                    """
+                    selectByMinScore:
+                    SELECT id, name
+                    FROM player
+                    WHERE score>=?;
+                    """.asSqlDelightFile(),
+                )
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(" >= ", diagnostics.single().fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `supports not equal and sql not equal operators in sq named query`() {
+        val diagnostics =
+            SpaceAroundComparisonOperatorsRule()
+                .diagnostics(
+                    """
+                    selectFiltered:
+                    SELECT id, name
+                    FROM player
+                    WHERE score!=? OR name<>'';
+                    """.asSqlDelightFile(),
+                )
+
+        assertEquals(2, diagnostics.size)
+        assertEquals(" != ", diagnostics[0].fixes.single().edits.single().replacement)
+        assertEquals(" <> ", diagnostics[1].fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `accepts operators with one space on both sides in clean sq file`() {
+        SpaceAroundComparisonOperatorsRule().assertDiagnosticCount(cleanPlayerSq, 0)
+    }
+
+    @Test
+    fun `ignores operators at line boundaries in sq named query`() {
+        val content =
+            """
+            selectById:
+            SELECT *
+            FROM player
+            WHERE id
+            = 1;
+            """.asSqlDelightFile()
+
+        SpaceAroundComparisonOperatorsRule().assertDiagnosticCount(content, 0)
+    }
+
+    @Test
+    fun `ignores comments strings and quoted identifiers in sq files`() {
+        val content =
+            """
+            selectLiteral:
+            -- id=1
+            SELECT 'id=1', "id=1", `id=1`, [id=1]
+            FROM player;
+            """.asSqlDelightFile()
+
+        SpaceAroundComparisonOperatorsRule().assertDiagnosticCount(content, 0)
+    }
+}
