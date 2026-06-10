@@ -80,7 +80,10 @@ sqldelightCheck {
     }
 
     reports {
-        maybeCreate("json").required.set(true)
+        maybeCreate("json").apply {
+            required.set(true)
+            options.put("prettyPrint", "true")
+        }
         maybeCreate("sarif").required.set(true)
         maybeCreate("text").required.set(true)
         maybeCreate("html").required.set(false)
@@ -113,7 +116,8 @@ Built-in reporters are installed with the Gradle plugin:
 - `markdown`: summary and diagnostics table suitable for GitHub Actions job summaries.
 
 Default report outputs are written under `build/reports/sqldelight-check/`. JSON, SARIF, and text are enabled by
-default. HTML and Markdown are available but disabled by default.
+default. HTML and Markdown are available but disabled by default. Reporter-specific options can be set with
+`options`; the built-in JSON and SARIF reporters support `prettyPrint`.
 
 ## Rule Sets
 

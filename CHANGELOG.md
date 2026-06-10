@@ -52,6 +52,7 @@ This version establishes the first Gradle plugin and API surface for checking SQ
   - `standard:use-is-null`
 - Added safe fix application for write tasks.
 - Added JSON, SARIF, text, navigable HTML, and GitHub Actions-friendly Markdown reporters.
+- Added reporter options in the Gradle DSL; JSON and SARIF support `prettyPrint`.
 - Added external provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.
 - Added Qodana configuration and Gradle TestKit coverage for the plugin.
 

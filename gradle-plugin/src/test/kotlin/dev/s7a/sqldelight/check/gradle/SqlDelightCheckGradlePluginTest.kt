@@ -275,6 +275,7 @@ class SqlDelightCheckGradlePluginTest {
                     reports {
                         maybeCreate("external").apply {
                             required.set(true)
+                            options.put("mode", "ci")
                             outputFile.set(layout.buildDirectory.file("reports/sqldelight-check/external.txt"))
                         }
                     }
@@ -286,7 +287,7 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertEquals("external diagnostics=0", project.file("build/reports/sqldelight-check/external.txt").readText())
+        assertEquals("external diagnostics=0 mode=ci", project.file("build/reports/sqldelight-check/external.txt").readText())
     }
 
     /**
@@ -351,14 +352,20 @@ class SqlDelightCheckGradlePluginTest {
 
                     @Override
                     public Reporter create(Map<String, String> options) {
-                        return new ExternalReporter();
+                        return new ExternalReporter(options);
                     }
 
                     private static final class ExternalReporter implements Reporter {
+                        private final Map<String, String> options;
+
+                        private ExternalReporter(Map<String, String> options) {
+                            this.options = options;
+                        }
+
                         @Override
                         public void write(Report report, OutputStream output) {
                             try {
-                                String text = "external diagnostics=" + report.getDiagnostics().size();
+                                String text = "external diagnostics=" + report.getDiagnostics().size() + " mode=" + options.get("mode");
                                 output.write(text.getBytes(StandardCharsets.UTF_8));
                             } catch (IOException exception) {
                                 throw new RuntimeException(exception);

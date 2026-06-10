@@ -106,7 +106,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 val outputFile = reporter.outputFile.get().asFile
                 outputFile.parentFile.mkdirs()
                 outputFile.outputStream().use { output ->
-                    provider.create().write(report, output)
+                    provider.create(reporter.options.get()).write(report, output)
                 }
                 logger.lifecycle("Wrote sqldelight-check {} report to {}", reporter.name, outputFile)
             }
