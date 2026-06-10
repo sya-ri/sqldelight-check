@@ -2,6 +2,10 @@ package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rules.standard.rules.FinalNewlineRule
+import dev.s7a.sqldelight.check.rules.standard.rules.KeywordCaseRule
+import dev.s7a.sqldelight.check.rules.standard.rules.LineEndingLfRule
+import dev.s7a.sqldelight.check.rules.standard.rules.MaxBlankLinesRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -20,5 +24,9 @@ public class StandardRuleSetProvider : RuleSetProvider {
         setOf(
             RuleProvider(::NoTrailingWhitespaceRule),
             RuleProvider(::FinalNewlineRule),
+            RuleProvider(::LineEndingLfRule),
+            RuleProvider(::NoTabIndentationRule),
+            RuleProvider(::MaxBlankLinesRule),
+            RuleProvider(::KeywordCaseRule),
         )
 }

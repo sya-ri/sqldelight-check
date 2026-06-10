@@ -28,6 +28,10 @@ class StandardRuleSetProviderTest {
         assertEquals(
             setOf(
                 RuleId("standard:final-newline"),
+                RuleId("standard:keyword-case"),
+                RuleId("standard:line-ending-lf"),
+                RuleId("standard:max-blank-lines"),
+                RuleId("standard:no-tab-indentation"),
                 RuleId("standard:no-trailing-whitespace"),
             ),
             ruleIds,
@@ -50,6 +54,53 @@ class StandardRuleSetProviderTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `line ending rule reports safe fix`() {
+        val diagnostics = runRule(RuleId("standard:line-ending-lf"), "SELECT 1;\r\n")
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        assertEquals("\n", diagnostics.single().fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `tab indentation rule reports safe fix`() {
+        val diagnostics = runRule(RuleId("standard:no-tab-indentation"), "\tSELECT 1;\n")
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        assertEquals("    ", diagnostics.single().fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `max blank lines rule reports safe fix`() {
+        val diagnostics = runRule(RuleId("standard:max-blank-lines"), "SELECT 1;\n\n\nSELECT 2;\n")
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `keyword case rule reports unsafe fix`() {
+        val diagnostics = runRule(RuleId("standard:keyword-case"), "select null from player;\n")
+
+        assertEquals(3, diagnostics.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
+        assertEquals("SELECT", diagnostics.first().fixes.single().edits.single().replacement)
+    }
+
+    @Test
+    fun `keyword case rule ignores comments and strings`() {
+        val diagnostics =
+            runRule(
+                RuleId("standard:keyword-case"),
+                "-- select from\nSELECT 'select from';\n",
+            )
+
+        assertEquals(0, diagnostics.size)
     }
 
     private fun runRule(

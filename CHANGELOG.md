@@ -15,6 +15,10 @@ This version establishes the first Gradle plugin and API surface for checking SQ
 - Added stable API modules for diagnostics, rule sets, reporters, and SQLDelight adapters.
 - Added standard rules:
   - `standard:final-newline`
+  - `standard:keyword-case`
+  - `standard:line-ending-lf`
+  - `standard:max-blank-lines`
+  - `standard:no-tab-indentation`
   - `standard:no-trailing-whitespace`
 - Added safe fix application for write tasks.
 - Added JSON, SARIF, text, HTML, and Markdown reporters.

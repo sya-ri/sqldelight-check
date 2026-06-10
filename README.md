@@ -120,10 +120,17 @@ default. HTML and Markdown are available but disabled by default.
 The initial standard rule set contains:
 
 - `standard:final-newline`: reports files that do not end with a newline. Safe fix: insert the final newline.
+- `standard:keyword-case`: reports common SQL keywords that are not uppercase outside comments and quoted text. Unsafe
+  fix: uppercase the keyword token.
+- `standard:line-ending-lf`: reports CRLF and CR line endings. Safe fix: replace them with LF.
+- `standard:max-blank-lines`: reports more than one consecutive blank line. Safe fix: remove extra blank lines.
+- `standard:no-tab-indentation`: reports tabs in leading indentation. Safe fix: replace indentation tabs with spaces.
 - `standard:no-trailing-whitespace`: reports spaces or tabs at the end of a line. Safe fix: remove trailing whitespace.
 
 Rules run after SQLDelight accepts the project input. SQLDelight parser and dialect behavior are not reimplemented by
 sqldelight-check.
+
+See [`rules/standard/README.md`](rules/standard/README.md) for detailed rule behavior and examples.
 
 ## Write Safety
 
