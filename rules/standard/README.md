@@ -99,15 +99,18 @@ The standard rule set uses two safety levels:
 | `standard:no-space-before-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `.`. |
 | `standard:no-space-before-function-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace between common SQL function names and `(`. |
 | `standard:no-space-before-semicolon` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `;`. |
+| `standard:no-right-join` | Warning / Auto | No | None | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
 | `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
 | `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
 | `standard:space-after-line-comment-marker` | Warning / Auto | Yes | Safe | Require one space after `--` when comment text follows. |
 | `standard:space-around-binary-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around binary arithmetic and concatenation operators. |
 | `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
 | `standard:space-before-block-comment-end` | Warning / Auto | Yes | Safe | Require one space before a block comment closing marker. |
+| `standard:use-is-null` | Warning / Auto | Yes | Unsafe | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
 
 ## SQLFluff References
 
@@ -122,6 +125,8 @@ Useful sqlfluff concepts reflected here:
 - Layout checks around dots, commas, semicolons, parentheses, function calls, comments, operators, blank lines, and line
   endings: the `standard:no-*` and `standard:space-*` spacing rules.
 - Structure checks for repeated semicolons: `standard:no-consecutive-semicolons`.
+- Convention checks for row counts, `NULL` comparisons, and join direction: `standard:prefer-count-star`,
+  `standard:use-is-null`, and `standard:no-right-join`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
@@ -938,6 +943,111 @@ Why unsafe:
 - Literal case is normally behavior-preserving, but without SQLDelight PSI the rule cannot prove every unquoted token is
   syntactically a literal.
 - Users must opt in before write tasks apply fixes.
+
+## `standard:prefer-count-star`
+
+Reports `COUNT(1)` and `COUNT(0)` when they are used as row-counting syntax.
+
+This rule is inspired by sqlfluff's row-count convention rule. The standard rule set defaults to `COUNT(*)` because it
+is the explicit SQL spelling for counting rows.
+
+Invalid:
+
+```sql
+selectPlayerCount:
+SELECT COUNT(1)
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayerCount:
+SELECT COUNT(*)
+FROM player;
+```
+
+Fix behavior:
+
+- Replaces the single `0` or `1` argument with `*`.
+- Leaves `COUNT(column)`, `COUNT(DISTINCT column)`, and other aggregate expressions alone.
+- Skips comments, string literals, and quoted identifiers.
+- Marks fixes as `Unsafe`.
+
+Why unsafe:
+
+- `COUNT(1)` and `COUNT(*)` are equivalent for common row-counting use, but projects may still choose a house style or
+  rely on dialect-specific explanation plans.
+- Users must opt in before write tasks apply fixes.
+
+## `standard:use-is-null`
+
+Reports equality comparisons where `NULL` appears on the right-hand side.
+
+SQL `NULL` semantics require `IS NULL` and `IS NOT NULL` for presence checks. This rule follows sqlfluff's convention
+rule while staying conservative around assignment contexts.
+
+Invalid:
+
+```sql
+selectMissingName:
+SELECT id, name
+FROM player
+WHERE name = NULL;
+```
+
+Valid:
+
+```sql
+selectMissingName:
+SELECT id, name
+FROM player
+WHERE name IS NULL;
+```
+
+Fix behavior:
+
+- Replaces `=` with `IS`.
+- Replaces `!=` and `<>` with `IS NOT`.
+- Skips `SET` clause assignments such as `SET deleted_at = NULL`.
+- Skips comments, string literals, and quoted identifiers.
+- Marks fixes as `Unsafe`.
+
+Why unsafe:
+
+- The replacement intentionally changes SQL behavior from equality comparison semantics to `NULL` predicate semantics.
+- The first implementation uses source text to avoid `SET` clause assignments, not SQLDelight expression facts.
+- Users must opt in before write tasks apply fixes.
+
+## `standard:no-right-join`
+
+Reports `RIGHT JOIN` and `RIGHT OUTER JOIN`.
+
+This rule is inspired by sqlfluff's left-join convention rule. It has no automatic fix because rewriting the join safely
+requires swapping relation order and preserving join predicates.
+
+Invalid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM player
+RIGHT JOIN team ON team.id = player.team_id;
+```
+
+Valid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM team
+LEFT JOIN player ON team.id = player.team_id;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
 
 ## `standard:keyword-case`
 

@@ -17,15 +17,18 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeDotRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeFunctionParenthesisRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeSemicolonRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoRightJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
+import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterBlockCommentStartRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterLineCommentMarkerRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAroundBinaryOperatorsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAroundComparisonOperatorsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceBeforeBlockCommentEndRule
+import dev.s7a.sqldelight.check.rules.standard.rules.UseIsNullRule
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 
@@ -57,14 +60,17 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoSpaceBeforeDotRule),
             RuleProvider(::NoSpaceBeforeFunctionParenthesisRule),
             RuleProvider(::NoSpaceBeforeSemicolonRule),
+            RuleProvider(::NoRightJoinRule),
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
+            RuleProvider(::PreferCountStarRule),
             RuleProvider(::SpaceAfterBlockCommentStartRule),
             RuleProvider(::SpaceAfterCommaRule),
             RuleProvider(::SpaceAfterLineCommentMarkerRule),
             RuleProvider(::SpaceAroundBinaryOperatorsRule),
             RuleProvider(::SpaceAroundComparisonOperatorsRule),
             RuleProvider(::SpaceBeforeBlockCommentEndRule),
+            RuleProvider(::UseIsNullRule),
         )
 }

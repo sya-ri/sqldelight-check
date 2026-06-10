@@ -115,6 +115,15 @@ internal fun String.sqlTokens(): Sequence<SqlToken> =
         }
     }
 
+internal fun String.identifierTokenAt(offset: Int): SqlToken? {
+    if (offset !in indices || !this[offset].isIdentifierStart()) return null
+    var end = offset + 1
+    while (end < length && this[end].isIdentifierPart()) {
+        end++
+    }
+    return SqlToken(text = substring(offset, end), startOffset = offset, endOffset = end)
+}
+
 internal fun String.sqlCharacters(): Sequence<SqlCharacter> =
     sequence {
         var index = 0
