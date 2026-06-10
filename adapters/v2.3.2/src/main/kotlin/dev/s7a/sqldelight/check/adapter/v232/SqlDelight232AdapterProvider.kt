@@ -6,6 +6,9 @@ import dev.s7a.sqldelight.check.adapter.spi.SqlDelightAdapter
 import dev.s7a.sqldelight.check.adapter.spi.SqlDelightAdapterProvider
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SourcePosition
+import dev.s7a.sqldelight.check.api.SourceRange
 import java.io.File
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
@@ -128,10 +131,9 @@ private object SqlDelight232Adapter : SqlDelightAdapter {
 
         return when {
             status.javaClass.name.endsWith("\$Failure") ->
-                // FIXME: Map SQLDelight error text back to SourceFile and SourceRange before finalizing v0.1.0 reports.
                 status.invokeNoArg("getErrors")
                     .asSequence()
-                    .map { error -> input.errorDiagnostic(error.toString()) }
+                    .map { error -> input.sqlDelightErrorDiagnostic(error.toString()) }
                     .toList()
             else -> emptyList()
         }
@@ -172,7 +174,92 @@ private object SqlDelight232Adapter : SqlDelightAdapter {
             range = null,
             database = database,
         )
+
+    private fun AnalysisInput.sqlDelightErrorDiagnostic(message: String): Diagnostic {
+        val parsed = SqlDelightErrorMessage.parse(message) ?: return errorDiagnostic(message)
+        val file = findSourceFile(parsed.path)
+        return Diagnostic(
+            ruleId = null,
+            severity = Severity.Error,
+            message = parsed.message,
+            file = file,
+            range = parsed.range,
+            database = database,
+        )
+    }
+
+    private fun AnalysisInput.findSourceFile(errorPath: String): SourceFile? {
+        val normalizedErrorPath = File(errorPath).normalizeForComparison()
+        return files.firstOrNull { file -> File(file.path).normalizeForComparison() == normalizedErrorPath }
+            ?: files.firstOrNull { file -> normalizedErrorPath.endsWith("/${file.path.normalizePathSeparators()}") }
+            ?: sourceFolders
+                .asSequence()
+                .mapNotNull { folder -> folder.relativePathFor(normalizedErrorPath) }
+                .mapNotNull { relativePath -> files.findByRelativePath(relativePath) }
+                .firstOrNull()
+            ?: dependencyFolders
+                .asSequence()
+                .mapNotNull { folder -> folder.relativePathFor(normalizedErrorPath) }
+                .mapNotNull { relativePath -> files.findByRelativePath(relativePath) }
+                .firstOrNull()
+    }
 }
+
+private data class SqlDelightErrorMessage(
+    val path: String,
+    val message: String,
+    val range: SourceRange,
+) {
+    companion object {
+        private val pattern = Regex("""^(.+):(\d+):(\d+)\s+([\s\S]*)$""")
+
+        fun parse(value: String): SqlDelightErrorMessage? {
+            val match = pattern.matchEntire(value.trimEnd()) ?: return null
+            val line = match.groupValues[2].toIntOrNull() ?: return null
+            val zeroBasedColumn = match.groupValues[3].toIntOrNull() ?: return null
+            val message = match.groupValues[4]
+            val column = zeroBasedColumn + 1
+            val caretWidth = message.caretWidth()
+            return SqlDelightErrorMessage(
+                path = match.groupValues[1],
+                message = message,
+                range =
+                    SourceRange(
+                        start = SourcePosition(line = line, column = column),
+                        end = SourcePosition(line = line, column = column + caretWidth.coerceAtLeast(1)),
+                    ),
+            )
+        }
+    }
+}
+
+private fun String.caretWidth(): Int =
+    lineSequence()
+        .mapNotNull { line -> caretRun.find(line)?.value?.length }
+        .firstOrNull()
+        ?: 1
+
+private val caretRun = Regex("""\^+""")
+
+private fun List<SourceFile>.findByRelativePath(relativePath: String): SourceFile? =
+    firstOrNull { file -> file.path.normalizePathSeparators() == relativePath }
+        ?: firstOrNull { file -> file.path.normalizePathSeparators().endsWith("/$relativePath") }
+
+private fun File.relativePathFor(normalizedPath: String): String? {
+    val folderPath = normalizeForComparison()
+    if (normalizedPath == folderPath) return ""
+    if (!normalizedPath.startsWith("$folderPath/")) return null
+    return normalizedPath.removePrefix("$folderPath/")
+}
+
+private fun File.normalizeForComparison(): String =
+    absoluteFile
+        .toPath()
+        .normalize()
+        .toString()
+        .normalizePathSeparators()
+
+private fun String.normalizePathSeparators(): String = replace(File.separatorChar, '/')
 
 private fun ClassLoader.loadDialect(): Any? {
     val dialectClass = Class.forName(DIALECT_CLASS, true, this)

@@ -230,7 +230,7 @@ The `v0.1.0` adapter targets SQLDelight `2.3.2`.
 ## Limitations
 
 - There is no standalone CLI.
-- SQLDelight diagnostic source ranges are still coarse when SQLDelight reports parser/compiler failures.
+- SQLDelight parser/compiler diagnostics use best-effort source ranges derived from SQLDelight error output.
 - `sqldelightLint` and `sqldelightFormat` currently share the same rule execution path.
 
 ## Development

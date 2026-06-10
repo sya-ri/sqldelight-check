@@ -50,10 +50,15 @@ class SqlDelight232AdapterProviderTest {
                         sourceFolders = listOf(sourceRoot.toFile()),
                         compilerClasspath = testRuntimeClasspath(),
                     ),
-                )
+        )
 
         assertEquals(1, result.files.size)
         assertTrue(result.diagnostics.isNotEmpty())
+        val diagnostic = result.diagnostics.single()
+        assertEquals("src/main/sqldelight/com/example/Broken.sq", diagnostic.file?.path)
+        assertEquals(1, diagnostic.range?.start?.line)
+        assertTrue((diagnostic.range?.start?.column ?: 0) >= 1)
+        assertTrue(diagnostic.message.isNotBlank(), diagnostic.message)
     }
 
     private fun testRuntimeClasspath(): List<File> =
