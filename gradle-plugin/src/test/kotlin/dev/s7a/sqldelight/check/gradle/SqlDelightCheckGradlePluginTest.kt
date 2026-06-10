@@ -214,6 +214,47 @@ class SqlDelightCheckGradlePluginTest {
         assertContains(report, """"errors":1""")
     }
 
+    @Test
+    fun `write task applies safe fixes and reports remaining diagnostics`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    kotlin("jvm") version "2.4.0"
+                    id("app.cash.sqldelight") version "2.3.2"
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                sqldelight {
+                    databases {
+                        create("Database") {
+                            packageName.set("com.example")
+                            srcDirs("src/main/sqldelight")
+                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            "CREATE TABLE player (  \n  id INTEGER NOT NULL PRIMARY KEY  \n);",
+        )
+
+        val result = project.run("sqldelightCheckWrite")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheckWrite")?.outcome)
+        assertEquals(
+            "CREATE TABLE player (\n  id INTEGER NOT NULL PRIMARY KEY\n);\n",
+            project.file("src/main/sqldelight/com/example/Player.sq").readText(),
+        )
+        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"diagnostics":0""")
+    }
+
     /**
      * Creates a temporary Gradle project for a TestKit run.
      */

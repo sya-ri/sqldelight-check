@@ -49,26 +49,32 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         tasks.register("sqldelightCheck", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Runs SQLDelight lint and format checks without modifying files."
+            task.applyFixes.convention(false)
         }
         tasks.register("sqldelightCheckWrite", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Applies SQLDelight formatter output and safe lint fixes."
+            task.applyFixes.convention(true)
         }
         tasks.register("sqldelightLint", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Runs SQLDelight lint checks without modifying files."
+            task.applyFixes.convention(false)
         }
         tasks.register("sqldelightLintWrite", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Applies safe SQLDelight lint fixes."
+            task.applyFixes.convention(true)
         }
         tasks.register("sqldelightFormat", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Checks SQLDelight formatting without modifying files."
+            task.applyFixes.convention(false)
         }
         tasks.register("sqldelightFormatWrite", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Applies SQLDelight formatting."
+            task.applyFixes.convention(true)
         }
     }
 }
