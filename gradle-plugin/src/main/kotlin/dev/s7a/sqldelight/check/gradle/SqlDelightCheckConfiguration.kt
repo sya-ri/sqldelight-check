@@ -1,0 +1,37 @@
+package dev.s7a.sqldelight.check.gradle
+
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.core.CheckConfig
+import dev.s7a.sqldelight.check.core.DatabaseConfig
+import dev.s7a.sqldelight.check.core.RuleConfig
+import dev.s7a.sqldelight.check.core.RuleSetConfig
+
+internal fun SqlDelightCheckExtension.toCheckConfig(): CheckConfig =
+    CheckConfig(
+        ruleSets = ruleSets.toRuleSetConfigs(),
+        rules = rules.toRuleConfigs(),
+        databases =
+            databases.associate { database ->
+                val config =
+                    DatabaseConfig(
+                        name = database.name,
+                        ruleSets = database.ruleSets.toRuleSetConfigs(),
+                        rules = database.rules.toRuleConfigs(),
+                    )
+                database.name to config
+            },
+        allowUnsafeWrites = write.unsafe.get(),
+    )
+
+private fun Iterable<RuleSetExtension>.toRuleSetConfigs(): Map<RuleSetId, RuleSetConfig> =
+    associate { ruleSet ->
+        val id = RuleSetId(ruleSet.name)
+        id to RuleSetConfig(id = id, enablement = ruleSet.enabled.get())
+    }
+
+private fun Iterable<RuleExtension>.toRuleConfigs(): Map<RuleId, RuleConfig> =
+    associate { rule ->
+        val id = RuleId(rule.name)
+        id to RuleConfig(id = id, enablement = rule.enabled.get(), severity = rule.severity.get())
+    }

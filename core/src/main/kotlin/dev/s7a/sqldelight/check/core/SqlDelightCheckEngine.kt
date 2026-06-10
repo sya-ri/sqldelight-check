@@ -43,54 +43,83 @@ public data class ResolvedRuleSetConfig(
 public class SqlDelightCheckEngine {
     /**
      * Runs analysis for all resolved SQLDelight databases.
-     *
-     * FIXME: Wire this to rule discovery, formatter execution, write validation, and reporter metadata.
      */
     public fun run(
         inputs: List<AnalysisInput> = emptyList(),
         adapter: SqlDelightAdapter? = null,
         ruleSetProviders: List<RuleSetProvider> = emptyList(),
+        config: CheckConfig = CheckConfig(),
     ): List<Diagnostic> =
         inputs.flatMap { input ->
             val analysisResult =
                 adapter
                     ?.analyze(input)
                     ?: AnalysisResult(files = input.files, diagnostics = emptyList())
-            analysisResult.diagnostics + runRules(input.database, analysisResult.files, ruleSetProviders)
+            analysisResult.diagnostics + runRules(input.database, analysisResult.files, ruleSetProviders, config)
         }
 
     private fun runRules(
         database: DatabaseContext,
         files: List<SourceFile>,
         ruleSetProviders: List<RuleSetProvider>,
+        config: CheckConfig,
     ): List<Diagnostic> {
-        // FIXME: Apply resolved user configuration and severity overrides before v0.1.0 release.
-        val rules = ruleSetProviders.flatMap { provider -> provider.ruleProviders().map { ruleProvider -> ruleProvider.create() } }
-        return files.flatMap { file -> runRulesForFile(database, file, rules) }
+        val resolver = ConfigurationResolver(config)
+        val rules =
+            ruleSetProviders.flatMap { provider ->
+                provider.ruleProviders().map { ruleProvider ->
+                    RuleCandidate(provider.id, ruleProvider.create())
+                }
+            }
+        return files.flatMap { file -> runRulesForFile(database, file, rules, resolver) }
     }
 
     private fun runRulesForFile(
         database: DatabaseContext,
         file: SourceFile,
-        rules: List<Rule>,
+        rules: List<RuleCandidate>,
+        resolver: ConfigurationResolver,
     ): List<Diagnostic> {
         val context =
             object : RuleContext {
                 override val database: DatabaseContext = database
                 override val file: SourceFile = file
             }
-        return rules.flatMap { rule ->
-            if (!rule.shouldRun(context)) return@flatMap emptyList()
+        return rules.flatMap { candidate ->
+            val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
+            val ruleConfig =
+                resolver.resolveRule(
+                    ruleId = candidate.rule.id,
+                    databaseName = database.name,
+                    defaultEnablement = candidate.rule.defaultEnablement,
+                    defaultSeverity = candidate.rule.defaultSeverity,
+                )
+            val enablement = EnablementResolver.resolveRuleEnablement(ruleSetConfig.enablement, ruleConfig.enablement)
+            if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
+
             val diagnostics = mutableListOf<Diagnostic>()
-            rule.run(context, DiagnosticReporter { diagnostic -> diagnostics += diagnostic })
+            candidate.rule.run(
+                context,
+                DiagnosticReporter { diagnostic ->
+                    diagnostics += diagnostic.copy(severity = ruleConfig.severity)
+                },
+            )
             diagnostics
         }
     }
 
-    private fun Rule.shouldRun(context: RuleContext): Boolean =
-        when (defaultEnablement) {
+    private fun Rule.shouldRun(
+        context: RuleContext,
+        enablement: Enablement,
+    ): Boolean =
+        when (enablement) {
             Enablement.Enabled -> true
             Enablement.Disabled -> false
             Enablement.Auto -> isApplicable(context)
         }
 }
+
+private data class RuleCandidate(
+    val ruleSetId: RuleSetId,
+    val rule: Rule,
+)

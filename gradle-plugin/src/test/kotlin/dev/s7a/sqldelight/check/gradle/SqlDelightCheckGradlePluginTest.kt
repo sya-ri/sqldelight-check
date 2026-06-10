@@ -156,6 +156,64 @@ class SqlDelightCheckGradlePluginTest {
         assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"errors":1""")
     }
 
+    @Test
+    fun `check task applies rule overrides from the extension`() {
+        val project =
+            testProject(
+                """
+                import dev.s7a.sqldelight.check.api.Enablement
+                import dev.s7a.sqldelight.check.api.Severity
+
+                plugins {
+                    kotlin("jvm") version "2.4.0"
+                    id("app.cash.sqldelight") version "2.3.2"
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                sqldelight {
+                    databases {
+                        create("Database") {
+                            packageName.set("com.example")
+                            srcDirs("src/main/sqldelight")
+                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                        }
+                    }
+                }
+
+                sqldelightCheck {
+                    ruleSets {
+                        maybeCreate("standard").enabled.set(Enablement.Disabled)
+                    }
+                    rules {
+                        maybeCreate("standard:final-newline").apply {
+                            enabled.set(Enablement.Enabled)
+                            severity.set(Severity.Error)
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent(),
+        )
+
+        val result = project.runAndFail("sqldelightCheck")
+
+        assertContains(result.output, "sqldelight-check found 1 error diagnostic(s).")
+        val report = project.file("build/reports/sqldelight-check/report.json").readText()
+        assertContains(report, """"ruleId":"standard:final-newline"""")
+        assertContains(report, """"errors":1""")
+    }
+
     /**
      * Creates a temporary Gradle project for a TestKit run.
      */

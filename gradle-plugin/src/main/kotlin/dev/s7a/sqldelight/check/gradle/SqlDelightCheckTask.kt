@@ -31,6 +31,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                     inputs = listOf(input.analysisInput),
                     adapter = provider.create(),
                     ruleSetProviders = project.sqldelightCheckRuleRegistry().providers(),
+                    config = extension.toCheckConfig(),
                 )
             }
         val report = Report(diagnostics)
