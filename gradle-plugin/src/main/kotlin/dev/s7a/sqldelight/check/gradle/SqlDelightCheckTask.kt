@@ -24,7 +24,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public abstract val applyFixes: Property<Boolean>
 
     /**
-     * Runs SQLDelight project detection, adapter analysis, and report writing.
+     * Runs SQLDelight project detection, core analysis, and report writing.
      */
     @TaskAction
     public fun run() {

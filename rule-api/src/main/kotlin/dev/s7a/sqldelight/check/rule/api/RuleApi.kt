@@ -11,7 +11,7 @@ import dev.s7a.sqldelight.check.api.SourceFile
 /**
  * Stable analysis view exposed to custom rules.
  *
- * This type intentionally does not expose SQLDelight compiler internals. Adapter implementations translate
+ * This type intentionally does not expose SQLDelight compiler internals. Core analysis translates
  * SQLDelight-version-specific structures into sqldelight-check-owned models before rules run.
  */
 public interface RuleContext {
@@ -75,4 +75,3 @@ public interface RuleSetProvider {
     /** Providers for rules in this set. */
     public fun ruleProviders(): Set<RuleProvider>
 }
-

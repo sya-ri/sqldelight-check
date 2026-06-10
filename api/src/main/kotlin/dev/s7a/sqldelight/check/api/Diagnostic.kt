@@ -1,7 +1,7 @@
 package dev.s7a.sqldelight.check.api
 
 /**
- * Diagnostic emitted by a rule, adapter, formatter, or configuration validation.
+ * Diagnostic emitted by a rule, core analyzer, formatter, or configuration validation.
  */
 public data class Diagnostic(
     /** Rule ID responsible for the diagnostic when available. */

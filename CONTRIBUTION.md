@@ -43,6 +43,6 @@ reflection class-name strings, and `ServiceLoader` provider names are intentiona
 
 - Gradle plugin metadata.
 - Generated reports.
-- SQLDelight `2.3.2` adapter behavior.
+- SQLDelight `2.3.2` core analyzer behavior.
 - Built-in rule and reporter discovery.
 - External provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.
