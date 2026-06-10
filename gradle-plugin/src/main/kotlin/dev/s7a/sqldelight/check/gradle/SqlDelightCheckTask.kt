@@ -2,8 +2,8 @@ package dev.s7a.sqldelight.check.gradle
 
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
-import org.gradle.api.GradleException
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -11,14 +11,26 @@ import org.gradle.api.tasks.TaskAction
  */
 public abstract class SqlDelightCheckTask : DefaultTask() {
     /**
-     * Runs the placeholder task implementation.
-     *
-     * FIXME: Connect tasks to SQLDelight project detection and write handling.
+     * Runs SQLDelight project detection, adapter analysis, and report writing.
      */
     @TaskAction
     public fun run() {
         val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
-        val diagnostics = SqlDelightCheckEngine().run()
+        val inputs = SqlDelightProjectResolver(project).resolve()
+        val diagnostics =
+            inputs.flatMap { input ->
+                val provider =
+                    project
+                        .sqldelightCheckAdapterRegistry()
+                        .find(input.sqlDelightVersion)
+                        ?: throw GradleException(
+                            "No sqldelight-check adapter found for SQLDelight ${input.sqlDelightVersion}.",
+                        )
+                SqlDelightCheckEngine().run(
+                    inputs = listOf(input.analysisInput),
+                    adapter = provider.create(),
+                )
+            }
         val report = Report(diagnostics)
         val registry = project.sqldelightCheckReporterRegistry()
 
@@ -35,5 +47,6 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 }
                 logger.lifecycle("Wrote sqldelight-check {} report to {}", reporter.name, outputFile)
             }
+        logger.lifecycle("sqldelight-check analyzed {} SQLDelight database(s).", inputs.size)
     }
 }

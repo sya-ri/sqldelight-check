@@ -7,6 +7,6 @@ dependencies {
     api(project(":api"))
     implementation(project(":rule-api"))
     api(project(":reporter-api"))
-    implementation(project(":adapter-spi"))
+    api(project(":adapter-spi"))
     testImplementation(kotlin("test"))
 }

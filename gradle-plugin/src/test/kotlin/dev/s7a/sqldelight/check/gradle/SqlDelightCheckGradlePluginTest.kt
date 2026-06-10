@@ -78,6 +78,49 @@ class SqlDelightCheckGradlePluginTest {
         assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), "diagnostics")
     }
 
+    @Test
+    fun `check task resolves sqldelight database inputs`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    kotlin("jvm") version "2.4.0"
+                    id("app.cash.sqldelight") version "2.3.2"
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                sqldelight {
+                    databases {
+                        create("Database") {
+                            packageName.set("com.example")
+                            srcDirs("src/main/sqldelight")
+                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY,
+              name TEXT NOT NULL
+            );
+            """.trimIndent(),
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
+        assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
+    }
+
     /**
      * Creates a temporary Gradle project for a TestKit run.
      */
@@ -98,6 +141,18 @@ class SqlDelightCheckGradlePluginTest {
          * Returns a file inside this temporary project.
          */
         fun file(path: String): Path = directory.resolve(path)
+
+        /**
+         * Writes [content] to a file inside this temporary project.
+         */
+        fun write(
+            path: String,
+            content: String,
+        ) {
+            val file = file(path)
+            Files.createDirectories(file.parent)
+            file.writeText(content)
+        }
 
         /**
          * Runs Gradle with the plugin-under-test classpath.

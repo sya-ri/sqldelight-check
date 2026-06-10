@@ -1,5 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
+import dev.s7a.sqldelight.check.adapter.spi.AnalysisInput
+import dev.s7a.sqldelight.check.adapter.spi.SqlDelightAdapter
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
@@ -33,10 +35,15 @@ public data class ResolvedRuleSetConfig(
  */
 public class SqlDelightCheckEngine {
     /**
-     * Runs the engine.
+     * Runs analysis for all resolved SQLDelight databases.
      *
-     * FIXME: Wire this to adapters, rule discovery, formatter execution, write validation, and reporters.
+     * FIXME: Wire this to rule discovery, formatter execution, write validation, and reporter metadata.
      */
-    public fun run(): List<Diagnostic> = emptyList()
+    public fun run(
+        inputs: List<AnalysisInput> = emptyList(),
+        adapter: SqlDelightAdapter? = null,
+    ): List<Diagnostic> {
+        if (adapter == null) return emptyList()
+        return inputs.flatMap { input -> adapter.analyze(input).diagnostics }
+    }
 }
-
