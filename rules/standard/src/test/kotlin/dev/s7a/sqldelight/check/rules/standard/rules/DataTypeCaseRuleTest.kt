@@ -40,6 +40,40 @@ class DataTypeCaseRuleTest {
     }
 
     @Test
+    fun `ignores sqldelight column adapter kotlin types`() {
+        DataTypeCaseRule().assertDiagnosticCount(
+            """
+            import com.example.PlayerId;
+
+            CREATE TABLE player (
+              id INTEGER AS PlayerId NOT NULL PRIMARY KEY,
+              local_score INTEGER AS Int NOT NULL,
+              remote_score INTEGER AS kotlin.Int NOT NULL,
+              is_active INTEGER AS kotlin.Boolean NOT NULL
+            );
+
+            selectById:
+            SELECT id, local_score, remote_score, is_active
+            FROM player
+            WHERE id = ?;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
+    fun `ignores data type words used as aliases`() {
+        DataTypeCaseRule().assertDiagnosticCount(
+            """
+            selectScore:
+            SELECT score AS int
+            FROM player;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
     fun `ignores comments strings and quoted identifiers`() {
         DataTypeCaseRule().assertDiagnosticCount(
             """

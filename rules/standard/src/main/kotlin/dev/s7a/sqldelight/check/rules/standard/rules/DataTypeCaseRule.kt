@@ -24,11 +24,13 @@ public class DataTypeCaseRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content
-            .sqlTokens()
-            .filter { token -> token.text.lowercase() in dataTypes }
-            .filterNot { token -> token.text == token.text.uppercase() }
-            .forEach { token ->
+        val tokens = content.sqlTokens().toList()
+        tokens
+            .withIndex()
+            .filter { (_, token) -> token.text.lowercase() in dataTypes }
+            .filterNot { (index, token) -> token.isSqlDelightColumnAdapterType(tokens, index, content) }
+            .filterNot { (_, token) -> token.text == token.text.uppercase() }
+            .forEach { (_, token) ->
                 val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
                 reporter.report(
                     Diagnostic(
@@ -52,6 +54,29 @@ public class DataTypeCaseRule : Rule {
     }
 
     private companion object {
+        fun SqlToken.isSqlDelightColumnAdapterType(
+            tokens: List<SqlToken>,
+            index: Int,
+            content: String,
+        ): Boolean =
+            tokens.getOrNull(index - 1)?.isKeyword("as") == true ||
+                content.isQualifiedIdentifierSegment(this)
+
+        fun String.isQualifiedIdentifierSegment(token: SqlToken): Boolean =
+            previousNonWhitespaceOffset(token.startOffset, '.') != null ||
+                nextNonWhitespaceOffset(token.endOffset, '.') != null
+
+        fun String.nextNonWhitespaceOffset(
+            offset: Int,
+            expected: Char,
+        ): Int? {
+            var index = offset
+            while (index < length && this[index].isWhitespace()) {
+                index++
+            }
+            return if (getOrNull(index) == expected) index else null
+        }
+
         val dataTypes =
             setOf(
                 "bigint",
