@@ -85,7 +85,9 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
         assertEquals(true, project.file("build/reports/sqldelight-check/report.sarif").exists())
         assertEquals(true, project.file("build/reports/sqldelight-check/report.text").exists())
-        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), "diagnostics")
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
+        assertEquals(EMPTY_SARIF_REPORT, project.file("build/reports/sqldelight-check/report.sarif").readText())
+        assertEquals("sqldelight-check diagnostics: 0\n", project.file("build/reports/sqldelight-check/report.text").readText())
     }
 
     @Test
@@ -101,14 +103,14 @@ class SqlDelightCheckGradlePluginTest {
               id INTEGER NOT NULL PRIMARY KEY,
               name TEXT NOT NULL
             );
-            """.trimIndent(),
+            """.trimIndent() + "\n",
         )
 
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
-        assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
@@ -122,7 +124,7 @@ class SqlDelightCheckGradlePluginTest {
                   id INTEGER NOT NULL PRIMARY KEY,
                   name TEXT NOT NULL
                 );
-                """.trimIndent(),
+                """.trimIndent() + "\n",
             )
 
             val result =
@@ -161,7 +163,7 @@ class SqlDelightCheckGradlePluginTest {
                   id INTEGER NOT NULL PRIMARY KEY,
                   name TEXT NOT NULL
                 );
-                """.trimIndent(),
+                """.trimIndent() + "\n",
             )
 
             val result =
@@ -265,8 +267,7 @@ class SqlDelightCheckGradlePluginTest {
 
         assertContains(result.output, "sqldelight-check found 1 error diagnostic(s).")
         val report = project.file("build/reports/sqldelight-check/report.json").readText()
-        assertContains(report, """"ruleId":"standard:final-newline"""")
-        assertContains(report, """"errors":1""")
+        assertEquals(finalNewlineErrorJsonReport(), report)
     }
 
     @Test
@@ -307,7 +308,7 @@ class SqlDelightCheckGradlePluginTest {
             "CREATE TABLE player (\n  id INTEGER NOT NULL PRIMARY KEY\n);\n",
             project.file("src/main/sqldelight/com/example/Player.sq").readText(),
         )
-        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"diagnostics":0""")
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
@@ -331,10 +332,7 @@ class SqlDelightCheckGradlePluginTest {
 
         assertEquals(SUCCESS, result.task(":sqldelightCheckWrite")?.outcome)
         assertEquals(content, project.file(path).readText())
-        assertContains(
-            project.file("build/reports/sqldelight-check/report.json").readText(),
-            """"ruleId":"standard:space-around-comparison-operators"""",
-        )
+        assertEquals(unsafeComparisonSpacingJsonReport(), project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
@@ -383,7 +381,7 @@ class SqlDelightCheckGradlePluginTest {
             """.trimIndent() + "\n",
             project.file(path).readText(),
         )
-        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"diagnostics":0""")
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
@@ -481,10 +479,23 @@ class SqlDelightCheckGradlePluginTest {
 
     private companion object {
         private const val SQLDELIGHT_SNAPSHOT_REPOSITORY_URL = "https://central.sonatype.com/repository/maven-snapshots/"
+        private const val EMPTY_JSON_REPORT =
+            """{"formatVersion":"0.1.0","summary":{"diagnostics":0,"errors":0,"warnings":0,"infos":0},"diagnostics":[]}"""
+        private const val EMPTY_SARIF_REPORT =
+            """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.0","rules":[]}},"results":[]}]}"""
 
         val stableSqlDelight2Versions = listOf("2.0.0", "2.0.2", "2.1.0", "2.2.1", "2.3.1", "2.3.2")
         val snapshotSqlDelight2Versions = listOf("2.4.0-SNAPSHOT")
         val verifySnapshots = System.getProperty("sqldelightCheck.verifySnapshots").toBoolean()
+
+        fun finalNewlineErrorJsonReport(): String =
+            """{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}"""
+
+        fun unsafeComparisonSpacingJsonReport(): String =
+            """{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
+
+        fun sqliteDatabaseJson(version: String = "2.3.2"): String =
+            """{"name":"Database","dialect":{"family":"SQLite","displayName":"sqlite 3 38","artifact":"app.cash.sqldelight:sqlite-3-38-dialect","version":"$version","implementationClass":null,"capabilities":["sqlite"]}}"""
     }
 
     /**
