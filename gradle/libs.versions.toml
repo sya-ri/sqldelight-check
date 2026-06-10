@@ -4,6 +4,8 @@ gradlePluginPublish = "2.1.1"
 kotlin = "2.4.0"
 kover = "0.9.8"
 kotlinter = "5.5.0"
+sqldelight = "2.3.2"
+sqlPsi = "0.7.3"
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
@@ -11,3 +13,9 @@ gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradl
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+
+[libraries]
+sqldelight-compiler-env = { module = "app.cash.sqldelight:compiler-env", version.ref = "sqldelight" }
+sqldelight-gradle-plugin = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
+sqldelight-sqlite338-dialect = { module = "app.cash.sqldelight:sqlite-3-38-dialect", version.ref = "sqldelight" }
+sql-psi-environment = { module = "app.cash.sql-psi:environment", version.ref = "sqlPsi" }

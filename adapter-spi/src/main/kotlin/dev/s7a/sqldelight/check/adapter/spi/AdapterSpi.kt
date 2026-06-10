@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.adapter.spi
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.SourceFile
+import java.io.File
 
 /**
  * Input required by a SQLDelight-version adapter to analyze one database.
@@ -12,6 +13,16 @@ public data class AnalysisInput(
     public val database: DatabaseContext,
     /** Source files that belong to the database. */
     public val files: List<SourceFile>,
+    /** SQLDelight package name configured for the database. */
+    public val packageName: String? = null,
+    /** Source folders that SQLDelight should parse for this database. */
+    public val sourceFolders: List<File> = emptyList(),
+    /** Dependency source folders from other SQLDelight databases. */
+    public val dependencyFolders: List<File> = emptyList(),
+    /** SQLDelight compiler/runtime classpath used by the original SQLDelight Gradle task. */
+    public val compilerClasspath: List<File> = emptyList(),
+    /** Runtime classpath used for loading the configured SQLDelight dialect. */
+    public val dialectClasspath: List<File> = emptyList(),
 )
 
 /**
@@ -49,4 +60,3 @@ public interface SqlDelightAdapterProvider {
      */
     public fun create(): SqlDelightAdapter
 }
-

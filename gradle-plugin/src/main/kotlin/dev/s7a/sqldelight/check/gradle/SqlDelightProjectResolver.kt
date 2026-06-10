@@ -11,6 +11,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.file.FileCollection
 
 private const val SQLDELIGHT_TASK_CLASS_NAME = "app.cash.sqldelight.gradle.SqlDelightTask"
 private const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
@@ -50,11 +51,17 @@ internal class SqlDelightProjectResolver(
         val properties = task.invokeNoArg("getProperties").invokeNoArg("get")
         val compilationUnit = task.invokeNoArg("getCompilationUnit").invokeNoArg("get")
         val databaseName = properties.invokeNoArg("getClassName") as String
+        val packageName = properties.invokeNoArg("getPackageName") as String
         val dialectConfiguration = project.configurations.findByName("${databaseName}DialectClasspath")
         val intellijConfiguration = project.configurations.findByName("${databaseName}IntellijEnv")
         val dialect = resolveDialect(dialectConfiguration)
         val version = resolveSqlDelightVersion(intellijConfiguration, dialect).orElse(DEFAULT_SQLDELIGHT_VERSION)
-        val sourceFiles = resolveSourceFiles(compilationUnit)
+        val sourceFolders = resolveSourceFolders(compilationUnit)
+        val localSourceFolders = sourceFolders.filterNot { folder -> folder.dependency }
+        val dependencySourceFolders = sourceFolders.filter { folder -> folder.dependency }
+        val sourceFiles = resolveSourceFiles(localSourceFolders)
+        val dialectClasspath = dialectConfiguration?.files?.toList().orEmpty()
+        val compilerClasspath = task.sqlDelightCompilerClasspath() + dialectClasspath
 
         return ResolvedSqlDelightInput(
             sqlDelightVersion = version,
@@ -62,6 +69,11 @@ internal class SqlDelightProjectResolver(
                 AnalysisInput(
                     database = DatabaseContext(name = databaseName, dialect = dialect),
                     files = sourceFiles,
+                    packageName = packageName,
+                    sourceFolders = localSourceFolders.map { folder -> folder.file },
+                    dependencyFolders = dependencySourceFolders.map { folder -> folder.file },
+                    compilerClasspath = compilerClasspath.distinctBy { file -> file.absolutePath },
+                    dialectClasspath = dialectClasspath,
                 ),
         )
     }
@@ -78,14 +90,23 @@ internal class SqlDelightProjectResolver(
         )
     }
 
-    private fun resolveSourceFiles(compilationUnit: Any): List<SourceFile> {
+    private fun resolveSourceFolders(compilationUnit: Any): List<ResolvedSourceFolder> {
         val sourceFolders = compilationUnit.invokeNoArg("getSourceFolders") as Iterable<*>
         return sourceFolders
-            .mapNotNull { sourceFolder -> sourceFolder?.invokeNoArg("getFolder") as? File }
+            .mapNotNull { sourceFolder ->
+                sourceFolder ?: return@mapNotNull null
+                val file = sourceFolder.invokeNoArg("getFolder") as? File ?: return@mapNotNull null
+                val dependency = sourceFolder.invokeNoArg("getDependency") as Boolean
+                ResolvedSourceFolder(file = file, dependency = dependency)
+            }
+    }
+
+    private fun resolveSourceFiles(sourceFolders: List<ResolvedSourceFolder>): List<SourceFile> =
+        sourceFolders
+            .map { sourceFolder -> sourceFolder.file }
             .flatMap { folder -> sqlDelightFiles(folder) }
             .distinctBy { file -> file.path }
             .sortedBy { file -> file.path }
-    }
 
     private fun sqlDelightFiles(folder: File): List<SourceFile> {
         if (!folder.exists()) return emptyList()
@@ -192,6 +213,11 @@ internal class SqlDelightProjectResolver(
     }
 }
 
+private data class ResolvedSourceFolder(
+    val file: File,
+    val dependency: Boolean,
+)
+
 private fun Any.hasSuperclass(className: String): Boolean {
     var current: Class<*>? = javaClass
     while (current != null) {
@@ -204,6 +230,20 @@ private fun Any.hasSuperclass(className: String): Boolean {
 private fun Any.invokeNoArg(name: String): Any {
     val method = javaClass.methods.first { method -> method.name == name && method.parameterCount == 0 }
     return method.invoke(this)
+}
+
+private fun Any.sqlDelightCompilerClasspath(): List<File> {
+    val taskClasspath =
+        (invokeNoArg("getClasspath") as? FileCollection)
+            ?.files
+            ?.toList()
+            .orEmpty()
+    val implementationClasspath =
+        generateSequence(javaClass as Class<*>?) { type -> type.superclass }
+            .filter { type -> type.name.startsWith("app.cash.sqldelight.") }
+            .mapNotNull { type -> type.protectionDomain.codeSource?.location?.toURI()?.let(::File) }
+            .toList()
+    return taskClasspath + implementationClasspath
 }
 
 private fun Configuration.directModuleDependencies(): List<ModuleDependency> =
