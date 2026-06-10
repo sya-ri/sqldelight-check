@@ -84,6 +84,7 @@ The standard rule set uses two safety levels:
 | Rule ID | Default | Fix | Safety | Purpose |
 | --- | --- | --- | --- | --- |
 | `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
+| `standard:consistent-order-by-direction` | Warning / Auto | No | None | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
 | `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
 | `standard:explicit-union-operator` | Warning / Auto | No | None | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
 | `standard:final-newline` | Warning / Auto | Yes | Safe | Require files to end with one LF newline. |
@@ -102,6 +103,8 @@ The standard rule set uses two safety levels:
 | `standard:no-space-before-function-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace between common SQL function names and `(`. |
 | `standard:no-space-before-semicolon` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `;`. |
 | `standard:no-right-join` | Warning / Auto | No | None | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
+| `standard:no-select-distinct-with-group-by` | Warning / Auto | No | None | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
+| `standard:no-select-trailing-comma` | Warning / Auto | Yes | Unsafe | Disallow trailing commas at the end of `SELECT` clauses. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
@@ -132,6 +135,8 @@ Useful sqlfluff concepts reflected here:
   `standard:use-is-null`, and `standard:no-right-join`.
 - Convention and ambiguity checks for operator and set-operation clarity: `standard:consistent-not-equal-operator`,
   `standard:prefer-coalesce`, and `standard:explicit-union-operator`.
+- Ambiguity checks for `SELECT` and `ORDER BY`: `standard:no-select-distinct-with-group-by`,
+  `standard:consistent-order-by-direction`, and `standard:no-select-trailing-comma`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
@@ -1124,6 +1129,118 @@ Fix behavior:
 
 - No automatic fix is provided because the rule cannot know whether the intended set operation is `ALL` or `DISTINCT`.
 - Skips comments, string literals, and quoted identifiers.
+
+## `standard:no-select-distinct-with-group-by`
+
+Reports statements that use both `SELECT DISTINCT` and `GROUP BY`.
+
+This rule is inspired by sqlfluff's ambiguous distinct rule. `GROUP BY` already creates grouped output, so combining it
+with `DISTINCT` is usually redundant or unclear.
+
+Invalid:
+
+```sql
+selectDistinctNames:
+SELECT DISTINCT name
+FROM player
+GROUP BY name;
+```
+
+Valid:
+
+```sql
+selectDistinctNames:
+SELECT DISTINCT name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectGroupedNames:
+SELECT name
+FROM player
+GROUP BY name;
+```
+
+Fix behavior:
+
+- No automatic fix is provided because the rule cannot know whether `DISTINCT` or `GROUP BY` should be removed.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:consistent-order-by-direction`
+
+Reports `ORDER BY` clauses that mix explicit and implicit sort directions.
+
+This rule is inspired by sqlfluff's ambiguous ordering rule. If one item specifies `ASC` or `DESC`, all items should do
+so; otherwise all items can rely on the default direction.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id, name, score
+FROM player
+ORDER BY name, score DESC;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name, score
+FROM player
+ORDER BY name ASC, score DESC;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name, score
+FROM player
+ORDER BY name, score;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:no-select-trailing-comma`
+
+Reports trailing commas at the end of a `SELECT` clause.
+
+This rule is inspired by sqlfluff's select trailing comma convention rule. Some dialects accept trailing select-list
+commas, but sqldelight-check's standard style forbids them by default.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id, name,
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name
+FROM player;
+```
+
+Fix behavior:
+
+- Removes the trailing comma before `FROM`.
+- Skips comments, string literals, and quoted identifiers.
+- Marks fixes as `Unsafe`.
+
+Why unsafe:
+
+- Dialects differ on whether trailing select-list commas are accepted.
+- The first implementation uses source text rather than SQLDelight select-clause facts.
+- Users must opt in before write tasks apply fixes.
 
 ## `standard:no-right-join`
 

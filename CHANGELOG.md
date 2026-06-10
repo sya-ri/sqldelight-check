@@ -15,6 +15,7 @@ This version establishes the first Gradle plugin and API surface for checking SQ
 - Added stable API modules for diagnostics, rule sets, reporters, and SQLDelight adapters.
 - Added standard rules:
   - `standard:consistent-not-equal-operator`
+  - `standard:consistent-order-by-direction`
   - `standard:data-type-case`
   - `standard:explicit-union-operator`
   - `standard:final-newline`
@@ -33,6 +34,8 @@ This version establishes the first Gradle plugin and API surface for checking SQ
   - `standard:no-space-before-function-parenthesis`
   - `standard:no-space-before-semicolon`
   - `standard:no-right-join`
+  - `standard:no-select-distinct-with-group-by`
+  - `standard:no-select-trailing-comma`
   - `standard:no-tab-indentation`
   - `standard:no-trailing-blank-lines`
   - `standard:no-trailing-whitespace`

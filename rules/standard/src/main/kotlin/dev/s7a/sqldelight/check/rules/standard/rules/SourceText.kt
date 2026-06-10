@@ -144,6 +144,12 @@ internal fun String.sqlCharacters(): Sequence<SqlCharacter> =
         }
     }
 
+internal fun String.statementEndAfter(offset: Int): Int =
+    sqlCharacters()
+        .firstOrNull { character -> character.offset >= offset && character.value == ';' }
+        ?.offset
+        ?: length
+
 internal fun String.lineComments(): Sequence<LineComment> =
     sequence {
         var index = 0

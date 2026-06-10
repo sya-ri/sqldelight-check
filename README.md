@@ -121,6 +121,8 @@ The initial standard rule set contains:
 
 - `standard:consistent-not-equal-operator`: reports files that mix `!=` and `<>`. Unsafe fix: replace later operators
   with the first style seen in the file.
+- `standard:consistent-order-by-direction`: reports `ORDER BY` clauses mixing explicit and implicit sort directions. No
+  automatic fix.
 - `standard:final-newline`: reports files that do not end with a newline. Safe fix: insert the final newline.
 - `standard:function-name-case`: reports common SQL function names that are not uppercase. Unsafe fix: uppercase the
   function token.
@@ -143,6 +145,10 @@ The initial standard rule set contains:
   fix: remove it.
 - `standard:no-space-before-semicolon`: reports inline whitespace before `;`. Safe fix: remove it.
 - `standard:no-right-join`: reports `RIGHT JOIN` and `RIGHT OUTER JOIN`. No automatic fix.
+- `standard:no-select-distinct-with-group-by`: reports `SELECT DISTINCT` statements that also contain `GROUP BY`. No
+  automatic fix.
+- `standard:no-select-trailing-comma`: reports trailing commas at the end of `SELECT` clauses. Unsafe fix: remove the
+  comma.
 - `standard:no-tab-indentation`: reports tabs in leading indentation. Safe fix: replace indentation tabs with spaces.
 - `standard:no-trailing-blank-lines`: reports blank lines after the last content line. Safe fix: remove them.
 - `standard:no-trailing-whitespace`: reports spaces or tabs at the end of a line. Safe fix: remove trailing whitespace.

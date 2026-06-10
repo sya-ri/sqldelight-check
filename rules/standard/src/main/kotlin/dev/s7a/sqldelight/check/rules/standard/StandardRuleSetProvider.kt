@@ -2,6 +2,7 @@ package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorRule
+import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentOrderByDirectionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.DataTypeCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitUnionOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FinalNewlineRule
@@ -20,6 +21,8 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeDotRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeFunctionParenthesisRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeSemicolonRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoRightJoinRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectDistinctWithGroupByRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectTrailingCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
@@ -48,6 +51,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
             RuleProvider(::ConsistentNotEqualOperatorRule),
+            RuleProvider(::ConsistentOrderByDirectionRule),
             RuleProvider(::DataTypeCaseRule),
             RuleProvider(::ExplicitUnionOperatorRule),
             RuleProvider(::FinalNewlineRule),
@@ -66,6 +70,8 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoSpaceBeforeFunctionParenthesisRule),
             RuleProvider(::NoSpaceBeforeSemicolonRule),
             RuleProvider(::NoRightJoinRule),
+            RuleProvider(::NoSelectDistinctWithGroupByRule),
+            RuleProvider(::NoSelectTrailingCommaRule),
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),

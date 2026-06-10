@@ -19,6 +19,7 @@ class StandardRuleSetProviderTest {
         assertEquals(
             setOf(
                 RuleId("standard:consistent-not-equal-operator"),
+                RuleId("standard:consistent-order-by-direction"),
                 RuleId("standard:data-type-case"),
                 RuleId("standard:explicit-union-operator"),
                 RuleId("standard:final-newline"),
@@ -37,6 +38,8 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:no-space-before-function-parenthesis"),
                 RuleId("standard:no-space-before-semicolon"),
                 RuleId("standard:no-right-join"),
+                RuleId("standard:no-select-distinct-with-group-by"),
+                RuleId("standard:no-select-trailing-comma"),
                 RuleId("standard:no-tab-indentation"),
                 RuleId("standard:no-trailing-blank-lines"),
                 RuleId("standard:no-trailing-whitespace"),
