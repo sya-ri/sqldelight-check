@@ -23,14 +23,14 @@ public class NoSelectDistinctWithGroupByRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.text.equals("select", ignoreCase = true)) return@forEachIndexed
+            if (!token.isKeyword("select")) return@forEachIndexed
             val distinct = tokens
                 .getOrNull(index + 1)
-                ?.takeIf { it.text.equals("distinct", ignoreCase = true) }
+                ?.takeIf { it.isKeyword("distinct") }
                 ?: return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
             val statementTokens = tokens.drop(index + 2).takeWhile { candidate -> candidate.startOffset < statementEnd }
-            if (!statementTokens.containsGroupBy()) return@forEachIndexed
+            if (!statementTokens.containsKeywordPair("group", "by")) return@forEachIndexed
 
             reporter.report(
                 Diagnostic(
@@ -45,11 +45,3 @@ public class NoSelectDistinctWithGroupByRule : Rule {
         }
     }
 }
-
-// FIXME: Replace this source-text statement scan with SQLDelight-derived select statement facts.
-private fun List<SqlToken>.containsGroupBy(): Boolean =
-    asSequence()
-        .zipWithNext()
-        .any { (first, second) ->
-            first.text.equals("group", ignoreCase = true) && second.text.equals("by", ignoreCase = true)
-        }

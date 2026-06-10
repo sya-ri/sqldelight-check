@@ -15,7 +15,9 @@ internal data class SqlToken(
     val text: String,
     val startOffset: Int,
     val endOffset: Int,
-)
+) {
+    val normalizedText: String = text.lowercase()
+}
 
 internal data class SqlCharacter(
     val value: Char,
@@ -149,6 +151,57 @@ internal fun String.statementEndAfter(offset: Int): Int =
         .firstOrNull { character -> character.offset >= offset && character.value == ';' }
         ?.offset
         ?: length
+
+internal fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
+
+internal fun List<SqlToken>.containsKeywordPair(
+    first: String,
+    second: String,
+): Boolean =
+    asSequence()
+        .zipWithNext()
+        .any { (left, right) -> left.isKeyword(first) && right.isKeyword(second) }
+
+internal fun List<SqlToken>.firstKeywordAfter(
+    startIndex: Int,
+    statementEnd: Int,
+    keyword: String,
+): SqlToken? =
+    asSequence()
+        .drop(startIndex)
+        .firstOrNull { token -> token.startOffset < statementEnd && token.isKeyword(keyword) }
+
+internal fun List<SqlToken>.firstBoundaryOffsetAfter(
+    startIndex: Int,
+    statementEnd: Int,
+    boundaryKeywords: Set<String>,
+): Int =
+    asSequence()
+        .drop(startIndex)
+        .firstOrNull { token -> token.startOffset < statementEnd && token.normalizedText in boundaryKeywords }
+        ?.startOffset
+        ?: statementEnd
+
+internal fun List<SqlToken>.lastKeywordBefore(
+    offset: Int,
+    keywords: Set<String>,
+): String? =
+    asSequence()
+        .takeWhile { token -> token.startOffset < offset }
+        .map { token -> token.normalizedText }
+        .filter { token -> token in keywords }
+        .lastOrNull()
+
+internal fun String.previousNonWhitespaceOffset(
+    offset: Int,
+    expected: Char,
+): Int? {
+    var index = offset - 1
+    while (index >= 0 && this[index].isWhitespace()) {
+        index--
+    }
+    return if (getOrNull(index) == expected) index else null
+}
 
 internal fun String.lineComments(): Sequence<LineComment> =
     sequence {

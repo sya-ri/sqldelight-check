@@ -23,10 +23,10 @@ public class ConsistentOrderByDirectionRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.text.equals("order", ignoreCase = true)) return@forEachIndexed
-            val by = tokens.getOrNull(index + 1)?.takeIf { it.text.equals("by", ignoreCase = true) }
+            if (!token.isKeyword("order")) return@forEachIndexed
+            val by = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("by") }
                 ?: return@forEachIndexed
-            val clauseEnd = tokens.orderByClauseEnd(index + 2, content.statementEndAfter(token.startOffset))
+            val clauseEnd = tokens.firstBoundaryOffsetAfter(index + 2, content.statementEndAfter(token.startOffset), orderByBoundaryKeywords)
             val itemDirections = content.orderByItemDirections(by.endOffset, clauseEnd)
             if (itemDirections.size < 2 || itemDirections.all { it } || itemDirections.none { it }) {
                 return@forEachIndexed
@@ -45,17 +45,6 @@ public class ConsistentOrderByDirectionRule : Rule {
         }
     }
 }
-
-// FIXME: Replace this source-text clause slicing with SQLDelight-derived ORDER BY expression facts.
-private fun List<SqlToken>.orderByClauseEnd(
-    startIndex: Int,
-    statementEnd: Int,
-): Int =
-    asSequence()
-        .drop(startIndex)
-        .firstOrNull { token -> token.startOffset < statementEnd && token.text.lowercase() in orderByBoundaryKeywords }
-        ?.startOffset
-        ?: statementEnd
 
 private fun String.orderByItemDirections(
     startOffset: Int,
@@ -78,7 +67,7 @@ private fun String.orderByItemDirections(
     return ranges
         .map { (start, end) -> tokens.filter { token -> token.startOffset >= start && token.endOffset <= end } }
         .filter { itemTokens -> itemTokens.isNotEmpty() }
-        .map { itemTokens -> itemTokens.any { token -> token.text.lowercase() in setOf("asc", "desc") } }
+        .map { itemTokens -> itemTokens.any { token -> token.normalizedText in setOf("asc", "desc") } }
 }
 
 private val orderByBoundaryKeywords =

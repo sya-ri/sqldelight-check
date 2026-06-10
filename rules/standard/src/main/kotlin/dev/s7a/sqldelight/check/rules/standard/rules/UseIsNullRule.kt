@@ -32,7 +32,7 @@ public class UseIsNullRule : Rule {
             .forEach { operator ->
                 val operatorText = content.substring(operator.startOffset, operator.endOffset)
                 if (operatorText !in setOf("=", "!=", "<>")) return@forEach
-                if (tokens.lastClauseKeywordBefore(operator.startOffset) == "set") return@forEach
+                if (tokens.lastKeywordBefore(operator.startOffset, nullComparisonClauseKeywords) == "set") return@forEach
 
                 val rightStart = content.horizontalWhitespaceEndAfter(operator.endOffset)
                 val rightToken = content.identifierTokenAt(rightStart) ?: return@forEach
@@ -70,16 +70,8 @@ public class UseIsNullRule : Rule {
             operatorText == "=" -> "is"
             isUppercase -> "IS NOT"
             else -> "is not"
-        }
+    }
 }
-
-// FIXME: Replace this text-based clause detection with SQLDelight-derived expression facts once rule-api exposes them.
-private fun List<SqlToken>.lastClauseKeywordBefore(offset: Int): String? =
-    asSequence()
-        .takeWhile { token -> token.startOffset < offset }
-        .map { token -> token.text.lowercase() }
-        .filter { token -> token in nullComparisonClauseKeywords }
-        .lastOrNull()
 
 private val nullComparisonClauseKeywords =
     setOf(

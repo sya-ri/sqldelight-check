@@ -26,9 +26,9 @@ public class NoSelectTrailingCommaRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.text.equals("select", ignoreCase = true)) return@forEachIndexed
+            if (!token.isKeyword("select")) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val from = tokens.firstFromAfter(index + 1, statementEnd) ?: return@forEachIndexed
+            val from = tokens.firstKeywordAfter(index + 1, statementEnd, "from") ?: return@forEachIndexed
             val commaOffset = content.previousNonWhitespaceOffset(from.startOffset, ',') ?: return@forEachIndexed
 
             val range = content.rangeAtOffsets(commaOffset, commaOffset + 1)
@@ -52,24 +52,4 @@ public class NoSelectTrailingCommaRule : Rule {
             )
         }
     }
-}
-
-// FIXME: Replace this source-text SELECT/FROM slicing with SQLDelight-derived select-clause facts.
-private fun List<SqlToken>.firstFromAfter(
-    startIndex: Int,
-    statementEnd: Int,
-): SqlToken? =
-    asSequence()
-        .drop(startIndex)
-        .firstOrNull { token -> token.startOffset < statementEnd && token.text.equals("from", ignoreCase = true) }
-
-private fun String.previousNonWhitespaceOffset(
-    offset: Int,
-    expected: Char,
-): Int? {
-    var index = offset - 1
-    while (index >= 0 && this[index].isWhitespace()) {
-        index--
-    }
-    return if (getOrNull(index) == expected) index else null
 }
