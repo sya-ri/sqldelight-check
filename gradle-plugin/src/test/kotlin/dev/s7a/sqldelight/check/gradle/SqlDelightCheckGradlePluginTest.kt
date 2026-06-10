@@ -10,8 +10,8 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.UnexpectedBuildFailure
@@ -109,7 +109,7 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
+        assertContentEquals(listOf("sqldelight-check analyzed 1 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
@@ -166,7 +166,7 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertContains(result.output, "sqldelight-check analyzed 2 SQLDelight database(s).")
+        assertContentEquals(listOf("sqldelight-check analyzed 2 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
@@ -192,7 +192,7 @@ class SqlDelightCheckGradlePluginTest {
                 }
 
             assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome, "SQLDelight $version should be supported.")
-            assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
+            assertContentEquals(listOf("sqldelight-check analyzed 1 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
         }
     }
 
@@ -231,7 +231,7 @@ class SqlDelightCheckGradlePluginTest {
                 }
 
             assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome, "SQLDelight $version should be supported.")
-            assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
+            assertContentEquals(listOf("sqldelight-check analyzed 1 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
         }
     }
 
@@ -265,9 +265,13 @@ class SqlDelightCheckGradlePluginTest {
 
         val result = project.runAndFail("sqldelightCheck")
 
-        assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
-        assertContains(result.output, "sqldelight-check found 1 error diagnostic(s).")
-        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"errors":1""")
+        assertContentEquals(
+            listOf(
+                "sqldelight-check analyzed 1 SQLDelight database(s).",
+            ),
+            result.sqldelightCheckOutputLines(),
+        )
+        assertEquals(sqlDelightCompilerErrorJsonReport(), project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
@@ -322,7 +326,12 @@ class SqlDelightCheckGradlePluginTest {
 
         val result = project.runAndFail("sqldelightCheck")
 
-        assertContains(result.output, "sqldelight-check found 1 error diagnostic(s).")
+        assertContentEquals(
+            listOf(
+                "sqldelight-check analyzed 1 SQLDelight database(s).",
+            ),
+            result.sqldelightCheckOutputLines(),
+        )
         val report = project.file("build/reports/sqldelight-check/report.json").readText()
         assertEquals(finalNewlineErrorJsonReport(), report)
     }
@@ -551,6 +560,9 @@ class SqlDelightCheckGradlePluginTest {
         fun unsafeComparisonSpacingJsonReport(): String =
             """{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
 
+        fun sqlDelightCompilerErrorJsonReport(): String =
+            """{"formatVersion":"0.1.0","summary":{"diagnostics":2,"errors":1,"warnings":1,"infos":0},"diagnostics":[{"ruleId":null,"severity":"error","message":"<stmt identifier clojure real> expected, got 'CREATE'\n1    CREATE\n     ^^^^^^","file":"src/main/sqldelight/com/example/Broken.sq","range":{"start":{"line":1,"column":1},"end":{"line":1,"column":7}},"database":${sqliteDatabaseJson()},"fixes":[]},{"ruleId":"standard:final-newline","severity":"warning","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Broken.sq","range":{"start":{"line":1,"column":20},"end":{"line":1,"column":20}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":1,"column":20},"end":{"line":1,"column":20}},"replacement":"\n"}]}]}]}"""
+
         fun sqliteDatabaseJson(version: String = "2.3.2"): String =
             """{"name":"Database","dialect":{"family":"SQLite","displayName":"sqlite 3 38","artifact":"app.cash.sqldelight:sqlite-3-38-dialect","version":"$version","implementationClass":null,"capabilities":["sqlite"]}}"""
     }
@@ -695,3 +707,8 @@ class SqlDelightCheckGradlePluginTest {
                 .buildAndFail()
     }
 }
+
+private fun BuildResult.sqldelightCheckOutputLines(): List<String> =
+    output
+        .lines()
+        .filter { line -> line.startsWith("sqldelight-check ") }
