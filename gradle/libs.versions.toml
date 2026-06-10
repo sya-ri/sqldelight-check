@@ -1,0 +1,13 @@
+[versions]
+dokka = "2.2.0"
+gradlePluginPublish = "2.1.1"
+kotlin = "2.4.0"
+kover = "0.9.8"
+kotlinter = "5.5.0"
+
+[plugins]
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradlePluginPublish" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
