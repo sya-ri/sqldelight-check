@@ -114,6 +114,63 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `check task resolves multiple sqldelight databases`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    kotlin("jvm") version "2.4.0"
+                    id("app.cash.sqldelight") version "2.3.2"
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                sqldelight {
+                    databases {
+                        create("PrimaryDatabase") {
+                            packageName.set("com.example.primary")
+                            srcDirs("src/main/primarysqldelight")
+                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                        }
+                        create("ReportingDatabase") {
+                            packageName.set("com.example.reporting")
+                            srcDirs("src/main/reportingsqldelight")
+                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+        project.write(
+            "src/main/primarysqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY,
+              name TEXT NOT NULL
+            );
+            """.trimIndent() + "\n",
+        )
+        project.write(
+            "src/main/reportingsqldelight/com/example/Report.sq",
+            """
+            CREATE TABLE report (
+              id INTEGER NOT NULL PRIMARY KEY,
+              title TEXT NOT NULL
+            );
+            """.trimIndent() + "\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertContains(result.output, "sqldelight-check analyzed 2 SQLDelight database(s).")
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
+    }
+
+    @Test
     fun `check task supports published stable sqldelight 2 versions`() {
         stableSqlDelight2Versions.forEach { version ->
             val project = testProject(sqlDelightBuildScript(sqlDelightVersion = version))
