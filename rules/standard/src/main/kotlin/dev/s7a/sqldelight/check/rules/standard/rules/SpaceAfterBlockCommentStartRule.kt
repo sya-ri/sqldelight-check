@@ -1,0 +1,54 @@
+package dev.s7a.sqldelight.check.rules.standard.rules
+
+import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.Enablement
+import dev.s7a.sqldelight.check.api.Fix
+import dev.s7a.sqldelight.check.api.FixSafety
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.TextEdit
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+
+/**
+ * Reports block comments whose opening marker is not followed by a space.
+ */
+public class SpaceAfterBlockCommentStartRule : Rule {
+    override val id: RuleId = RuleId("standard:space-after-block-comment-start")
+    override val defaultSeverity: Severity = Severity.Warning
+    override val defaultEnablement: Enablement = Enablement.Auto
+
+    override fun run(
+        context: RuleContext,
+        reporter: DiagnosticReporter,
+    ) {
+        val content = context.file.content
+        content.blockComments().forEach { comment ->
+            val markerEnd = comment.startOffset + 2
+            if (markerEnd >= comment.endOffset) return@forEach
+            val next = content[markerEnd]
+            if (next == ' ' || next == '\r' || next == '\n' || next == '*' || next == '+') return@forEach
+
+            val range = content.rangeAtOffsets(markerEnd, markerEnd)
+            reporter.report(
+                Diagnostic(
+                    ruleId = id,
+                    severity = defaultSeverity,
+                    message = "Block comment start marker should be followed by one space.",
+                    file = context.file,
+                    range = range,
+                    database = context.database,
+                    fixes =
+                        listOf(
+                            Fix(
+                                title = "Insert space after block comment start",
+                                safety = FixSafety.Safe,
+                                edits = listOf(TextEdit(range = range, replacement = " ")),
+                            ),
+                        ),
+                ),
+            )
+        }
+    }
+}

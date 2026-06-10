@@ -12,10 +12,10 @@ import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 /**
- * Reports common SQL function names that are not uppercase.
+ * Reports spaces or tabs between common SQL function names and their opening parenthesis.
  */
-public class FunctionNameCaseRule : Rule {
-    override val id: RuleId = RuleId("standard:function-name-case")
+public class NoSpaceBeforeFunctionParenthesisRule : Rule {
+    override val id: RuleId = RuleId("standard:no-space-before-function-parenthesis")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
 
@@ -27,29 +27,29 @@ public class FunctionNameCaseRule : Rule {
         content
             .sqlTokens()
             .filter { token -> token.text.lowercase() in commonSqlFunctions }
-            .filter { token -> content.nextNonHorizontalWhitespace(token.endOffset) == '(' }
-            .filterNot { token -> token.text == token.text.uppercase() }
             .forEach { token ->
-                val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
+                val parenthesisOffset = content.nextNonHorizontalWhitespaceOffset(token.endOffset) ?: return@forEach
+                if (content[parenthesisOffset] != '(' || parenthesisOffset == token.endOffset) return@forEach
+
+                val range = content.rangeAtOffsets(token.endOffset, parenthesisOffset)
                 reporter.report(
                     Diagnostic(
                         ruleId = id,
                         severity = defaultSeverity,
-                        message = "SQL function '${token.text}' should be uppercase.",
+                        message = "Function name should not be separated from opening parenthesis.",
                         file = context.file,
                         range = range,
                         database = context.database,
                         fixes =
                             listOf(
                                 Fix(
-                                    title = "Uppercase function name",
-                                    safety = FixSafety.Unsafe,
-                                    edits = listOf(TextEdit(range = range, replacement = token.text.uppercase())),
+                                    title = "Remove whitespace before function parenthesis",
+                                    safety = FixSafety.Safe,
+                                    edits = listOf(TextEdit(range = range, replacement = "")),
                                 ),
                             ),
                     ),
                 )
             }
     }
-
 }

@@ -27,6 +27,11 @@ internal data class LineComment(
     val endOffset: Int,
 )
 
+internal data class BlockComment(
+    val startOffset: Int,
+    val endOffset: Int,
+)
+
 internal fun String.rangeAtOffsets(
     startOffset: Int,
     endOffset: Int,
@@ -151,12 +156,38 @@ internal fun String.lineComments(): Sequence<LineComment> =
         }
     }
 
+internal fun String.blockComments(): Sequence<BlockComment> =
+    sequence {
+        var index = 0
+        while (index < length) {
+            index =
+                when {
+                    startsWith("--", index) -> skipLineComment(index)
+                    startsWith("/*", index) -> {
+                        val end = skipBlockComment(index)
+                        yield(BlockComment(startOffset = index, endOffset = end))
+                        end
+                    }
+                    this@blockComments[index] == '\'' -> skipQuoted(index, '\'')
+                    this@blockComments[index] == '"' -> skipQuoted(index, '"')
+                    this@blockComments[index] == '`' -> skipQuoted(index, '`')
+                    this@blockComments[index] == '[' -> skipBracketQuoted(index)
+                    else -> index + 1
+                }
+        }
+    }
+
 internal fun String.nextNonHorizontalWhitespace(offset: Int): Char? {
+    val index = nextNonHorizontalWhitespaceOffset(offset) ?: return null
+    return this[index]
+}
+
+internal fun String.nextNonHorizontalWhitespaceOffset(offset: Int): Int? {
     var index = offset
     while (index < length && (this[index] == ' ' || this[index] == '\t')) {
         index++
     }
-    return getOrNull(index)
+    return if (index < length) index else null
 }
 
 private fun String.skipLineComment(start: Int): Int {

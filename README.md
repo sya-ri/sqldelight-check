@@ -136,15 +136,23 @@ The initial standard rule set contains:
 - `standard:no-space-before-closing-parenthesis`: reports inline whitespace before `)`. Safe fix: remove it.
 - `standard:no-space-before-comma`: reports inline whitespace before `,`. Safe fix: remove it.
 - `standard:no-space-before-dot`: reports inline whitespace before `.`. Safe fix: remove it.
+- `standard:no-space-before-function-parenthesis`: reports whitespace between common SQL function names and `(`. Safe
+  fix: remove it.
 - `standard:no-space-before-semicolon`: reports inline whitespace before `;`. Safe fix: remove it.
 - `standard:no-tab-indentation`: reports tabs in leading indentation. Safe fix: replace indentation tabs with spaces.
 - `standard:no-trailing-blank-lines`: reports blank lines after the last content line. Safe fix: remove them.
 - `standard:no-trailing-whitespace`: reports spaces or tabs at the end of a line. Safe fix: remove trailing whitespace.
+- `standard:space-after-block-comment-start`: reports block comments where the opening marker is not followed by a
+  space. Safe fix: insert the space.
 - `standard:space-after-comma`: reports missing or repeated inline spaces after `,`. Safe fix: use one space.
 - `standard:space-after-line-comment-marker`: reports line comments where `--` is not followed by a space. Safe fix:
   insert the space.
+- `standard:space-around-binary-operators`: reports binary arithmetic and concatenation operators without one space on
+  both sides. Unsafe fix: normalize inline spacing around the operator.
 - `standard:space-around-comparison-operators`: reports comparison operators without one space on both sides. Unsafe fix:
   normalize inline spacing around the operator.
+- `standard:space-before-block-comment-end`: reports block comments where the closing marker is not preceded by a space.
+  Safe fix: insert the space.
 
 Rules run after SQLDelight accepts the project input. SQLDelight parser and dialect behavior are not reimplemented by
 sqldelight-check.

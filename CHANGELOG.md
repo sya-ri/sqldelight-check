@@ -28,13 +28,17 @@ This version establishes the first Gradle plugin and API surface for checking SQ
   - `standard:no-space-before-closing-parenthesis`
   - `standard:no-space-before-comma`
   - `standard:no-space-before-dot`
+  - `standard:no-space-before-function-parenthesis`
   - `standard:no-space-before-semicolon`
   - `standard:no-tab-indentation`
   - `standard:no-trailing-blank-lines`
   - `standard:no-trailing-whitespace`
+  - `standard:space-after-block-comment-start`
   - `standard:space-after-comma`
   - `standard:space-after-line-comment-marker`
+  - `standard:space-around-binary-operators`
   - `standard:space-around-comparison-operators`
+  - `standard:space-before-block-comment-end`
 - Added safe fix application for write tasks.
 - Added JSON, SARIF, text, HTML, and Markdown reporters.
 - Added external provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.

@@ -97,13 +97,17 @@ The standard rule set uses two safety levels:
 | `standard:no-space-before-closing-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `)`. |
 | `standard:no-space-before-comma` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `,`. |
 | `standard:no-space-before-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `.`. |
+| `standard:no-space-before-function-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace between common SQL function names and `(`. |
 | `standard:no-space-before-semicolon` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `;`. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
 | `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
 | `standard:space-after-line-comment-marker` | Warning / Auto | Yes | Safe | Require one space after `--` when comment text follows. |
+| `standard:space-around-binary-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around binary arithmetic and concatenation operators. |
 | `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
+| `standard:space-before-block-comment-end` | Warning / Auto | Yes | Safe | Require one space before a block comment closing marker. |
 
 ## SQLFluff References
 
@@ -115,8 +119,8 @@ Useful sqlfluff concepts reflected here:
 
 - Capitalisation checks: `standard:keyword-case`, `standard:function-name-case`, `standard:data-type-case`, and
   `standard:literal-case`.
-- Layout checks around dots, commas, semicolons, parentheses, comments, blank lines, and line endings: the
-  `standard:no-*` and `standard:space-*` spacing rules.
+- Layout checks around dots, commas, semicolons, parentheses, function calls, comments, operators, blank lines, and line
+  endings: the `standard:no-*` and `standard:space-*` spacing rules.
 - Structure checks for repeated semicolons: `standard:no-consecutive-semicolons`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
@@ -576,6 +580,94 @@ Fix behavior:
 - Skips comments, string literals, and quoted identifiers.
 - Safe to apply in write tasks.
 
+## `standard:no-space-before-function-parenthesis`
+
+Reports spaces and tabs between a recognized SQL function name and the following `(`.
+
+Function calls are easier to distinguish from grouping expressions when the function token is tight to its argument
+list. The rule uses the same common function-name catalog as `standard:function-name-case`.
+
+Invalid:
+
+```sql
+selectPlayerStats:
+SELECT COUNT (*), COALESCE (MAX(score), 0)
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayerStats:
+SELECT COUNT(*), COALESCE(MAX(score), 0)
+FROM player;
+```
+
+Ignored:
+
+```sql
+selectWrapped:
+SELECT *
+FROM (SELECT id FROM player) AS nested_player;
+```
+
+Fix behavior:
+
+- Removes inline spaces and tabs between a recognized function token and `(`.
+- Skips grouping parentheses that are not preceded by a recognized function name.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:space-around-binary-operators`
+
+Reports binary arithmetic and concatenation operators that do not have exactly one inline space on both sides.
+
+Covered operators:
+
+```text
++, -, *, /, %, ||
+```
+
+Invalid:
+
+```sql
+updateScore:
+UPDATE player
+SET score=score+1
+WHERE id = ?;
+```
+
+Valid:
+
+```sql
+updateScore:
+UPDATE player
+SET score=score + 1
+WHERE id = ?;
+```
+
+Ignored:
+
+```sql
+selectConstants:
+SELECT +2, -4, COUNT(*)
+FROM player;
+```
+
+Fix behavior:
+
+- Replaces surrounding inline spaces or tabs with one space on each side.
+- Skips operators split across lines.
+- Skips common unary plus/minus cases and `*` in `SELECT *` or `COUNT(*)`.
+- Skips comments, string literals, and quoted identifiers.
+- Marks fixes as `Unsafe`.
+
+Why unsafe:
+
+- Dialects and extensions can define operator behavior that is difficult to infer from source text alone.
+- Unary and binary operator roles can be context-sensitive.
+- The current rule uses source text rather than SQLDelight PSI, so users must opt in before write tasks apply fixes.
+
 ## `standard:space-around-comparison-operators`
 
 Reports comparison operators that do not have exactly one inline space on both sides.
@@ -653,6 +745,74 @@ Fix behavior:
 
 - Inserts one space after `--` when another character follows on the same line.
 - Skips `--` sequences inside string literals and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:space-after-block-comment-start`
+
+Reports block comments when comment text follows the opening marker immediately without a space.
+
+SQLDelight migrations often use inline notes next to schema changes. Requiring `/* comment */` keeps those comments
+readable while leaving empty block comments and hint-like `/*+ ... */` comments alone.
+
+Invalid:
+
+```sql
+/*Player table.*/
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Valid:
+
+```sql
+/* Player table. */
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Ignored:
+
+```sql
+/**/
+/*+ dialect-specific hint-like comment */
+```
+
+Fix behavior:
+
+- Inserts one space after the opening marker when comment text follows immediately.
+- Skips empty block comments and `/*+` comments.
+- Skips block comment markers inside string literals and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:space-before-block-comment-end`
+
+Reports block comments when comment text touches the closing marker without a preceding space.
+
+Invalid:
+
+```sql
+/* Player table.*/
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Valid:
+
+```sql
+/* Player table. */
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Fix behavior:
+
+- Inserts one space before the closing marker when comment text touches it.
+- Skips empty block comments.
+- Skips block comment markers inside string literals and quoted identifiers.
 - Safe to apply in write tasks.
 
 ## `standard:function-name-case`
