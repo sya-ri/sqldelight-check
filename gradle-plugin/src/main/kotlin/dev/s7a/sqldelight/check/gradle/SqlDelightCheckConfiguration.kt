@@ -7,6 +7,9 @@ import dev.s7a.sqldelight.check.core.DatabaseConfig
 import dev.s7a.sqldelight.check.core.RuleConfig
 import dev.s7a.sqldelight.check.core.RuleSetConfig
 
+/**
+ * Converts the Gradle extension model into the immutable core configuration used during task execution.
+ */
 internal fun SqlDelightCheckExtension.toCheckConfig(): CheckConfig =
     CheckConfig(
         ruleSets = ruleSets.toRuleSetConfigs(),

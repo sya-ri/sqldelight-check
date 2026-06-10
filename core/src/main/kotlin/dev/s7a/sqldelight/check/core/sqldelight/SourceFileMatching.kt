@@ -4,6 +4,9 @@ import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.api.SourceFile
 import java.io.File
 
+/**
+ * Finds the sqldelight-check source file that corresponds to a SQLDelight compiler error path.
+ */
 internal fun AnalysisInput.findSourceFile(errorPath: String): SourceFile? {
     val normalizedErrorPath = File(errorPath).normalizeForComparison()
     return files.firstOrNull { file -> File(file.path).normalizeForComparison() == normalizedErrorPath }
