@@ -57,8 +57,8 @@ internal class SqlDelightProjectResolver(
     }
 
     private fun resolveTask(task: Any): ResolvedSqlDelightInput? {
-        val properties = task.invokeNoArg("getProperties").invokeNoArg("get")
-        val compilationUnit = task.invokeNoArg("getCompilationUnit").invokeNoArg("get")
+        val properties = task.invokeNoArg("getProperties").unwrapGradleProvider()
+        val compilationUnit = task.compilationUnit(properties)
         val databaseName = properties.invokeNoArg("getClassName") as String
         val packageName = properties.invokeNoArg("getPackageName") as String
         val dialectConfiguration = project.configurations.findByName("${databaseName}DialectClasspath")
@@ -129,6 +129,16 @@ internal class SqlDelightProjectResolver(
             )
         }
     }
+
+    private fun Any.compilationUnit(properties: Any): Any =
+        invokeNoArgOrNull("getCompilationUnit")
+            ?.unwrapGradleProvider()
+            ?: properties
+                .invokeNoArg("getCompilationUnits")
+                .unwrapGradleProvider()
+                .asIterable()
+                .firstOrNull()
+            ?: error("SQLDelight database properties ${properties.javaClass.name} do not expose a compilation unit.")
 
     private fun resolveSqlDelightVersion(
         configuration: Configuration?,
@@ -290,9 +300,41 @@ private fun Any.hasSuperclass(className: String): Boolean {
 }
 
 private fun Any.invokeNoArg(name: String): Any {
-    val method = javaClass.methods.first { method -> method.name == name && method.parameterCount == 0 }
+    val method =
+        noArgMethod(name)
+            ?: error(
+                "SQLDelight model ${javaClass.name} does not expose $name(). " +
+                    "Available no-arg methods: ${javaClass.noArgMethodNames().joinToString()}",
+            )
     return method.invoke(this)
 }
+
+private fun Any.invokeNoArgOrNull(name: String): Any? = noArgMethod(name)?.invoke(this)
+
+private fun Any.noArgMethod(name: String) = javaClass.methods.firstOrNull { method ->
+    method.name == name && method.parameterCount == 0
+}
+
+private fun Any.unwrapGradleProvider(): Any =
+    invokeNoArgOrNull("get") ?: this
+
+private fun Any.asIterable(): Iterable<*> =
+    when (this) {
+        is Iterable<*> -> this
+        is Array<*> -> asIterable()
+        else ->
+            error(
+                "SQLDelight model ${javaClass.name} is not iterable. " +
+                    "Available no-arg methods: ${javaClass.noArgMethodNames().joinToString()}",
+            )
+    }
+
+private fun Class<*>.noArgMethodNames(): List<String> =
+    methods
+        .filter { method -> method.parameterCount == 0 }
+        .map { method -> method.name }
+        .distinct()
+        .sorted()
 
 private fun Any.sqlDelightCompilerClasspath(): List<File> {
     val taskClasspath =

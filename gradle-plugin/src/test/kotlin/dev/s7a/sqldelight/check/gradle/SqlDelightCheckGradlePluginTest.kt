@@ -1,7 +1,5 @@
 package dev.s7a.sqldelight.check.gradle
 
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.jar.JarEntry
@@ -13,6 +11,9 @@ import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 
 /**
  * Functional tests for applying the sqldelight-check Gradle plugin.
@@ -85,27 +86,7 @@ class SqlDelightCheckGradlePluginTest {
     fun `check task resolves sqldelight database inputs`() {
         val project =
             testProject(
-                """
-                plugins {
-                    kotlin("jvm") version "2.4.0"
-                    id("app.cash.sqldelight") version "2.3.2"
-                    id("dev.s7a.sqldelight.check")
-                }
-
-                repositories {
-                    mavenCentral()
-                }
-
-                sqldelight {
-                    databases {
-                        create("Database") {
-                            packageName.set("com.example")
-                            srcDirs("src/main/sqldelight")
-                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
-                        }
-                    }
-                }
-                """.trimIndent(),
+                sqlDelightBuildScript(),
             )
         project.write(
             "src/main/sqldelight/com/example/Player.sq",
@@ -122,6 +103,32 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
         assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
+    }
+
+    @Test
+    fun `check task supports published stable sqldelight 2 versions`() {
+        stableSqlDelight2Versions.forEach { version ->
+            val project = testProject(sqlDelightBuildScript(sqlDelightVersion = version))
+            project.write(
+                "src/main/sqldelight/com/example/Player.sq",
+                """
+                CREATE TABLE player (
+                  id INTEGER NOT NULL PRIMARY KEY,
+                  name TEXT NOT NULL
+                );
+                """.trimIndent(),
+            )
+
+            val result =
+                try {
+                    project.run("sqldelightCheck")
+                } catch (failure: UnexpectedBuildFailure) {
+                    throw AssertionError("SQLDelight $version should be supported.", failure)
+                }
+
+            assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome, "SQLDelight $version should be supported.")
+            assertContains(result.output, "sqldelight-check analyzed 1 SQLDelight database(s).")
+        }
     }
 
     @Test
@@ -290,7 +297,8 @@ class SqlDelightCheckGradlePluginTest {
         val project =
             testProject(
                 sqlDelightBuildScript(
-                    """
+                    extraConfiguration =
+                        """
                     sqldelightCheck {
                         write {
                             unsafe.set(true)
@@ -368,11 +376,14 @@ class SqlDelightCheckGradlePluginTest {
     /**
      * Returns a build script with SQLDelight configured for the functional test project.
      */
-    private fun sqlDelightBuildScript(extraConfiguration: String = ""): String =
+    private fun sqlDelightBuildScript(
+        sqlDelightVersion: String = "2.3.2",
+        extraConfiguration: String = "",
+    ): String =
         """
         plugins {
             kotlin("jvm") version "2.4.0"
-            id("app.cash.sqldelight") version "2.3.2"
+            id("app.cash.sqldelight") version "$sqlDelightVersion"
             id("dev.s7a.sqldelight.check")
         }
 
@@ -385,7 +396,7 @@ class SqlDelightCheckGradlePluginTest {
                 create("Database") {
                     packageName.set("com.example")
                     srcDirs("src/main/sqldelight")
-                    dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                    dialect("app.cash.sqldelight:sqlite-3-38-dialect:$sqlDelightVersion")
                 }
             }
         }
@@ -401,6 +412,10 @@ class SqlDelightCheckGradlePluginTest {
         directory.resolve("settings.gradle.kts").writeText("""rootProject.name = "sqldelight-check-test"""")
         directory.resolve("build.gradle.kts").writeText(buildScript)
         return TestProject(directory)
+    }
+
+    private companion object {
+        val stableSqlDelight2Versions = listOf("2.0.0", "2.0.2", "2.1.0", "2.2.1", "2.3.1", "2.3.2")
     }
 
     /**
