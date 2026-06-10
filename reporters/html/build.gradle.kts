@@ -6,5 +6,6 @@ plugins {
 dependencies {
     implementation(project(":api"))
     implementation(project(":reporter-api"))
+    implementation(libs.kotlinx.html.jvm)
     testImplementation(kotlin("test"))
 }

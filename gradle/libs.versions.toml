@@ -4,6 +4,8 @@ gradlePluginPublish = "2.1.1"
 kotlin = "2.4.0"
 kover = "0.9.8"
 kotlinter = "5.5.0"
+kotlinxHtml = "0.12.0"
+kotlinxSerialization = "1.11.0"
 mavenPublish = "0.36.0"
 sqldelight = "2.3.2"
 sqlPsi = "0.7.3"
@@ -13,6 +15,7 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradlePluginPublish" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
@@ -22,3 +25,5 @@ sqldelight-compiler-env = { module = "app.cash.sqldelight:compiler-env", version
 sqldelight-gradle-plugin = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 sqldelight-sqlite338-dialect = { module = "app.cash.sqldelight:sqlite-3-38-dialect", version.ref = "sqldelight" }
 sql-psi-environment = { module = "app.cash.sql-psi:environment", version.ref = "sqlPsi" }
+kotlinx-html-jvm = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinxHtml" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }

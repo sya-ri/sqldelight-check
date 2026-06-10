@@ -1,15 +1,20 @@
 package dev.s7a.sqldelight.check.reporter.json
 
+import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
+import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
 import java.io.OutputStream
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * Provider for the built-in JSON reporter.
@@ -17,185 +22,153 @@ import java.io.OutputStream
 public class JsonReporterProvider : ReporterProvider {
     override val id: String = "json"
 
-    override fun create(options: Map<String, String>): Reporter = JsonReporter
+    override fun create(options: Map<String, String>): Reporter =
+        JsonReporter(
+            json =
+                Json {
+                    prettyPrint = options[PRETTY_PRINT_OPTION]?.toBooleanStrictOrNull() ?: false
+                },
+        )
 }
 
-private object JsonReporter : Reporter {
+private class JsonReporter(
+    private val json: Json,
+) : Reporter {
     override fun write(
         report: Report,
         output: OutputStream,
     ) {
-        output.write(report.toJson().toByteArray())
+        output.write(json.encodeToString(report.toJsonReport()).toByteArray())
     }
 }
 
-private fun Report.toJson(): String =
-    buildString {
-        append("{")
-        appendJsonField("formatVersion", "0.1.0")
-        append(",")
-        append("\"summary\":")
-        appendSummary(this@toJson)
-        append(",")
-        append("\"diagnostics\":[")
-        diagnostics.forEachIndexed { index, diagnostic ->
-            if (index > 0) append(",")
-            appendDiagnostic(diagnostic)
-        }
-        append("]}")
-    }
+private const val PRETTY_PRINT_OPTION = "prettyPrint"
 
-private fun StringBuilder.appendSummary(report: Report) {
-    append("{")
-    appendJsonField("diagnostics", report.diagnostics.size)
-    append(",")
-    appendJsonField("errors", report.diagnostics.count { diagnostic -> diagnostic.severity == Severity.Error })
-    append(",")
-    appendJsonField("warnings", report.diagnostics.count { diagnostic -> diagnostic.severity == Severity.Warning })
-    append(",")
-    appendJsonField("infos", report.diagnostics.count { diagnostic -> diagnostic.severity == Severity.Info })
-    append("}")
-}
+@Serializable
+private data class JsonReport(
+    val formatVersion: String,
+    val summary: JsonSummary,
+    val diagnostics: List<JsonDiagnostic>,
+)
 
-private fun StringBuilder.appendDiagnostic(diagnostic: Diagnostic) {
-    append("{")
-    appendNullableJsonField("ruleId", diagnostic.ruleId?.value)
-    append(",")
-    appendJsonField("severity", diagnostic.severity.name.lowercase())
-    append(",")
-    appendJsonField("message", diagnostic.message)
-    append(",")
-    appendNullableJsonField("file", diagnostic.file?.path)
-    append(",")
-    append("\"range\":")
-    appendRange(diagnostic.range)
-    append(",")
-    append("\"database\":")
-    appendDatabase(diagnostic)
-    append(",")
-    append("\"fixes\":[")
-    diagnostic.fixes.forEachIndexed { index, fix ->
-        if (index > 0) append(",")
-        appendFix(fix)
-    }
-    append("]}")
-}
+@Serializable
+private data class JsonSummary(
+    val diagnostics: Int,
+    val errors: Int,
+    val warnings: Int,
+    val infos: Int,
+)
 
-private fun StringBuilder.appendDatabase(diagnostic: Diagnostic) {
-    val database = diagnostic.database
-    if (database == null) {
-        append("null")
-        return
-    }
-    append("{")
-    appendJsonField("name", database.name)
-    append(",")
-    append("\"dialect\":{")
-    appendJsonField("family", database.dialect.family.name)
-    append(",")
-    appendJsonField("displayName", database.dialect.displayName)
-    append(",")
-    appendNullableJsonField("artifact", database.dialect.artifact)
-    append(",")
-    appendNullableJsonField("version", database.dialect.version)
-    append(",")
-    appendNullableJsonField("implementationClass", database.dialect.implementationClass)
-    append(",")
-    append("\"capabilities\":[")
-    database.dialect.capabilities.sorted().forEachIndexed { index, capability ->
-        if (index > 0) append(",")
-        appendJsonString(capability)
-    }
-    append("]}}")
-}
+@Serializable
+private data class JsonDiagnostic(
+    val ruleId: String?,
+    val severity: String,
+    val message: String,
+    val file: String?,
+    val range: JsonRange?,
+    val database: JsonDatabase?,
+    val fixes: List<JsonFix>,
+)
 
-private fun StringBuilder.appendFix(fix: Fix) {
-    append("{")
-    appendJsonField("title", fix.title)
-    append(",")
-    appendJsonField("safety", fix.safety.name.lowercase())
-    append(",")
-    append("\"edits\":[")
-    fix.edits.forEachIndexed { index, edit ->
-        if (index > 0) append(",")
-        appendEdit(edit)
-    }
-    append("]}")
-}
+@Serializable
+private data class JsonDatabase(
+    val name: String,
+    val dialect: JsonDialect,
+)
 
-private fun StringBuilder.appendEdit(edit: TextEdit) {
-    append("{")
-    append("\"range\":")
-    appendRange(edit.range)
-    append(",")
-    appendJsonField("replacement", edit.replacement)
-    append("}")
-}
+@Serializable
+private data class JsonDialect(
+    val family: String,
+    val displayName: String,
+    val artifact: String?,
+    val version: String?,
+    val implementationClass: String?,
+    val capabilities: List<String>,
+)
 
-private fun StringBuilder.appendRange(range: SourceRange?) {
-    if (range == null) {
-        append("null")
-        return
-    }
-    append("{")
-    append("\"start\":")
-    appendPosition(range.start)
-    append(",")
-    append("\"end\":")
-    appendPosition(range.end)
-    append("}")
-}
+@Serializable
+private data class JsonFix(
+    val title: String,
+    val safety: String,
+    val edits: List<JsonTextEdit>,
+)
 
-private fun StringBuilder.appendPosition(position: SourcePosition) {
-    append("{")
-    appendJsonField("line", position.line)
-    append(",")
-    appendJsonField("column", position.column)
-    append("}")
-}
+@Serializable
+private data class JsonTextEdit(
+    val range: JsonRange,
+    val replacement: String,
+)
 
-private fun StringBuilder.appendJsonField(
-    name: String,
-    value: String,
-) {
-    appendJsonString(name)
-    append(":")
-    appendJsonString(value)
-}
+@Serializable
+private data class JsonRange(
+    val start: JsonPosition,
+    val end: JsonPosition,
+)
 
-private fun StringBuilder.appendJsonField(
-    name: String,
-    value: Int,
-) {
-    appendJsonString(name)
-    append(":")
-    append(value)
-}
+@Serializable
+private data class JsonPosition(
+    val line: Int,
+    val column: Int,
+)
 
-private fun StringBuilder.appendNullableJsonField(
-    name: String,
-    value: String?,
-) {
-    appendJsonString(name)
-    append(":")
-    if (value == null) {
-        append("null")
-    } else {
-        appendJsonString(value)
-    }
-}
+private fun Report.toJsonReport(): JsonReport =
+    JsonReport(
+        formatVersion = "0.1.0",
+        summary =
+            JsonSummary(
+                diagnostics = diagnostics.size,
+                errors = diagnostics.count { diagnostic -> diagnostic.severity == Severity.Error },
+                warnings = diagnostics.count { diagnostic -> diagnostic.severity == Severity.Warning },
+                infos = diagnostics.count { diagnostic -> diagnostic.severity == Severity.Info },
+            ),
+        diagnostics = diagnostics.map { diagnostic -> diagnostic.toJsonDiagnostic() },
+    )
 
-private fun StringBuilder.appendJsonString(value: String) {
-    append("\"")
-    value.forEach { character ->
-        when (character) {
-            '\\' -> append("\\\\")
-            '"' -> append("\\\"")
-            '\n' -> append("\\n")
-            '\r' -> append("\\r")
-            '\t' -> append("\\t")
-            else -> append(character)
-        }
-    }
-    append("\"")
-}
+private fun Diagnostic.toJsonDiagnostic(): JsonDiagnostic =
+    JsonDiagnostic(
+        ruleId = ruleId?.value,
+        severity = severity.name.lowercase(),
+        message = message,
+        file = file?.path,
+        range = range?.toJsonRange(),
+        database = database?.toJsonDatabase(),
+        fixes = fixes.map { fix -> fix.toJsonFix() },
+    )
+
+private fun DatabaseContext.toJsonDatabase(): JsonDatabase =
+    JsonDatabase(
+        name = name,
+        dialect = dialect.toJsonDialect(),
+    )
+
+private fun SqlDialect.toJsonDialect(): JsonDialect =
+    JsonDialect(
+        family = family.name,
+        displayName = displayName,
+        artifact = artifact,
+        version = version,
+        implementationClass = implementationClass,
+        capabilities = capabilities.sorted(),
+    )
+
+private fun Fix.toJsonFix(): JsonFix =
+    JsonFix(
+        title = title,
+        safety = safety.name.lowercase(),
+        edits = edits.map { edit -> edit.toJsonTextEdit() },
+    )
+
+private fun TextEdit.toJsonTextEdit(): JsonTextEdit =
+    JsonTextEdit(
+        range = range.toJsonRange(),
+        replacement = replacement,
+    )
+
+private fun SourceRange.toJsonRange(): JsonRange =
+    JsonRange(
+        start = start.toJsonPosition(),
+        end = end.toJsonPosition(),
+    )
+
+private fun SourcePosition.toJsonPosition(): JsonPosition =
+    JsonPosition(line = line, column = column)

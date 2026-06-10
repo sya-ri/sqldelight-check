@@ -7,6 +7,32 @@ import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
 import java.io.OutputStream
+import kotlinx.html.BODY
+import kotlinx.html.TBODY
+import kotlinx.html.a
+import kotlinx.html.body
+import kotlinx.html.br
+import kotlinx.html.code
+import kotlinx.html.div
+import kotlinx.html.h1
+import kotlinx.html.h2
+import kotlinx.html.head
+import kotlinx.html.html
+import kotlinx.html.id
+import kotlinx.html.lang
+import kotlinx.html.meta
+import kotlinx.html.p
+import kotlinx.html.stream.createHTML
+import kotlinx.html.strong
+import kotlinx.html.style
+import kotlinx.html.table
+import kotlinx.html.tbody
+import kotlinx.html.td
+import kotlinx.html.th
+import kotlinx.html.thead
+import kotlinx.html.title
+import kotlinx.html.tr
+import kotlinx.html.unsafe
 
 /**
  * Provider for the built-in HTML reporter.
@@ -27,76 +53,96 @@ private object HtmlReporter : Reporter {
 }
 
 private fun Report.toHtml(): String =
-    buildString {
-        appendLine("<!doctype html>")
-        appendLine("<html lang=\"en\">")
-        appendLine("<head>")
-        appendLine("<meta charset=\"utf-8\">")
-        appendLine("<title>sqldelight-check report</title>")
-        appendLine("<style>")
-        appendLine(
-            """
-            :root {
-              color-scheme: light dark;
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    "<!doctype html>\n" +
+        createHTML().html {
+            lang = "en"
+            head {
+                meta(charset = "utf-8")
+                title { +"sqldelight-check report" }
+                style {
+                    unsafe {
+                        +"""
+                        :root {
+                          color-scheme: light dark;
+                          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                        }
+                        body { margin: 2rem; line-height: 1.5; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid CanvasText; padding: 0.5rem; text-align: left; vertical-align: top; }
+                        th { background: color-mix(in srgb, CanvasText 10%, Canvas); }
+                        code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+                        .summary { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0 2rem; }
+                        .summary div { border: 1px solid CanvasText; padding: 0.5rem 0.75rem; }
+                        .severity-error { color: #b42318; font-weight: 700; }
+                        .severity-warning { color: #a15c07; font-weight: 700; }
+                        .severity-info { color: #175cd3; font-weight: 700; }
+                        """.trimIndent()
+                    }
+                }
             }
-            body { margin: 2rem; line-height: 1.5; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid CanvasText; padding: 0.5rem; text-align: left; vertical-align: top; }
-            th { background: color-mix(in srgb, CanvasText 10%, Canvas); }
-            code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-            .summary { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0 2rem; }
-            .summary div { border: 1px solid CanvasText; padding: 0.5rem 0.75rem; }
-            .severity-error { color: #b42318; font-weight: 700; }
-            .severity-warning { color: #a15c07; font-weight: 700; }
-            .severity-info { color: #175cd3; font-weight: 700; }
-            """.trimIndent(),
-        )
-        appendLine("</style>")
-        appendLine("</head>")
-        appendLine("<body>")
-        appendLine("<h1>sqldelight-check report</h1>")
-        appendSummary(diagnostics)
-        appendLine("<h2>Diagnostics</h2>")
-        if (diagnostics.isEmpty()) {
-            appendLine("<p>No diagnostics.</p>")
-        } else {
-            appendLine("<table>")
-            appendLine("<thead><tr><th>#</th><th>Severity</th><th>Rule</th><th>Location</th><th>Message</th><th>Fixes</th></tr></thead>")
-            appendLine("<tbody>")
-            diagnostics.forEachIndexed { index, diagnostic ->
-                appendDiagnosticRow(index + 1, diagnostic)
+            body {
+                h1 { +"sqldelight-check report" }
+                summary(diagnostics)
+                h2 { +"Diagnostics" }
+                if (diagnostics.isEmpty()) {
+                    p { +"No diagnostics." }
+                } else {
+                    table {
+                        thead {
+                            tr {
+                                th { +"#" }
+                                th { +"Severity" }
+                                th { +"Rule" }
+                                th { +"Location" }
+                                th { +"Message" }
+                                th { +"Fixes" }
+                            }
+                        }
+                        tbody {
+                            diagnostics.forEachIndexed { index, diagnostic ->
+                                diagnosticRow(index + 1, diagnostic)
+                            }
+                        }
+                    }
+                }
             }
-            appendLine("</tbody>")
-            appendLine("</table>")
         }
-        appendLine("</body>")
-        appendLine("</html>")
-    }
 
-private fun StringBuilder.appendSummary(diagnostics: List<Diagnostic>) {
-    appendLine("<div class=\"summary\" aria-label=\"summary\">")
-    appendLine("<div><strong>Total</strong><br>${diagnostics.size}</div>")
-    Severity.entries.forEach { severity ->
-        val count = diagnostics.count { diagnostic -> diagnostic.severity == severity }
-        appendLine("<div><strong>${severity.name.escapeHtml()}</strong><br>$count</div>")
+private fun BODY.summary(diagnostics: List<Diagnostic>) {
+    div("summary") {
+        attributes["aria-label"] = "summary"
+        div {
+            strong { +"Total" }
+            br {}
+            +"${diagnostics.size}"
+        }
+        Severity.entries.forEach { severity ->
+            div {
+                strong { +severity.name }
+                br {}
+                +"${diagnostics.count { diagnostic -> diagnostic.severity == severity }}"
+            }
+        }
     }
-    appendLine("</div>")
 }
 
-private fun StringBuilder.appendDiagnosticRow(
+private fun TBODY.diagnosticRow(
     index: Int,
     diagnostic: Diagnostic,
 ) {
-    val severityClass = "severity-${diagnostic.severity.name.lowercase()}"
-    append("<tr id=\"diagnostic-$index\">")
-    append("<td><a href=\"#diagnostic-$index\">$index</a></td>")
-    append("<td class=\"$severityClass\">${diagnostic.severity.name.escapeHtml()}</td>")
-    append("<td><code>${(diagnostic.ruleId?.value ?: "-").escapeHtml()}</code></td>")
-    append("<td>${diagnostic.locationLabel().escapeHtml()}</td>")
-    append("<td>${diagnostic.message.escapeHtml()}</td>")
-    append("<td>${diagnostic.fixes.size}</td>")
-    appendLine("</tr>")
+    tr {
+        id = "diagnostic-$index"
+        td {
+            a(href = "#diagnostic-$index") { +"$index" }
+        }
+        td("severity-${diagnostic.severity.name.lowercase()}") { +diagnostic.severity.name }
+        td {
+            code { +(diagnostic.ruleId?.value ?: "-") }
+        }
+        td { +diagnostic.locationLabel() }
+        td { +diagnostic.message }
+        td { +"${diagnostic.fixes.size}" }
+    }
 }
 
 private fun Diagnostic.locationLabel(): String {
@@ -106,17 +152,3 @@ private fun Diagnostic.locationLabel(): String {
 }
 
 private fun SourceRange.toLocationLabel(): String = "${start.line}:${start.column}"
-
-private fun String.escapeHtml(): String =
-    buildString {
-        this@escapeHtml.forEach { character ->
-            when (character) {
-                '&' -> append("&amp;")
-                '<' -> append("&lt;")
-                '>' -> append("&gt;")
-                '"' -> append("&quot;")
-                '\'' -> append("&#39;")
-                else -> append(character)
-            }
-        }
-    }

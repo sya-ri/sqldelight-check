@@ -2,10 +2,15 @@ package dev.s7a.sqldelight.check.reporter.sarif
 
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
 import java.io.OutputStream
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * Provider for the built-in SARIF reporter.
@@ -13,79 +18,152 @@ import java.io.OutputStream
 public class SarifReporterProvider : ReporterProvider {
     override val id: String = "sarif"
 
-    override fun create(options: Map<String, String>): Reporter = SarifReporter
+    override fun create(options: Map<String, String>): Reporter =
+        SarifReporter(
+            json =
+                Json {
+                    prettyPrint = options[PRETTY_PRINT_OPTION]?.toBooleanStrictOrNull() ?: false
+                },
+        )
 }
 
-private object SarifReporter : Reporter {
+private class SarifReporter(
+    private val json: Json,
+) : Reporter {
     override fun write(
         report: Report,
         output: OutputStream,
     ) {
-        output.write(report.toSarif().toByteArray())
+        output.write(json.encodeToString(report.toSarifReport()).toByteArray())
     }
 }
 
-private fun Report.toSarif(): String =
-    buildString {
-        append("{")
-        appendJsonField("version", "2.1.0")
-        append(",")
-        appendJsonField("\$schema", "https://json.schemastore.org/sarif-2.1.0.json")
-        append(",")
-        append("\"runs\":[{")
-        append("\"tool\":{\"driver\":{")
-        appendJsonField("name", "sqldelight-check")
-        append(",")
-        appendJsonField("semanticVersion", "0.1.0")
-        append(",")
-        append("\"rules\":[")
-        diagnostics
-            .map { diagnostic -> diagnostic.ruleId?.value ?: "sqldelight-check:diagnostic" }
-            .distinct()
-            .forEachIndexed { index, ruleId ->
-                if (index > 0) append(",")
-                append("{")
-                appendJsonField("id", ruleId)
-                append("}")
-            }
-        append("]}}},")
-        append("\"results\":[")
-        diagnostics.forEachIndexed { index, diagnostic ->
-            if (index > 0) append(",")
-            appendResult(diagnostic)
-        }
-        append("]}]}")
-    }
+private const val PRETTY_PRINT_OPTION = "prettyPrint"
 
-private fun StringBuilder.appendResult(diagnostic: Diagnostic) {
-    append("{")
-    appendJsonField("ruleId", diagnostic.ruleId?.value ?: "sqldelight-check:diagnostic")
-    append(",")
-    appendJsonField("level", diagnostic.severity.toSarifLevel())
-    append(",")
-    append("\"message\":{")
-    appendJsonField("text", diagnostic.message)
-    append("}")
-    val file = diagnostic.file
-    val range = diagnostic.range
-    if (file != null && range != null) {
-        append(",")
-        append("\"locations\":[{\"physicalLocation\":{")
-        append("\"artifactLocation\":{")
-        appendJsonField("uri", file.path)
-        append("},")
-        append("\"region\":{")
-        appendJsonField("startLine", range.start.line)
-        append(",")
-        appendJsonField("startColumn", range.start.column)
-        append(",")
-        appendJsonField("endLine", range.end.line)
-        append(",")
-        appendJsonField("endColumn", range.end.column)
-        append("}}}]")
-    }
-    append("}")
+@Serializable
+private data class SarifReport(
+    val version: String,
+    @SerialName("\$schema")
+    val schema: String,
+    val runs: List<SarifRun>,
+)
+
+@Serializable
+private data class SarifRun(
+    val tool: SarifTool,
+    val results: List<SarifResult>,
+)
+
+@Serializable
+private data class SarifTool(
+    val driver: SarifDriver,
+)
+
+@Serializable
+private data class SarifDriver(
+    val name: String,
+    val semanticVersion: String,
+    val rules: List<SarifRule>,
+)
+
+@Serializable
+private data class SarifRule(
+    val id: String,
+)
+
+@Serializable
+private data class SarifResult(
+    val ruleId: String,
+    val level: String,
+    val message: SarifMessage,
+    val locations: List<SarifLocation>? = null,
+)
+
+@Serializable
+private data class SarifMessage(
+    val text: String,
+)
+
+@Serializable
+private data class SarifLocation(
+    val physicalLocation: SarifPhysicalLocation,
+)
+
+@Serializable
+private data class SarifPhysicalLocation(
+    val artifactLocation: SarifArtifactLocation,
+    val region: SarifRegion,
+)
+
+@Serializable
+private data class SarifArtifactLocation(
+    val uri: String,
+)
+
+@Serializable
+private data class SarifRegion(
+    val startLine: Int,
+    val startColumn: Int,
+    val endLine: Int,
+    val endColumn: Int,
+)
+
+private fun Report.toSarifReport(): SarifReport =
+    SarifReport(
+        version = "2.1.0",
+        schema = "https://json.schemastore.org/sarif-2.1.0.json",
+        runs =
+            listOf(
+                SarifRun(
+                    tool =
+                        SarifTool(
+                            driver =
+                                SarifDriver(
+                                    name = "sqldelight-check",
+                                    semanticVersion = "0.1.0",
+                                    rules =
+                                        diagnostics
+                                            .map { diagnostic -> diagnostic.sarifRuleId() }
+                                            .distinct()
+                                            .map(::SarifRule),
+                                ),
+                        ),
+                    results = diagnostics.map { diagnostic -> diagnostic.toSarifResult() },
+                ),
+            ),
+    )
+
+private fun Diagnostic.toSarifResult(): SarifResult =
+    SarifResult(
+        ruleId = sarifRuleId(),
+        level = severity.toSarifLevel(),
+        message = SarifMessage(message),
+        locations = sarifLocations(),
+    )
+
+private fun Diagnostic.sarifRuleId(): String = ruleId?.value ?: "sqldelight-check:diagnostic"
+
+private fun Diagnostic.sarifLocations(): List<SarifLocation>? {
+    val sourceFile = file ?: return null
+    val sourceRange = range ?: return null
+    return listOf(
+        SarifLocation(
+            physicalLocation =
+                SarifPhysicalLocation(
+                    artifactLocation = SarifArtifactLocation(sourceFile.path),
+                    region = sourceRange.toSarifRegion(),
+                ),
+        ),
+    )
 }
+
+private fun SourceRange.toSarifRegion(): SarifRegion =
+    SarifRegion(
+        startLine = start.line,
+        startColumn = start.column,
+        endLine = end.line,
+        endColumn = end.column,
+    )
 
 private fun Severity.toSarifLevel(): String =
     when (this) {
@@ -93,36 +171,3 @@ private fun Severity.toSarifLevel(): String =
         Severity.Warning -> "warning"
         Severity.Info -> "note"
     }
-
-private fun StringBuilder.appendJsonField(
-    name: String,
-    value: String,
-) {
-    appendJsonString(name)
-    append(":")
-    appendJsonString(value)
-}
-
-private fun StringBuilder.appendJsonField(
-    name: String,
-    value: Int,
-) {
-    appendJsonString(name)
-    append(":")
-    append(value)
-}
-
-private fun StringBuilder.appendJsonString(value: String) {
-    append("\"")
-    value.forEach { character ->
-        when (character) {
-            '\\' -> append("\\\\")
-            '"' -> append("\\\"")
-            '\n' -> append("\\n")
-            '\r' -> append("\\r")
-            '\t' -> append("\\t")
-            else -> append(character)
-        }
-    }
-    append("\"")
-}
