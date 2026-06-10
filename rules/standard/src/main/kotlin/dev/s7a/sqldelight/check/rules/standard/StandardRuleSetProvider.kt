@@ -1,6 +1,8 @@
 package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rules.standard.rules.FinalNewlineRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 
@@ -13,8 +15,10 @@ public class StandardRuleSetProvider : RuleSetProvider {
     /**
      * Returns rule providers in the standard rule set.
      *
-     * FIXME: Populate this from the initial sqlfluff- and SQLDelight-informed rule selection.
      */
-    override fun ruleProviders(): Set<RuleProvider> = emptySet()
+    override fun ruleProviders(): Set<RuleProvider> =
+        setOf(
+            RuleProvider(::NoTrailingWhitespaceRule),
+            RuleProvider(::FinalNewlineRule),
+        )
 }
-
