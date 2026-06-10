@@ -206,6 +206,9 @@ dependencies {
 
 Rule set artifacts provide `dev.s7a.sqldelight.check.rule.api.RuleSetProvider` via Java `ServiceLoader`.
 Reporter artifacts provide `dev.s7a.sqldelight.check.reporter.api.ReporterProvider` via Java `ServiceLoader`.
+Custom rules can override `Rule.isApplicable(context)` to opt into dialect-, database-, or file-specific automatic
+enablement. The method is consulted only when the resolved rule enablement is `Auto`; explicit `Enabled` and `Disabled`
+settings remain user overrides.
 
 Custom rule set projects should compile against:
 

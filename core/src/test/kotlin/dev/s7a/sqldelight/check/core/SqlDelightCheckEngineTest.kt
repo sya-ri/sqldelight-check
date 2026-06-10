@@ -54,18 +54,62 @@ class SqlDelightCheckEngineTest {
         assertEquals(Severity.Error, diagnostics.single().severity)
     }
 
-    private fun testRuleSet(): RuleSetProvider =
+    @Test
+    fun `auto rule is skipped when dialect applicability rejects the database`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput(DialectFamily.MySql)),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(
+                            testRule(
+                                isApplicable = { context -> context.database.dialect.family == DialectFamily.SQLite },
+                            ),
+                        ),
+                    ),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `explicit rule enablement overrides dialect auto applicability`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput(DialectFamily.MySql)),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(
+                            testRule(
+                                isApplicable = { context -> context.database.dialect.family == DialectFamily.SQLite },
+                            ),
+                        ),
+                    ),
+                config =
+                    CheckConfig(
+                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                    ),
+            )
+
+        assertEquals(1, diagnostics.size)
+    }
+
+    private fun testRuleSet(rule: Rule = testRule()): RuleSetProvider =
         object : RuleSetProvider {
             override val id: RuleSetId = ruleSetId
 
-            override fun ruleProviders(): Set<RuleProvider> = setOf(RuleProvider { testRule() })
+            override fun ruleProviders(): Set<RuleProvider> = setOf(RuleProvider { rule })
         }
 
-    private fun testRule(): Rule =
+    private fun testRule(
+        isApplicable: (RuleContext) -> Boolean = { true },
+    ): Rule =
         object : Rule {
             override val id: RuleId = ruleId
             override val defaultSeverity: Severity = Severity.Warning
             override val defaultEnablement: Enablement = Enablement.Auto
+
+            override fun isApplicable(context: RuleContext): Boolean = isApplicable.invoke(context)
 
             override fun run(
                 context: RuleContext,
@@ -84,12 +128,12 @@ class SqlDelightCheckEngineTest {
             }
         }
 
-    private fun testInput(): AnalysisInput =
+    private fun testInput(family: DialectFamily = DialectFamily.SQLite): AnalysisInput =
         AnalysisInput(
             database =
                 DatabaseContext(
                     name = "Database",
-                    dialect = SqlDialect(family = DialectFamily.SQLite, displayName = "SQLite"),
+                    dialect = SqlDialect(family = family, displayName = family.name),
                 ),
             files = listOf(SourceFile(path = "src/main/sqldelight/Test.sq", content = "SELECT 1;")),
             sourceFolders = emptyList(),
