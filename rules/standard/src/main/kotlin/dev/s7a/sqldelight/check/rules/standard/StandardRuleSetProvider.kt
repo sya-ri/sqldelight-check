@@ -1,7 +1,9 @@
 package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.DataTypeCaseRule
+import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitUnionOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FinalNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FunctionNameCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.KeywordCaseRule
@@ -21,6 +23,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoRightJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
+import dev.s7a.sqldelight.check.rules.standard.rules.PreferCoalesceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterBlockCommentStartRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterCommaRule
@@ -44,7 +47,9 @@ public class StandardRuleSetProvider : RuleSetProvider {
      */
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
+            RuleProvider(::ConsistentNotEqualOperatorRule),
             RuleProvider(::DataTypeCaseRule),
+            RuleProvider(::ExplicitUnionOperatorRule),
             RuleProvider(::FinalNewlineRule),
             RuleProvider(::FunctionNameCaseRule),
             RuleProvider(::KeywordCaseRule),
@@ -64,6 +69,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
+            RuleProvider(::PreferCoalesceRule),
             RuleProvider(::PreferCountStarRule),
             RuleProvider(::SpaceAfterBlockCommentStartRule),
             RuleProvider(::SpaceAfterCommaRule),

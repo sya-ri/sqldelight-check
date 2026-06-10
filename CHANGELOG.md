@@ -14,7 +14,9 @@ This version establishes the first Gradle plugin and API surface for checking SQ
 - Added a SQLDelight `2.3.2` adapter that delegates analysis to SQLDelight compiler APIs.
 - Added stable API modules for diagnostics, rule sets, reporters, and SQLDelight adapters.
 - Added standard rules:
+  - `standard:consistent-not-equal-operator`
   - `standard:data-type-case`
+  - `standard:explicit-union-operator`
   - `standard:final-newline`
   - `standard:function-name-case`
   - `standard:keyword-case`
@@ -34,6 +36,7 @@ This version establishes the first Gradle plugin and API surface for checking SQ
   - `standard:no-tab-indentation`
   - `standard:no-trailing-blank-lines`
   - `standard:no-trailing-whitespace`
+  - `standard:prefer-coalesce`
   - `standard:prefer-count-star`
   - `standard:space-after-block-comment-start`
   - `standard:space-after-comma`

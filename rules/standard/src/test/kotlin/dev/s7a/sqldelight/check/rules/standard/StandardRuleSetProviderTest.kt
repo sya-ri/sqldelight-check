@@ -18,7 +18,9 @@ class StandardRuleSetProviderTest {
 
         assertEquals(
             setOf(
+                RuleId("standard:consistent-not-equal-operator"),
                 RuleId("standard:data-type-case"),
+                RuleId("standard:explicit-union-operator"),
                 RuleId("standard:final-newline"),
                 RuleId("standard:function-name-case"),
                 RuleId("standard:keyword-case"),
@@ -38,6 +40,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:no-tab-indentation"),
                 RuleId("standard:no-trailing-blank-lines"),
                 RuleId("standard:no-trailing-whitespace"),
+                RuleId("standard:prefer-coalesce"),
                 RuleId("standard:prefer-count-star"),
                 RuleId("standard:space-after-block-comment-start"),
                 RuleId("standard:space-after-comma"),

@@ -83,7 +83,9 @@ The standard rule set uses two safety levels:
 
 | Rule ID | Default | Fix | Safety | Purpose |
 | --- | --- | --- | --- | --- |
+| `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
 | `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
+| `standard:explicit-union-operator` | Warning / Auto | No | None | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
 | `standard:final-newline` | Warning / Auto | Yes | Safe | Require files to end with one LF newline. |
 | `standard:function-name-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL function names outside comments and quoted text. |
 | `standard:keyword-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL keywords outside comments and quoted text. |
@@ -103,6 +105,7 @@ The standard rule set uses two safety levels:
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:prefer-coalesce` | Warning / Auto | Yes | Unsafe | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
 | `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
 | `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
@@ -127,6 +130,8 @@ Useful sqlfluff concepts reflected here:
 - Structure checks for repeated semicolons: `standard:no-consecutive-semicolons`.
 - Convention checks for row counts, `NULL` comparisons, and join direction: `standard:prefer-count-star`,
   `standard:use-is-null`, and `standard:no-right-join`.
+- Convention and ambiguity checks for operator and set-operation clarity: `standard:consistent-not-equal-operator`,
+  `standard:prefer-coalesce`, and `standard:explicit-union-operator`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
@@ -944,6 +949,41 @@ Why unsafe:
   syntactically a literal.
 - Users must opt in before write tasks apply fixes.
 
+## `standard:prefer-coalesce`
+
+Reports `IFNULL` and `NVL` calls.
+
+This rule is inspired by sqlfluff's coalesce convention rule. `COALESCE` is the portable spelling and accepts more than
+two arguments, so the standard rule set prefers it for SQLDelight projects that target multiple dialects.
+
+Invalid:
+
+```sql
+selectDisplayName:
+SELECT IFNULL(nickname, name)
+FROM player;
+```
+
+Valid:
+
+```sql
+selectDisplayName:
+SELECT COALESCE(nickname, name)
+FROM player;
+```
+
+Fix behavior:
+
+- Replaces the function token with `COALESCE`.
+- Skips identifiers named `ifnull` or `nvl` when they are not followed by `(`.
+- Skips comments, string literals, and quoted identifiers.
+- Marks fixes as `Unsafe`.
+
+Why unsafe:
+
+- `IFNULL`, `NVL`, and `COALESCE` can differ in dialect support, type inference, and evaluation details.
+- Users must opt in before write tasks apply fixes.
+
 ## `standard:prefer-count-star`
 
 Reports `COUNT(1)` and `COUNT(0)` when they are used as row-counting syntax.
@@ -1018,6 +1058,72 @@ Why unsafe:
 - The replacement intentionally changes SQL behavior from equality comparison semantics to `NULL` predicate semantics.
 - The first implementation uses source text to avoid `SET` clause assignments, not SQLDelight expression facts.
 - Users must opt in before write tasks apply fixes.
+
+## `standard:consistent-not-equal-operator`
+
+Reports files that mix `!=` and `<>` not-equal operators.
+
+The first not-equal operator in a file defines the convention for that file. Later operators using the other spelling are
+reported.
+
+Invalid:
+
+```sql
+selectMismatchedPlayers:
+SELECT id, name
+FROM player
+WHERE name != 'admin' AND status <> 'deleted';
+```
+
+Valid:
+
+```sql
+selectMismatchedPlayers:
+SELECT id, name
+FROM player
+WHERE name != 'admin' AND status != 'deleted';
+```
+
+Fix behavior:
+
+- Replaces later mismatched not-equal operators with the first not-equal operator spelling seen in the file.
+- Skips comments, string literals, and quoted identifiers.
+- Marks fixes as `Unsafe`.
+
+Why unsafe:
+
+- Not every dialect supports both not-equal spellings equally.
+- Users must opt in before write tasks apply fixes.
+
+## `standard:explicit-union-operator`
+
+Reports `UNION` operators that do not explicitly specify `ALL` or `DISTINCT`.
+
+This rule is inspired by sqlfluff's ambiguous union rule. Bare `UNION` has distinct semantics, but requiring
+`UNION DISTINCT` makes that choice visible in code review.
+
+Invalid:
+
+```sql
+selectAllNames:
+SELECT name FROM active_player
+UNION
+SELECT name FROM archived_player;
+```
+
+Valid:
+
+```sql
+selectAllNames:
+SELECT name FROM active_player
+UNION DISTINCT
+SELECT name FROM archived_player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided because the rule cannot know whether the intended set operation is `ALL` or `DISTINCT`.
+- Skips comments, string literals, and quoted identifiers.
 
 ## `standard:no-right-join`
 

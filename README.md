@@ -119,11 +119,14 @@ default. HTML and Markdown are available but disabled by default.
 
 The initial standard rule set contains:
 
+- `standard:consistent-not-equal-operator`: reports files that mix `!=` and `<>`. Unsafe fix: replace later operators
+  with the first style seen in the file.
 - `standard:final-newline`: reports files that do not end with a newline. Safe fix: insert the final newline.
 - `standard:function-name-case`: reports common SQL function names that are not uppercase. Unsafe fix: uppercase the
   function token.
 - `standard:data-type-case`: reports common SQL data type names that are not uppercase. Unsafe fix: uppercase the data
   type token.
+- `standard:explicit-union-operator`: reports `UNION` without explicit `ALL` or `DISTINCT`. No automatic fix.
 - `standard:keyword-case`: reports common SQL keywords that are not uppercase outside comments and quoted text. Unsafe
   fix: uppercase the keyword token.
 - `standard:line-ending-lf`: reports CRLF and CR line endings. Safe fix: replace them with LF.
@@ -143,6 +146,7 @@ The initial standard rule set contains:
 - `standard:no-tab-indentation`: reports tabs in leading indentation. Safe fix: replace indentation tabs with spaces.
 - `standard:no-trailing-blank-lines`: reports blank lines after the last content line. Safe fix: remove them.
 - `standard:no-trailing-whitespace`: reports spaces or tabs at the end of a line. Safe fix: remove trailing whitespace.
+- `standard:prefer-coalesce`: reports `IFNULL` and `NVL` calls. Unsafe fix: replace the function name with `COALESCE`.
 - `standard:prefer-count-star`: reports `COUNT(1)` and `COUNT(0)` row counts. Unsafe fix: replace the argument with
   `*`.
 - `standard:space-after-block-comment-start`: reports block comments where the opening marker is not followed by a
