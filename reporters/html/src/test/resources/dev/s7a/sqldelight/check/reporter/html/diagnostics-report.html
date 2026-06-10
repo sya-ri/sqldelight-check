@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>sqldelight-check report</title>
+    <style>:root {
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f6f8fa;
+  color: #1f2328;
+}
+body {
+  margin: 0;
+  line-height: 1.5;
+  background: #f6f8fa;
+  color: #1f2328;
+}
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem;
+}
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.summary { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0 2rem; }
+.summary div {
+  border: 1px solid #d0d7de;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  min-width: 5rem;
+  background: #ffffff;
+}
+.diagnostics { display: grid; gap: 1rem; }
+.diagnostic-card {
+  border: 1px solid #d0d7de;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(31 35 40 / 0.08);
+}
+.diagnostic-card h3 { margin: 0 0 0.75rem; }
+.meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.meta span {
+  border: 1px solid #d0d7de;
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.875rem;
+  background: #f6f8fa;
+}
+.message { margin: 0.75rem 0; }
+.fix-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.code-panel strong { display: block; margin-bottom: 0.375rem; }
+.code-frame {
+  overflow-x: auto;
+  border: 1px solid #d0d7de;
+  border-radius: 0.5rem;
+  background: #f6f8fa;
+  padding: 0.75rem 0;
+}
+.code-line {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 1rem;
+  min-width: max-content;
+  padding: 0 0.75rem;
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre;
+}
+.line-number { color: #6e7781; text-align: right; user-select: none; }
+.marked { background: #fff1a7; border-bottom: 2px solid #f79009; }
+.severity-error { color: #b42318; font-weight: 700; }
+.severity-warning { color: #a15c07; font-weight: 700; }
+.severity-info { color: #175cd3; font-weight: 700; }</style>
+  </head>
+  <body>
+    <main>
+      <h1>sqldelight-check report</h1>
+      <div class="summary" aria-label="summary">
+        <div><strong>Total</strong><br>3</div>
+        <div><strong>Info</strong><br>1</div>
+        <div><strong>Warning</strong><br>1</div>
+        <div><strong>Error</strong><br>1</div>
+      </div>
+      <h2>Diagnostics</h2>
+      <div class="diagnostics">
+        <div class="diagnostic-card" id="diagnostic-1">
+          <h3><a href="#diagnostic-1">#1</a> <code>standard:no-select-trailing-comma</code></h3>
+          <div class="meta"><span class="severity-error">Error</span><span>src/commonMain/sqldelight/Team.sq:3:12</span><span>1 fix(es)</span></div>
+          <p class="message">Remove the trailing comma from the SELECT list.</p>
+          <div class="fix-preview">
+            <div class="code-panel"><strong>Current</strong>
+              <div class="code-frame">
+                <div class="code-line"><span class="line-number">2</span><span>SELECT id,</span></div>
+                <div class="code-line"><span class="line-number">3</span><span>       name<span class="marked">,</span></span></div>
+                <div class="code-line"><span class="line-number">4</span><span>FROM team;</span></div>
+              </div>
+            </div>
+            <div class="code-panel"><strong>Fixed</strong>
+              <div class="code-frame">
+                <div class="code-line"><span class="line-number">2</span><span>SELECT id,</span></div>
+                <div class="code-line"><span class="line-number">3</span><span>       name</span></div>
+                <div class="code-line"><span class="line-number">4</span><span>FROM team;</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="diagnostic-card" id="diagnostic-2">
+          <h3><a href="#diagnostic-2">#2</a> <code>standard:use-is-null</code></h3>
+          <div class="meta"><span class="severity-warning">Warning</span><span>src/commonMain/sqldelight/Player.sq:2:39</span><span>1 fix(es)</span></div>
+          <p class="message">Use `IS NULL` instead of = NULL &amp; keep &lt;safe&gt;.</p>
+          <div class="fix-preview">
+            <div class="code-panel"><strong>Current</strong>
+              <div class="code-frame">
+                <div class="code-line"><span class="line-number">1</span><span>selectByDeleted:</span></div>
+                <div class="code-line"><span class="line-number">2</span><span>SELECT * FROM player WHERE deleted_at <span class="marked">= NULL</span>;</span></div>
+              </div>
+            </div>
+            <div class="code-panel"><strong>Fixed</strong>
+              <div class="code-frame">
+                <div class="code-line"><span class="line-number">1</span><span>selectByDeleted:</span></div>
+                <div class="code-line"><span class="line-number">2</span><span>SELECT * FROM player WHERE deleted_at <span class="marked">IS NULL</span>;</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="diagnostic-card" id="diagnostic-3">
+          <h3><a href="#diagnostic-3">#3</a> <code>standard:keyword-case</code></h3>
+          <div class="meta"><span class="severity-info">Info</span><span>src/commonMain/sqldelight/Search.sq:2:1</span><span>1 fix(es)</span></div>
+          <p class="message">Use uppercase SQL keywords.</p>
+          <div class="fix-preview">
+            <div class="code-panel"><strong>Current</strong>
+              <div class="code-frame">
+                <div class="code-line"><span class="line-number">1</span><span>searchPlayers:</span></div>
+                <div class="code-line"><span class="line-number">2</span><span><span class="marked">select</span> * from player;</span></div>
+              </div>
+            </div>
+            <div class="code-panel"><strong>Fixed</strong>
+              <div class="code-frame">
+                <div class="code-line"><span class="line-number">1</span><span>searchPlayers:</span></div>
+                <div class="code-line"><span class="line-number">2</span><span><span class="marked">SELECT</span> * from player;</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
