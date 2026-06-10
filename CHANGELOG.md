@@ -21,6 +21,22 @@ This version establishes the first Gradle plugin and API surface for checking SQ
 - Added external provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.
 - Added Qodana configuration and Gradle TestKit coverage for the plugin.
 
+### Published Artifacts
+
+- Gradle plugin `dev.s7a.sqldelight.check`
+- `dev.s7a:sqldelight-check-api:0.1.0`
+- `dev.s7a:sqldelight-check-rule-api:0.1.0`
+- `dev.s7a:sqldelight-check-reporter-api:0.1.0`
+- `dev.s7a:sqldelight-check-adapter-spi:0.1.0`
+- `dev.s7a:sqldelight-check-core:0.1.0`
+- `dev.s7a:sqldelight-check-rules-standard:0.1.0`
+- `dev.s7a:sqldelight-check-reporter-json:0.1.0`
+- `dev.s7a:sqldelight-check-reporter-sarif:0.1.0`
+- `dev.s7a:sqldelight-check-reporter-text:0.1.0`
+- `dev.s7a:sqldelight-check-reporter-html:0.1.0`
+- `dev.s7a:sqldelight-check-reporter-markdown:0.1.0`
+- `dev.s7a:sqldelight-check-adapter-2-3-2:0.1.0`
+
 ### Notes
 
 sqldelight-check is pre-1.0. API names and report schemas may change while the first real-world usage is incorporated.

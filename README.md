@@ -154,6 +154,22 @@ dependencies {
 Rule set artifacts provide `dev.s7a.sqldelight.check.rule.api.RuleSetProvider` via Java `ServiceLoader`.
 Reporter artifacts provide `dev.s7a.sqldelight.check.reporter.api.ReporterProvider` via Java `ServiceLoader`.
 
+Custom rule set projects should compile against:
+
+```kotlin
+dependencies {
+    compileOnly("dev.s7a:sqldelight-check-rule-api:0.1.0")
+}
+```
+
+Custom reporter projects should compile against:
+
+```kotlin
+dependencies {
+    compileOnly("dev.s7a:sqldelight-check-reporter-api:0.1.0")
+}
+```
+
 ## SQLDelight And Dialects
 
 sqldelight-check reads SQLDelight database tasks from Gradle and supports multiple SQLDelight databases in one project.
