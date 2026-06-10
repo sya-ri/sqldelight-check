@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.gradle
 import dev.s7a.sqldelight.check.core.AdapterRegistry
 import dev.s7a.sqldelight.check.core.ReporterRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
+import java.net.URLClassLoader
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
@@ -83,10 +84,7 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
  * Returns the reporter registry attached to this project.
  */
 internal fun Project.sqldelightCheckReporterRegistry(): ReporterRegistry =
-    (this as ExtensionAware)
-        .extensions
-        .extraProperties
-        .get("sqldelightCheckReporterRegistry") as ReporterRegistry
+    ReporterRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckReporter"))
 
 /**
  * Registers default reporters and output locations.
@@ -106,12 +104,8 @@ private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension)
             outputFile.convention(layout.buildDirectory.file("reports/sqldelight-check/report.$name"))
         }
     }
-    extensions.extraProperties["sqldelightCheckReporterRegistry"] =
-        ReporterRegistry.load(SqlDelightCheckGradlePlugin::class.java.classLoader)
     extensions.extraProperties["sqldelightCheckAdapterRegistry"] =
         AdapterRegistry.load(SqlDelightCheckGradlePlugin::class.java.classLoader)
-    extensions.extraProperties["sqldelightCheckRuleRegistry"] =
-        RuleRegistry.load(SqlDelightCheckGradlePlugin::class.java.classLoader)
 }
 
 /**
@@ -127,7 +121,14 @@ internal fun Project.sqldelightCheckAdapterRegistry(): AdapterRegistry =
  * Returns the rule registry attached to this project.
  */
 internal fun Project.sqldelightCheckRuleRegistry(): RuleRegistry =
-    (this as ExtensionAware)
-        .extensions
-        .extraProperties
-        .get("sqldelightCheckRuleRegistry") as RuleRegistry
+    RuleRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckRuleSet"))
+
+private fun Project.sqldelightCheckProviderClassLoader(configurationName: String): ClassLoader {
+    val urls =
+        configurations
+            .getByName(configurationName)
+            .files
+            .map { file -> file.toURI().toURL() }
+            .toTypedArray()
+    return URLClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
+}

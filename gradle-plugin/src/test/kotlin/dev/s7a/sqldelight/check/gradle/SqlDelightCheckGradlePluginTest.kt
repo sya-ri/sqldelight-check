@@ -4,6 +4,9 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.jar.JarEntry
+import java.util.jar.JarOutputStream
+import javax.tools.ToolProvider
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -255,6 +258,37 @@ class SqlDelightCheckGradlePluginTest {
         assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"diagnostics":0""")
     }
 
+    @Test
+    fun `check task loads external reporters from configuration`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                dependencies {
+                    add("sqldelightCheckReporter", files("external-reporter.jar"))
+                }
+
+                sqldelightCheck {
+                    reports {
+                        maybeCreate("external").apply {
+                            required.set(true)
+                            outputFile.set(layout.buildDirectory.file("reports/sqldelight-check/external.txt"))
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+        project.createExternalReporterJar()
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals("external diagnostics=0", project.file("build/reports/sqldelight-check/external.txt").readText())
+    }
+
     /**
      * Creates a temporary Gradle project for a TestKit run.
      */
@@ -286,6 +320,94 @@ class SqlDelightCheckGradlePluginTest {
             val file = file(path)
             Files.createDirectories(file.parent)
             file.writeText(content)
+        }
+
+        /**
+         * Creates a reporter provider jar used to verify external provider discovery.
+         */
+        fun createExternalReporterJar() {
+            val sourceDirectory = directory.resolve("external-reporter-src")
+            val classesDirectory = directory.resolve("external-reporter-classes")
+            Files.createDirectories(sourceDirectory.resolve("com/example"))
+            Files.createDirectories(classesDirectory)
+            val sourceFile = sourceDirectory.resolve("com/example/ExternalReporterProvider.java")
+            sourceFile.writeText(
+                """
+                package com.example;
+
+                import dev.s7a.sqldelight.check.reporter.api.Report;
+                import dev.s7a.sqldelight.check.reporter.api.Reporter;
+                import dev.s7a.sqldelight.check.reporter.api.ReporterProvider;
+                import java.io.IOException;
+                import java.io.OutputStream;
+                import java.nio.charset.StandardCharsets;
+                import java.util.Map;
+
+                public final class ExternalReporterProvider implements ReporterProvider {
+                    @Override
+                    public String getId() {
+                        return "external";
+                    }
+
+                    @Override
+                    public Reporter create(Map<String, String> options) {
+                        return new ExternalReporter();
+                    }
+
+                    private static final class ExternalReporter implements Reporter {
+                        @Override
+                        public void write(Report report, OutputStream output) {
+                            try {
+                                String text = "external diagnostics=" + report.getDiagnostics().size();
+                                output.write(text.getBytes(StandardCharsets.UTF_8));
+                            } catch (IOException exception) {
+                                throw new RuntimeException(exception);
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+
+            val compiler = ToolProvider.getSystemJavaCompiler() ?: error("JDK compiler is required for this test.")
+            val compileResult =
+                compiler.run(
+                    null,
+                    null,
+                    null,
+                    "-classpath",
+                    System.getProperty("java.class.path"),
+                    "-d",
+                    classesDirectory.toString(),
+                    sourceFile.toString(),
+                )
+            check(compileResult == 0) { "Failed to compile external reporter fixture." }
+
+            val serviceDirectory =
+                classesDirectory.resolve(
+                    "META-INF/services",
+                )
+            Files.createDirectories(serviceDirectory)
+            serviceDirectory
+                .resolve("dev.s7a.sqldelight.check.reporter.api.ReporterProvider")
+                .writeText("com.example.ExternalReporterProvider\n")
+
+            JarOutputStream(Files.newOutputStream(file("external-reporter.jar"))).use { jar ->
+                Files.walk(classesDirectory).use { paths ->
+                    paths
+                        .filter { path -> Files.isRegularFile(path) }
+                        .forEach { path ->
+                            val entryName =
+                                classesDirectory
+                                    .relativize(path)
+                                    .toString()
+                                    .replace('\\', '/')
+                            jar.putNextEntry(JarEntry(entryName))
+                            Files.copy(path, jar)
+                            jar.closeEntry()
+                        }
+                }
+            }
         }
 
         /**
