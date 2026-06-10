@@ -12,16 +12,27 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
 import java.io.ByteArrayOutputStream
 import kotlin.test.Test
-import kotlin.test.assertContains
+import kotlin.test.assertEquals
 
 class MarkdownReporterProviderTest {
     @Test
     fun `writes empty report`() {
         val markdown = MarkdownReporterProvider().render(Report(diagnostics = emptyList()))
 
-        assertContains(markdown, "# sqldelight-check")
-        assertContains(markdown, "| 0 | 0 | 0 | 0 |")
-        assertContains(markdown, "No diagnostics.")
+        assertEquals(
+            """
+            # sqldelight-check
+
+            | Total | Errors | Warnings | Infos |
+            | ---: | ---: | ---: | ---: |
+            | 0 | 0 | 0 | 0 |
+
+            ## Diagnostics
+
+            No diagnostics.
+            """.trimIndent() + "\n",
+            markdown,
+        )
     }
 
     @Test
@@ -38,10 +49,22 @@ class MarkdownReporterProviderTest {
                 ),
             )
 
-        assertContains(markdown, "| Warning | `standard:use-is-null` |")
-        assertContains(markdown, "src/commonMain/sqldelight/Player.sq:2:8")
-        assertContains(markdown, "Avoid pipe \\| and newline<br>inside messages.")
-        assertContains(markdown, " | 1 |")
+        assertEquals(
+            """
+            # sqldelight-check
+
+            | Total | Errors | Warnings | Infos |
+            | ---: | ---: | ---: | ---: |
+            | 1 | 0 | 1 | 0 |
+
+            ## Diagnostics
+
+            | Severity | Rule | Location | Message | Fixes |
+            | --- | --- | --- | --- | ---: |
+            | Warning | `standard:use-is-null` | src/commonMain/sqldelight/Player.sq:2:8 | Avoid pipe \| and newline<br>inside messages. | 1 |
+            """.trimIndent() + "\n",
+            markdown,
+        )
     }
 }
 
