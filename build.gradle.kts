@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalAbiValidation::class)
+
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
@@ -49,6 +52,9 @@ subprojects {
         apply(plugin = "com.vanniktech.maven.publish")
 
         pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+            extensions.configure<KotlinJvmProjectExtension>("kotlin") {
+                abiValidation()
+            }
             extensions.configure<MavenPublishBaseExtension>("mavenPublishing") {
                 publishToMavenCentral()
                 if (providers.gradleProperty("signingInMemoryKey").isPresent) {

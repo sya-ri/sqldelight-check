@@ -30,6 +30,12 @@ Before committing Kotlin or Gradle changes, scan for fully qualified type refere
 and convert them to imports when practical. Package names, import declarations, plugin IDs, Maven coordinates,
 reflection class-name strings, and `ServiceLoader` provider names are intentionally allowed.
 
+When public API changes are intentional, update Kotlin ABI baselines after reviewing the API surface:
+
+```shell
+./gradlew --no-daemon updateKotlinAbi
+```
+
 ## Implementation Notes
 
 - Keep SQL parsing and dialect validation inside SQLDelight's compiler/parser layer. Do not reimplement SQLDelight parsing in rules.
@@ -41,6 +47,10 @@ reflection class-name strings, and `ServiceLoader` provider names are intentiona
 
 `v0.1.0` publishing is not automated yet. Before a release, verify:
 
+- `./gradlew --no-daemon check`
+- `./gradlew --no-daemon dokkaGeneratePublicationHtml dokkaGeneratePublicationJavadoc`
+- `./gradlew --no-daemon publishToMavenLocal`
+- Qodana with the repository `qodana.yaml` configuration.
 - Gradle plugin metadata.
 - Generated reports.
 - SQLDelight `2.3.2` core analyzer behavior.

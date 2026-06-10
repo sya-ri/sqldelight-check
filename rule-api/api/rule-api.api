@@ -1,0 +1,30 @@
+public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticReporter {
+	public abstract fun report (Ldev/s7a/sqldelight/check/api/Diagnostic;)V
+}
+
+public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
+	public abstract fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public abstract fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public abstract fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public abstract fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/Rule$DefaultImpls {
+	public static fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+}
+
+public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleContext {
+	public abstract fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
+	public abstract fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
+}
+
+public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleProvider {
+	public abstract fun create ()Ldev/s7a/sqldelight/check/rule/api/Rule;
+}
+
+public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
+	public abstract fun getId-wigqPlY ()Ljava/lang/String;
+	public abstract fun ruleProviders ()Ljava/util/Set;
+}
+

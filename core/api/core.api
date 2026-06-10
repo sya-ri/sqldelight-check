@@ -1,0 +1,190 @@
+public final class dev/s7a/sqldelight/check/core/AnalysisInput {
+	public fun <init> (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/util/List;
+	public final fun component6 ()Ljava/util/List;
+	public final fun component7 ()Ljava/util/List;
+	public final fun component8 ()Ljava/util/List;
+	public final fun copy (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)Ldev/s7a/sqldelight/check/core/AnalysisInput;
+	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/core/AnalysisInput;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/AnalysisInput;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompilerClasspath ()Ljava/util/List;
+	public final fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
+	public final fun getDependencyFolders ()Ljava/util/List;
+	public final fun getDialectClasspath ()Ljava/util/List;
+	public final fun getFiles ()Ljava/util/List;
+	public final fun getPackageName ()Ljava/lang/String;
+	public final fun getSourceFolders ()Ljava/util/List;
+	public final fun getSqlDelightVersion ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/AnalysisResult {
+	public fun <init> (Ljava/util/List;Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;Ljava/util/List;)Ldev/s7a/sqldelight/check/core/AnalysisResult;
+	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/core/AnalysisResult;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/AnalysisResult;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDiagnostics ()Ljava/util/List;
+	public final fun getFiles ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/CheckConfig {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Z)V
+	public synthetic fun <init> (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/Map;
+	public final fun component2 ()Ljava/util/Map;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun component4 ()Z
+	public final fun copy (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Z)Ldev/s7a/sqldelight/check/core/CheckConfig;
+	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/core/CheckConfig;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;ZILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/CheckConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAllowUnsafeWrites ()Z
+	public final fun getDatabases ()Ljava/util/Map;
+	public final fun getRuleSets ()Ljava/util/Map;
+	public final fun getRules ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/ConfigurationResolver {
+	public fun <init> (Ldev/s7a/sqldelight/check/core/CheckConfig;)V
+	public final fun resolveRule-u3awsJM (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;)Ldev/s7a/sqldelight/check/core/ResolvedRuleConfig;
+	public static synthetic fun resolveRule-u3awsJM$default (Ldev/s7a/sqldelight/check/core/ConfigurationResolver;Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ResolvedRuleConfig;
+	public final fun resolveRuleSet-LV2AQIs (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;)Ldev/s7a/sqldelight/check/core/ResolvedRuleSetConfig;
+	public static synthetic fun resolveRuleSet-LV2AQIs$default (Ldev/s7a/sqldelight/check/core/ConfigurationResolver;Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ResolvedRuleSetConfig;
+}
+
+public final class dev/s7a/sqldelight/check/core/DatabaseConfig {
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/Map;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;)Ldev/s7a/sqldelight/check/core/DatabaseConfig;
+	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/core/DatabaseConfig;Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/DatabaseConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getRuleSets ()Ljava/util/Map;
+	public final fun getRules ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/EnablementResolver {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/core/EnablementResolver;
+	public final fun resolveRuleEnablement (Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Enablement;)Ldev/s7a/sqldelight/check/api/Enablement;
+}
+
+public final class dev/s7a/sqldelight/check/core/FixApplicationResult {
+	public fun <init> (Ljava/lang/String;II)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/String;II)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
+	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/core/FixApplicationResult;Ljava/lang/String;IIILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAppliedFixes ()I
+	public final fun getContent ()Ljava/lang/String;
+	public final fun getSkippedFixes ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/FixApplier {
+	public fun <init> ()V
+	public final fun apply (Ljava/lang/String;Ljava/util/List;Z)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
+}
+
+public final class dev/s7a/sqldelight/check/core/ReporterRegistry {
+	public static final field Companion Ldev/s7a/sqldelight/check/core/ReporterRegistry$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun all ()Ljava/util/List;
+	public final fun find (Ljava/lang/String;)Ldev/s7a/sqldelight/check/reporter/api/ReporterProvider;
+}
+
+public final class dev/s7a/sqldelight/check/core/ReporterRegistry$Companion {
+	public final fun load (Ljava/lang/ClassLoader;)Ldev/s7a/sqldelight/check/core/ReporterRegistry;
+	public static synthetic fun load$default (Ldev/s7a/sqldelight/check/core/ReporterRegistry$Companion;Ljava/lang/ClassLoader;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ReporterRegistry;
+}
+
+public final class dev/s7a/sqldelight/check/core/ResolvedRuleConfig {
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-cwxIa2A ()Ljava/lang/String;
+	public final fun component2 ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun component3 ()Ldev/s7a/sqldelight/check/api/Severity;
+	public final fun copy-me9k-jg (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;)Ldev/s7a/sqldelight/check/core/ResolvedRuleConfig;
+	public static synthetic fun copy-me9k-jg$default (Ldev/s7a/sqldelight/check/core/ResolvedRuleConfig;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ResolvedRuleConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun getRuleId-cwxIa2A ()Ljava/lang/String;
+	public final fun getSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/ResolvedRuleSetConfig {
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-wigqPlY ()Ljava/lang/String;
+	public final fun component2 ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun copy-2Q98TFc (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;)Ldev/s7a/sqldelight/check/core/ResolvedRuleSetConfig;
+	public static synthetic fun copy-2Q98TFc$default (Ldev/s7a/sqldelight/check/core/ResolvedRuleSetConfig;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ResolvedRuleSetConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun getRuleSetId-wigqPlY ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/RuleConfig {
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-cwxIa2A ()Ljava/lang/String;
+	public final fun component2 ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun component3 ()Ldev/s7a/sqldelight/check/api/Severity;
+	public final fun copy-me9k-jg (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;)Ldev/s7a/sqldelight/check/core/RuleConfig;
+	public static synthetic fun copy-me9k-jg$default (Ldev/s7a/sqldelight/check/core/RuleConfig;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/RuleConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun getId-cwxIa2A ()Ljava/lang/String;
+	public final fun getSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/RuleRegistry {
+	public static final field Companion Ldev/s7a/sqldelight/check/core/RuleRegistry$Companion;
+	public final fun providers ()Ljava/util/List;
+}
+
+public final class dev/s7a/sqldelight/check/core/RuleRegistry$Companion {
+	public final fun load (Ljava/lang/ClassLoader;)Ldev/s7a/sqldelight/check/core/RuleRegistry;
+}
+
+public final class dev/s7a/sqldelight/check/core/RuleSetConfig {
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-wigqPlY ()Ljava/lang/String;
+	public final fun component2 ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun copy-2Q98TFc (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;)Ldev/s7a/sqldelight/check/core/RuleSetConfig;
+	public static synthetic fun copy-2Q98TFc$default (Ldev/s7a/sqldelight/check/core/RuleSetConfig;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/RuleSetConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun getId-wigqPlY ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/SqlDelightCheckEngine {
+	public fun <init> ()V
+	public final fun run (Ljava/util/List;Ljava/util/List;Ldev/s7a/sqldelight/check/core/CheckConfig;)Ljava/util/List;
+	public static synthetic fun run$default (Ldev/s7a/sqldelight/check/core/SqlDelightCheckEngine;Ljava/util/List;Ljava/util/List;Ldev/s7a/sqldelight/check/core/CheckConfig;ILjava/lang/Object;)Ljava/util/List;
+}
+
