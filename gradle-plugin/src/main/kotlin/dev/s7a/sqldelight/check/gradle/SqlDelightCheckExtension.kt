@@ -1,14 +1,8 @@
 package dev.s7a.sqldelight.check.gradle
 
-import dev.s7a.sqldelight.check.api.Enablement
-import dev.s7a.sqldelight.check.api.Severity
 import org.gradle.api.Action
-import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.provider.Property
 import javax.inject.Inject
 
 /**
@@ -80,113 +74,4 @@ public open class SqlDelightCheckExtension
         public fun write(configure: Action<in WriteExtension>) {
             configure.execute(write)
         }
-    }
-
-/**
- * DSL object for a rule set.
- */
-public open class RuleSetExtension
-    @Inject
-    constructor(
-        private val name: String,
-        objects: ObjectFactory,
-    ) : Named {
-        /** Rule set enablement. */
-        public val enabled: Property<Enablement> =
-            objects.property(Enablement::class.java).convention(Enablement.Auto)
-
-        override fun getName(): String = name
-    }
-
-/**
- * DSL object for one rule override.
- */
-public open class RuleExtension
-    @Inject
-    constructor(
-        private val name: String,
-        objects: ObjectFactory,
-    ) : Named {
-        /** Rule enablement. */
-        public val enabled: Property<Enablement> =
-            objects.property(Enablement::class.java).convention(Enablement.Auto)
-
-        /** Rule severity. */
-        public val severity: Property<Severity> =
-            objects.property(Severity::class.java).convention(Severity.Warning)
-
-        override fun getName(): String = name
-    }
-
-/**
- * DSL object for one reporter.
- */
-public open class ReporterExtension
-    @Inject
-    constructor(
-        private val name: String,
-        objects: ObjectFactory,
-    ) : Named {
-        /** Whether this reporter should produce output. */
-        public val required: Property<Boolean> =
-            objects.property(Boolean::class.java).convention(false)
-
-        /** Report output file. */
-        public val outputFile: RegularFileProperty = objects.fileProperty()
-
-        /** Reporter-specific string options passed to the selected reporter provider. */
-        public val options: MapProperty<String, String> =
-            objects.mapProperty(String::class.java, String::class.java).convention(emptyMap())
-
-        override fun getName(): String = name
-    }
-
-/**
- * DSL object for one SQLDelight database override.
- */
-public open class DatabaseExtension
-    @Inject
-    constructor(
-        private val name: String,
-        objects: ObjectFactory,
-    ) : Named {
-        /** Database-specific rule set overrides. */
-        public val ruleSets: NamedDomainObjectContainer<RuleSetExtension> =
-            objects.domainObjectContainer(RuleSetExtension::class.java) { ruleSetName ->
-                objects.newInstance(RuleSetExtension::class.java, ruleSetName)
-            }
-
-        /** Database-specific rule overrides. */
-        public val rules: NamedDomainObjectContainer<RuleExtension> =
-            objects.domainObjectContainer(RuleExtension::class.java) { ruleName ->
-                objects.newInstance(RuleExtension::class.java, ruleName)
-            }
-
-        /**
-         * Configures database-specific rule set overrides.
-         */
-        public fun ruleSets(configure: Action<in NamedDomainObjectContainer<RuleSetExtension>>) {
-            configure.execute(ruleSets)
-        }
-
-        /**
-         * Configures database-specific rule overrides.
-         */
-        public fun rules(configure: Action<in NamedDomainObjectContainer<RuleExtension>>) {
-            configure.execute(rules)
-        }
-
-        override fun getName(): String = name
-    }
-
-/**
- * DSL object for write task behavior.
- */
-public open class WriteExtension
-    @Inject
-    constructor(
-        objects: ObjectFactory,
-    ) {
-        /** Whether write tasks may apply unsafe fixes. */
-        public val unsafe: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     }

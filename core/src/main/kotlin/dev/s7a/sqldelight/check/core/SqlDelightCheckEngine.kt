@@ -3,37 +3,13 @@ package dev.s7a.sqldelight.check.core
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
-import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
-import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.core.sqldelight.SqlDelight2Analyzer
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
-import dev.s7a.sqldelight.check.core.sqldelight.SqlDelight2Analyzer
-
-/**
- * Resolved configuration for one rule after global and database-specific overrides are applied.
- */
-public data class ResolvedRuleConfig(
-    /** Rule ID being configured. */
-    public val ruleId: RuleId,
-    /** Final enablement before `Auto` applicability is evaluated. */
-    public val enablement: Enablement,
-    /** Final severity assigned to diagnostics from this rule. */
-    public val severity: Severity,
-)
-
-/**
- * Resolved configuration for one rule set.
- */
-public data class ResolvedRuleSetConfig(
-    /** Rule set ID being configured. */
-    public val ruleSetId: RuleSetId,
-    /** Final enablement before rule-level overrides are applied. */
-    public val enablement: Enablement,
-)
 
 /**
  * Entry point for sqldelight-check analysis.
