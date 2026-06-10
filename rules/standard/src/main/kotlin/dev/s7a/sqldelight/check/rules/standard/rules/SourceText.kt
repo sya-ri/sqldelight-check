@@ -22,6 +22,11 @@ internal data class SqlCharacter(
     val offset: Int,
 )
 
+internal data class LineComment(
+    val startOffset: Int,
+    val endOffset: Int,
+)
+
 internal fun String.rangeAtOffsets(
     startOffset: Int,
     endOffset: Int,
@@ -124,6 +129,35 @@ internal fun String.sqlCharacters(): Sequence<SqlCharacter> =
                 }
         }
     }
+
+internal fun String.lineComments(): Sequence<LineComment> =
+    sequence {
+        var index = 0
+        while (index < length) {
+            index =
+                when {
+                    startsWith("--", index) -> {
+                        val end = skipLineComment(index)
+                        yield(LineComment(startOffset = index, endOffset = end))
+                        end
+                    }
+                    startsWith("/*", index) -> skipBlockComment(index)
+                    this@lineComments[index] == '\'' -> skipQuoted(index, '\'')
+                    this@lineComments[index] == '"' -> skipQuoted(index, '"')
+                    this@lineComments[index] == '`' -> skipQuoted(index, '`')
+                    this@lineComments[index] == '[' -> skipBracketQuoted(index)
+                    else -> index + 1
+                }
+        }
+    }
+
+internal fun String.nextNonHorizontalWhitespace(offset: Int): Char? {
+    var index = offset
+    while (index < length && (this[index] == ' ' || this[index] == '\t')) {
+        index++
+    }
+    return getOrNull(index)
+}
 
 private fun String.skipLineComment(start: Int): Int {
     val newline = indexOf('\n', startIndex = start + 2)

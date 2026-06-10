@@ -38,7 +38,7 @@ class KeywordCaseRuleTest {
                 path = MIGRATION_SQM_PATH,
             )
 
-        assertEquals(6, diagnostics.size)
+        assertEquals(5, diagnostics.size)
     }
 
     @Test

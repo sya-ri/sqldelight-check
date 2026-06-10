@@ -120,20 +120,29 @@ default. HTML and Markdown are available but disabled by default.
 The initial standard rule set contains:
 
 - `standard:final-newline`: reports files that do not end with a newline. Safe fix: insert the final newline.
+- `standard:function-name-case`: reports common SQL function names that are not uppercase. Unsafe fix: uppercase the
+  function token.
+- `standard:data-type-case`: reports common SQL data type names that are not uppercase. Unsafe fix: uppercase the data
+  type token.
 - `standard:keyword-case`: reports common SQL keywords that are not uppercase outside comments and quoted text. Unsafe
   fix: uppercase the keyword token.
 - `standard:line-ending-lf`: reports CRLF and CR line endings. Safe fix: replace them with LF.
+- `standard:literal-case`: reports SQL literal tokens that are not uppercase. Unsafe fix: uppercase the literal token.
 - `standard:max-blank-lines`: reports more than one consecutive blank line. Safe fix: remove extra blank lines.
 - `standard:no-consecutive-semicolons`: reports directly repeated semicolon tokens. Safe fix: remove extra semicolons.
 - `standard:no-leading-blank-lines`: reports blank lines before the first content line. Safe fix: remove them.
+- `standard:no-space-after-dot`: reports inline whitespace after `.`. Safe fix: remove it.
 - `standard:no-space-after-opening-parenthesis`: reports inline whitespace after `(`. Safe fix: remove it.
 - `standard:no-space-before-closing-parenthesis`: reports inline whitespace before `)`. Safe fix: remove it.
 - `standard:no-space-before-comma`: reports inline whitespace before `,`. Safe fix: remove it.
+- `standard:no-space-before-dot`: reports inline whitespace before `.`. Safe fix: remove it.
 - `standard:no-space-before-semicolon`: reports inline whitespace before `;`. Safe fix: remove it.
 - `standard:no-tab-indentation`: reports tabs in leading indentation. Safe fix: replace indentation tabs with spaces.
 - `standard:no-trailing-blank-lines`: reports blank lines after the last content line. Safe fix: remove them.
 - `standard:no-trailing-whitespace`: reports spaces or tabs at the end of a line. Safe fix: remove trailing whitespace.
 - `standard:space-after-comma`: reports missing or repeated inline spaces after `,`. Safe fix: use one space.
+- `standard:space-after-line-comment-marker`: reports line comments where `--` is not followed by a space. Safe fix:
+  insert the space.
 - `standard:space-around-comparison-operators`: reports comparison operators without one space on both sides. Unsafe fix:
   normalize inline spacing around the operator.
 

@@ -91,7 +91,6 @@ public class KeywordCaseRule : Rule {
                 "like",
                 "limit",
                 "not",
-                "null",
                 "on",
                 "or",
                 "order",

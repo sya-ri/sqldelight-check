@@ -83,20 +83,26 @@ The standard rule set uses two safety levels:
 
 | Rule ID | Default | Fix | Safety | Purpose |
 | --- | --- | --- | --- | --- |
+| `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
 | `standard:final-newline` | Warning / Auto | Yes | Safe | Require files to end with one LF newline. |
+| `standard:function-name-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL function names outside comments and quoted text. |
 | `standard:keyword-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL keywords outside comments and quoted text. |
 | `standard:line-ending-lf` | Warning / Auto | Yes | Safe | Replace CRLF or CR line endings with LF. |
+| `standard:literal-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
 | `standard:max-blank-lines` | Warning / Auto | Yes | Safe | Disallow more than one consecutive blank line. |
 | `standard:no-consecutive-semicolons` | Warning / Auto | Yes | Safe | Disallow directly repeated semicolon tokens. |
 | `standard:no-leading-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines before the first content line. |
+| `standard:no-space-after-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `.`. |
 | `standard:no-space-after-opening-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `(`. |
 | `standard:no-space-before-closing-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `)`. |
 | `standard:no-space-before-comma` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `,`. |
+| `standard:no-space-before-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `.`. |
 | `standard:no-space-before-semicolon` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `;`. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
 | `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
+| `standard:space-after-line-comment-marker` | Warning / Auto | Yes | Safe | Require one space after `--` when comment text follows. |
 | `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
 
 ## SQLFluff References
@@ -107,9 +113,10 @@ engine runs in SQLDelight projects, reports SQLDelight database metadata, and ne
 
 Useful sqlfluff concepts reflected here:
 
-- Capitalisation checks: `standard:keyword-case`.
-- Layout checks around commas, semicolons, parentheses, blank lines, and line endings: the `standard:no-*` spacing and
-  blank-line rules.
+- Capitalisation checks: `standard:keyword-case`, `standard:function-name-case`, `standard:data-type-case`, and
+  `standard:literal-case`.
+- Layout checks around dots, commas, semicolons, parentheses, comments, blank lines, and line endings: the
+  `standard:no-*` and `standard:space-*` spacing rules.
 - Structure checks for repeated semicolons: `standard:no-consecutive-semicolons`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
@@ -429,6 +436,61 @@ Fix behavior:
 - Skips comments, string literals, and quoted identifiers.
 - Safe to apply in write tasks.
 
+## `standard:no-space-before-dot`
+
+Reports spaces and tabs immediately before `.` outside comments and quoted text.
+
+Qualified column references are common in SQLDelight query files when joins are introduced. Keeping the dot tight on
+both sides prevents `table . column` variants from drifting through a codebase.
+
+Invalid:
+
+```sql
+selectPlayer:
+SELECT player .id
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayer:
+SELECT player.id
+FROM player;
+```
+
+Fix behavior:
+
+- Removes inline spaces and tabs immediately before `.`.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:no-space-after-dot`
+
+Reports spaces and tabs immediately after `.` outside comments and quoted text.
+
+Invalid:
+
+```sql
+selectPlayer:
+SELECT player. id
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayer:
+SELECT player.id
+FROM player;
+```
+
+Fix behavior:
+
+- Removes inline spaces and tabs immediately after `.`.
+- Skips comments, string literals, and quoted identifiers.
+- Safe to apply in write tasks.
+
 ## `standard:no-consecutive-semicolons`
 
 Reports directly repeated semicolon tokens outside comments and quoted text.
@@ -553,6 +615,170 @@ Why unsafe:
 - Some dialect-specific operators are visually similar to comparison operators.
 - The current rule uses source text rather than SQLDelight PSI, so users must opt in before write tasks apply fixes.
 
+## `standard:space-after-line-comment-marker`
+
+Reports `--` line comments when comment text follows immediately without a space.
+
+SQLDelight files often contain short comments above schema declarations, named queries, and migrations. Requiring
+`-- comment` keeps those comments readable while leaving empty `--` separator comments alone.
+
+Invalid:
+
+```sql
+--Player lookup queries.
+selectAll:
+SELECT id, name
+FROM player;
+```
+
+Valid:
+
+```sql
+-- Player lookup queries.
+selectAll:
+SELECT id, name
+FROM player;
+```
+
+Valid:
+
+```sql
+--
+selectAll:
+SELECT id, name
+FROM player;
+```
+
+Fix behavior:
+
+- Inserts one space after `--` when another character follows on the same line.
+- Skips `--` sequences inside string literals and quoted identifiers.
+- Safe to apply in write tasks.
+
+## `standard:function-name-case`
+
+Reports common SQL function names that are not uppercase.
+
+This rule is inspired by sqlfluff's function capitalisation rule. sqldelight-check only checks recognized function-name
+tokens followed by `(`, so function-like column names are left alone.
+
+Invalid:
+
+```sql
+selectPlayerStats:
+SELECT count(*), coalesce(max(score), 0)
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayerStats:
+SELECT COUNT(*), COALESCE(MAX(score), 0)
+FROM player;
+```
+
+Fix behavior:
+
+- Replaces recognized function tokens with uppercase text.
+- Marks fixes as `Unsafe`.
+- Skips comments, string literals, and quoted identifiers.
+
+Why unsafe:
+
+- Function names can be dialect-specific.
+- User-defined functions can use project-specific naming conventions.
+- The rule uses source text rather than SQLDelight PSI, so users must opt in before write tasks apply fixes.
+
+Current function coverage:
+
+```text
+ABS, AVG, COALESCE, COUNT, DATE, DATETIME, GROUP_CONCAT, HEX, IFNULL, INSTR,
+JSON_EXTRACT, LENGTH, LOWER, LTRIM, MAX, MIN, NULLIF, RANDOM, REPLACE, ROUND,
+RTRIM, STRFTIME, SUBSTR, SUBSTRING, SUM, TIME, TRIM, TYPEOF, UPPER
+```
+
+## `standard:data-type-case`
+
+Reports common SQL data type names that are not uppercase.
+
+This rule is inspired by sqlfluff's data type capitalisation rule. It is intentionally conservative and only recognizes
+common type names that appear in SQLDelight schema and migration files.
+
+Invalid:
+
+```sql
+CREATE TABLE player (
+  id integer NOT NULL PRIMARY KEY,
+  name text NOT NULL
+);
+```
+
+Valid:
+
+```sql
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+```
+
+Fix behavior:
+
+- Replaces recognized data type tokens with uppercase text.
+- Marks fixes as `Unsafe`.
+- Skips comments, string literals, and quoted identifiers.
+
+Why unsafe:
+
+- SQLDelight supports dialects and custom column adapters.
+- Some projects may intentionally use custom type names or type aliases.
+- The rule uses source text rather than SQLDelight PSI, so users must opt in before write tasks apply fixes.
+
+Current data type coverage:
+
+```text
+BIGINT, BLOB, BOOL, BOOLEAN, CHAR, CLOB, DECIMAL, DOUBLE, FLOAT, INT, INTEGER,
+NUMERIC, REAL, SMALLINT, TEXT, TIMESTAMP, VARCHAR
+```
+
+## `standard:literal-case`
+
+Reports SQL literal tokens that are not uppercase.
+
+This rule is inspired by sqlfluff's literal capitalisation rule and owns literal casing separately from
+`standard:keyword-case`.
+
+Invalid:
+
+```sql
+selectActive:
+SELECT id, name
+FROM player
+WHERE deleted_at IS null AND active = true;
+```
+
+Valid:
+
+```sql
+selectActive:
+SELECT id, name
+FROM player
+WHERE deleted_at IS NULL AND active = TRUE;
+```
+
+Fix behavior:
+
+- Replaces `null`, `true`, and `false` variants with uppercase text.
+- Marks fixes as `Unsafe`.
+- Skips comments, string literals, and quoted identifiers.
+
+Why unsafe:
+
+- Literal case is normally behavior-preserving, but without SQLDelight PSI the rule cannot prove every unquoted token is
+  syntactically a literal.
+- Users must opt in before write tasks apply fixes.
+
 ## `standard:keyword-case`
 
 Reports common SQL keywords that are not uppercase.
@@ -604,8 +830,8 @@ Current keyword coverage:
 ADD, ALTER, AND, AS, ASC, BETWEEN, BY, CASE, CHECK, COLUMN, CONSTRAINT, CREATE,
 DEFAULT, DELETE, DESC, DISTINCT, DROP, ELSE, END, EXISTS, FOREIGN, FROM, GROUP,
 HAVING, IN, INDEX, INNER, INSERT, INTO, IS, JOIN, KEY, LEFT, LIKE, LIMIT, NOT,
-NULL, ON, OR, ORDER, OUTER, PRIMARY, REFERENCES, RIGHT, SELECT, SET, TABLE,
-THEN, UNION, UNIQUE, UPDATE, VALUES, WHEN, WHERE
+ON, OR, ORDER, OUTER, PRIMARY, REFERENCES, RIGHT, SELECT, SET, TABLE, THEN,
+UNION, UNIQUE, UPDATE, VALUES, WHEN, WHERE
 ```
 
 ## Current Boundaries
