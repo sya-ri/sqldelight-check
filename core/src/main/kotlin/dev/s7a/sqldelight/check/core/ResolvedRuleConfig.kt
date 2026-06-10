@@ -8,10 +8,16 @@ import dev.s7a.sqldelight.check.api.Severity
  * Resolved configuration for one rule after global and database-specific overrides are applied.
  */
 public data class ResolvedRuleConfig(
-    /** Rule ID being configured. */
+    /**
+     * Rule ID being configured.
+     */
     public val ruleId: RuleId,
-    /** Final enablement before `Auto` applicability is evaluated. */
+    /**
+     * Final enablement before `Auto` applicability is evaluated.
+     */
     public val enablement: Enablement,
-    /** Final severity assigned to diagnostics from this rule. */
+    /**
+     * Final severity assigned to diagnostics from this rule.
+     */
     public val severity: Severity,
 )

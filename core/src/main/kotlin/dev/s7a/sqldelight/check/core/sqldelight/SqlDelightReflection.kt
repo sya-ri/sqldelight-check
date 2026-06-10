@@ -4,19 +4,29 @@ import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.ServiceLoader
 
-/** SQLDelight compilation unit class name used for reflective proxies. */
+/**
+ * SQLDelight compilation unit class name used for reflective proxies.
+ */
 internal const val SQL_DELIGHT_COMPILATION_UNIT_CLASS = "app.cash.sqldelight.core.SqlDelightCompilationUnit"
 
-/** SQLDelight database properties class name used for reflective proxies. */
+/**
+ * SQLDelight database properties class name used for reflective proxies.
+ */
 internal const val SQL_DELIGHT_DATABASE_PROPERTIES_CLASS = "app.cash.sqldelight.core.SqlDelightDatabaseProperties"
 
-/** SQLDelight dialect service interface class name. */
+/**
+ * SQLDelight dialect service interface class name.
+ */
 internal const val SQL_DELIGHT_DIALECT_CLASS = "app.cash.sqldelight.dialect.api.SqlDelightDialect"
 
-/** SQLDelight compiler environment class name. */
+/**
+ * SQLDelight compiler environment class name.
+ */
 internal const val SQL_DELIGHT_ENVIRONMENT_CLASS = "app.cash.sqldelight.core.SqlDelightEnvironment"
 
-/** SQLDelight source folder class name used for reflective proxies. */
+/**
+ * SQLDelight source folder class name used for reflective proxies.
+ */
 internal const val SQL_DELIGHT_SOURCE_FOLDER_CLASS = "app.cash.sqldelight.core.SqlDelightSourceFolder"
 
 /**

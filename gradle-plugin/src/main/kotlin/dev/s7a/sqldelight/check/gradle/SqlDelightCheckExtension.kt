@@ -13,31 +13,41 @@ public open class SqlDelightCheckExtension
     constructor(
         objects: ObjectFactory,
     ) {
-        /** Rule set defaults applied to every SQLDelight database unless overridden. */
+        /**
+         * Rule set defaults applied to every SQLDelight database unless overridden.
+         */
         public val ruleSets: NamedDomainObjectContainer<RuleSetExtension> =
             objects.domainObjectContainer(RuleSetExtension::class.java) { name ->
                 objects.newInstance(RuleSetExtension::class.java, name)
             }
 
-        /** Rule overrides applied to every SQLDelight database unless overridden. */
+        /**
+         * Rule overrides applied to every SQLDelight database unless overridden.
+         */
         public val rules: NamedDomainObjectContainer<RuleExtension> =
             objects.domainObjectContainer(RuleExtension::class.java) { name ->
                 objects.newInstance(RuleExtension::class.java, name)
             }
 
-        /** Reporters and output options. */
+        /**
+         * Reporters and output options.
+         */
         public val reports: NamedDomainObjectContainer<ReporterExtension> =
             objects.domainObjectContainer(ReporterExtension::class.java) { name ->
                 objects.newInstance(ReporterExtension::class.java, name)
             }
 
-        /** Database-specific overrides keyed by SQLDelight database name. */
+        /**
+         * Database-specific overrides keyed by SQLDelight database name.
+         */
         public val databases: NamedDomainObjectContainer<DatabaseExtension> =
             objects.domainObjectContainer(DatabaseExtension::class.java) { name ->
                 objects.newInstance(DatabaseExtension::class.java, name)
             }
 
-        /** Write behavior shared by `*Write` tasks. */
+        /**
+         * Write behavior shared by `*Write` tasks.
+         */
         public val write: WriteExtension = objects.newInstance(WriteExtension::class.java)
 
         /**

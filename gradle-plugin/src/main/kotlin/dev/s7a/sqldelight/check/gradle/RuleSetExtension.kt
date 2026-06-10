@@ -15,7 +15,9 @@ public open class RuleSetExtension
         private val name: String,
         objects: ObjectFactory,
     ) : Named {
-        /** Rule set enablement. */
+        /**
+         * Rule set enablement.
+         */
         public val enabled: Property<Enablement> =
             objects.property(Enablement::class.java).convention(Enablement.Auto)
 

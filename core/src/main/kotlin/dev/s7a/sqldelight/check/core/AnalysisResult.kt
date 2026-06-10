@@ -7,8 +7,12 @@ import dev.s7a.sqldelight.check.api.SourceFile
  * Stable analysis result produced before rule execution.
  */
 public data class AnalysisResult(
-    /** Files accepted for downstream rule and formatter execution. */
+    /**
+     * Files accepted for downstream rule and formatter execution.
+     */
     public val files: List<SourceFile>,
-    /** Diagnostics emitted by SQLDelight or core validation. */
+    /**
+     * Diagnostics emitted by SQLDelight or core validation.
+     */
     public val diagnostics: List<Diagnostic>,
 )

@@ -15,13 +15,17 @@ public open class DatabaseExtension
         private val name: String,
         objects: ObjectFactory,
     ) : Named {
-        /** Database-specific rule set overrides. */
+        /**
+         * Database-specific rule set overrides.
+         */
         public val ruleSets: NamedDomainObjectContainer<RuleSetExtension> =
             objects.domainObjectContainer(RuleSetExtension::class.java) { ruleSetName ->
                 objects.newInstance(RuleSetExtension::class.java, ruleSetName)
             }
 
-        /** Database-specific rule overrides. */
+        /**
+         * Database-specific rule overrides.
+         */
         public val rules: NamedDomainObjectContainer<RuleExtension> =
             objects.domainObjectContainer(RuleExtension::class.java) { ruleName ->
                 objects.newInstance(RuleExtension::class.java, ruleName)

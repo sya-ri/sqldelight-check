@@ -4,13 +4,21 @@ package dev.s7a.sqldelight.check.core.sqldelight
  * Parsed SQLDelight semantic version used for compatibility checks.
  */
 internal data class SqlDelightVersion(
-    /** Major version component. */
+    /**
+     * Major version component.
+     */
     val major: Int,
-    /** Minor version component. */
+    /**
+     * Minor version component.
+     */
     val minor: Int,
-    /** Patch version component. */
+    /**
+     * Patch version component.
+     */
     val patch: Int,
-    /** Optional prerelease qualifier without the leading hyphen. */
+    /**
+     * Optional prerelease qualifier without the leading hyphen.
+     */
     val qualifier: String?,
 ) {
     companion object {

@@ -28,9 +28,13 @@ private val SQLDELIGHT_COMPILER_CLASSES =
  * SQLDelight database input resolved from a Gradle project.
  */
 internal data class ResolvedSqlDelightInput(
-    /** SQLDelight version used for this database. */
+    /**
+     * SQLDelight version used for this database.
+     */
     val sqlDelightVersion: String,
-    /** Core analysis input for sqldelight-check. */
+    /**
+     * Core analysis input for sqldelight-check.
+     */
     val analysisInput: AnalysisInput,
 )
 

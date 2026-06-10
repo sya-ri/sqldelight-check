@@ -16,11 +16,15 @@ public open class RuleExtension
         private val name: String,
         objects: ObjectFactory,
     ) : Named {
-        /** Rule enablement. */
+        /**
+         * Rule enablement.
+         */
         public val enabled: Property<Enablement> =
             objects.property(Enablement::class.java).convention(Enablement.Auto)
 
-        /** Rule severity. */
+        /**
+         * Rule severity.
+         */
         public val severity: Property<Severity> =
             objects.property(Severity::class.java).convention(Severity.Warning)
 

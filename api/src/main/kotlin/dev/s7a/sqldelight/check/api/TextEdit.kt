@@ -4,8 +4,12 @@ package dev.s7a.sqldelight.check.api
  * Text edit represented as a replacement over a source range.
  */
 public data class TextEdit(
-    /** Range to replace. */
+    /**
+     * Range to replace.
+     */
     public val range: SourceRange,
-    /** Replacement text. */
+    /**
+     * Replacement text.
+     */
     public val replacement: String,
 )

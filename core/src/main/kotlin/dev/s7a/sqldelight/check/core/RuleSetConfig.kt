@@ -7,8 +7,12 @@ import dev.s7a.sqldelight.check.api.RuleSetId
  * Rule set configuration before database-specific overrides are applied.
  */
 public data class RuleSetConfig(
-    /** Rule set ID. */
+    /**
+     * Rule set ID.
+     */
     public val id: RuleSetId,
-    /** Configured rule set enablement. */
+    /**
+     * Configured rule set enablement.
+     */
     public val enablement: Enablement,
 )

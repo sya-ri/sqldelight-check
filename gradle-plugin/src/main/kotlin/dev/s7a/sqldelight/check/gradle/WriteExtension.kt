@@ -12,6 +12,8 @@ public open class WriteExtension
     constructor(
         objects: ObjectFactory,
     ) {
-        /** Whether write tasks may apply unsafe fixes. */
+        /**
+         * Whether write tasks may apply unsafe fixes.
+         */
         public val unsafe: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     }

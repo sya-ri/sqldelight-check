@@ -8,13 +8,19 @@ import dev.s7a.sqldelight.check.api.Severity
  * Lint or formatting rule contributed by a rule set.
  */
 public interface Rule {
-    /** Globally unique rule ID using `rule-set:rule-name` form. */
+    /**
+     * Globally unique rule ID using `rule-set:rule-name` form.
+     */
     public val id: RuleId
 
-    /** Default severity used when user configuration does not override it. */
+    /**
+     * Default severity used when user configuration does not override it.
+     */
     public val defaultSeverity: Severity
 
-    /** Default enablement before user configuration and auto applicability are resolved. */
+    /**
+     * Default enablement before user configuration and auto applicability are resolved.
+     */
     public val defaultEnablement: Enablement
 
     /**

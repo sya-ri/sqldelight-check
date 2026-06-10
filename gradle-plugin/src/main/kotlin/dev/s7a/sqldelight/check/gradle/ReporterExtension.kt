@@ -16,14 +16,20 @@ public open class ReporterExtension
         private val name: String,
         objects: ObjectFactory,
     ) : Named {
-        /** Whether this reporter should produce output. */
+        /**
+         * Whether this reporter should produce output.
+         */
         public val required: Property<Boolean> =
             objects.property(Boolean::class.java).convention(false)
 
-        /** Report output file. */
+        /**
+         * Report output file.
+         */
         public val outputFile: RegularFileProperty = objects.fileProperty()
 
-        /** Reporter-specific string options passed to the selected reporter provider. */
+        /**
+         * Reporter-specific string options passed to the selected reporter provider.
+         */
         public val options: MapProperty<String, String> =
             objects.mapProperty(String::class.java, String::class.java).convention(emptyMap())
 

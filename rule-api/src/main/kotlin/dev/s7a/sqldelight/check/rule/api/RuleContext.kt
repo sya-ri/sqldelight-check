@@ -10,9 +10,13 @@ import dev.s7a.sqldelight.check.api.SourceFile
  * SQLDelight-version-specific structures into sqldelight-check-owned models before rules run.
  */
 public interface RuleContext {
-    /** Database containing the file being analyzed. */
+    /**
+     * Database containing the file being analyzed.
+     */
     public val database: DatabaseContext
 
-    /** File being analyzed. */
+    /**
+     * File being analyzed.
+     */
     public val file: SourceFile
 }

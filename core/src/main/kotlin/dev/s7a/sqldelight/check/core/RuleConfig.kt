@@ -8,10 +8,16 @@ import dev.s7a.sqldelight.check.api.Severity
  * Rule configuration before database-specific overrides are applied.
  */
 public data class RuleConfig(
-    /** Rule ID. */
+    /**
+     * Rule ID.
+     */
     public val id: RuleId,
-    /** Configured rule enablement. */
+    /**
+     * Configured rule enablement.
+     */
     public val enablement: Enablement,
-    /** Configured rule severity. */
+    /**
+     * Configured rule severity.
+     */
     public val severity: Severity,
 )
