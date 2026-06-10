@@ -6,6 +6,7 @@ import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import javax.inject.Inject
 
@@ -129,6 +130,9 @@ public open class ReporterExtension
         public val required: Property<Boolean> =
             objects.property(Boolean::class.java).convention(false)
 
+        /** Report output file. */
+        public val outputFile: RegularFileProperty = objects.fileProperty()
+
         override fun getName(): String = name
     }
 
@@ -181,4 +185,3 @@ public open class WriteExtension
         /** Whether write tasks may apply unsafe fixes. */
         public val unsafe: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     }
-

@@ -6,7 +6,7 @@ plugins {
 dependencies {
     api(project(":api"))
     implementation(project(":rule-api"))
-    implementation(project(":reporter-api"))
+    api(project(":reporter-api"))
     implementation(project(":adapter-spi"))
     testImplementation(kotlin("test"))
 }

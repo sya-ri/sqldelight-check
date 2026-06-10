@@ -1,14 +1,17 @@
 package dev.s7a.sqldelight.check.gradle
 
+import dev.s7a.sqldelight.check.core.ReporterRegistry
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 
 /**
  * Gradle plugin entry point for sqldelight-check.
  */
 public class SqlDelightCheckGradlePlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.extensions.create("sqldelightCheck", SqlDelightCheckExtension::class.java)
+        val extension = target.extensions.create("sqldelightCheck", SqlDelightCheckExtension::class.java)
+        target.configureDefaultReports(extension)
         target.createRuleSetConfiguration()
         target.createReporterConfiguration()
         target.registerSqlDelightCheckTasks()
@@ -68,3 +71,33 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
     }
 }
 
+/**
+ * Returns the reporter registry attached to this project.
+ */
+internal fun Project.sqldelightCheckReporterRegistry(): ReporterRegistry =
+    (this as ExtensionAware)
+        .extensions
+        .extraProperties
+        .get("sqldelightCheckReporterRegistry") as ReporterRegistry
+
+/**
+ * Registers default reporters and output locations.
+ */
+private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension) {
+    val defaults =
+        mapOf(
+            "json" to true,
+            "sarif" to true,
+            "text" to true,
+            "html" to false,
+            "markdown" to false,
+        )
+    defaults.forEach { (name, required) ->
+        extension.reports.maybeCreate(name).apply {
+            this.required.convention(required)
+            outputFile.convention(layout.buildDirectory.file("reports/sqldelight-check/report.$name"))
+        }
+    }
+    extensions.extraProperties["sqldelightCheckReporterRegistry"] =
+        ReporterRegistry.load(SqlDelightCheckGradlePlugin::class.java.classLoader)
+}

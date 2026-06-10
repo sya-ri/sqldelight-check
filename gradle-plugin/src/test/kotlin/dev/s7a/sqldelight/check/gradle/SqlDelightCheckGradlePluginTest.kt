@@ -4,6 +4,8 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -56,6 +58,26 @@ class SqlDelightCheckGradlePluginTest {
         assertContains(result.output, "task.sqldelightFormatWrite=true")
     }
 
+    @Test
+    fun `check task writes default reports`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    id("dev.s7a.sqldelight.check")
+                }
+                """.trimIndent(),
+            )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
+        assertEquals(true, project.file("build/reports/sqldelight-check/report.sarif").exists())
+        assertEquals(true, project.file("build/reports/sqldelight-check/report.text").exists())
+        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), "diagnostics")
+    }
+
     /**
      * Creates a temporary Gradle project for a TestKit run.
      */
@@ -72,6 +94,11 @@ class SqlDelightCheckGradlePluginTest {
     private class TestProject(
         private val directory: Path,
     ) {
+        /**
+         * Returns a file inside this temporary project.
+         */
+        fun file(path: String): Path = directory.resolve(path)
+
         /**
          * Runs Gradle with the plugin-under-test classpath.
          */

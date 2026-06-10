@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlinter) apply false
@@ -14,7 +16,7 @@ subprojects {
     version = rootProject.version
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension>("kotlin") {
+        extensions.configure<KotlinJvmProjectExtension>("kotlin") {
             jvmToolchain(25)
             explicitApi()
         }
