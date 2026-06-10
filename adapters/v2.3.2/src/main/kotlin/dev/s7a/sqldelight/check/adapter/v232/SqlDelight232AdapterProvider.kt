@@ -110,8 +110,16 @@ private object SqlDelight232Adapter : SqlDelightAdapter {
         val environment =
             environmentClass
                 .constructors
-                .first { constructor -> constructor.parameterCount == 5 }
-                .newInstance(properties, compilationUnit, "sqldelight-check", false, dialectClass.cast(dialect))
+                .first { constructor -> constructor.parameterCount == 7 }
+                .newInstance(
+                    properties,
+                    compilationUnit,
+                    false,
+                    dialectClass.cast(dialect),
+                    "sqldelight-check",
+                    input.sourceFolders,
+                    input.dependencyFolders,
+                )
         val status =
             environmentClass
                 .methods

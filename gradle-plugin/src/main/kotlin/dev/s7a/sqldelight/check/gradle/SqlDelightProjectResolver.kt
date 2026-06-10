@@ -16,6 +16,14 @@ import org.gradle.api.file.FileCollection
 private const val SQLDELIGHT_TASK_CLASS_NAME = "app.cash.sqldelight.gradle.SqlDelightTask"
 private const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
 private const val DEFAULT_SQLDELIGHT_VERSION = "2.3.2"
+private val SQLDELIGHT_COMPILER_CLASSES =
+    listOf(
+        "app.cash.sqldelight.core.SqlDelightCompilationUnit",
+        "app.cash.sqldelight.core.SqlDelightDatabaseProperties",
+        "app.cash.sqldelight.core.SqlDelightSourceFolder",
+        "app.cash.sqldelight.dialect.api.SqlDelightDialect",
+        "com.alecstrong.sql.psi.core.SqlCoreEnvironment",
+    )
 
 /**
  * SQLDelight database input resolved from a Gradle project.
@@ -243,7 +251,19 @@ private fun Any.sqlDelightCompilerClasspath(): List<File> {
             .filter { type -> type.name.startsWith("app.cash.sqldelight.") }
             .mapNotNull { type -> type.protectionDomain.codeSource?.location?.toURI()?.let(::File) }
             .toList()
-    return taskClasspath + implementationClasspath
+    val compilerApiClasspath =
+        SQLDELIGHT_COMPILER_CLASSES.mapNotNull { className ->
+            runCatching {
+                Class
+                    .forName(className, false, javaClass.classLoader)
+                    .protectionDomain
+                    .codeSource
+                    ?.location
+                    ?.toURI()
+                    ?.let(::File)
+            }.getOrNull()
+        }
+    return taskClasspath + implementationClasspath + compilerApiClasspath
 }
 
 private fun Configuration.directModuleDependencies(): List<ModuleDependency> =

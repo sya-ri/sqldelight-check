@@ -121,6 +121,41 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
     }
 
+    @Test
+    fun `check task fails after writing reports when sqldelight reports errors`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    kotlin("jvm") version "2.4.0"
+                    id("app.cash.sqldelight") version "2.3.2"
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                sqldelight {
+                    databases {
+                        create("Database") {
+                            packageName.set("com.example")
+                            srcDirs("src/main/sqldelight")
+                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+        project.write("src/main/sqldelight/com/example/Broken.sq", "CREATE TABL broken;")
+
+        val result = project.runAndFail("sqldelightCheck")
+
+        assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
+        assertContains(result.output, "sqldelight-check found 1 error diagnostic(s).")
+        assertContains(project.file("build/reports/sqldelight-check/report.json").readText(), """"errors":1""")
+    }
+
     /**
      * Creates a temporary Gradle project for a TestKit run.
      */
@@ -164,5 +199,16 @@ class SqlDelightCheckGradlePluginTest {
                 .withArguments(*arguments, "--stacktrace")
                 .withPluginClasspath()
                 .build()
+
+        /**
+         * Runs Gradle and expects the build to fail.
+         */
+        fun runAndFail(vararg arguments: String) =
+            GradleRunner
+                .create()
+                .withProjectDir(directory.toFile())
+                .withArguments(*arguments, "--stacktrace")
+                .withPluginClasspath()
+                .buildAndFail()
     }
 }
