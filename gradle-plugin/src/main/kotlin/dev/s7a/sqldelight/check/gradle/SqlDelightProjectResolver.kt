@@ -16,6 +16,7 @@ import org.gradle.api.file.FileCollection
 private const val SQLDELIGHT_TASK_CLASS_NAME = "app.cash.sqldelight.gradle.SqlDelightTask"
 private const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
 private const val DEFAULT_SQLDELIGHT_VERSION = "2.3.2"
+private const val DIALECT_SUFFIX = "-dialect"
 private val SQLDELIGHT_COMPILER_CLASSES =
     listOf(
         "app.cash.sqldelight.core.SqlDelightCompilationUnit",
@@ -137,7 +138,7 @@ internal class SqlDelightProjectResolver(
             configuration
                 ?.moduleComponents()
                 ?.firstOrNull { component ->
-                    component.group == SQLDELIGHT_GROUP && component.module == "compiler-env"
+                    component.isSqlDelightModule(SqlDelightModule.CompilerEnv.moduleName)
                 }
                 ?.version
         return compilerEnvVersion ?: dialect.version
@@ -156,7 +157,7 @@ internal class SqlDelightProjectResolver(
         val resolvedDialect =
             configuration
                 ?.moduleComponents()
-                ?.firstOrNull { component -> component.module.endsWith("-dialect") }
+                ?.firstOrNull { component -> component.isDialectArtifact() }
         if (resolvedDialect != null) {
             return dialectFromCoordinate(
                 group = resolvedDialect.group,
@@ -177,40 +178,41 @@ internal class SqlDelightProjectResolver(
         version: String?,
     ): SqlDialect {
         val artifact = "$group:$module"
-        return when {
-            group == SQLDELIGHT_GROUP && module.startsWith("sqlite-") && module.endsWith("-dialect") ->
+        val knownDialect = KnownSqlDelightDialect.from(group, module)
+        return when (knownDialect) {
+            is KnownSqlDelightDialect.SQLite ->
                 SqlDialect(
                     family = DialectFamily.SQLite,
-                    displayName = module.removeSuffix("-dialect").replace('-', ' '),
+                    displayName = knownDialect.displayName,
                     artifact = artifact,
                     version = version,
-                    capabilities = setOf("sqlite"),
+                    capabilities = knownDialect.capabilities,
                 )
-            group == SQLDELIGHT_GROUP && module == "mysql-dialect" ->
+            KnownSqlDelightDialect.MySql ->
                 SqlDialect(
                     family = DialectFamily.MySql,
-                    displayName = "MySQL",
+                    displayName = knownDialect.displayName,
                     artifact = artifact,
                     version = version,
-                    capabilities = setOf("mysql"),
+                    capabilities = knownDialect.capabilities,
                 )
-            group == SQLDELIGHT_GROUP && module == "postgresql-dialect" ->
+            KnownSqlDelightDialect.PostgreSql ->
                 SqlDialect(
                     family = DialectFamily.PostgreSql,
-                    displayName = "PostgreSQL",
+                    displayName = knownDialect.displayName,
                     artifact = artifact,
                     version = version,
-                    capabilities = setOf("postgresql"),
+                    capabilities = knownDialect.capabilities,
                 )
-            group == SQLDELIGHT_GROUP && module == "hsql-dialect" ->
+            KnownSqlDelightDialect.Hsql ->
                 SqlDialect(
                     family = DialectFamily.Hsql,
-                    displayName = "HSQL",
+                    displayName = knownDialect.displayName,
                     artifact = artifact,
                     version = version,
-                    capabilities = setOf("hsql"),
+                    capabilities = knownDialect.capabilities,
                 )
-            else ->
+            null ->
                 SqlDialect(
                     family = DialectFamily.Custom,
                     displayName = module,
@@ -225,6 +227,58 @@ private data class ResolvedSourceFolder(
     val file: File,
     val dependency: Boolean,
 )
+
+private enum class SqlDelightModule(
+    val moduleName: String,
+) {
+    CompilerEnv("compiler-env"),
+}
+
+private sealed interface KnownSqlDelightDialect {
+    val displayName: String
+    val capabilities: Set<String>
+
+    data class SQLite(
+        override val displayName: String,
+    ) : KnownSqlDelightDialect {
+        override val capabilities: Set<String> = setOf("sqlite")
+    }
+
+    data object MySql : KnownSqlDelightDialect {
+        override val displayName: String = "MySQL"
+        override val capabilities: Set<String> = setOf("mysql")
+    }
+
+    data object PostgreSql : KnownSqlDelightDialect {
+        override val displayName: String = "PostgreSQL"
+        override val capabilities: Set<String> = setOf("postgresql")
+    }
+
+    data object Hsql : KnownSqlDelightDialect {
+        override val displayName: String = "HSQL"
+        override val capabilities: Set<String> = setOf("hsql")
+    }
+
+    companion object {
+        fun from(
+            group: String,
+            module: String,
+        ): KnownSqlDelightDialect? {
+            if (group != SQLDELIGHT_GROUP) return null
+            return when (module) {
+                "mysql-dialect" -> MySql
+                "postgresql-dialect" -> PostgreSql
+                "hsql-dialect" -> Hsql
+                else ->
+                    if (module.startsWith("sqlite-") && module.endsWith(DIALECT_SUFFIX)) {
+                        SQLite(displayName = module.removeSuffix(DIALECT_SUFFIX).replace('-', ' '))
+                    } else {
+                        null
+                    }
+            }
+        }
+    }
+}
 
 private fun Any.hasSuperclass(className: String): Boolean {
     var current: Class<*>? = javaClass
@@ -276,5 +330,11 @@ private fun Configuration.moduleComponents(): List<ModuleComponentIdentifier> =
         .resolutionResult
         .allComponents
         .mapNotNull { component -> component.id as? ModuleComponentIdentifier }
+
+private fun ModuleComponentIdentifier.isSqlDelightModule(moduleName: String): Boolean =
+    group == SQLDELIGHT_GROUP && module == moduleName
+
+private fun ModuleComponentIdentifier.isDialectArtifact(): Boolean =
+    group == SQLDELIGHT_GROUP && module.endsWith(DIALECT_SUFFIX)
 
 private fun String?.orElse(fallback: String): String = this ?: fallback
