@@ -239,7 +239,7 @@ class SqlDelightCheckGradlePluginTest {
             CREATE TABLE player (
               id INTEGER NOT NULL PRIMARY KEY
             );
-            """.trimIndent() + "\n",
+            """.trimIndent(),
         )
 
         val result = project.run("sqldelightCheck")
@@ -289,7 +289,7 @@ class SqlDelightCheckGradlePluginTest {
             CREATE TABLE player (
               id INTEGER NOT NULL PRIMARY KEY
             );
-            """.trimIndent() + "\n",
+            """.trimIndent(),
         )
 
         val result = project.run("sqldelightCheck")
@@ -300,7 +300,7 @@ class SqlDelightCheckGradlePluginTest {
                 "sqldelight-check [Database] files (1):",
                 "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
                 "sqldelight-check [Database] src/main/sqldelight/com/example/Player.sq rules (1):",
-                "sqldelight-check [Database]   - standard:final-newline",
+                "sqldelight-check [Database] - [x] standard:final-newline",
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
             ),
             result.sqldelightCheckOutputLines(),

@@ -42,7 +42,8 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
         val logLevel = logLevel.get()
         val config = extension.toCheckConfig(logLevel)
-        val trace = tracing(logLevel)
+        val traceCollector = RuleTraceCollector()
+        val trace = tracing(logLevel, traceCollector)
         var result = analyze(config, trace)
         if (applyFixes.get()) {
             val changedFiles = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeWrites)
@@ -53,6 +54,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         }
 
         writeReports(extension, result.diagnostics)
+        logRuleHits(logLevel, traceCollector.traces, result.diagnostics)
         logger.lifecycle("sqldelight-check analyzed {} SQLDelight database(s).", result.databaseCount)
 
         val errorCount = result.diagnostics.count { diagnostic -> diagnostic.severity == Severity.Error }
@@ -76,7 +78,10 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         return AnalysisRunResult(databaseCount = inputs.size, diagnostics = diagnostics)
     }
 
-    private fun tracing(logLevel: LogLevel): AnalysisTrace =
+    private fun tracing(
+        logLevel: LogLevel,
+        traceCollector: RuleTraceCollector,
+    ): AnalysisTrace =
         object : AnalysisTrace {
             override fun databaseFiles(
                 database: DatabaseContext,
@@ -95,16 +100,38 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 ruleIds: List<RuleId>,
             ) {
                 if (!logLevel.logsRules) return
-                logger.lifecycle("sqldelight-check [{}] {} rules ({}):", database.name, file.path, ruleIds.size)
-                if (ruleIds.isEmpty()) {
-                    logger.lifecycle("sqldelight-check [{}]   - (none)", database.name)
-                    return
-                }
-                ruleIds.forEach { ruleId ->
-                    logger.lifecycle("sqldelight-check [{}]   - {}", database.name, ruleId.value)
-                }
+                traceCollector.record(database.name, file.path, ruleIds)
             }
         }
+
+    private fun logRuleHits(
+        logLevel: LogLevel,
+        traces: List<FileRuleTrace>,
+        diagnostics: List<Diagnostic>,
+    ) {
+        if (!logLevel.logsRules) return
+        val hitRuleIdsByFile =
+            diagnostics
+                .filter { diagnostic -> diagnostic.file != null && diagnostic.ruleId != null }
+                .groupBy { diagnostic -> diagnostic.file!!.path }
+                .mapValues { (_, fileDiagnostics) ->
+                    fileDiagnostics.mapTo(linkedSetOf()) { diagnostic -> diagnostic.ruleId!!.value }
+                }
+
+        traces.forEach { trace ->
+            logger.lifecycle("sqldelight-check [{}] {} rules ({}):", trace.databaseName, trace.filePath, trace.ruleIds.size)
+            if (trace.ruleIds.isEmpty()) {
+                logger.lifecycle("sqldelight-check [{}]   - (none)", trace.databaseName)
+                return@forEach
+            }
+
+            val hitRuleIds = hitRuleIdsByFile[trace.filePath].orEmpty()
+            trace.ruleIds.forEach { ruleId ->
+                val marker = if (ruleId.value in hitRuleIds) "x" else " "
+                logger.lifecycle("sqldelight-check [{}] - [{}] {}", trace.databaseName, marker, ruleId.value)
+            }
+        }
+    }
 
     private fun applyDiagnosticFixes(
         diagnostics: List<Diagnostic>,
@@ -153,4 +180,25 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
 private data class AnalysisRunResult(
     val databaseCount: Int,
     val diagnostics: List<Diagnostic>,
+)
+
+private data class RuleTraceCollector(
+    val traces: MutableList<FileRuleTrace> = mutableListOf(),
+) {
+    /**
+     * Records the rule IDs that were considered for one file.
+     */
+    public fun record(
+        databaseName: String,
+        filePath: String,
+        ruleIds: List<RuleId>,
+    ) {
+        traces += FileRuleTrace(databaseName = databaseName, filePath = filePath, ruleIds = ruleIds)
+    }
+}
+
+private data class FileRuleTrace(
+    val databaseName: String,
+    val filePath: String,
+    val ruleIds: List<RuleId>,
 )
