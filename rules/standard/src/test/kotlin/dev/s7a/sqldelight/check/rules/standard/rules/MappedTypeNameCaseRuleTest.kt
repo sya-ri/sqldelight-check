@@ -1,5 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.Severity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -16,6 +17,7 @@ class MappedTypeNameCaseRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
+        assertEquals(Severity.Info, diagnostics.single().severity)
     }
 
     @Test

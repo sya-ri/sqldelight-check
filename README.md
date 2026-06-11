@@ -187,11 +187,13 @@ Omitting rule IDs suppresses all rule diagnostics covered by that directive.
 
 Built-in rule set artifacts are installed with the Gradle plugin and are also published separately for custom setups:
 
-- `sqldelight-check-rules-standard`: dialect-independent rules for `.sq` and `.sqm` files.
-- `sqldelight-check-rules-postgres`: PostgreSQL-specific rules gated by `DialectCapability.PostgreSql`.
-- `sqldelight-check-rules-mysql`: MySQL-specific rules gated by `DialectCapability.MySql`.
-- `sqldelight-check-rules-sqlite`: SQLite-specific rules gated by `DialectCapability.SQLite`.
-- `sqldelight-check-rules-hsql`: HSQL-specific rule-set slot gated by `DialectCapability.Hsql`.
+The built-in rule sets currently include 148 rules:
+
+- `sqldelight-check-rules-standard`: 119 dialect-independent rules for `.sq` and `.sqm` files.
+- `sqldelight-check-rules-postgres`: 12 PostgreSQL-specific rules gated by `DialectCapability.PostgreSql`.
+- `sqldelight-check-rules-mysql`: 8 MySQL-specific rules gated by `DialectCapability.MySql`.
+- `sqldelight-check-rules-sqlite`: 6 SQLite-specific rules gated by `DialectCapability.SQLite`.
+- `sqldelight-check-rules-hsql`: 3 HSQL-specific rules gated by `DialectCapability.Hsql`.
 
 See the rule-set README files for rule behavior, options, and examples:
 

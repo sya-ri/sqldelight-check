@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.api.Severity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -27,6 +28,7 @@ class NoReplaceIntoRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals(qualifiedRuleId("mysql:no-replace-into"), diagnostics.single().ruleId)
+        assertEquals(Severity.Error, diagnostics.single().severity)
         assertEquals(2, diagnostics.single().range?.start?.line)
         assertEquals(1, diagnostics.single().range?.start?.column)
         assertTrue(diagnostics.single().fixes.isEmpty())

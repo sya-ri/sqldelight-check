@@ -21,20 +21,20 @@ Rule IDs use the `hsql:<rule-name>` form.
 
 ## Configuration Model
 
-- `🔘` in the Enable column when enabled automatically for HSQL dialects.
-- `⚠️` in the Severity column for the built-in default severity.
+- `🟢` in the Enable column when enabled automatically for HSQL dialects.
+- `❌` or `⚠️` in the Severity column for the built-in default severity.
 - The Fix column is blank when write tasks do not attach a fix.
 
-Built-in rules default to `Severity.Warning` in `v0.1.0`. `Severity.Error`
-and `Severity.Info` are supported through user configuration.
+Built-in rules use `Severity.Error` for high-risk findings and `Severity.Warning` for other visible findings.
+`Severity.Info` is supported for advisory findings and user configuration.
 
 ## Rule Summary
 
 | Rule ID | Enable | Severity | Fix | Purpose |
 | --- | --- | --- | --- | --- |
-| [`hsql:no-database-file-settings`](#hsqlno-database-file-settings) | 🔘 | ⚠️ |  | Disallow database or file settings in schema and migration sources. |
-| [`hsql:no-system-operations`](#hsqlno-system-operations) | 🔘 | ⚠️ |  | Disallow HSQL system operations in schema and migration sources. |
-| [`hsql:no-text-table-source`](#hsqlno-text-table-source) | 🔘 | ⚠️ |  | Disallow HSQL text-table sources in versioned SQLDelight files. |
+| [`hsql:no-database-file-settings`](#hsqlno-database-file-settings) | 🟢 | ❌ |  | Disallow database or file settings in schema and migration sources. |
+| [`hsql:no-system-operations`](#hsqlno-system-operations) | 🟢 | ❌ |  | Disallow HSQL system operations in schema and migration sources. |
+| [`hsql:no-text-table-source`](#hsqlno-text-table-source) | 🟢 | ⚠️ |  | Disallow HSQL text-table sources in versioned SQLDelight files. |
 
 ## Notes
 

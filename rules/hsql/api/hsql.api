@@ -6,10 +6,12 @@ public final class dev/s7a/sqldelight/check/rules/hsql/HsqlRuleSetProvider : dev
 
 public final class dev/s7a/sqldelight/check/rules/hsql/rules/NoDatabaseFileSettingsRule : dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule {
 	public fun <init> ()V
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 }
 
 public final class dev/s7a/sqldelight/check/rules/hsql/rules/NoSystemOperationsRule : dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule {
 	public fun <init> ()V
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 }
 
 public final class dev/s7a/sqldelight/check/rules/hsql/rules/NoTextTableSourceRule : dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule {

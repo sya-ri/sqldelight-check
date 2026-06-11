@@ -1,5 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.Severity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -15,6 +16,7 @@ class NoDropTableInMigrationRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
+        assertEquals(Severity.Error, diagnostics.single().severity)
         assertEquals("Avoid DROP TABLE in SQLDelight migrations unless the destructive change is intentional.", diagnostics.single().message)
     }
 

@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.api.Severity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,6 +21,7 @@ class NoDatabaseFileSettingsRuleTest {
             )
 
         assertEquals(2, diagnostics.size)
+        assertEquals(setOf(Severity.Error), diagnostics.map { it.severity }.toSet())
         assertEquals(setOf(qualifiedRuleId("hsql:no-database-file-settings")), diagnostics.map { it.ruleId }.toSet())
     }
 

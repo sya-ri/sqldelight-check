@@ -124,7 +124,9 @@ public class NoDropColumnRule : RegexPostgresRule(
     ruleName = "no-drop-column",
     pattern = """\bALTER\s+TABLE\b(?:(?!;).)*\bDROP\s+COLUMN\b""",
     message = "Avoid dropping PostgreSQL columns in a migration that may run against live application code.",
-)
+) {
+    override val defaultSeverity: Severity = Severity.Error
+}
 
 /**
  * Reports PostgreSQL RENAME COLUMN migrations.
@@ -136,7 +138,9 @@ public class NoRenameColumnRule : RegexPostgresRule(
     ruleName = "no-rename-column",
     pattern = """\bALTER\s+TABLE\b(?:(?!;).)*\bRENAME\s+COLUMN\b""",
     message = "Avoid renaming PostgreSQL columns in a migration that may run against live application code.",
-)
+) {
+    override val defaultSeverity: Severity = Severity.Error
+}
 
 /**
  * Reports PostgreSQL RENAME TABLE migrations.
@@ -148,7 +152,9 @@ public class NoRenameTableRule : RegexPostgresRule(
     ruleName = "no-rename-table",
     pattern = """\bALTER\s+TABLE\b(?:(?!;).)*\bRENAME\s+TO\b""",
     message = "Avoid renaming PostgreSQL tables in a migration that may run against live application code.",
-)
+) {
+    override val defaultSeverity: Severity = Severity.Error
+}
 
 /**
  * Base implementation for PostgreSQL rules that can be evaluated from masked source text.
@@ -162,7 +168,7 @@ public abstract class RegexPostgresRule(
     private val message: String,
 ) : Rule {
     override val id: RuleId = RuleId("$ruleName")
-    override val defaultSeverity: Severity = Severity.Warning
+    override open val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapability.PostgreSql
     private val regex = Regex(pattern, regexOptions)

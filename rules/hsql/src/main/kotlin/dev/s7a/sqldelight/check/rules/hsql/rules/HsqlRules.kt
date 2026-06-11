@@ -28,7 +28,9 @@ public class NoDatabaseFileSettingsRule : RegexHsqlRule(
     ruleName = "no-database-file-settings",
     pattern = """\bSET\s+(?:DATABASE|FILES)\b""",
     message = "Keep HSQL database and file settings out of SQLDelight schema migrations.",
-)
+) {
+    override val defaultSeverity: Severity = Severity.Error
+}
 
 /**
  * Reports HSQL system operations in SQLDelight schema and migration sources.
@@ -40,7 +42,9 @@ public class NoSystemOperationsRule : RegexHsqlRule(
     ruleName = "no-system-operations",
     pattern = """\b(?:CHECKPOINT|SHUTDOWN)\b|(?:^|;)\s*SCRIPT\b|\bBACKUP\s+DATABASE\b|\bPERFORM\s+(?:EXPORT|IMPORT)\b""",
     message = "Keep HSQL system operations out of SQLDelight schema migrations.",
-)
+) {
+    override val defaultSeverity: Severity = Severity.Error
+}
 
 /**
  * Reports HSQL TEXT table declarations and source bindings.
@@ -66,7 +70,7 @@ public abstract class RegexHsqlRule(
     private val message: String,
 ) : Rule {
     override val id: RuleId = RuleId("$ruleName")
-    override val defaultSeverity: Severity = Severity.Warning
+    override open val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapability.Hsql
     private val regex = Regex(pattern, regexOptions)

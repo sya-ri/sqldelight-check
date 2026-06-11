@@ -24,14 +24,17 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoConcurrentInd
 
 public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoDropColumnRule : dev/s7a/sqldelight/check/rules/postgres/rules/RegexPostgresRule {
 	public fun <init> ()V
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 }
 
 public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoRenameColumnRule : dev/s7a/sqldelight/check/rules/postgres/rules/RegexPostgresRule {
 	public fun <init> ()V
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 }
 
 public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoRenameTableRule : dev/s7a/sqldelight/check/rules/postgres/rules/RegexPostgresRule {
 	public fun <init> ()V
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 }
 
 public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoSetNotNullOnExistingColumnRule : dev/s7a/sqldelight/check/rules/postgres/rules/RegexPostgresRule {

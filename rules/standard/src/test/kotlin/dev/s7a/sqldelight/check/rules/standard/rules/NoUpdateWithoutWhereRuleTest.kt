@@ -1,5 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.Severity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -16,6 +17,7 @@ class NoUpdateWithoutWhereRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
+        assertEquals(Severity.Error, diagnostics.single().severity)
         assertEquals(2, diagnostics.single().range?.start?.line)
     }
 

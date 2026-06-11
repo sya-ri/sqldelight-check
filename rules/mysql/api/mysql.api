@@ -14,6 +14,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoDisplayWidthInte
 
 public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoExclusiveLockRule : dev/s7a/sqldelight/check/rules/mysql/rules/RegexMySqlRule {
 	public fun <init> ()V
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 }
 
 public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoReplaceIntoRule : dev/s7a/sqldelight/check/rule/api/Rule {

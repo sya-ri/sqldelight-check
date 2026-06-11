@@ -51,7 +51,9 @@ public class NoExclusiveLockRule : RegexMySqlRule(
     ruleName = "no-exclusive-lock",
     pattern = """\bLOCK\s*=\s*EXCLUSIVE\b""",
     message = "Avoid MySQL ALTER TABLE LOCK=EXCLUSIVE for online migrations.",
-)
+) {
+    override val defaultSeverity: Severity = Severity.Error
+}
 
 /**
  * Reports MySQL zero date defaults that are rejected by stricter SQL modes.
@@ -160,7 +162,7 @@ public abstract class RegexMySqlRule(
     private val message: String,
 ) : Rule {
     override val id: RuleId = RuleId("$ruleName")
-    override val defaultSeverity: Severity = Severity.Warning
+    override open val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapability.MySql
     private val regex = Regex(pattern, regexOptions)

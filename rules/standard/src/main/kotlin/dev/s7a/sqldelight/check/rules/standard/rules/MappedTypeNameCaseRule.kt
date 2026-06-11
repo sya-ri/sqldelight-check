@@ -14,7 +14,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
  */
 public class MappedTypeNameCaseRule : Rule {
     override val id: RuleId = RuleId("mapped-type-name-case")
-    override val defaultSeverity: Severity = Severity.Warning
+    override val defaultSeverity: Severity = Severity.Info
     override val defaultEnable: Boolean = true
 
     override fun run(

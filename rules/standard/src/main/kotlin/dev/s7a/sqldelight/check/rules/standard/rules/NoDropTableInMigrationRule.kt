@@ -16,7 +16,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  */
 public class NoDropTableInMigrationRule : Rule {
     override val id: RuleId = RuleId("no-drop-table-in-migration")
-    override val defaultSeverity: Severity = Severity.Warning
+    override val defaultSeverity: Severity = Severity.Error
     override val defaultEnable: Boolean = true
 
     override fun run(

@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  */
 public class NoUpdateWithoutWhereRule : Rule {
     override val id: RuleId = RuleId("no-update-without-where")
-    override val defaultSeverity: Severity = Severity.Warning
+    override val defaultSeverity: Severity = Severity.Error
     override val defaultEnable: Boolean = true
 
     override fun run(
