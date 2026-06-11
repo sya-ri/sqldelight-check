@@ -26,6 +26,7 @@ val publishedArtifacts =
         ":core" to "sqldelight-check-core",
         ":reporter-api" to "sqldelight-check-reporter-api",
         ":reporters:html" to "sqldelight-check-reporter-html",
+        ":reporters:github-annotations" to "sqldelight-check-reporter-github-annotations",
         ":reporters:json" to "sqldelight-check-reporter-json",
         ":reporters:markdown" to "sqldelight-check-reporter-markdown",
         ":reporters:sarif" to "sqldelight-check-reporter-sarif",

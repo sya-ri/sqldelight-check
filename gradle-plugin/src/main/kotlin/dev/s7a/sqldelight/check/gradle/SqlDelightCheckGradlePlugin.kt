@@ -95,6 +95,7 @@ private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension)
             "text" to true,
             "html" to false,
             "markdown" to false,
+            "github-annotations" to false,
         )
     defaults.forEach { (name, required) ->
         extension.reports.maybeCreate(name).apply {

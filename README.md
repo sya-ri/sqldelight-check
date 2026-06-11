@@ -131,10 +131,53 @@ Built-in reporters are installed with the Gradle plugin:
 - `text`
 - `html`: navigable diagnostics table for uploaded CI artifacts.
 - `markdown`: summary and diagnostics table suitable for GitHub Actions job summaries.
+- `github-annotations`: GitHub Actions workflow command annotations for changed files and check logs.
 
 Default report outputs are written under `build/reports/sqldelight-check/`. JSON, SARIF, and text are enabled by
 default. HTML and Markdown are available but disabled by default. Reporter-specific options can be set with
 `options`; the built-in JSON and SARIF reporters support `prettyPrint`.
+
+### GitHub Actions annotations
+
+Enable the `github-annotations` reporter and print its output after `sqldelightCheck`. GitHub Actions turns the printed
+workflow commands into inline annotations on the workflow run and pull request diff when the diagnostic location is part
+of the diff.
+
+```kotlin
+sqldelightCheck {
+    reports {
+        maybeCreate("github-annotations").required.set(true)
+    }
+}
+```
+
+```yaml
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  sqldelight-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+      - name: Run sqldelight-check
+        run: ./gradlew --no-daemon sqldelightCheck
+      - name: Publish sqldelight-check annotations
+        if: always()
+        run: |
+          if [ -f build/reports/sqldelight-check/report.github-annotations ]; then
+            cat build/reports/sqldelight-check/report.github-annotations
+          fi
+```
 
 ## Rule Sets
 

@@ -29,5 +29,6 @@ include(
     ":reporters:text",
     ":reporters:html",
     ":reporters:markdown",
+    ":reporters:github-annotations",
     ":gradle-plugin",
 )

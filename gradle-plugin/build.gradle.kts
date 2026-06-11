@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":reporters:text"))
     implementation(project(":reporters:html"))
     implementation(project(":reporters:markdown"))
+    implementation(project(":reporters:github-annotations"))
     compileOnly(kotlin("gradle-plugin-api"))
     testImplementation(kotlin("test"))
     testImplementation(gradleTestKit())
