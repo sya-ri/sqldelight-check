@@ -61,7 +61,6 @@ class SqlDelightProjectResolverTest {
                             dialect =
                                 SqlDialect(
                                     family = DialectFamily.SQLite,
-                                    displayName = "sqlite 3 38",
                                 ),
                         ),
                     files = files,

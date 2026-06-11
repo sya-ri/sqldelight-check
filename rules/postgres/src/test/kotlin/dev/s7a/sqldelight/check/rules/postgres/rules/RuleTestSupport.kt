@@ -37,7 +37,6 @@ internal fun Rule.diagnostics(
                         dialect =
                             SqlDialect(
                                 family = DialectFamily.PostgreSql,
-                                displayName = "PostgreSQL",
                                 capabilities = capabilities,
                             ),
                     )

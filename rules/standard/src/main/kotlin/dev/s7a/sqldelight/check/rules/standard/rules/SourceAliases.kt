@@ -20,7 +20,7 @@ internal enum class TableReferenceIntroducer {
 }
 
 internal fun String.tableReferences(
-    sourceKeywords: SqlDialectSourceKeywords = SqlDialectSourceKeywords.Default,
+    sourceKeywords: SqlDialectSourceKeywords = SqlDialectSourceKeywords.SourceScannerDefault,
 ): List<TableReference> {
     val tokens = sqlTokens().toList()
     val references = mutableListOf<TableReference>()

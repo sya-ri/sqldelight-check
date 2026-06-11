@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.gradle
 
 import dev.s7a.sqldelight.check.api.LogLevel
+import dev.s7a.sqldelight.check.core.DialectRegistry
 import dev.s7a.sqldelight.check.core.ReporterRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
 import java.net.URLClassLoader
@@ -16,6 +17,7 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         target.configureDefaultReports(extension)
         target.createRuleSetConfiguration()
         target.createReporterConfiguration()
+        target.createDialectConfiguration()
         target.registerSqlDelightCheckTasks(extension)
     }
 
@@ -38,6 +40,17 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
             configuration.isCanBeConsumed = false
             configuration.isCanBeResolved = true
             configuration.description = "External sqldelight-check reporter provider artifacts."
+        }
+    }
+
+    /**
+     * Registers the dependency bucket for external dialect providers.
+     */
+    private fun Project.createDialectConfiguration() {
+        configurations.create("sqldelightCheckDialect") { configuration ->
+            configuration.isCanBeConsumed = false
+            configuration.isCanBeResolved = true
+            configuration.description = "External sqldelight-check dialect provider artifacts."
         }
     }
 
@@ -116,6 +129,15 @@ private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension)
  */
 internal fun Project.sqldelightCheckRuleRegistry(): RuleRegistry =
     RuleRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckRuleSet"))
+
+/**
+ * Returns the dialect registry attached to this project.
+ */
+internal fun Project.sqldelightCheckDialectRegistry(): DialectRegistry =
+    DialectRegistry.create(
+        DialectRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckDialect")).providers() +
+            BuiltInSqlDialectProvider(),
+    )
 
 private fun Project.sqldelightCheckProviderClassLoader(configurationName: String): ClassLoader {
     val urls =

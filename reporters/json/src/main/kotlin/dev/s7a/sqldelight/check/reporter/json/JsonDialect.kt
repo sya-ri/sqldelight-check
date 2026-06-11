@@ -8,9 +8,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class JsonDialect(
     val family: String,
-    val displayName: String,
-    val artifact: String?,
-    val version: String?,
-    val implementationClass: String?,
     val capabilities: List<String>,
 )

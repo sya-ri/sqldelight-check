@@ -46,6 +46,17 @@ public final class dev/s7a/sqldelight/check/core/DatabaseConfig {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class dev/s7a/sqldelight/check/core/DialectRegistry {
+	public static final field Companion Ldev/s7a/sqldelight/check/core/DialectRegistry$Companion;
+	public final fun providers ()Ljava/util/List;
+	public final fun resolve (Ldev/s7a/sqldelight/check/api/SqlDialectCoordinate;)Ldev/s7a/sqldelight/check/api/SqlDialect;
+}
+
+public final class dev/s7a/sqldelight/check/core/DialectRegistry$Companion {
+	public final fun create (Ljava/util/List;)Ldev/s7a/sqldelight/check/core/DialectRegistry;
+	public final fun load (Ljava/lang/ClassLoader;)Ldev/s7a/sqldelight/check/core/DialectRegistry;
+}
+
 public final class dev/s7a/sqldelight/check/core/FixApplicationResult {
 	public fun <init> (Ljava/lang/String;II)V
 	public fun <init> (Ljava/lang/String;IILjava/util/List;)V

@@ -38,7 +38,6 @@ internal fun Rule.diagnostics(
                         dialect =
                             SqlDialect(
                                 family = DialectFamily.SQLite,
-                                displayName = "SQLite",
                                 capabilities = capabilities,
                             ),
                     )

@@ -7,7 +7,9 @@ import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.core.AnalysisInput
+import dev.s7a.sqldelight.check.core.DialectRegistry
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -32,6 +34,7 @@ internal data class ResolvedSqlDelightInput(
  */
 internal class SqlDelightProjectResolver(
     private val project: Project,
+    private val dialectRegistry: DialectRegistry,
 ) {
     /**
      * Resolves SQLDelight database inputs known to the project.
@@ -124,10 +127,12 @@ internal class SqlDelightProjectResolver(
     private fun resolveDialect(configuration: Configuration?): SqlDialect {
         val directDialect = configuration?.directModuleDependencies()?.firstOrNull()
         if (directDialect != null) {
-            return sqlDialectFromCoordinate(
-                group = directDialect.group.orEmpty(),
-                module = directDialect.name,
-                version = directDialect.version,
+            return resolveDialectCoordinate(
+                SqlDialectCoordinate(
+                    group = directDialect.group.orEmpty(),
+                    module = directDialect.name,
+                    version = directDialect.version,
+                ),
             )
         }
 
@@ -136,18 +141,19 @@ internal class SqlDelightProjectResolver(
                 ?.moduleComponents()
                 ?.firstOrNull { component -> component.isDialectArtifact() }
         if (resolvedDialect != null) {
-            return sqlDialectFromCoordinate(
-                group = resolvedDialect.group,
-                module = resolvedDialect.module,
-                version = resolvedDialect.version,
+            return resolveDialectCoordinate(
+                SqlDialectCoordinate(
+                    group = resolvedDialect.group,
+                    module = resolvedDialect.module,
+                    version = resolvedDialect.version,
+                ),
             )
         }
 
-        return SqlDialect(
-            family = DialectFamily.Custom,
-            displayName = "Custom SQLDelight dialect",
-        )
+        return SqlDialect(family = DialectFamily.Custom)
     }
+
+    private fun resolveDialectCoordinate(coordinate: SqlDialectCoordinate): SqlDialect = dialectRegistry.resolve(coordinate)
 
 }
 

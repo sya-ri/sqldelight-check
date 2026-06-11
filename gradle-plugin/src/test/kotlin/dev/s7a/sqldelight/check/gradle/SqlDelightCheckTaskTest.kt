@@ -60,7 +60,6 @@ class SqlDelightCheckTaskTest {
                     dialect =
                         SqlDialect(
                             family = DialectFamily.SQLite,
-                            displayName = "sqlite 3 38",
                         ),
                 ),
         )

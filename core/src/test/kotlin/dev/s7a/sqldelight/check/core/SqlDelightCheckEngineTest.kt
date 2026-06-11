@@ -450,7 +450,7 @@ class SqlDelightCheckEngineTest {
             database =
                 DatabaseContext(
                     name = "Database",
-                    dialect = SqlDialect(family = family, displayName = family.name, capabilities = capabilities),
+                    dialect = SqlDialect(family = family, capabilities = capabilities),
                 ),
             files = listOf(SourceFile(path = "src/main/sqldelight/Test.sq", content = content)),
         )

@@ -193,18 +193,28 @@ public final class dev/s7a/sqldelight/check/api/SourceRange {
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialect {
-	public fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;)V
-	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;)V
+	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getArtifact ()Ljava/lang/String;
 	public final fun getCapabilities ()Ljava/util/Set;
-	public final fun getDisplayName ()Ljava/lang/String;
 	public final fun getFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
-	public final fun getImplementationClass ()Ljava/lang/String;
 	public final fun getSourceKeywords ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectCoordinate {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getGroup ()Ljava/lang/String;
+	public final fun getModule ()Ljava/lang/String;
 	public final fun getVersion ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class dev/s7a/sqldelight/check/api/SqlDialectProvider {
+	public abstract fun resolve (Ldev/s7a/sqldelight/check/api/SqlDialectCoordinate;)Ldev/s7a/sqldelight/check/api/SqlDialect;
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourceKeywords {
@@ -213,6 +223,8 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourceKeywords {
 	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
 	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun extend (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
+	public static synthetic fun extend$default (Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
 	public final fun getAliasBoundaryKeywords ()Ljava/util/Set;
 	public final fun getJoinModifierKeywords ()Ljava/util/Set;
 	public final fun getTableReferenceBoundaryKeywords ()Ljava/util/Set;
@@ -221,7 +233,11 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourceKeywords {
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourceKeywords$Companion {
-	public final fun getDefault ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
+	public final fun getHsql ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
+	public final fun getMySql ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
+	public final fun getPostgreSql ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
+	public final fun getSQLite ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
+	public final fun getSourceScannerDefault ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
 }
 
 public final class dev/s7a/sqldelight/check/api/TextEdit {

@@ -151,11 +151,9 @@ class SourceSqlFactsExtractorTest {
         val dialect =
             SqlDialect(
                 family = DialectFamily.Custom,
-                displayName = "Custom",
                 sourceKeywords =
-                    SqlDialectSourceKeywords(
-                        tableReferenceBoundaryKeywords =
-                            SqlDialectSourceKeywords.Default.tableReferenceBoundaryKeywords + "sample",
+                    SqlDialectSourceKeywords.SourceScannerDefault.extend(
+                        addTableReferenceBoundaryKeywords = setOf("sample"),
                     ),
             )
 
@@ -167,7 +165,7 @@ class SourceSqlFactsExtractorTest {
 
     private fun extract(
         content: String,
-        dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite, displayName = "SQLite"),
+        dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
     ) = SourceSqlFactsExtractor.extract(SourceFile(path = "src/main/sqldelight/com/example/Test.sq", content = content), dialect)
 
     private fun String.textIn(range: SourceRange): String = substring(range.start.toOffsetIn(this), range.end.toOffsetIn(this))

@@ -79,7 +79,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         config: CheckConfig,
         trace: AnalysisTrace,
     ): AnalysisRunResult {
-        val inputs = SqlDelightProjectResolver(project).resolve()
+        val inputs = SqlDelightProjectResolver(project, project.sqldelightCheckDialectRegistry()).resolve()
         val diagnostics =
             SqlDelightCheckEngine().run(
                 inputs = inputs.map { input -> input.analysisInput },

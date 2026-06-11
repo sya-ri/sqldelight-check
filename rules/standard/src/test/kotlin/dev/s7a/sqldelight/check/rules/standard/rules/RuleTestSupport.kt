@@ -73,7 +73,7 @@ internal fun Rule.diagnostics(
                 override val database: DatabaseContext =
                     DatabaseContext(
                         name = "Database",
-                        dialect = SqlDialect(family = DialectFamily.SQLite, displayName = "SQLite"),
+                        dialect = SqlDialect(family = DialectFamily.SQLite),
                     )
                 override val file: SourceFile = SourceFile(path = path, content = content)
                 override val options: Map<String, String> = options

@@ -34,6 +34,7 @@ class SqlDelightCheckGradlePluginTest {
                         println("hasExtension=" + (project.extensions.findByName("sqldelightCheck") != null))
                         println("hasRuleSetConfiguration=" + (configurations.findByName("sqldelightCheckRuleSet") != null))
                         println("hasReporterConfiguration=" + (configurations.findByName("sqldelightCheckReporter") != null))
+                        println("hasDialectConfiguration=" + (configurations.findByName("sqldelightCheckDialect") != null))
                         listOf(
                             "sqldelightCheck",
                             "sqldelightFix",
@@ -53,6 +54,7 @@ class SqlDelightCheckGradlePluginTest {
                 "hasExtension=true",
                 "hasRuleSetConfiguration=true",
                 "hasReporterConfiguration=true",
+                "hasDialectConfiguration=true",
                 "task.sqldelightCheck=true",
                 "task.sqldelightFix=true",
             )
@@ -839,6 +841,56 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals("external asset=details.txt", project.file("build/reports/sqldelight-check/external/details.txt").readText())
     }
 
+    @Test
+    fun `check task loads external dialect providers from configuration`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Enablement
+                        import dev.s7a.sqldelight.check.api.Severity
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        dependencies {
+                            add("sqldelightCheckDialect", files("external-dialect.jar"))
+                        }
+
+                        sqldelightCheck {
+                            ruleSets {
+                                standard {
+                                    enabled.set(Enablement.Disabled)
+                                }
+                            }
+                            rules {
+                                rule("standard:final-newline") {
+                                    enabled.set(Enablement.Enabled)
+                                    severity.set(Severity.Error)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.createExternalDialectJar()
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent(),
+        )
+
+        project.runAndFail("sqldelightCheck")
+
+        assertEquals(
+            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":{"name":"Database","dialect":{"family":"Custom","capabilities":["external"]}},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}""",
+            project.file("build/reports/sqldelight-check/report.json").readText(),
+        )
+    }
+
     /**
      * Returns a build script with SQLDelight configured for the functional test project.
      */
@@ -930,8 +982,8 @@ class SqlDelightCheckGradlePluginTest {
         fun unsafeComparisonSpacingJsonReport(): String =
             """{"summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
 
-        fun sqliteDatabaseJson(version: String = "2.3.2"): String =
-            """{"name":"Database","dialect":{"family":"SQLite","displayName":"sqlite 3 38","artifact":"app.cash.sqldelight:sqlite-3-38-dialect","version":"$version","implementationClass":null,"capabilities":["sqlite"]}}"""
+        fun sqliteDatabaseJson(): String =
+            """{"name":"Database","dialect":{"family":"SQLite","capabilities":["sqlite"]}}"""
     }
 
     /**
@@ -1049,6 +1101,87 @@ class SqlDelightCheckGradlePluginTest {
                 .writeText("com.example.ExternalReporterProvider\n")
 
             JarOutputStream(Files.newOutputStream(file("external-reporter.jar"))).use { jar ->
+                Files.walk(classesDirectory).use { paths ->
+                    paths
+                        .filter { path -> Files.isRegularFile(path) }
+                        .forEach { path ->
+                            val entryName =
+                                classesDirectory
+                                    .relativize(path)
+                                    .toString()
+                                    .replace('\\', '/')
+                            jar.putNextEntry(JarEntry(entryName))
+                            Files.copy(path, jar)
+                            jar.closeEntry()
+                        }
+                }
+            }
+        }
+
+        /**
+         * Creates a dialect provider jar used to verify external provider discovery.
+         */
+        fun createExternalDialectJar() {
+            val sourceDirectory = directory.resolve("external-dialect-src")
+            val classesDirectory = directory.resolve("external-dialect-classes")
+            Files.createDirectories(sourceDirectory.resolve("com/example"))
+            Files.createDirectories(classesDirectory)
+            val sourceFile = sourceDirectory.resolve("com/example/ExternalDialectProvider.java")
+            sourceFile.writeText(
+                """
+                package com.example;
+
+                import dev.s7a.sqldelight.check.api.DialectCapability;
+                import dev.s7a.sqldelight.check.api.DialectFamily;
+                import dev.s7a.sqldelight.check.api.SqlDialect;
+                import dev.s7a.sqldelight.check.api.SqlDialectCoordinate;
+                import dev.s7a.sqldelight.check.api.SqlDialectProvider;
+                import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords;
+                import java.util.Collections;
+
+                public final class ExternalDialectProvider implements SqlDialectProvider {
+                    @Override
+                    public SqlDialect resolve(SqlDialectCoordinate coordinate) {
+                        if (!coordinate.getGroup().equals("app.cash.sqldelight")) {
+                            return null;
+                        }
+                        if (!coordinate.getModule().startsWith("sqlite-")) {
+                            return null;
+                        }
+                        return new SqlDialect(
+                            DialectFamily.Custom,
+                            Collections.singleton(new DialectCapability("external")),
+                            new SqlDialectSourceKeywords()
+                        );
+                    }
+                }
+                """.trimIndent(),
+            )
+
+            val compiler = ToolProvider.getSystemJavaCompiler() ?: error("JDK compiler is required for this test.")
+            val compileResult =
+                compiler.run(
+                    null,
+                    null,
+                    null,
+                    "-classpath",
+                    System.getProperty("java.class.path"),
+                    "-d",
+                    classesDirectory.toString(),
+                    sourceFile.toString(),
+                )
+            check(compileResult == 0) { "Failed to compile external dialect fixture." }
+
+            val serviceDirectory =
+                classesDirectory.resolve(
+                    "META-INF/services",
+                )
+            Files.createDirectories(serviceDirectory)
+            serviceDirectory
+                .resolve("dev.s7a.sqldelight.check.api.SqlDialectProvider")
+                .writeText("com.example.ExternalDialectProvider\n")
+
+            JarOutputStream(Files.newOutputStream(file("external-dialect.jar"))).use { jar ->
                 Files.walk(classesDirectory).use { paths ->
                     paths
                         .filter { path -> Files.isRegularFile(path) }
