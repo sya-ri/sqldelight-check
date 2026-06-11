@@ -1,7 +1,7 @@
-# Dialect Author Guide
+# Dialects Author Guide
 
 sqldelight-check loads SQL dialect metadata through Java `ServiceLoader`. Built-in SQLDelight dialect metadata is
-packaged as a dialect module, and a third-party dialect can be added through the `sqldelightCheckDialect` Gradle
+packaged as a dialects module, and third-party dialects can be added through the `sqldelightCheckDialects` Gradle
 configuration.
 
 ## Dependency
@@ -18,7 +18,7 @@ Consumers add the published dialect artifact to the checked project:
 
 ```kotlin
 dependencies {
-    sqldelightCheckDialect("com.example:my-sqldelight-dialect:1.0.0")
+    sqldelightCheckDialects("com.example:my-sqldelight-dialects:1.0.0")
 }
 ```
 
@@ -27,7 +27,7 @@ dependencies {
 Implement `SqlDialectProvider` and return dialect metadata for coordinates your provider owns.
 
 ```kotlin
-package com.example.sqldelight.dialect
+package com.example.sqldelight.dialects
 
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
@@ -62,13 +62,13 @@ src/main/resources/META-INF/services/dev.s7a.sqldelight.check.api.SqlDialectProv
 with the provider class name:
 
 ```text
-com.example.sqldelight.dialect.ExampleDialectProvider
+com.example.sqldelight.dialects.ExampleDialectProvider
 ```
 
 ## Resolution
 
 sqldelight-check resolves the SQLDelight dialect artifact coordinate for each database and asks discovered dialect
-providers for metadata. Providers from `sqldelightCheckDialect` are consulted before bundled providers, so a project can
+providers for metadata. Providers from `sqldelightCheckDialects` are consulted before bundled providers, so a project can
 override built-in SQLDelight dialect metadata when needed. Third-party providers should still return `null` for
 unrelated coordinates.
 

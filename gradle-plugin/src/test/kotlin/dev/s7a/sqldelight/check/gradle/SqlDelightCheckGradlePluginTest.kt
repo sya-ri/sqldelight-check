@@ -34,7 +34,7 @@ class SqlDelightCheckGradlePluginTest {
                         println("hasExtension=" + (project.extensions.findByName("sqldelightCheck") != null))
                         println("hasRuleSetConfiguration=" + (configurations.findByName("sqldelightCheckRuleSet") != null))
                         println("hasReporterConfiguration=" + (configurations.findByName("sqldelightCheckReporter") != null))
-                        println("hasDialectConfiguration=" + (configurations.findByName("sqldelightCheckDialect") != null))
+                        println("hasDialectsConfiguration=" + (configurations.findByName("sqldelightCheckDialects") != null))
                         listOf(
                             "sqldelightCheck",
                             "sqldelightFix",
@@ -54,7 +54,7 @@ class SqlDelightCheckGradlePluginTest {
                 "hasExtension=true",
                 "hasRuleSetConfiguration=true",
                 "hasReporterConfiguration=true",
-                "hasDialectConfiguration=true",
+                "hasDialectsConfiguration=true",
                 "task.sqldelightCheck=true",
                 "task.sqldelightFix=true",
             )
@@ -854,7 +854,7 @@ class SqlDelightCheckGradlePluginTest {
                     extraConfiguration =
                         """
                         dependencies {
-                            add("sqldelightCheckDialect", files("external-dialect.jar"))
+                            add("sqldelightCheckDialects", files("external-dialect.jar"))
                         }
 
                         sqldelightCheck {

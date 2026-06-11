@@ -203,8 +203,6 @@ See the rule-set README files for rule behavior, options, and examples:
 
 Rules run over source files resolved from SQLDelight's Gradle task model. SQLDelight parser and dialect behavior are
 not reimplemented by sqldelight-check.
-See [Architecture Notes](docs/architecture.md) for the Gradle model compatibility and rule API boundaries.
-See [Rule Rationale](docs/rule-rationale.md) for the criteria used to keep built-in rules grounded.
 
 sqldelight-check's standard rules are inspired by the practical SQL linting vocabulary established by
 [SQLFluff](https://sqlfluff.com/). Thanks to the SQLFluff project for making those rule categories familiar and useful
@@ -215,21 +213,59 @@ SQLDelight database metadata.
 
 Built-in reporters are installed with the Gradle plugin:
 
-- `json`: machine-readable summary and diagnostics.
-- `sarif`: SARIF 2.1.0 results for code scanning and artifact upload.
-- `text`: compact human-readable diagnostic count.
-- `html`: navigable diagnostics table for uploaded CI artifacts.
-- `markdown`: summary and diagnostics table suitable for GitHub Actions job summaries.
-- `github-annotations`: GitHub Actions workflow command annotations for changed files and check logs.
+| Reporter | Default | Output |
+| --- | --- | --- |
+| `json` | Enabled | Machine-readable summary and diagnostics. |
+| `sarif` | Enabled | SARIF 2.1.0 results for code scanning and artifact upload. |
+| `text` | Enabled | Compact human-readable diagnostic count. |
+| `html` | Disabled | Navigable diagnostics table for uploaded CI artifacts. |
+| `markdown` | Disabled | Summary and diagnostics table for GitHub Actions job summaries. |
+| `github-annotations` | Auto on GitHub Actions | Workflow command annotations for changed files and check logs. |
 
 Default report outputs are written under `build/reports/sqldelight-check/`. JSON, SARIF, and text are enabled by
 default. HTML and Markdown are available but disabled by default. GitHub annotations are enabled automatically on GitHub
 Actions when `GITHUB_ACTIONS=true`, unless explicitly disabled.
 
-![HTML report preview](docs/assets/html-report.png)
+Reporter-specific options can be set with `options`; the built-in JSON and SARIF reporters also expose typed
+`prettyPrint` configuration.
 
-See [Report Outputs](docs/reports.md) for GitHub Actions snippets and examples. The HTML report is intended to be the
-primary visual artifact for CI uploads.
+```kotlin
+sqldelightCheck {
+    reports {
+        json {
+            prettyPrint.set(true)
+        }
+        sarif {
+            prettyPrint.set(true)
+        }
+        html {
+            required.set(true)
+        }
+    }
+}
+```
+
+![HTML report preview](assets/html-report.png)
+
+To publish GitHub annotations, print the generated workflow command file after `sqldelightCheck`, including on failure:
+
+```yaml
+- name: Run sqldelight-check
+  id: sqldelight-check
+  run: ./gradlew sqldelightCheck
+
+- name: Publish sqldelight-check annotations
+  if: always()
+  run: |
+    if [ -f build/reports/sqldelight-check/report.github-annotations ]; then
+      cat build/reports/sqldelight-check/report.github-annotations
+    fi
+```
+
+Upload `build/reports/sqldelight-check/` as a CI artifact when JSON, SARIF, Markdown, or HTML reports are useful to
+reviewers. SARIF and GitHub annotation paths are written relative to `GITHUB_WORKSPACE` on GitHub Actions. Outside
+GitHub Actions, paths are relative to the Gradle root project. If the Gradle root is nested under the repository
+checkout, pass `-PsqldelightCheck.reportRoot="$PWD"` from the checkout root.
 
 ## Fix Safety
 
@@ -254,7 +290,7 @@ Add custom rule set, reporter, and dialect artifacts through Gradle configuratio
 dependencies {
     sqldelightCheckRuleSet("com.example:my-sqldelight-rules:1.0.0")
     sqldelightCheckReporter("com.example:my-sqldelight-reporter:1.0.0")
-    sqldelightCheckDialect("com.example:my-sqldelight-dialect:1.0.0")
+    sqldelightCheckDialects("com.example:my-sqldelight-dialects:1.0.0")
 }
 ```
 
@@ -262,8 +298,7 @@ Authoring guides:
 
 - [Rule Set Author Guide](docs/rule-set-authors.md)
 - [Reporter Author Guide](docs/reporter-authors.md)
-- [Dialect Author Guide](docs/dialect-authors.md)
-- [Branch Protection](docs/branch-protection.md)
+- [Dialects Author Guide](docs/dialects-authors.md)
 
 ## SQLDelight And Dialects
 

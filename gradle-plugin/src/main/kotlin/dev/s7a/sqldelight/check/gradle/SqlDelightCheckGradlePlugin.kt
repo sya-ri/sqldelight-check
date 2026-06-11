@@ -20,7 +20,7 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         target.configureDefaultReports(extension)
         target.createRuleSetConfiguration()
         target.createReporterConfiguration()
-        target.createDialectConfiguration()
+        target.createDialectsConfiguration()
         target.registerSqlDelightCheckTasks(extension)
     }
 
@@ -49,8 +49,8 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
     /**
      * Registers the dependency bucket for external dialects.
      */
-    private fun Project.createDialectConfiguration() {
-        configurations.create("sqldelightCheckDialect") { configuration ->
+    private fun Project.createDialectsConfiguration() {
+        configurations.create("sqldelightCheckDialects") { configuration ->
             configuration.isCanBeConsumed = false
             configuration.isCanBeResolved = true
             configuration.description = "External sqldelight-check dialect artifacts."
@@ -136,8 +136,8 @@ internal fun Project.sqldelightCheckRuleRegistry(): RuleRegistry =
 /**
  * Returns the dialect registry attached to this project.
  */
-internal fun Project.sqldelightCheckDialectRegistry(): DialectRegistry =
-    DialectRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckDialect"))
+internal fun Project.sqldelightCheckDialectsRegistry(): DialectRegistry =
+    DialectRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckDialects"))
 
 private fun Project.sqldelightCheckProviderClassLoader(configurationName: String): ClassLoader {
     val urls =
