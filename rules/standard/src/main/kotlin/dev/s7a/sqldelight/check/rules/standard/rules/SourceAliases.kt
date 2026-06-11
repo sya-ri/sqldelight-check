@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 internal data class TableReference(
     val statementStartOffset: Int,
     val depth: Int,
+    val introducedBy: TableReferenceIntroducer,
     val sourceStartOffset: Int,
     val sourceEndOffset: Int,
     val tableName: String?,
@@ -10,6 +11,11 @@ internal data class TableReference(
     val aliasUsesAs: Boolean,
     val isSubquery: Boolean,
 )
+
+internal enum class TableReferenceIntroducer {
+    From,
+    Join,
+}
 
 internal fun String.tableReferences(): List<TableReference> {
     val tokens = sqlTokens().toList()
@@ -21,7 +27,15 @@ internal fun String.tableReferences(): List<TableReference> {
         val statementStart = statementStartBefore(token.startOffset)
         val statementEnd = statementEndAfter(token.startOffset)
         val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth)
-        references += tableReferencesAfterKeyword(tokens, token.endOffset, boundary, depth, statementStart)
+        references +=
+            tableReferencesAfterKeyword(
+                tokens = tokens,
+                startOffset = token.endOffset,
+                boundaryOffset = boundary,
+                depth = depth,
+                statementStart = statementStart,
+                introducedBy = if (token.isKeyword("join")) TableReferenceIntroducer.Join else TableReferenceIntroducer.From,
+            )
     }
     return references
 }
@@ -32,6 +46,7 @@ private fun String.tableReferencesAfterKeyword(
     boundaryOffset: Int,
     depth: Int,
     statementStart: Int,
+    introducedBy: TableReferenceIntroducer,
 ): List<TableReference> {
     val references = mutableListOf<TableReference>()
     var segmentStart = startOffset
@@ -40,11 +55,11 @@ private fun String.tableReferencesAfterKeyword(
         .takeWhile { character -> character.offset < boundaryOffset }
         .forEach { character ->
             if (character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth) {
-                tableReferenceInSegment(tokens, segmentStart, character.offset, depth, statementStart)?.let(references::add)
+                tableReferenceInSegment(tokens, segmentStart, character.offset, depth, statementStart, introducedBy)?.let(references::add)
                 segmentStart = character.offset + 1
             }
         }
-    tableReferenceInSegment(tokens, segmentStart, boundaryOffset, depth, statementStart)?.let(references::add)
+    tableReferenceInSegment(tokens, segmentStart, boundaryOffset, depth, statementStart, introducedBy)?.let(references::add)
     return references
 }
 
@@ -54,6 +69,7 @@ private fun String.tableReferenceInSegment(
     endOffset: Int,
     depth: Int,
     statementStart: Int,
+    introducedBy: TableReferenceIntroducer,
 ): TableReference? {
     val open = nextSqlCharacterAfter(startOffset)
     if (open?.value == '(' && open.offset < endOffset) {
@@ -72,6 +88,7 @@ private fun String.tableReferenceInSegment(
         return TableReference(
             statementStartOffset = statementStart,
             depth = depth,
+            introducedBy = introducedBy,
             sourceStartOffset = open.offset,
             sourceEndOffset = closeOffset + 1,
             tableName = null,
@@ -95,6 +112,7 @@ private fun String.tableReferenceInSegment(
     return TableReference(
         statementStartOffset = statementStart,
         depth = depth,
+        introducedBy = introducedBy,
         sourceStartOffset = firstToken.startOffset,
         sourceEndOffset = firstToken.endOffset,
         tableName = tableName,

@@ -128,6 +128,8 @@ The standard rule set uses two safety levels:
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:no-unused-cte` | Warning / Auto | No | None | Disallow CTEs that are not referenced by the main query. |
+| `standard:no-unused-join` | Warning / Auto | No | None | Disallow JOIN sources that are not referenced by later qualified column reads. |
 | `standard:no-unnecessary-statement-parentheses` | Warning / Auto | No | None | Disallow redundant parentheses around whole top-level `SELECT` statements. |
 | `standard:no-update-without-where` | Warning / Auto | No | None | Disallow `UPDATE` statements without a top-level `WHERE`. |
 | `standard:operator-line-position` | Warning / Auto | No | None | Require multiline comparison and binary operators to trail the previous line. |
@@ -185,6 +187,8 @@ Useful sqlfluff concepts reflected here:
 - Parse-light alias and identifier checks from SQLFluff AL01, AL02, AL08, and RF05:
   `standard:require-table-alias-as`, `standard:require-column-alias-as`,
   `standard:unique-column-aliases`, and `standard:no-special-character-identifiers`.
+- Parse-light reference checks from SQLFluff ST03 and ST11: `standard:no-unused-cte` and
+  `standard:no-unused-join`.
 
 ## `standard:blocked-words`
 
@@ -287,6 +291,66 @@ FROM player;
 Fix behavior:
 
 - No fix is provided.
+
+## `standard:no-unused-cte`
+
+Reports `WITH name AS (...)` CTEs that are not referenced by the main query.
+
+Invalid:
+
+```sql
+selectPlayers:
+WITH ranked AS (
+  SELECT id
+  FROM player
+)
+SELECT id
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+WITH ranked AS (
+  SELECT id
+  FROM player
+)
+SELECT id
+FROM ranked;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- Recursive or ambiguous CTE layouts are left to future SQLDelight-derived facts.
+
+## `standard:no-unused-join`
+
+Reports JOIN sources whose alias or table name is not used as a later qualified column reference.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player AS p
+JOIN team AS t ON p.team_id IS NOT NULL;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player AS p
+JOIN team AS t ON t.id = p.team_id;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- The rule ignores comments and string literals when checking for qualified references.
 
 ## `standard:require-table-alias-as`
 
