@@ -52,9 +52,9 @@ private fun String.quotedIdentifiers(): Sequence<QuotedIdentifier> =
         while (index < length) {
             index =
                 when {
-                    startsWith("--", index) -> skipLineCommentForIdentifierScan(index)
-                    startsWith("/*", index) -> skipBlockCommentForIdentifierScan(index)
-                    this@quotedIdentifiers[index] == '\'' -> skipSingleQuotedLiteral(index)
+                    startsWith("--", index) -> skipLineComment(index)
+                    startsWith("/*", index) -> skipBlockComment(index)
+                    this@quotedIdentifiers[index] == '\'' -> skipQuoted(index, '\'')
                     this@quotedIdentifiers[index] == '"' -> {
                         val identifier = quotedIdentifier(index, '"', '"')
                         if (identifier != null) yield(identifier)
@@ -98,30 +98,4 @@ private fun String.quotedIdentifier(
         }
     }
     return null
-}
-
-private fun String.skipSingleQuotedLiteral(start: Int): Int {
-    var index = start + 1
-    while (index < length) {
-        if (this[index] == '\'') {
-            if (index + 1 < length && this[index + 1] == '\'') {
-                index += 2
-            } else {
-                return index + 1
-            }
-        } else {
-            index++
-        }
-    }
-    return length
-}
-
-private fun String.skipLineCommentForIdentifierScan(start: Int): Int {
-    val newline = indexOf('\n', startIndex = start + 2)
-    return if (newline == -1) length else newline + 1
-}
-
-private fun String.skipBlockCommentForIdentifierScan(start: Int): Int {
-    val end = indexOf("*/", startIndex = start + 2)
-    return if (end == -1) length else end + 2
 }

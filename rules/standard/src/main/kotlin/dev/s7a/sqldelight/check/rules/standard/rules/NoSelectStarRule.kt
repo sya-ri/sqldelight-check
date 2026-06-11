@@ -22,23 +22,11 @@ public class NoSelectStarRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val tokens = content.sqlTokens().toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
-            val selectDepth = content.sqlParenthesisDepthAt(token.startOffset)
-            val statementEnd = content.statementEndAfter(token.startOffset)
-            val fromToken =
-                tokens
-                    .drop(index + 1)
-                    .firstOrNull { candidate ->
-                        candidate.startOffset < statementEnd &&
-                            content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
-                            candidate.isKeyword("from")
-                    } ?: return@forEachIndexed
+        content.selectFromRanges().forEach { select ->
             content.sqlCharacters()
-                .dropWhile { character -> character.offset <= token.endOffset }
-                .takeWhile { character -> character.offset < fromToken.startOffset }
-                .filter { character -> character.value == '*' && content.sqlParenthesisDepthAt(character.offset) == selectDepth }
+                .dropWhile { character -> character.offset <= select.selectEndOffset }
+                .takeWhile { character -> character.offset < select.fromStartOffset }
+                .filter { character -> character.value == '*' && content.sqlParenthesisDepthAt(character.offset) == select.depth }
                 .forEach { character ->
                     reporter.report(
                         RuleDiagnostic(

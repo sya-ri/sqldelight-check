@@ -26,7 +26,7 @@ public class QueryNameCaseRule : Rule {
 
         val content = context.file.content
         content.sqlDelightLabels().forEach { label ->
-            if (label.name.isLowerCamelCase()) return@forEach
+            if (label.name.isLowerCamelIdentifier()) return@forEach
 
             reporter.report(
                 RuleDiagnostic(
@@ -53,25 +53,10 @@ private fun String.sqlDelightLabels(): Sequence<SqlDelightLabel> =
             val first = line.firstNonWhitespaceOffset ?: return@forEach
             if (startsWith("--", first) || startsWith("/*", first)) return@forEach
 
-            var end = first
-            if (!getOrNull(end).isSqlDelightLabelStart()) return@forEach
-            end++
-            while (getOrNull(end).isSqlDelightLabelPart()) {
-                end++
-            }
-            if (getOrNull(end) != ':') return@forEach
-            if (getOrNull(end + 1) == ':') return@forEach
+            val name = identifierTokenAt(first) ?: return@forEach
+            if (getOrNull(name.endOffset) != ':') return@forEach
+            if (getOrNull(name.endOffset + 1) == ':') return@forEach
 
-            yield(SqlDelightLabel(name = substring(first, end), startOffset = first, endOffset = end))
+            yield(SqlDelightLabel(name = name.text, startOffset = name.startOffset, endOffset = name.endOffset))
         }
     }
-
-private fun String.isLowerCamelCase(): Boolean =
-    isNotEmpty() &&
-        first().isLowerCase() &&
-        all { character -> character.isLetterOrDigit() } &&
-        any { character -> character.isLetter() }
-
-private fun Char?.isSqlDelightLabelStart(): Boolean = this == '_' || this?.isLetter() == true
-
-private fun Char?.isSqlDelightLabelPart(): Boolean = this == '_' || this?.isLetterOrDigit() == true

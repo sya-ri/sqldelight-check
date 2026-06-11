@@ -74,20 +74,3 @@ private fun String.groupedStatementBlocks(): Sequence<GroupedStatementBlock> =
 private fun String.statementCountIn(block: GroupedStatementBlock): Int =
     sqlCharacters()
         .count { character -> character.offset in block.bodyStartOffset until block.bodyEndOffset && character.value == ';' }
-
-private fun String.matchingClosingBraceOffset(openOffset: Int): Int? {
-    if (getOrNull(openOffset) != '{') return null
-    var depth = 0
-    sqlCharacters()
-        .dropWhile { character -> character.offset < openOffset }
-        .forEach { character ->
-            when (character.value) {
-                '{' -> depth++
-                '}' -> {
-                    depth--
-                    if (depth == 0) return character.offset
-                }
-            }
-        }
-    return null
-}

@@ -27,7 +27,7 @@ public class ConsistentColumnReferencesRule : Rule {
             if (!token.isKeyword("group") && !token.isKeyword("order")) return@forEachIndexed
             val by = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("by") }
                 ?: return@forEachIndexed
-            if (content.parenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
+            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
 
             val clauseName = "${token.text.uppercase()} ${by.text.uppercase()}"
             val boundaryKeywords =
@@ -131,19 +131,6 @@ private fun String.withoutOrderBySuffix(): String {
         text = directionWords.dropLast(1).joinToString(" ")
     }
     return text.trim()
-}
-
-private fun String.parenthesisDepthAt(offset: Int): Int {
-    var depth = 0
-    sqlCharacters()
-        .takeWhile { character -> character.offset < offset }
-        .forEach { character ->
-            when (character.value) {
-                '(' -> depth++
-                ')' -> if (depth > 0) depth--
-            }
-        }
-    return depth
 }
 
 private fun String.isOrderDirection(): Boolean = equals("asc", ignoreCase = true) || equals("desc", ignoreCase = true)

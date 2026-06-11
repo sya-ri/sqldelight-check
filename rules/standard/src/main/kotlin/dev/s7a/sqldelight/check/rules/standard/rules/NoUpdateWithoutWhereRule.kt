@@ -27,12 +27,7 @@ public class NoUpdateWithoutWhereRule : Rule {
             if (!token.isKeyword("update")) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val hasWhere =
-                tokens
-                    .drop(index + 1)
-                    .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                    .any { candidate -> candidate.isKeyword("where") && content.sqlParenthesisDepthAt(candidate.startOffset) == depth }
-            if (hasWhere) return@forEachIndexed
+            if (content.hasWhereClauseAfter(tokens, index, statementEnd, depth)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(

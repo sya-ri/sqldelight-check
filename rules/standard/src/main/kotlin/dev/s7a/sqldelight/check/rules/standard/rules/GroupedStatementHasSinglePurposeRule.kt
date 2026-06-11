@@ -80,19 +80,3 @@ private fun String.groupedStatementRanges(): Sequence<GroupedStatementRange> =
             )
         }
     }
-
-private fun String.matchingClosingBraceOffset(openOffset: Int): Int? {
-    var depth = 0
-    sqlCharacters()
-        .dropWhile { character -> character.offset < openOffset }
-        .forEach { character ->
-            when (character.value) {
-                '{' -> depth++
-                '}' -> {
-                    depth--
-                    if (depth == 0) return character.offset
-                }
-            }
-        }
-    return null
-}

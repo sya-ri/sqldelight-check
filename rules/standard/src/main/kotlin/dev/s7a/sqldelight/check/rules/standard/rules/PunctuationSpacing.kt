@@ -10,12 +10,7 @@ import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 
-internal data class ComparisonOperator(
-    val startOffset: Int,
-    val endOffset: Int,
-)
-
-internal data class BinaryOperator(
+internal data class SqlOperator(
     val startOffset: Int,
     val endOffset: Int,
 )
@@ -71,35 +66,76 @@ internal fun String.horizontalWhitespaceEndAfter(offset: Int): Int {
     return index
 }
 
-internal fun String.comparisonOperatorAt(offset: Int): ComparisonOperator? {
+internal fun String.reportOperatorSpacing(
+    context: RuleContext,
+    reporter: DiagnosticReporter,
+    rule: Rule,
+    operators: Sequence<SqlOperator>,
+    canNormalize: (leftStart: Int, operatorStart: Int, operatorEnd: Int, rightEnd: Int) -> Boolean,
+    message: (operatorText: String) -> String,
+    fixTitle: String,
+) {
+    operators
+        .distinctBy { operator -> operator.startOffset }
+        .forEach { operator ->
+            val leftStart = horizontalWhitespaceStartBefore(operator.startOffset)
+            val rightEnd = horizontalWhitespaceEndAfter(operator.endOffset)
+            if (!canNormalize(leftStart, operator.startOffset, operator.endOffset, rightEnd)) return@forEach
+
+            val operatorText = substring(operator.startOffset, operator.endOffset)
+            val replacement = " $operatorText "
+            if (substring(leftStart, rightEnd) == replacement) return@forEach
+
+            val range = rangeAtOffsets(leftStart, rightEnd)
+            reporter.report(
+                RuleDiagnostic(
+                    severity = rule.defaultSeverity,
+                    message = message(operatorText),
+                    file = context.file,
+                    range = range,
+                    database = context.database,
+                    fixes =
+                        listOf(
+                            Fix(
+                                title = fixTitle,
+                                safety = FixSafety.Unsafe,
+                                edits = listOf(TextEdit(range = range, replacement = replacement)),
+                            ),
+                        ),
+                ),
+            )
+        }
+}
+
+internal fun String.comparisonOperatorAt(offset: Int): SqlOperator? {
     if (offset >= length) return null
     return when (this[offset]) {
         '=' ->
             when {
                 offset > 0 && this[offset - 1].isComparisonOperatorCharacter() -> null
                 offset + 1 < length && this[offset + 1].isComparisonOperatorCharacter() -> null
-                else -> ComparisonOperator(startOffset = offset, endOffset = offset + 1)
+                else -> SqlOperator(startOffset = offset, endOffset = offset + 1)
             }
         '!' ->
             if (offset + 1 < length && this[offset + 1] == '=') {
-                ComparisonOperator(startOffset = offset, endOffset = offset + 2)
+                SqlOperator(startOffset = offset, endOffset = offset + 2)
             } else {
                 null
             }
         '<' ->
             when {
                 offset + 1 < length && this[offset + 1] in setOf('=', '>') ->
-                    ComparisonOperator(startOffset = offset, endOffset = offset + 2)
+                    SqlOperator(startOffset = offset, endOffset = offset + 2)
                 offset + 1 < length && this[offset + 1].isComparisonOperatorCharacter() -> null
-                else -> ComparisonOperator(startOffset = offset, endOffset = offset + 1)
+                else -> SqlOperator(startOffset = offset, endOffset = offset + 1)
             }
         '>' ->
             when {
                 offset > 0 && this[offset - 1].isComparisonOperatorCharacter() -> null
                 offset + 1 < length && this[offset + 1] == '=' ->
-                    ComparisonOperator(startOffset = offset, endOffset = offset + 2)
+                    SqlOperator(startOffset = offset, endOffset = offset + 2)
                 offset + 1 < length && this[offset + 1].isComparisonOperatorCharacter() -> null
-                else -> ComparisonOperator(startOffset = offset, endOffset = offset + 1)
+                else -> SqlOperator(startOffset = offset, endOffset = offset + 1)
             }
         else -> null
     }
@@ -119,14 +155,14 @@ internal fun String.canNormalizeInlineSpacing(
     return true
 }
 
-internal fun String.binaryOperatorAt(offset: Int): BinaryOperator? {
+internal fun String.binaryOperatorAt(offset: Int): SqlOperator? {
     if (offset >= length) return null
     return when {
-        startsWith("||", offset) -> BinaryOperator(startOffset = offset, endOffset = offset + 2)
-        this[offset] in setOf('*', '/', '%') -> BinaryOperator(startOffset = offset, endOffset = offset + 1)
-        this[offset] == '+' && !isUnarySign(offset) -> BinaryOperator(startOffset = offset, endOffset = offset + 1)
+        startsWith("||", offset) -> SqlOperator(startOffset = offset, endOffset = offset + 2)
+        this[offset] in setOf('*', '/', '%') -> SqlOperator(startOffset = offset, endOffset = offset + 1)
+        this[offset] == '+' && !isUnarySign(offset) -> SqlOperator(startOffset = offset, endOffset = offset + 1)
         this[offset] == '-' && offset + 1 < length && this[offset + 1] == '>' -> null
-        this[offset] == '-' && !isUnarySign(offset) -> BinaryOperator(startOffset = offset, endOffset = offset + 1)
+        this[offset] == '-' && !isUnarySign(offset) -> SqlOperator(startOffset = offset, endOffset = offset + 1)
         else -> null
     }
 }

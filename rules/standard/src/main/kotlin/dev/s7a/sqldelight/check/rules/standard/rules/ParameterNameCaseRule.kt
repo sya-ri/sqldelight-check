@@ -26,7 +26,7 @@ public class ParameterNameCaseRule : Rule {
 
         val content = context.file.content
         content.namedSqlDelightParameters().forEach { parameter ->
-            if (parameter.name.isParameterLowerCamelCase()) return@forEach
+            if (parameter.name.isLowerCamelIdentifier()) return@forEach
 
             reporter.report(
                 RuleDiagnostic(
@@ -53,22 +53,7 @@ private fun String.namedSqlDelightParameters(): Sequence<NamedSqlDelightParamete
             if (character.value != ':') return@forEach
             if (getOrNull(character.offset + 1) == ':') return@forEach
             val start = character.offset + 1
-            if (!getOrNull(start).isParameterNameStart()) return@forEach
-
-            var end = start + 1
-            while (getOrNull(end).isParameterNamePart()) {
-                end++
-            }
-            yield(NamedSqlDelightParameter(name = substring(start, end), nameStartOffset = start, nameEndOffset = end))
+            val name = identifierTokenAt(start) ?: return@forEach
+            yield(NamedSqlDelightParameter(name = name.text, nameStartOffset = name.startOffset, nameEndOffset = name.endOffset))
         }
     }
-
-private fun String.isParameterLowerCamelCase(): Boolean =
-    isNotEmpty() &&
-        first().isLowerCase() &&
-        all { character -> character.isLetterOrDigit() } &&
-        any { character -> character.isLetter() }
-
-private fun Char?.isParameterNameStart(): Boolean = this == '_' || this?.isLetter() == true
-
-private fun Char?.isParameterNamePart(): Boolean = this == '_' || this?.isLetterOrDigit() == true

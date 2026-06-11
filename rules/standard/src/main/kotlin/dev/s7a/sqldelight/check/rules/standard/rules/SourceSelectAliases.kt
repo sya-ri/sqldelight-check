@@ -8,27 +8,47 @@ internal data class ResultColumnAlias(
     val usesAs: Boolean,
 )
 
-internal fun String.resultColumnAliases(): List<ResultColumnAlias> {
-    val tokens = sqlTokens().toList()
-    val aliases = mutableListOf<ResultColumnAlias>()
-    tokens.forEachIndexed { index, token ->
-        if (!token.isKeyword("select")) return@forEachIndexed
-        val selectDepth = sqlParenthesisDepthAt(token.startOffset)
-        val statementEnd = statementEndAfter(token.startOffset)
-        val fromToken =
-            tokens
-                .drop(index + 1)
-                .firstOrNull { candidate ->
-                    candidate.startOffset < statementEnd &&
-                        sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
-                        candidate.isKeyword("from")
-                } ?: return@forEachIndexed
+internal data class SelectFromRange(
+    val selectStartOffset: Int,
+    val selectEndOffset: Int,
+    val fromStartOffset: Int,
+    val depth: Int,
+)
 
-        selectTargets(token.endOffset, fromToken.startOffset, selectDepth).forEach { target ->
+internal fun String.selectFromRanges(): Sequence<SelectFromRange> =
+    sequence {
+        val tokens = sqlTokens().toList()
+        tokens.forEachIndexed { index, token ->
+            if (!token.isKeyword("select")) return@forEachIndexed
+            val selectDepth = sqlParenthesisDepthAt(token.startOffset)
+            val statementEnd = statementEndAfter(token.startOffset)
+            val fromToken =
+                tokens
+                    .drop(index + 1)
+                    .firstOrNull { candidate ->
+                        candidate.startOffset < statementEnd &&
+                            sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
+                            candidate.isKeyword("from")
+                    } ?: return@forEachIndexed
+            yield(
+                SelectFromRange(
+                    selectStartOffset = token.startOffset,
+                    selectEndOffset = token.endOffset,
+                    fromStartOffset = fromToken.startOffset,
+                    depth = selectDepth,
+                ),
+            )
+        }
+    }
+
+internal fun String.resultColumnAliases(): List<ResultColumnAlias> {
+    val aliases = mutableListOf<ResultColumnAlias>()
+    selectFromRanges().forEach { select ->
+        selectTargets(select.selectEndOffset, select.fromStartOffset, select.depth).forEach { target ->
             target.aliasIn(this)?.let { alias ->
                 aliases +=
                     ResultColumnAlias(
-                        selectStartOffset = token.startOffset,
+                        selectStartOffset = select.selectStartOffset,
                         targetStartOffset = target.startOffset,
                         targetEndOffset = target.endOffset,
                         token = alias.token,

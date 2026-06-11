@@ -3,7 +3,6 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -81,21 +80,6 @@ private fun SqlResultColumnFacts.expressionText(content: String): String {
     text = text.replace(Regex("""(?i)\s+as\s+${Regex.escape(aliasText)}\s*$"""), "")
     text = text.replace(Regex("""\s+${Regex.escape(aliasText)}\s*$"""), "")
     return text.trim()
-}
-
-private fun SourcePosition.toOffsetIn(content: String): Int {
-    var line = 1
-    var column = 1
-    content.forEachIndexed { index, character ->
-        if (line == this.line && column == this.column) return index
-        if (character == '\n') {
-            line++
-            column = 1
-        } else {
-            column++
-        }
-    }
-    return content.length
 }
 
 private val simpleIdentifierRegex = Regex("""[A-Za-z_][A-Za-z0-9_]*""")
