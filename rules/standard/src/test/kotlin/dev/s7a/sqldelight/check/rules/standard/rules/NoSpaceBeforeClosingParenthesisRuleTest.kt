@@ -45,6 +45,24 @@ class NoSpaceBeforeClosingParenthesisRuleTest {
     }
 
     @Test
+    fun `accepts indented multiline check constraint closing parenthesis`() {
+        val content =
+            """
+            CREATE TABLE sample (
+              id INTEGER NOT NULL PRIMARY KEY,
+              reason TEXT NOT NULL,
+              detail TEXT,
+              CHECK (
+                (reason = 'OTHER' AND detail IS NOT NULL AND detail != '')
+                  OR (reason != 'OTHER' AND detail IS NULL)
+              )
+            );
+            """.asSqlDelightFile()
+
+        NoSpaceBeforeClosingParenthesisRule().assertDiagnosticCount(content, 0, path = MIGRATION_SQM_PATH)
+    }
+
+    @Test
     fun `ignores comments strings and quoted identifiers in sq files`() {
         val content =
             """
