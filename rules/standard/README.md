@@ -104,13 +104,16 @@ The standard rule set uses two safety levels:
 | `standard:consistent-parameter-names` | 🔘 | ⚠️ |  | Require repeated predicates on the same column to reuse the same named parameter. |
 | `standard:consistent-reference-qualification` | 🔘 | ⚠️ |  | Require single-table SELECT result columns to qualify references consistently. |
 | `standard:consistent-set-operation-column-count` | 🔘 | ⚠️ |  | Require adjacent set-operation SELECT lists to return the same number of columns. |
+| `standard:cte-newline` | 🔘 | ⚠️ |  | Require each CTE definition in a multiline `WITH` clause to start its own line. |
 | `standard:data-type-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL data type names outside comments and quoted text. |
 | `standard:explicit-cross-join` | 🔘 | ⚠️ |  | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
 | `standard:explicit-inner-join` | 🔘 | ⚠️ |  | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
 | `standard:explicit-union-operator` | 🔘 | ⚠️ |  | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
 | `standard:final-newline` | 🔘 | ⚠️ | ✅ | Require files to end with one LF newline. |
 | `standard:function-name-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL function names outside comments and quoted text. |
+| `standard:group-by-target-newline` | 🔘 | ⚠️ |  | Require one grouping expression per line in multiline `GROUP BY` clauses. |
 | `standard:grouped-statement-has-single-purpose` | 🔘 | ℹ️ |  | Discourage SQLDelight grouped statements that mix reads and writes. |
+| `standard:join-newline` | 🔘 | ⚠️ |  | Require top-level `JOIN` clauses to start their own line in multiline statements. |
 | `standard:keyword-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
 | `standard:line-ending-lf` | 🔘 | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
 | `standard:literal-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
@@ -156,6 +159,7 @@ The standard rule set uses two safety levels:
 | `standard:no-unnecessary-statement-parentheses` | 🔘 | ⚠️ |  | Disallow redundant parentheses around whole top-level `SELECT` statements. |
 | `standard:no-update-without-where` | 🔘 | ⚠️ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
 | `standard:operator-line-position` | 🔘 | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
+| `standard:order-by-target-newline` | 🔘 | ⚠️ |  | Require one ordering expression per line in multiline `ORDER BY` clauses. |
 | `standard:prefer-between-for-inclusive-range` | 🔘 | ℹ️ |  | Prefer `BETWEEN` for simple inclusive ranges on the same expression. |
 | `standard:prefer-coalesce` | 🔘 | ⚠️ | 🛠️ | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | 🔘 | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
@@ -187,6 +191,7 @@ The standard rule set uses two safety levels:
 | `standard:unique-column-aliases` | 🔘 | ⚠️ |  | Require SELECT result column aliases to be unique within a SELECT list. |
 | `standard:unique-table-aliases` | 🔘 | ⚠️ |  | Require top-level table aliases to be unique within a statement. |
 | `standard:use-is-null` | 🔘 | ⚠️ | 🛠️ | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
+| `standard:where-condition-newline` | 🔘 | ⚠️ |  | Require same-level boolean operators to start their own lines in multiline `WHERE` clauses. |
 
 ## `standard:blocked-words`
 
@@ -2010,6 +2015,166 @@ Fix behavior:
 - No automatic fix is provided.
 - Single-line SQL is accepted.
 - Skips comments, string literals, quoted identifiers, and nested parenthesized clauses.
+
+## `standard:cte-newline`
+
+Reports multiline `WITH` clauses when a CTE definition does not start its own line after indentation.
+
+Invalid:
+
+```sql
+selectPlayers:
+WITH recent AS (
+  SELECT id FROM player
+), active AS (
+  SELECT id FROM player WHERE active = 1
+)
+SELECT id FROM recent;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+WITH
+  recent AS (
+    SELECT id FROM player
+  ),
+  active AS (
+    SELECT id FROM player WHERE active = 1
+  )
+SELECT id FROM recent;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line SQL is accepted.
+- Skips comments, string literals, quoted identifiers, and nested parenthesized clauses.
+
+## `standard:join-newline`
+
+Reports top-level `JOIN` clauses in multiline statements when the join clause does not start its own line after
+indentation.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT player.id, team.name
+FROM player INNER JOIN team ON team.id = player.team_id;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT player.id, team.name
+FROM player
+INNER JOIN team ON team.id = player.team_id;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line SQL is accepted.
+- Skips comments, string literals, quoted identifiers, and nested parenthesized joins.
+
+## `standard:group-by-target-newline`
+
+Reports multiline `GROUP BY` clauses when multiple grouping expressions share a line.
+
+Invalid:
+
+```sql
+selectScores:
+SELECT team_id, age, COUNT(*)
+FROM player
+GROUP BY team_id, age,
+  active;
+```
+
+Valid:
+
+```sql
+selectScores:
+SELECT team_id, age, COUNT(*)
+FROM player
+GROUP BY
+  team_id,
+  age,
+  active;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line `GROUP BY` lists are accepted.
+- Skips commas in nested expressions.
+
+## `standard:order-by-target-newline`
+
+Reports multiline `ORDER BY` clauses when multiple ordering expressions share a line.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id, name, age
+FROM player
+ORDER BY name, age,
+  id;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name, age
+FROM player
+ORDER BY
+  name,
+  age,
+  id;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line `ORDER BY` lists are accepted.
+- Skips commas in nested expressions.
+
+## `standard:where-condition-newline`
+
+Reports multiline `WHERE` clauses when same-level `AND` or `OR` operators do not start their own line after
+indentation.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE active = 1 AND deleted_at IS NULL
+  OR admin = 1;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE active = 1
+  AND deleted_at IS NULL
+  OR admin = 1;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line `WHERE` clauses are accepted.
+- Skips `AND` inside `BETWEEN ... AND ...`.
 
 ## `standard:no-right-join`
 

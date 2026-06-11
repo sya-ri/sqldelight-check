@@ -50,8 +50,11 @@ Deterministic formatting:
 
 - `standard:blank-line-between-statements`
 - `standard:clause-keyword-newline`
+- `standard:cte-newline`
 - `standard:data-type-case`
 - `standard:function-name-case`
+- `standard:group-by-target-newline`
+- `standard:join-newline`
 - `standard:keyword-case`
 - `standard:literal-case`
 - `standard:no-distinct-parentheses`
@@ -66,8 +69,10 @@ Deterministic formatting:
 - `standard:no-space-before-function-parenthesis`
 - `standard:no-space-before-semicolon`
 - `standard:operator-line-position`
+- `standard:order-by-target-newline`
 - `standard:select-comma-line-position`
 - `standard:select-modifier-line-position`
+- `standard:where-condition-newline`
 - `standard:select-target-newline`
 - `standard:set-operator-line-position`
 - `standard:space-after-block-comment-start`

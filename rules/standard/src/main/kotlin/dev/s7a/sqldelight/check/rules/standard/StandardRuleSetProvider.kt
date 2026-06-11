@@ -11,12 +11,15 @@ import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentOrderByDirectionR
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentParameterNamesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentReferenceQualificationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentSetOperationColumnCountRule
+import dev.s7a.sqldelight.check.rules.standard.rules.CteNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.DataTypeCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitCrossJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitInnerJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitUnionOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FinalNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FunctionNameCaseRule
+import dev.s7a.sqldelight.check.rules.standard.rules.GroupByTargetNewlineRule
+import dev.s7a.sqldelight.check.rules.standard.rules.JoinNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.KeywordCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.LineEndingLfRule
 import dev.s7a.sqldelight.check.rules.standard.rules.LiteralCaseRule
@@ -63,6 +66,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnnecessaryStatementParenthesesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUpdateWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.OperatorLinePositionRule
+import dev.s7a.sqldelight.check.rules.standard.rules.OrderByTargetNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCoalesceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferBetweenForInclusiveRangeRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
@@ -94,6 +98,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.StatementTerminatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UniqueTableAliasesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UniqueColumnAliasesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UseIsNullRule
+import dev.s7a.sqldelight.check.rules.standard.rules.WhereConditionNewlineRule
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 
@@ -119,13 +124,16 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::ConsistentParameterNamesRule),
             RuleProvider(::ConsistentReferenceQualificationRule),
             RuleProvider(::ConsistentSetOperationColumnCountRule),
+            RuleProvider(::CteNewlineRule),
             RuleProvider(::DataTypeCaseRule),
             RuleProvider(::ExplicitCrossJoinRule),
             RuleProvider(::ExplicitInnerJoinRule),
             RuleProvider(::ExplicitUnionOperatorRule),
             RuleProvider(::FinalNewlineRule),
             RuleProvider(::FunctionNameCaseRule),
+            RuleProvider(::GroupByTargetNewlineRule),
             RuleProvider(::GroupedStatementHasSinglePurposeRule),
+            RuleProvider(::JoinNewlineRule),
             RuleProvider(::KeywordCaseRule),
             RuleProvider(::LineEndingLfRule),
             RuleProvider(::LiteralCaseRule),
@@ -171,6 +179,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoUnnecessaryStatementParenthesesRule),
             RuleProvider(::NoUpdateWithoutWhereRule),
             RuleProvider(::OperatorLinePositionRule),
+            RuleProvider(::OrderByTargetNewlineRule),
             RuleProvider(::PreferBetweenForInclusiveRangeRule),
             RuleProvider(::PreferCoalesceRule),
             RuleProvider(::PreferCountStarRule),
@@ -202,5 +211,6 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::UniqueColumnAliasesRule),
             RuleProvider(::UniqueTableAliasesRule),
             RuleProvider(::UseIsNullRule),
+            RuleProvider(::WhereConditionNewlineRule),
         )
 }
