@@ -113,6 +113,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterLineCommentMarker
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAroundBinaryOperatorsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAroundComparisonOperatorsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceBeforeBlockCommentEndRule
+import dev.s7a.sqldelight.check.rules.standard.rules.StatementIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.StatementTerminatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UniqueTableAliasesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UniqueColumnAliasesRule
@@ -246,6 +247,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::SpaceAroundBinaryOperatorsRule),
             RuleProvider(::SpaceAroundComparisonOperatorsRule),
             RuleProvider(::SpaceBeforeBlockCommentEndRule),
+            RuleProvider(::StatementIndentationRule),
             RuleProvider(::StatementTerminatorRule),
             RuleProvider(::UniqueColumnAliasesRule),
             RuleProvider(::UniqueTableAliasesRule),
