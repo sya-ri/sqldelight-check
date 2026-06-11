@@ -78,6 +78,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:prefer-simple-boolean-case"),
                 RuleId("standard:require-order-by-with-limit"),
                 RuleId("standard:require-column-alias-as"),
+                RuleId("standard:require-parentheses-for-mixed-boolean-operators"),
                 RuleId("standard:require-result-column-alias"),
                 RuleId("standard:require-table-alias-as"),
                 RuleId("standard:require-table-alias-for-subquery"),

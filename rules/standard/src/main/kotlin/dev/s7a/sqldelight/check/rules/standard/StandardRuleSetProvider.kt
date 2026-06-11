@@ -61,6 +61,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.PreferExplicitColumnListInI
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferSimpleBooleanCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireOrderByWithLimitRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireColumnAliasAsRule
+import dev.s7a.sqldelight.check.rules.standard.rules.RequireParenthesesForMixedBooleanOperatorsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireResultColumnAliasRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasAsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasForSubqueryRule
@@ -151,6 +152,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::PreferSimpleBooleanCaseRule),
             RuleProvider(::RequireOrderByWithLimitRule),
             RuleProvider(::RequireColumnAliasAsRule),
+            RuleProvider(::RequireParenthesesForMixedBooleanOperatorsRule),
             RuleProvider(::RequireResultColumnAliasRule),
             RuleProvider(::RequireTableAliasAsRule),
             RuleProvider(::RequireTableAliasForSubqueryRule),

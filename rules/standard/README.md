@@ -154,6 +154,7 @@ The standard rule set uses two safety levels:
 | `standard:prefer-simple-boolean-case` | 🔘 | ⚠️ |  | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
 | `standard:require-column-alias-as` | 🔘 | ⚠️ |  | Require `AS` for SELECT result column aliases. |
 | `standard:require-order-by-with-limit` | 🔘 | ⚠️ |  | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
+| `standard:require-parentheses-for-mixed-boolean-operators` | 🔘 | ⚠️ |  | Require parentheses when `AND` and `OR` are mixed at the same predicate level. |
 | `standard:require-result-column-alias` | 🔘 | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
 | `standard:require-table-alias-as` | 🔘 | ⚠️ |  | Require `AS` for table aliases. |
 | `standard:require-table-alias-for-subquery` | 🔘 | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
@@ -2274,6 +2275,52 @@ Fix behavior:
 
 - No automatic fix is provided.
 - Reports only exact single-branch boolean literal cases.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:require-parentheses-for-mixed-boolean-operators`
+
+Reports `WHERE`, `HAVING`, and join `ON` predicates that mix same-level `AND`
+and `OR` operators without explicit parentheses.
+
+SQL precedence makes `AND` bind more tightly than `OR`, but indentation alone
+can make the intended grouping hard to review. This rule requires grouping to be
+visible in the SQL text.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE active = 1
+  AND deleted_at IS NULL
+  OR admin = 1;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE (active = 1 AND deleted_at IS NULL)
+  OR admin = 1;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE active = 1
+  AND (deleted_at IS NULL OR admin = 1);
+```
+
+Fix behavior:
+
+- No automatic fix is provided because the correct grouping is semantic.
+- Ignores the `AND` in `BETWEEN ... AND ...`.
 - Skips comments, string literals, and quoted identifiers.
 
 ## `standard:no-from-subquery`

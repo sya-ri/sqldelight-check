@@ -91,6 +91,7 @@ SQL clarity:
 - `standard:prefer-count-star`
 - `standard:prefer-simple-boolean-case`
 - `standard:require-column-alias-as`
+- `standard:require-parentheses-for-mixed-boolean-operators`
 - `standard:require-result-column-alias`
 - `standard:require-table-alias-as`
 - `standard:require-table-alias-for-subquery`
