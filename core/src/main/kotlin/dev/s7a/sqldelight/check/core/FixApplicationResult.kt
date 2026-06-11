@@ -6,7 +6,7 @@ import dev.s7a.sqldelight.check.api.SourceFile
 /**
  * Result of applying diagnostic fixes to one source file.
  */
-public data class FixApplicationResult(
+public class FixApplicationResult(
     /**
      * Updated file content after all selected fixes were applied.
      */
@@ -34,12 +34,31 @@ public data class FixApplicationResult(
         skippedFixes = skippedFixes,
         skippedFixDetails = emptyList(),
     )
+
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is FixApplicationResult &&
+            content == other.content &&
+            appliedFixes == other.appliedFixes &&
+            skippedFixes == other.skippedFixes &&
+            skippedFixDetails == other.skippedFixDetails
+
+    override fun hashCode(): Int {
+        var result = content.hashCode()
+        result = 31 * result + appliedFixes
+        result = 31 * result + skippedFixes
+        result = 31 * result + skippedFixDetails.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "FixApplicationResult(content=$content, appliedFixes=$appliedFixes, skippedFixes=$skippedFixes, skippedFixDetails=$skippedFixDetails)"
 }
 
 /**
  * A diagnostic fix that was not applied.
  */
-public data class SkippedFix(
+public class SkippedFix(
     /**
      * Rule ID that produced the fix when available.
      */
@@ -56,7 +75,25 @@ public data class SkippedFix(
      * Reason the fix was not applied.
      */
     public val reason: FixSkipReason,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SkippedFix &&
+            ruleId == other.ruleId &&
+            file == other.file &&
+            title == other.title &&
+            reason == other.reason
+
+    override fun hashCode(): Int {
+        var result = ruleId?.hashCode() ?: 0
+        result = 31 * result + (file?.hashCode() ?: 0)
+        result = 31 * result + title.hashCode()
+        result = 31 * result + reason.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "SkippedFix(ruleId=$ruleId, file=$file, title=$title, reason=$reason)"
+}
 
 /**
  * Structured reason a diagnostic fix was not applied.

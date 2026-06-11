@@ -7,7 +7,7 @@ import java.io.File
 /**
  * Input required to analyze one SQLDelight database.
  */
-public data class AnalysisInput(
+public class AnalysisInput(
     /**
      * Database metadata resolved by the Gradle plugin.
      */
@@ -40,4 +40,31 @@ public data class AnalysisInput(
      * Runtime classpath used for loading the configured SQLDelight dialect.
      */
     public val dialectClasspath: List<File> = emptyList(),
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is AnalysisInput &&
+            database == other.database &&
+            files == other.files &&
+            sqlDelightVersion == other.sqlDelightVersion &&
+            packageName == other.packageName &&
+            sourceFolders == other.sourceFolders &&
+            dependencyFolders == other.dependencyFolders &&
+            compilerClasspath == other.compilerClasspath &&
+            dialectClasspath == other.dialectClasspath
+
+    override fun hashCode(): Int {
+        var result = database.hashCode()
+        result = 31 * result + files.hashCode()
+        result = 31 * result + (sqlDelightVersion?.hashCode() ?: 0)
+        result = 31 * result + (packageName?.hashCode() ?: 0)
+        result = 31 * result + sourceFolders.hashCode()
+        result = 31 * result + dependencyFolders.hashCode()
+        result = 31 * result + compilerClasspath.hashCode()
+        result = 31 * result + dialectClasspath.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "AnalysisInput(database=$database, files=$files, sqlDelightVersion=$sqlDelightVersion, packageName=$packageName, sourceFolders=$sourceFolders, dependencyFolders=$dependencyFolders, compilerClasspath=$compilerClasspath, dialectClasspath=$dialectClasspath)"
+}

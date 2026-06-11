@@ -7,7 +7,7 @@ import dev.s7a.sqldelight.check.api.RuleSetId
 /**
  * Global sqldelight-check configuration.
  */
-public data class CheckConfig(
+public class CheckConfig(
     /**
      * Global rule set configuration.
      */
@@ -28,4 +28,25 @@ public data class CheckConfig(
      * Logging verbosity for task execution.
      */
     public val logLevel: LogLevel = LogLevel.Info,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is CheckConfig &&
+            ruleSets == other.ruleSets &&
+            rules == other.rules &&
+            databases == other.databases &&
+            allowUnsafeFixes == other.allowUnsafeFixes &&
+            logLevel == other.logLevel
+
+    override fun hashCode(): Int {
+        var result = ruleSets.hashCode()
+        result = 31 * result + rules.hashCode()
+        result = 31 * result + databases.hashCode()
+        result = 31 * result + allowUnsafeFixes.hashCode()
+        result = 31 * result + logLevel.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "CheckConfig(ruleSets=$ruleSets, rules=$rules, databases=$databases, allowUnsafeFixes=$allowUnsafeFixes, logLevel=$logLevel)"
+}

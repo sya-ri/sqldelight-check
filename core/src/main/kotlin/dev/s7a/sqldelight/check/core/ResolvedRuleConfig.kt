@@ -7,7 +7,7 @@ import dev.s7a.sqldelight.check.api.Severity
 /**
  * Resolved configuration for one rule after global and database-specific overrides are applied.
  */
-public data class ResolvedRuleConfig(
+public class ResolvedRuleConfig(
     /**
      * Rule ID being configured.
      */
@@ -24,4 +24,23 @@ public data class ResolvedRuleConfig(
      * Final rule-specific string options after global and database-specific values are merged.
      */
     public val options: Map<String, String>,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is ResolvedRuleConfig &&
+            ruleId == other.ruleId &&
+            enablement == other.enablement &&
+            severity == other.severity &&
+            options == other.options
+
+    override fun hashCode(): Int {
+        var result = ruleId.hashCode()
+        result = 31 * result + enablement.hashCode()
+        result = 31 * result + severity.hashCode()
+        result = 31 * result + options.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "ResolvedRuleConfig(ruleId=$ruleId, enablement=$enablement, severity=$severity, options=$options)"
+}

@@ -1,9 +1,5 @@
 public final class dev/s7a/sqldelight/check/api/DatabaseContext {
 	public fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlDialect;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ldev/s7a/sqldelight/check/api/SqlDialect;
-	public final fun copy (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlDialect;)Ldev/s7a/sqldelight/check/api/DatabaseContext;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlDialect;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/DatabaseContext;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDialect ()Ldev/s7a/sqldelight/check/api/SqlDialect;
 	public final fun getName ()Ljava/lang/String;
@@ -14,15 +10,6 @@ public final class dev/s7a/sqldelight/check/api/DatabaseContext {
 public final class dev/s7a/sqldelight/check/api/Diagnostic {
 	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1-226TpoM ()Ljava/lang/String;
-	public final fun component2 ()Ldev/s7a/sqldelight/check/api/Severity;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ldev/s7a/sqldelight/check/api/SourceFile;
-	public final fun component5 ()Ldev/s7a/sqldelight/check/api/SourceRange;
-	public final fun component6 ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
-	public final fun component7 ()Ljava/util/List;
-	public final fun copy-jWJ1tiY (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)Ldev/s7a/sqldelight/check/api/Diagnostic;
-	public static synthetic fun copy-jWJ1tiY$default (Ldev/s7a/sqldelight/check/api/Diagnostic;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/Diagnostic;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
 	public final fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
@@ -45,9 +32,6 @@ public final class dev/s7a/sqldelight/check/api/DialectCapabilities {
 
 public final class dev/s7a/sqldelight/check/api/DialectCapability {
 	public fun <init> (Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/DialectCapability;Ljava/lang/String;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getId ()Ljava/lang/String;
 	public fun hashCode ()I
@@ -76,11 +60,6 @@ public final class dev/s7a/sqldelight/check/api/Enablement : java/lang/Enum {
 
 public final class dev/s7a/sqldelight/check/api/Fix {
 	public fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/FixSafety;Ljava/util/List;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ldev/s7a/sqldelight/check/api/FixSafety;
-	public final fun component3 ()Ljava/util/List;
-	public final fun copy (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/FixSafety;Ljava/util/List;)Ldev/s7a/sqldelight/check/api/Fix;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/Fix;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/FixSafety;Ljava/util/List;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/Fix;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getEdits ()Ljava/util/List;
 	public final fun getSafety ()Ldev/s7a/sqldelight/check/api/FixSafety;
@@ -147,10 +126,6 @@ public final class dev/s7a/sqldelight/check/api/Severity : java/lang/Enum {
 
 public final class dev/s7a/sqldelight/check/api/SourceFile {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SourceFile;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/SourceFile;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getContent ()Ljava/lang/String;
 	public final fun getPath ()Ljava/lang/String;
@@ -160,10 +135,6 @@ public final class dev/s7a/sqldelight/check/api/SourceFile {
 
 public final class dev/s7a/sqldelight/check/api/SourcePosition {
 	public fun <init> (II)V
-	public final fun component1 ()I
-	public final fun component2 ()I
-	public final fun copy (II)Ldev/s7a/sqldelight/check/api/SourcePosition;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/SourcePosition;IIILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/SourcePosition;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getColumn ()I
 	public final fun getLine ()I
@@ -173,10 +144,6 @@ public final class dev/s7a/sqldelight/check/api/SourcePosition {
 
 public final class dev/s7a/sqldelight/check/api/SourceRange {
 	public fun <init> (Ldev/s7a/sqldelight/check/api/SourcePosition;Ldev/s7a/sqldelight/check/api/SourcePosition;)V
-	public final fun component1 ()Ldev/s7a/sqldelight/check/api/SourcePosition;
-	public final fun component2 ()Ldev/s7a/sqldelight/check/api/SourcePosition;
-	public final fun copy (Ldev/s7a/sqldelight/check/api/SourcePosition;Ldev/s7a/sqldelight/check/api/SourcePosition;)Ldev/s7a/sqldelight/check/api/SourceRange;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/SourcePosition;Ldev/s7a/sqldelight/check/api/SourcePosition;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/SourceRange;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getEnd ()Ldev/s7a/sqldelight/check/api/SourcePosition;
 	public final fun getStart ()Ldev/s7a/sqldelight/check/api/SourcePosition;
@@ -187,14 +154,6 @@ public final class dev/s7a/sqldelight/check/api/SourceRange {
 public final class dev/s7a/sqldelight/check/api/SqlDialect {
 	public fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;)V
 	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()Ldev/s7a/sqldelight/check/api/DialectFamily;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ljava/lang/String;
-	public final fun component5 ()Ljava/lang/String;
-	public final fun component6 ()Ljava/util/Set;
-	public final fun copy (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;)Ldev/s7a/sqldelight/check/api/SqlDialect;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/SqlDialect;Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/SqlDialect;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getArtifact ()Ljava/lang/String;
 	public final fun getCapabilities ()Ljava/util/Set;
@@ -208,10 +167,6 @@ public final class dev/s7a/sqldelight/check/api/SqlDialect {
 
 public final class dev/s7a/sqldelight/check/api/TextEdit {
 	public fun <init> (Ldev/s7a/sqldelight/check/api/SourceRange;Ljava/lang/String;)V
-	public final fun component1 ()Ldev/s7a/sqldelight/check/api/SourceRange;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun copy (Ldev/s7a/sqldelight/check/api/SourceRange;Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/TextEdit;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/api/TextEdit;Ldev/s7a/sqldelight/check/api/SourceRange;Ljava/lang/String;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/TextEdit;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getRange ()Ldev/s7a/sqldelight/check/api/SourceRange;
 	public final fun getReplacement ()Ljava/lang/String;

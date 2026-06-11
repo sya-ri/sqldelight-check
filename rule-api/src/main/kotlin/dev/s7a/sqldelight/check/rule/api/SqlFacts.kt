@@ -10,17 +10,26 @@ import dev.s7a.sqldelight.check.api.SourceRange
  * SQLDelight, SQL-PSI, or a conservative source scanner depending on adapter
  * support for the current SQLDelight version.
  */
-public data class SqlFacts(
+public class SqlFacts(
     /**
      * Top-level SQL statements discovered in the analyzed source file.
      */
     public val statements: List<SqlStatementFacts> = emptyList(),
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlFacts &&
+            statements == other.statements
+
+    override fun hashCode(): Int = statements.hashCode()
+
+    override fun toString(): String = "SqlFacts(statements=$statements)"
+}
 
 /**
  * Stable facts for one top-level SQL statement.
  */
-public data class SqlStatementFacts(
+public class SqlStatementFacts(
     /**
      * Statement kind inferred from the leading SQL keyword.
      */
@@ -45,7 +54,30 @@ public data class SqlStatementFacts(
      * Qualified column-like references discovered in the statement.
      */
     public val qualifiedReferences: List<SqlQualifiedReferenceFacts> = emptyList(),
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlStatementFacts &&
+            kind == other.kind &&
+            range == other.range &&
+            select == other.select &&
+            tableReferences == other.tableReferences &&
+            joins == other.joins &&
+            qualifiedReferences == other.qualifiedReferences
+
+    override fun hashCode(): Int {
+        var result = kind.hashCode()
+        result = 31 * result + range.hashCode()
+        result = 31 * result + (select?.hashCode() ?: 0)
+        result = 31 * result + tableReferences.hashCode()
+        result = 31 * result + joins.hashCode()
+        result = 31 * result + qualifiedReferences.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "SqlStatementFacts(kind=$kind, range=$range, select=$select, tableReferences=$tableReferences, joins=$joins, qualifiedReferences=$qualifiedReferences)"
+}
 
 /**
  * Coarse statement kinds used by parser-backed rules.
@@ -88,7 +120,7 @@ public enum class SqlStatementKind {
 /**
  * Stable facts for a SELECT statement.
  */
-public data class SqlSelectFacts(
+public class SqlSelectFacts(
     /**
      * Source range from SELECT through the end of the select list.
      */
@@ -97,12 +129,22 @@ public data class SqlSelectFacts(
      * Result columns in source order.
      */
     public val resultColumns: List<SqlResultColumnFacts>,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlSelectFacts &&
+            selectListRange == other.selectListRange &&
+            resultColumns == other.resultColumns
+
+    override fun hashCode(): Int = 31 * selectListRange.hashCode() + resultColumns.hashCode()
+
+    override fun toString(): String = "SqlSelectFacts(selectListRange=$selectListRange, resultColumns=$resultColumns)"
+}
 
 /**
  * Stable facts for a SELECT result column.
  */
-public data class SqlResultColumnFacts(
+public class SqlResultColumnFacts(
     /**
      * Source range covered by the result column expression and optional alias.
      */
@@ -115,12 +157,28 @@ public data class SqlResultColumnFacts(
      * True when the result column is a wildcard such as `*` or `table.*`.
      */
     public val wildcard: Boolean = false,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlResultColumnFacts &&
+            range == other.range &&
+            alias == other.alias &&
+            wildcard == other.wildcard
+
+    override fun hashCode(): Int {
+        var result = range.hashCode()
+        result = 31 * result + (alias?.hashCode() ?: 0)
+        result = 31 * result + wildcard.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "SqlResultColumnFacts(range=$range, alias=$alias, wildcard=$wildcard)"
+}
 
 /**
  * Stable facts for a table or derived-table reference.
  */
-public data class SqlTableReferenceFacts(
+public class SqlTableReferenceFacts(
     /**
      * Source range covered by the table reference.
      */
@@ -137,12 +195,30 @@ public data class SqlTableReferenceFacts(
      * True when this reference is a derived table or subquery.
      */
     public val subquery: Boolean = false,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlTableReferenceFacts &&
+            range == other.range &&
+            name == other.name &&
+            alias == other.alias &&
+            subquery == other.subquery
+
+    override fun hashCode(): Int {
+        var result = range.hashCode()
+        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (alias?.hashCode() ?: 0)
+        result = 31 * result + subquery.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "SqlTableReferenceFacts(range=$range, name=$name, alias=$alias, subquery=$subquery)"
+}
 
 /**
  * Stable facts for a JOIN clause.
  */
-public data class SqlJoinFacts(
+public class SqlJoinFacts(
     /**
      * Source range covered by the JOIN keyword and joined source.
      */
@@ -155,7 +231,23 @@ public data class SqlJoinFacts(
      * Joined table or derived-table reference.
      */
     public val table: SqlTableReferenceFacts,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlJoinFacts &&
+            range == other.range &&
+            kind == other.kind &&
+            table == other.table
+
+    override fun hashCode(): Int {
+        var result = range.hashCode()
+        result = 31 * result + kind.hashCode()
+        result = 31 * result + table.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "SqlJoinFacts(range=$range, kind=$kind, table=$table)"
+}
 
 /**
  * Stable facts for a qualified reference such as `table.column`.
@@ -163,7 +255,7 @@ public data class SqlJoinFacts(
  * The model records source syntax only. It does not claim that the qualifier
  * resolves to a table in scope or that the name resolves to a real column.
  */
-public data class SqlQualifiedReferenceFacts(
+public class SqlQualifiedReferenceFacts(
     /**
      * Source range covered by the whole qualified reference.
      */
@@ -176,4 +268,20 @@ public data class SqlQualifiedReferenceFacts(
      * Referenced name after the dot.
      */
     public val name: String,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlQualifiedReferenceFacts &&
+            range == other.range &&
+            qualifier == other.qualifier &&
+            name == other.name
+
+    override fun hashCode(): Int {
+        var result = range.hashCode()
+        result = 31 * result + qualifier.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "SqlQualifiedReferenceFacts(range=$range, qualifier=$qualifier, name=$name)"
+}

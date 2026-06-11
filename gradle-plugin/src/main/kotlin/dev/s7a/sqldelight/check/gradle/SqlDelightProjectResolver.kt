@@ -220,30 +220,18 @@ internal fun mergeResolvedSqlDelightInputs(inputs: List<ResolvedSqlDelightInput>
         }
     }
 
-    return first.copy(
+    return ResolvedSqlDelightInput(
+        sqlDelightVersion = first.sqlDelightVersion,
         analysisInput =
-            first.analysisInput.copy(
-                files =
-                    inputs
-                        .flatMap { input -> input.analysisInput.files }
-                        .distinctBy { file -> file.path }
-                        .sortedBy { file -> file.path },
-                sourceFolders =
-                    inputs
-                        .flatMap { input -> input.analysisInput.sourceFolders }
-                        .distinctBy { file -> file.absolutePath },
-                dependencyFolders =
-                    inputs
-                        .flatMap { input -> input.analysisInput.dependencyFolders }
-                        .distinctBy { file -> file.absolutePath },
-                compilerClasspath =
-                    inputs
-                        .flatMap { input -> input.analysisInput.compilerClasspath }
-                        .distinctBy { file -> file.absolutePath },
-                dialectClasspath =
-                    inputs
-                        .flatMap { input -> input.analysisInput.dialectClasspath }
-                        .distinctBy { file -> file.absolutePath },
+            AnalysisInput(
+                database = first.analysisInput.database,
+                files = inputs.flatMap { input -> input.analysisInput.files }.distinctBy { file -> file.path }.sortedBy { file -> file.path },
+                sqlDelightVersion = first.analysisInput.sqlDelightVersion,
+                packageName = first.analysisInput.packageName,
+                sourceFolders = inputs.flatMap { input -> input.analysisInput.sourceFolders }.distinctBy { file -> file.absolutePath },
+                dependencyFolders = inputs.flatMap { input -> input.analysisInput.dependencyFolders }.distinctBy { file -> file.absolutePath },
+                compilerClasspath = inputs.flatMap { input -> input.analysisInput.compilerClasspath }.distinctBy { file -> file.absolutePath },
+                dialectClasspath = inputs.flatMap { input -> input.analysisInput.dialectClasspath }.distinctBy { file -> file.absolutePath },
             ),
     )
 }

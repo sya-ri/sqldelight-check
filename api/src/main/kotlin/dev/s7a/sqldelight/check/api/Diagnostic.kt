@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.api
 /**
  * Diagnostic emitted by a rule, core analyzer, formatter, or configuration validation.
  */
-public data class Diagnostic(
+public class Diagnostic(
     /**
      * Rule ID responsible for the diagnostic when available.
      */
@@ -32,4 +32,29 @@ public data class Diagnostic(
      * Optional fixes for the diagnostic.
      */
     public val fixes: List<Fix> = emptyList(),
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is Diagnostic &&
+            ruleId == other.ruleId &&
+            severity == other.severity &&
+            message == other.message &&
+            file == other.file &&
+            range == other.range &&
+            database == other.database &&
+            fixes == other.fixes
+
+    override fun hashCode(): Int {
+        var result = ruleId?.hashCode() ?: 0
+        result = 31 * result + severity.hashCode()
+        result = 31 * result + message.hashCode()
+        result = 31 * result + (file?.hashCode() ?: 0)
+        result = 31 * result + (range?.hashCode() ?: 0)
+        result = 31 * result + (database?.hashCode() ?: 0)
+        result = 31 * result + fixes.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "Diagnostic(ruleId=$ruleId, severity=$severity, message=$message, file=$file, range=$range, database=$database, fixes=$fixes)"
+}

@@ -321,7 +321,7 @@ private fun TextEdit.replacementRangeAfterEdit(): SourceRange? {
     if (replacement.isEmpty() || replacement.contains('\n')) return null
     return SourceRange(
         start = range.start,
-        end = range.start.copy(column = range.start.column + replacement.length),
+        end = SourcePosition(line = range.start.line, column = range.start.column + replacement.length),
     )
 }
 

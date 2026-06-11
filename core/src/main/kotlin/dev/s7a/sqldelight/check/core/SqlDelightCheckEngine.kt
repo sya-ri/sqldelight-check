@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.core.sqldelight.SqlDelight2Analyzer
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -89,7 +90,7 @@ public class SqlDelightCheckEngine {
                 candidate.rule.run(
                     context,
                     DiagnosticReporter { diagnostic ->
-                        diagnostics += diagnostic.copy(severity = ruleConfig.severity)
+                        diagnostics += diagnostic.withSeverity(ruleConfig.severity)
                     },
                 )
                 diagnostics
@@ -111,6 +112,17 @@ public class SqlDelightCheckEngine {
     private fun Rule.hasTargetCapability(context: RuleContext): Boolean =
         targetCapability?.let { capability -> capability in context.database.dialect.capabilities } ?: true
 }
+
+private fun Diagnostic.withSeverity(severity: Severity): Diagnostic =
+    Diagnostic(
+        ruleId = ruleId,
+        severity = severity,
+        message = message,
+        file = file,
+        range = range,
+        database = database,
+        fixes = fixes,
+    )
 
 private data class RuleCandidate(
     val ruleSetId: RuleSetId,

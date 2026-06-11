@@ -6,7 +6,7 @@ import dev.s7a.sqldelight.check.api.RuleSetId
 /**
  * Rule set configuration before database-specific overrides are applied.
  */
-public data class RuleSetConfig(
+public class RuleSetConfig(
     /**
      * Rule set ID.
      */
@@ -15,4 +15,14 @@ public data class RuleSetConfig(
      * Configured rule set enablement.
      */
     public val enablement: Enablement,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is RuleSetConfig &&
+            id == other.id &&
+            enablement == other.enablement
+
+    override fun hashCode(): Int = 31 * id.hashCode() + enablement.hashCode()
+
+    override fun toString(): String = "RuleSetConfig(id=$id, enablement=$enablement)"
+}
