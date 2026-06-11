@@ -88,6 +88,7 @@ The standard rule set uses two safety levels:
 | `standard:consistent-column-references` | Warning / Auto | No | None | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
 | `standard:consistent-order-by-direction` | Warning / Auto | No | None | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
+| `standard:consistent-set-operation-column-count` | Warning / Auto | No | None | Require adjacent set-operation SELECT lists to return the same number of columns. |
 | `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
 | `standard:explicit-cross-join` | Warning / Auto | No | None | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
 | `standard:explicit-inner-join` | Warning / Auto | No | None | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
@@ -180,7 +181,8 @@ Useful sqlfluff concepts reflected here:
   `standard:require-order-by-with-limit`, `standard:explicit-cross-join`, `standard:explicit-inner-join`,
   `standard:no-distinct-parentheses`, `standard:no-select-trailing-comma`,
   `standard:select-modifier-line-position`, `standard:clause-keyword-newline`,
-  `standard:no-unnecessary-statement-parentheses`, and `standard:no-from-subquery`.
+  `standard:no-unnecessary-statement-parentheses`, `standard:no-from-subquery`, and
+  `standard:consistent-set-operation-column-count`.
 - Parse-light convention checks for blocked words and table aliases: `standard:blocked-words`,
   `standard:no-self-alias`, `standard:require-table-alias-for-subquery`, and
   `standard:unique-table-aliases`.
@@ -1616,6 +1618,38 @@ ORDER BY name, score;
 Fix behavior:
 
 - No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:consistent-set-operation-column-count`
+
+Reports `UNION`, `INTERSECT`, and `EXCEPT` operations whose adjacent `SELECT` lists return different column counts.
+
+Invalid:
+
+```sql
+selectAllPlayers:
+SELECT id, name
+FROM active_player
+UNION ALL
+SELECT id
+FROM archived_player;
+```
+
+Valid:
+
+```sql
+selectAllPlayers:
+SELECT id, name
+FROM active_player
+UNION ALL
+SELECT id, name
+FROM archived_player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided because the rule cannot know which branch should add or remove columns.
+- Branches with wildcard targets are skipped because their result count is unknown.
 - Skips comments, string literals, and quoted identifiers.
 
 ## `standard:no-select-trailing-comma`
