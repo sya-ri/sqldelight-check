@@ -17,7 +17,7 @@ internal fun Report.toSarifReport(): SarifReport =
                             driver =
                                 SarifDriver(
                                     name = "sqldelight-check",
-                                    semanticVersion = "0.1.0",
+                                    semanticVersion = "0.1.1",
                                     rules =
                                         diagnostics
                                             .map { diagnostic -> diagnostic.sarifRuleId() }
