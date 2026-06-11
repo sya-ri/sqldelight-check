@@ -163,7 +163,7 @@ public abstract class RegexPostgresRule(
     private val message: String,
 ) : Rule {
     override val id: RuleId = RuleId(ruleName)
-    override open val defaultSeverity: Severity = Severity.Warning
+    override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapability.PostgreSql
     private val regex = Regex(pattern, regexOptions)

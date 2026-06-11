@@ -46,7 +46,7 @@ internal class SqlDelightProjectResolver(
         val resolved =
             project.tasks
                 .withType(SqlDelightTask::class.java)
-                .mapNotNull { task -> resolveTask(task) }
+                .map { task -> resolveTask(task) }
 
         return resolved
             .groupBy { input -> input.analysisInput.database.name }
