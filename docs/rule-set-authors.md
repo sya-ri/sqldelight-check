@@ -107,10 +107,28 @@ stable fact type to `rule-api` over reaching into SQLDelight internals.
 `rule-api` also provides small source-text helpers for rules that only need
 offset-stable text checks:
 
+- `RegexRule` reports regex matches in source text after masking comments and quoted text.
 - `String.rangeAtOffsets(startOffset, endOffset)` converts offsets to a `SourceRange`.
 - `String.sqlTokens()` scans SQL-like identifiers outside comments and quoted text.
 - `String.maskSqlCommentsAndQuotedText()` masks comments and quoted text while preserving offsets.
 - `Map<String, String>.booleanOption(...)`, `positiveIntOption(...)`, and `commaSeparatedOption(...)` parse common rule options.
+
+Use `RegexRule` for simple source-text policies before writing the same masking
+and range mapping by hand:
+
+```kotlin
+import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.rule.api.RegexRule
+
+class NoUnsafePragmaRule : RegexRule(
+    ruleName = "no-unsafe-pragma",
+    pattern = """\bPRAGMA\s+writable_schema\s*=\s*ON\b""",
+    message = "Avoid enabling writable_schema in checked SQLDelight sources.",
+    defaultSeverity = Severity.Error,
+    targetCapability = DialectCapability.SQLite,
+)
+```
 
 ## IDs And Configuration
 

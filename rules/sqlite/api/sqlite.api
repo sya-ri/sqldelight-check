@@ -24,35 +24,19 @@ public final class dev/s7a/sqldelight/check/rules/sqlite/rules/ForeignKeysRestor
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
-public final class dev/s7a/sqldelight/check/rules/sqlite/rules/NoAlterTableComplexChangeRule : dev/s7a/sqldelight/check/rules/sqlite/rules/RegexSQLiteRule {
+public final class dev/s7a/sqldelight/check/rules/sqlite/rules/NoAlterTableComplexChangeRule : dev/s7a/sqldelight/check/rule/api/RegexRule {
 	public fun <init> ()V
 }
 
-public final class dev/s7a/sqldelight/check/rules/sqlite/rules/NoAutoincrementWithoutNeedRule : dev/s7a/sqldelight/check/rules/sqlite/rules/RegexSQLiteRule {
+public final class dev/s7a/sqldelight/check/rules/sqlite/rules/NoAutoincrementWithoutNeedRule : dev/s7a/sqldelight/check/rule/api/RegexRule {
 	public fun <init> ()V
 }
 
-public final class dev/s7a/sqldelight/check/rules/sqlite/rules/PreferIntegerPrimaryKeyRule : dev/s7a/sqldelight/check/rules/sqlite/rules/RegexSQLiteRule {
+public final class dev/s7a/sqldelight/check/rules/sqlite/rules/PreferIntegerPrimaryKeyRule : dev/s7a/sqldelight/check/rule/api/RegexRule {
 	public fun <init> ()V
 }
 
-public final class dev/s7a/sqldelight/check/rules/sqlite/rules/PreferWithoutRowidForCompositePkRule : dev/s7a/sqldelight/check/rule/api/Rule {
+public final class dev/s7a/sqldelight/check/rules/sqlite/rules/PreferWithoutRowidForCompositePkRule : dev/s7a/sqldelight/check/rule/api/RegexRule {
 	public fun <init> ()V
-	public fun getDefaultEnable ()Z
-	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
-	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
-	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
-}
-
-public abstract class dev/s7a/sqldelight/check/rules/sqlite/rules/RegexSQLiteRule : dev/s7a/sqldelight/check/rule/api/Rule {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public fun getDefaultEnable ()Z
-	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
-	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
-	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
