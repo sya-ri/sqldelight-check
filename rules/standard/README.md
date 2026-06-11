@@ -160,7 +160,9 @@ The standard rule set uses two safety levels:
 | `standard:require-result-column-alias` | 🔘 | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
 | `standard:require-table-alias-as` | 🔘 | ⚠️ |  | Require `AS` for table aliases. |
 | `standard:require-table-alias-for-subquery` | 🔘 | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
+| `standard:select-comma-line-position` | 🔘 | ⚠️ |  | Require multiline `SELECT` list commas to trail the previous result expression. |
 | `standard:select-modifier-line-position` | 🔘 | ⚠️ |  | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
+| `standard:select-target-newline` | 🔘 | ⚠️ |  | Require one result expression per line in multiline `SELECT` lists. |
 | `standard:set-operator-line-position` | 🔘 | ⚠️ |  | Require multiline set operators to begin their own line after indentation. |
 | `standard:space-after-block-comment-start` | 🔘 | ⚠️ | ✅ | Require one space after a block comment opening marker. |
 | `standard:space-after-comma` | 🔘 | ⚠️ | ✅ | Require one inline space after `,` when another token follows. |
@@ -842,6 +844,40 @@ Fix behavior:
 
 - No automatic fix is provided.
 - Single-line SQL is accepted.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:select-comma-line-position`
+
+Reports multiline `SELECT` list commas that do not trail the previous result
+expression.
+
+This rule is the positive `SELECT`-list companion to `standard:no-leading-comma`.
+It makes the preferred trailing-comma style explicit for multiline result lists.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT
+  id
+  , name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT
+  id,
+  name
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line `SELECT` lists are accepted.
 - Skips comments, string literals, and quoted identifiers.
 
 ## `standard:space-after-comma`
@@ -1855,6 +1891,41 @@ FROM player;
 Fix behavior:
 
 - No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:select-target-newline`
+
+Reports multiline `SELECT` lists that do not put every result expression on its
+own line.
+
+Single-line `SELECT` lists are accepted. Once a result list becomes multiline,
+each top-level result expression should be line-addressable for stable diffs and
+reviews.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id, name,
+  age
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT
+  id,
+  name,
+  age
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Only top-level `SELECT` list separators are considered.
 - Skips comments, string literals, and quoted identifiers.
 
 ## `standard:clause-keyword-newline`

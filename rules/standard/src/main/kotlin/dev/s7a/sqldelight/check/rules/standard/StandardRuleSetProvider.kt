@@ -67,7 +67,9 @@ import dev.s7a.sqldelight.check.rules.standard.rules.RequireParenthesesForMixedB
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireResultColumnAliasRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasAsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasForSubqueryRule
+import dev.s7a.sqldelight.check.rules.standard.rules.SelectCommaLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SelectModifierLinePositionRule
+import dev.s7a.sqldelight.check.rules.standard.rules.SelectTargetNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SetOperatorLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterBlockCommentStartRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterCommaRule
@@ -160,7 +162,9 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::RequireResultColumnAliasRule),
             RuleProvider(::RequireTableAliasAsRule),
             RuleProvider(::RequireTableAliasForSubqueryRule),
+            RuleProvider(::SelectCommaLinePositionRule),
             RuleProvider(::SelectModifierLinePositionRule),
+            RuleProvider(::SelectTargetNewlineRule),
             RuleProvider(::SetOperatorLinePositionRule),
             RuleProvider(::SpaceAfterBlockCommentStartRule),
             RuleProvider(::SpaceAfterCommaRule),

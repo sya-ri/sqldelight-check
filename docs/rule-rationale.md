@@ -66,7 +66,9 @@ Deterministic formatting:
 - `standard:no-space-before-function-parenthesis`
 - `standard:no-space-before-semicolon`
 - `standard:operator-line-position`
+- `standard:select-comma-line-position`
 - `standard:select-modifier-line-position`
+- `standard:select-target-newline`
 - `standard:set-operator-line-position`
 - `standard:space-after-block-comment-start`
 - `standard:space-after-comma`
