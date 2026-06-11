@@ -110,13 +110,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         diagnostics: List<Diagnostic>,
     ) {
         if (!logLevel.logsRules) return
-        val hitRuleIdsByFile =
-            diagnostics
-                .filter { diagnostic -> diagnostic.file != null && diagnostic.ruleId != null }
-                .groupBy { diagnostic -> diagnostic.file!!.path }
-                .mapValues { (_, fileDiagnostics) ->
-                    fileDiagnostics.mapTo(linkedSetOf()) { diagnostic -> diagnostic.ruleId!!.value }
-                }
+        val hitRuleIdsByFile = diagnosticRuleHitsByFile(diagnostics)
 
         traces.forEach { trace ->
             logger.lifecycle("sqldelight-check [{}] {} rules ({}):", trace.databaseName, trace.filePath, trace.ruleIds.size)
@@ -125,7 +119,13 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 return@forEach
             }
 
-            val hitRuleIds = hitRuleIdsByFile[trace.filePath].orEmpty()
+            val hitRuleIds =
+                hitRuleIdsByFile[
+                    FileRuleKey(
+                        databaseName = trace.databaseName,
+                        filePath = trace.filePath,
+                    ),
+                ].orEmpty()
             trace.ruleIds.forEach { ruleId ->
                 val marker = if (ruleId.value in hitRuleIds) "x" else " "
                 logger.lifecycle("sqldelight-check [{}] - [{}] {}", trace.databaseName, marker, ruleId.value)
@@ -201,4 +201,22 @@ private data class FileRuleTrace(
     val databaseName: String,
     val filePath: String,
     val ruleIds: List<RuleId>,
+)
+
+internal fun diagnosticRuleHitsByFile(diagnostics: List<Diagnostic>): Map<FileRuleKey, Set<String>> =
+    diagnostics
+        .filter { diagnostic -> diagnostic.file != null && diagnostic.ruleId != null && diagnostic.database != null }
+        .groupBy { diagnostic ->
+            FileRuleKey(
+                databaseName = diagnostic.database!!.name,
+                filePath = diagnostic.file!!.path,
+            )
+        }
+        .mapValues { (_, fileDiagnostics) ->
+            fileDiagnostics.mapTo(linkedSetOf()) { diagnostic -> diagnostic.ruleId!!.value }
+        }
+
+internal data class FileRuleKey(
+    val databaseName: String,
+    val filePath: String,
 )

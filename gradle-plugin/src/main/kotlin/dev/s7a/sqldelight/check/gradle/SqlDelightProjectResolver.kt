@@ -56,7 +56,7 @@ internal class SqlDelightProjectResolver(
 
         return resolved
             .groupBy { input -> input.analysisInput.database.name }
-            .map { (_, inputs) -> mergeInputs(inputs) }
+            .map { (_, inputs) -> mergeResolvedSqlDelightInputs(inputs) }
     }
 
     private fun resolveTask(task: Any): ResolvedSqlDelightInput? {
@@ -89,18 +89,6 @@ internal class SqlDelightProjectResolver(
                     compilerClasspath = compilerClasspath.distinctBy { file -> file.absolutePath },
                     dialectClasspath = dialectClasspath,
                 ),
-        )
-    }
-
-    private fun mergeInputs(inputs: List<ResolvedSqlDelightInput>): ResolvedSqlDelightInput {
-        val first = inputs.first()
-        val files =
-            inputs
-                .flatMap { input -> input.analysisInput.files }
-                .distinctBy { file -> file.path }
-                .sortedBy { file -> file.path }
-        return first.copy(
-            analysisInput = first.analysisInput.copy(files = files),
         )
     }
 
@@ -210,6 +198,55 @@ internal class SqlDelightProjectResolver(
         )
     }
 
+}
+
+/**
+ * Combines SQLDelight inputs that Gradle exposes for the same logical database.
+ *
+ * SQLDelight can expose more than one task-backed input for a database. The
+ * analyzer must see every source and dependency folder that contributed files;
+ * otherwise reports can mention files that SQLDelight did not parse.
+ */
+internal fun mergeResolvedSqlDelightInputs(inputs: List<ResolvedSqlDelightInput>): ResolvedSqlDelightInput {
+    val first = inputs.first()
+    inputs.drop(1).forEach { input ->
+        require(input.analysisInput.database == first.analysisInput.database) {
+            "Cannot merge SQLDelight inputs for different database contexts."
+        }
+        require(input.sqlDelightVersion == first.sqlDelightVersion) {
+            "Cannot merge SQLDelight inputs for ${first.analysisInput.database.name} with different SQLDelight versions."
+        }
+        require(input.analysisInput.packageName == first.analysisInput.packageName) {
+            "Cannot merge SQLDelight inputs for ${first.analysisInput.database.name} with different package names."
+        }
+    }
+
+    return first.copy(
+        analysisInput =
+            first.analysisInput.copy(
+                files =
+                    inputs
+                        .flatMap { input -> input.analysisInput.files }
+                        .distinctBy { file -> file.path }
+                        .sortedBy { file -> file.path },
+                sourceFolders =
+                    inputs
+                        .flatMap { input -> input.analysisInput.sourceFolders }
+                        .distinctBy { file -> file.absolutePath },
+                dependencyFolders =
+                    inputs
+                        .flatMap { input -> input.analysisInput.dependencyFolders }
+                        .distinctBy { file -> file.absolutePath },
+                compilerClasspath =
+                    inputs
+                        .flatMap { input -> input.analysisInput.compilerClasspath }
+                        .distinctBy { file -> file.absolutePath },
+                dialectClasspath =
+                    inputs
+                        .flatMap { input -> input.analysisInput.dialectClasspath }
+                        .distinctBy { file -> file.absolutePath },
+            ),
+    )
 }
 
 private data class ResolvedSourceFolder(
