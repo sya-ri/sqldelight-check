@@ -39,7 +39,8 @@ sqldelight {
 }
 ```
 
-The plugin installs the standard rule set and standard reporters by default.
+The plugin installs the standard rule set and standard reporters by default. Dialect-specific rule sets are published
+separately so projects can opt into rules that only make sense for a specific SQLDelight dialect.
 
 ## Tasks
 
@@ -64,6 +65,7 @@ import dev.s7a.sqldelight.check.api.Severity
 sqldelightCheck {
     ruleSets {
         maybeCreate("standard").enabled.set(Enablement.Auto)
+        maybeCreate("postgres").enabled.set(Enablement.Auto)
     }
 
     rules {
@@ -105,6 +107,20 @@ Enablement values:
 
 Rule-level explicit enablement overrides a rule set default. Severity values are `Info`, `Warning`, and `Error`; error
 diagnostics fail check tasks after reports are written.
+
+## Rule Sets
+
+Built-in rule set artifacts:
+
+- `sqldelight-check-rules-standard`: dialect-independent rules for `.sq` and `.sqm` files.
+- `sqldelight-check-rules-postgres`: PostgreSQL-specific rules gated by `DialectCapabilities.PostgreSql`.
+- `sqldelight-check-rules-mysql`: MySQL-specific rule-set slot gated by `DialectCapabilities.MySql`.
+- `sqldelight-check-rules-sqlite`: SQLite-specific rule-set slot gated by `DialectCapabilities.SQLite`.
+- `sqldelight-check-rules-hsql`: HSQL-specific rule-set slot gated by `DialectCapabilities.Hsql`.
+
+Rules in dialect-specific rule sets can use SQLDelight's resolved dialect capability to stay inactive for unrelated
+databases. Empty dialect slots are published intentionally so third-party and future built-in dialect rules follow the
+same shape.
 
 ## Reports
 

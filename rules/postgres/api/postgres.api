@@ -1,0 +1,16 @@
+public final class dev/s7a/sqldelight/check/rules/postgres/PostgresRuleSetProvider : dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
+	public fun <init> ()V
+	public fun getId-wigqPlY ()Ljava/lang/String;
+	public final fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun ruleProviders ()Ljava/util/Set;
+}
+
+public final class dev/s7a/sqldelight/check/rules/postgres/rules/ExcessiveLocksRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+

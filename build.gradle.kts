@@ -31,6 +31,10 @@ val publishedArtifacts =
         ":reporters:sarif" to "sqldelight-check-reporter-sarif",
         ":reporters:text" to "sqldelight-check-reporter-text",
         ":rule-api" to "sqldelight-check-rule-api",
+        ":rules:hsql" to "sqldelight-check-rules-hsql",
+        ":rules:mysql" to "sqldelight-check-rules-mysql",
+        ":rules:postgres" to "sqldelight-check-rules-postgres",
+        ":rules:sqlite" to "sqldelight-check-rules-sqlite",
         ":rules:standard" to "sqldelight-check-rules-standard",
     )
 
