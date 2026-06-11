@@ -87,6 +87,7 @@ jobs:
             printf '{"version":"%s"}\n' "${version}" > ../pages/version.json
           fi
           touch ../pages/.nojekyll
+          printf 'sqldelight-check.s7a.dev\n' > ../pages/CNAME
 
       - name: Deploy Pages branch
         working-directory: pages
