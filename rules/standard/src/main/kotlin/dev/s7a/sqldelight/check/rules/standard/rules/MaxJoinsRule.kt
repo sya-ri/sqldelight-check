@@ -4,7 +4,7 @@ import dev.s7a.sqldelight.check.rule.api.booleanOption
 import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
 import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -42,8 +42,7 @@ public class MaxJoinsRule : Rule {
 
             val firstExcessJoin = joins[max]
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "Statement has more than $max JOIN clauses.",
                     file = context.file,

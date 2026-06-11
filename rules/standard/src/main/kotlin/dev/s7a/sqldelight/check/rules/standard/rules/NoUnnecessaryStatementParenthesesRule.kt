@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -41,8 +41,7 @@ public class NoUnnecessaryStatementParenthesesRule : Rule {
                 if (tokens.any { token -> token.startOffset in (openOffset + 1)..<select.startOffset }) return@forEach
 
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Remove redundant parentheses around the SELECT statement.",
                         file = context.file,

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -41,8 +41,7 @@ public class NoBlankLineAfterQueryLabelRule : Rule {
             val lastBlankLine = lines[firstBodyLineIndex - 1]
             val range = content.rangeAtOffsets(firstBlankLine.startOffset, lastBlankLine.newlineEndOffset)
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "Query label should not be separated from its statement by blank lines.",
                     file = context.file,

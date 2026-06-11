@@ -34,7 +34,7 @@ class HtmlReporterProviderTest {
                     diagnostics =
                         listOf(
                             diagnostic(
-                                qualifiedRuleId = qualifiedRuleId("standard:no-select-trailing-comma"),
+                                ruleId = qualifiedRuleId("standard:no-select-trailing-comma"),
                                 severity = Severity.Error,
                                 message = "Remove the trailing comma from the SELECT list.",
                                 path = "src/commonMain/sqldelight/Team.sq",
@@ -53,13 +53,13 @@ class HtmlReporterProviderTest {
                                 replacement = "",
                             ),
                             diagnostic(
-                                qualifiedRuleId = qualifiedRuleId("standard:use-is-null"),
+                                ruleId = qualifiedRuleId("standard:use-is-null"),
                                 severity = Severity.Warning,
                                 message = "Use `IS NULL` instead of = NULL & keep <safe>.",
                                 replacement = "IS NULL",
                             ),
                             diagnostic(
-                                qualifiedRuleId = qualifiedRuleId("standard:keyword-case"),
+                                ruleId = qualifiedRuleId("standard:keyword-case"),
                                 severity = Severity.Info,
                                 message = "Use uppercase SQL keywords.",
                                 path = "src/commonMain/sqldelight/Search.sq",
@@ -95,7 +95,7 @@ private fun expectedHtml(name: String): String =
     }.readText()
 
 private fun diagnostic(
-    qualifiedRuleId: QualifiedRuleId = qualifiedRuleId("standard:use-is-null"),
+    ruleId: QualifiedRuleId = qualifiedRuleId("standard:use-is-null"),
     severity: Severity = Severity.Warning,
     message: String,
     path: String = "src/commonMain/sqldelight/Player.sq",
@@ -108,7 +108,6 @@ private fun diagnostic(
     replacement: String = "IS NULL",
 ): Diagnostic =
     Diagnostic(
-        ruleId = qualifiedRuleId.ruleId,
         severity = severity,
         message = message,
         file = SourceFile(
@@ -117,7 +116,7 @@ private fun diagnostic(
         ),
         range = range,
         database = null,
-        qualifiedRuleId = qualifiedRuleId,
+        ruleId = ruleId,
         fixes =
             listOf(
                 Fix(

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -29,8 +29,7 @@ public class NoOffsetPaginationRule : Rule {
             }
             .forEach { token ->
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Prefer keyset pagination over OFFSET pagination for stable and scalable paging.",
                         file = context.file,

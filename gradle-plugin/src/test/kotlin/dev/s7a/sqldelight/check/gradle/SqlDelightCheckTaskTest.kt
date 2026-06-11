@@ -47,7 +47,7 @@ class SqlDelightCheckTaskTest {
         ruleId: QualifiedRuleId,
     ): Diagnostic =
         Diagnostic(
-            ruleId = ruleId.ruleId,
+            ruleId = ruleId,
             severity = Severity.Warning,
             message = "test",
             file = SourceFile(path = "src/main/sqldelight/com/example/Query.sq", content = "SELECT * FROM player;\n"),
@@ -61,7 +61,6 @@ class SqlDelightCheckTaskTest {
                             displayName = "sqlite 3 38",
                         ),
                 ),
-            qualifiedRuleId = ruleId,
         )
 }
 

@@ -60,9 +60,9 @@ public class FixApplicationResult(
  */
 public class SkippedFix(
     /**
-     * Rule ID that produced the fix when available.
+     * Rule ID that produced the fix.
      */
-    public val ruleId: QualifiedRuleId?,
+    public val ruleId: QualifiedRuleId,
     /**
      * File that contained the skipped fix when available.
      */
@@ -85,7 +85,7 @@ public class SkippedFix(
             reason == other.reason
 
     override fun hashCode(): Int {
-        var result = ruleId?.hashCode() ?: 0
+        var result = ruleId.hashCode()
         result = 31 * result + (file?.hashCode() ?: 0)
         result = 31 * result + title.hashCode()
         result = 31 * result + reason.hashCode()

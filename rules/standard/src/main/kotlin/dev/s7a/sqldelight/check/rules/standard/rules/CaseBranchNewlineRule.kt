@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -39,8 +39,7 @@ public class CaseBranchNewlineRule : Rule {
                     val line = lines.lineContaining(branch.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == branch.startOffset) return@forEach
                     reporter.report(
-                        Diagnostic(
-                            ruleId = id,
+                        RuleDiagnostic(
                             severity = defaultSeverity,
                             message = "Multiline CASE branch keywords should start their own line.",
                             file = context.file,

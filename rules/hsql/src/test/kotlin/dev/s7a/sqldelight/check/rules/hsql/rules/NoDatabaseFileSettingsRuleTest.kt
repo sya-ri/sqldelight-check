@@ -20,7 +20,7 @@ class NoDatabaseFileSettingsRuleTest {
             )
 
         assertEquals(2, diagnostics.size)
-        assertEquals(setOf(qualifiedRuleId("hsql:no-database-file-settings")), diagnostics.map { it.qualifiedRuleId }.toSet())
+        assertEquals(setOf(qualifiedRuleId("hsql:no-database-file-settings")), diagnostics.map { it.ruleId }.toSet())
     }
 
     @Test

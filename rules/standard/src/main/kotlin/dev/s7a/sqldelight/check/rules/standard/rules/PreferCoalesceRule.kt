@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -33,8 +33,7 @@ public class PreferCoalesceRule : Rule {
 
                 val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Use COALESCE instead of ${token.text.uppercase()}.",
                         file = context.file,

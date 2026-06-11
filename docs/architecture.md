@@ -3,42 +3,28 @@
 This document records the implementation boundaries that matter for the
 `v0.1.0` API surface.
 
-## SQLDelight 2.x Compatibility
+## SQLDelight Compatibility
 
-sqldelight-check uses SQLDelight itself for parser and compiler diagnostics.
-The Gradle plugin resolves SQLDelight database metadata and the configured
-dialect classpath from the checked project. Core analysis links to the
-SQLDelight 2.x compiler API directly and loads the checked project's dialect
-implementation through a small child class loader.
+sqldelight-check uses SQLDelight's Gradle task model to discover databases,
+local `.sq` and `.sqm` source files, and dialect coordinates. The core rule
+engine does not invoke the SQLDelight compiler or expose SQLDelight PSI.
 
-The compatibility code in `core.sqldelight` is intentionally narrow:
+The compatibility boundary is intentionally narrow:
 
-- `SqlDelight2VersionSupport` accepts stable SQLDelight `2.0.x` through
-  `2.3.x` and the explicitly tested `2.4.0-SNAPSHOT`.
-- `SqlDelightProjectResolver` reads SQLDelight's Gradle task model through
-  SQLDelight `2.3.2` task and property types. It does not use reflective
-  method lookup for database name, package name, source folders, or
-  compilation-unit discovery.
-- `SqlDelight2Analyzer` builds typed SQLDelight compilation-unit and database
-  property models, then runs `SqlDelightEnvironment` without reflective
-  compiler calls.
-- The analyzer is compiled against SQLDelight `2.3.2`. Compatibility with
-  earlier stable `2.x` Gradle plugin and dialect combinations is verified by
-  Gradle TestKit projects that actually apply those versions.
-- The dialect child class loader is only used for `ServiceLoader` discovery of
-  the configured `SqlDelightDialect` implementation.
-- `SourceFileMatching` maps SQLDelight compiler error paths back to
-  sqldelight-check `SourceFile` values.
+- `SqlDelightProjectResolver` reads SQLDelight task properties for database
+  name, compilation unit source folders, and dialect configuration.
+- `AnalysisInput` contains only stable sqldelight-check data:
+  `DatabaseContext` and resolved `SourceFile` values.
+- Dialect coordinates are converted to stable `SqlDialect` metadata and passed
+  to rules. The dialect implementation is not loaded by core.
+- SQLDelight parser and compiler diagnostics remain SQLDelight's own
+  responsibility. sqldelight-check reports rule diagnostics only.
 
-Those pieces keep the public rule API independent from SQLDelight and IntelliJ
-internals while still letting SQLDelight own parsing and dialect validation.
-The Gradle plugin treats SQLDelight's Gradle task model as a compatibility
-surface for the supported `2.x` line and relies on TestKit coverage across the
-declared versions to catch task model changes.
-
-For SQLDelight `3.x`, sqldelight-check should treat compatibility as a larger
-update. The current `2.x` analyzer should not grow unbounded fallback logic for
-unknown major versions.
+This keeps the public rule API independent from SQLDelight and IntelliJ
+internals. SQLDelight version compatibility is therefore primarily about
+whether the Gradle task model still exposes the database and source folder
+shape sqldelight-check reads. TestKit coverage across SQLDelight plugin
+versions should catch task model changes.
 
 ## Rule Model And PSI
 

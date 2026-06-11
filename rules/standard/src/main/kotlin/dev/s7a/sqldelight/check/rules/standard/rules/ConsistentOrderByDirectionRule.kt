@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -33,8 +33,7 @@ public class ConsistentOrderByDirectionRule : Rule {
             }
 
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "ORDER BY should specify ASC/DESC for all columns or for none of them.",
                     file = context.file,

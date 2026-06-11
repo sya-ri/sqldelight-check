@@ -26,7 +26,7 @@ class ForeignKeysRestoredRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
-        assertEquals(qualifiedRuleId("sqlite:foreign-keys-restored"), diagnostics.single().qualifiedRuleId)
+        assertEquals(qualifiedRuleId("sqlite:foreign-keys-restored"), diagnostics.single().ruleId)
         assertEquals(1, diagnostics.single().range?.start?.line)
         assertEquals(1, diagnostics.single().range?.start?.column)
         assertTrue(diagnostics.single().fixes.isEmpty())

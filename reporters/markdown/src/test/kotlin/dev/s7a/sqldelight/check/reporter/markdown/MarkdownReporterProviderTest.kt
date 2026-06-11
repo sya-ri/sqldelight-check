@@ -81,9 +81,8 @@ private fun MarkdownReporterProvider.render(report: Report): String {
 }
 
 private fun diagnostic(message: String): Diagnostic {
-    val qualifiedRuleId = qualifiedRuleId("standard:use-is-null")
+    val ruleId = qualifiedRuleId("standard:use-is-null")
     return Diagnostic(
-        ruleId = qualifiedRuleId.ruleId,
         severity = Severity.Warning,
         message = message,
         file = SourceFile(
@@ -95,7 +94,7 @@ private fun diagnostic(message: String): Diagnostic {
             end = SourcePosition(line = 2, column = 16),
         ),
         database = null,
-        qualifiedRuleId = qualifiedRuleId,
+        ruleId = ruleId,
         fixes =
             listOf(
                 Fix(

@@ -1,6 +1,6 @@
 package com.example.sqldelight.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFileKind
@@ -27,8 +27,7 @@ public class NoSelectStarRule : Rule {
             .forEach { match ->
                 val starOffset = match.value.lastIndexOf('*').let { offset -> match.range.first + offset }
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = context.options["message"] ?: "Avoid SELECT * in public SQLDelight queries.",
                         file = context.file,

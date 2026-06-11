@@ -79,9 +79,8 @@ private fun SarifReporterProvider.render(
 }
 
 private fun diagnostic(): Diagnostic {
-    val qualifiedRuleId = qualifiedRuleId("standard:use-is-null")
+    val ruleId = qualifiedRuleId("standard:use-is-null")
     return Diagnostic(
-        ruleId = qualifiedRuleId.ruleId,
         severity = Severity.Warning,
         message = "Use `IS NULL` instead of = NULL & keep <safe>.",
         file = SourceFile(
@@ -93,7 +92,7 @@ private fun diagnostic(): Diagnostic {
             end = SourcePosition(line = 2, column = 16),
         ),
         database = null,
-        qualifiedRuleId = qualifiedRuleId,
+        ruleId = ruleId,
     )
 }
 

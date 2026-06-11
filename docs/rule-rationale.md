@@ -29,8 +29,8 @@ Built-in rules use `Severity.Warning` for high-confidence findings and
 dependent.
 
 Users can promote or demote rules with `Severity.Error` and `Severity.Info` in
-`build.gradle.kts`. SQLDelight parser and compiler diagnostics remain errors
-because they come from SQLDelight itself.
+`build.gradle.kts`. sqldelight-check reports rule diagnostics only; SQLDelight
+parser and compiler diagnostics are produced by SQLDelight's own tasks.
 
 ## Standard Rule Audit
 

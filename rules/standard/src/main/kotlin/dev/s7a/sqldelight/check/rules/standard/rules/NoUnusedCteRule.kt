@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -28,8 +28,7 @@ public class NoUnusedCteRule : Rule {
             block.ctes.forEach { cte ->
                 if (content.hasTokenAfter(cte.name, block.mainQueryStartOffset)) return@forEach
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "CTE '${cte.name}' is not referenced by the main query.",
                         file = context.file,

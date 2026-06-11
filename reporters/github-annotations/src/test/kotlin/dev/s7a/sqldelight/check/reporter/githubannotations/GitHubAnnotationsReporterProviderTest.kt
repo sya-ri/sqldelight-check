@@ -35,7 +35,7 @@ class GitHubAnnotationsReporterProviderTest {
                                 message = "Use IS NULL, not = NULL\nSee 100% rule coverage.",
                             ),
                             diagnostic(
-                                qualifiedRuleId = null,
+                                ruleId = qualifiedRuleId("standard:project"),
                                 severity = Severity.Info,
                                 file = null,
                                 range = null,
@@ -48,7 +48,7 @@ class GitHubAnnotationsReporterProviderTest {
         assertEquals(
             """
             ::warning title=standard%3Ause-is-null,file=src/commonMain/sqldelight/Player%2CTest.sq,line=2,col=8,endLine=2,endColumn=16::Use IS NULL, not = NULL%0ASee 100%25 rule coverage.
-            ::notice title=sqldelight-check::Project-level note
+            ::notice title=standard%3Aproject::Project-level note
             """.trimIndent() + "\n",
             annotations,
         )
@@ -62,7 +62,7 @@ private fun GitHubAnnotationsReporterProvider.render(report: Report): String {
 }
 
 private fun diagnostic(
-    qualifiedRuleId: QualifiedRuleId? = qualifiedRuleId("standard:use-is-null"),
+    ruleId: QualifiedRuleId = qualifiedRuleId("standard:use-is-null"),
     severity: Severity,
     file: SourceFile? =
         SourceFile(
@@ -77,13 +77,12 @@ private fun diagnostic(
     message: String,
 ): Diagnostic =
     Diagnostic(
-        ruleId = qualifiedRuleId?.ruleId,
+        ruleId = ruleId,
         severity = severity,
         message = message,
         file = file,
         range = range,
         database = null,
-        qualifiedRuleId = qualifiedRuleId,
         fixes = emptyList(),
     )
 

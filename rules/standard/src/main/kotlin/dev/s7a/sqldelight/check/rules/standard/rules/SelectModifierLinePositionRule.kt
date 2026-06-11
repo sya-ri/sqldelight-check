@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -34,8 +34,7 @@ public class SelectModifierLinePositionRule : Rule {
             if (selectLine.number == modifierLine.number) return@forEachIndexed
 
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "${modifier.text.uppercase()} should be on the same line as SELECT.",
                     file = context.file,

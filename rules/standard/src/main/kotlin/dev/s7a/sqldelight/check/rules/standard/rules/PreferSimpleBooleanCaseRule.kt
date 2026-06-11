@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -27,8 +27,7 @@ public class PreferSimpleBooleanCaseRule : Rule {
 
             val match = tokens.simpleBooleanCaseMatch(index) ?: return@forEachIndexed
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "Prefer a direct boolean predicate instead of CASE returning TRUE or FALSE.",
                     file = context.file,

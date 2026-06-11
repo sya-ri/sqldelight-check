@@ -4,10 +4,10 @@ import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
-import dev.s7a.sqldelight.check.core.sqldelight.SqlDelight2Analyzer
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -16,15 +16,15 @@ import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import dev.s7a.sqldelight.check.rule.api.defaultEnablement
 
 /**
- * Runs SQLDelight analysis and sqldelight-check rules for resolved database inputs.
+ * Runs sqldelight-check rules for resolved database inputs.
  *
  * The engine keeps Gradle- and reporter-specific behavior outside the core
  * execution path so tests and custom integrations can exercise the same
- * analysis model directly.
+ * rule model directly.
  */
 public class SqlDelightCheckEngine {
     /**
-     * Runs analysis for all resolved SQLDelight databases and returns every
+     * Runs rules for all resolved SQLDelight databases and returns every
      * diagnostic that remains after source-level rule suppressions are applied.
      */
     public fun run(
@@ -34,9 +34,8 @@ public class SqlDelightCheckEngine {
         trace: AnalysisTrace = AnalysisTrace.None,
     ): List<Diagnostic> =
         inputs.flatMap { input ->
-            val analysisResult = SqlDelight2Analyzer.analyze(input)
-            trace.databaseFiles(input.database, analysisResult.files)
-            analysisResult.diagnostics + runRules(input.database, analysisResult.files, ruleSetProviders, config, trace)
+            trace.databaseFiles(input.database, input.files)
+            runRules(input.database, input.files, ruleSetProviders, config, trace)
         }
 
     private fun runRules(
@@ -84,7 +83,12 @@ public class SqlDelightCheckEngine {
                         override val options: Map<String, String> = ruleConfig.options
                         override val facts: SqlFacts = facts
                     }
-                val enablement = EnablementResolver.resolveRuleEnablement(ruleSetConfig.enablement, ruleConfig.enablement)
+                val enablement =
+                    if (ruleConfig.enablement == Enablement.Auto) {
+                        ruleSetConfig.enablement
+                    } else {
+                        ruleConfig.enablement
+                    }
                 if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
 
                 executedRuleIds += candidate.ruleId
@@ -115,18 +119,17 @@ public class SqlDelightCheckEngine {
         targetCapability?.let { capability -> capability in context.database.dialect.capabilities } ?: true
 }
 
-private fun Diagnostic.withRuleIdentity(
+private fun RuleDiagnostic.withRuleIdentity(
     ruleId: QualifiedRuleId,
     severity: Severity,
 ): Diagnostic =
     Diagnostic(
-        ruleId = ruleId.ruleId,
+        ruleId = ruleId,
         severity = severity,
         message = message,
         file = file,
         range = range,
         database = database,
-        qualifiedRuleId = ruleId,
         fixes = fixes,
     )
 

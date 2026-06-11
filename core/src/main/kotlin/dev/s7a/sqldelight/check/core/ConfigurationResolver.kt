@@ -8,13 +8,13 @@ import dev.s7a.sqldelight.check.api.Severity
 /**
  * Resolves global and database-specific configuration into final per-database values.
  */
-public class ConfigurationResolver(
+internal class ConfigurationResolver(
     private val config: CheckConfig,
 ) {
     /**
      * Resolves a rule set for a database.
      */
-    public fun resolveRuleSet(
+    fun resolveRuleSet(
         ruleSetId: RuleSetId,
         databaseName: String,
         defaultEnablement: Enablement = Enablement.Auto,
@@ -30,7 +30,7 @@ public class ConfigurationResolver(
     /**
      * Resolves a rule for a database.
      */
-    public fun resolveRule(
+    fun resolveRule(
         ruleId: QualifiedRuleId,
         databaseName: String,
         defaultEnablement: Enablement = Enablement.Auto,

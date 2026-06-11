@@ -27,7 +27,7 @@ class ReindexConcurrentlyRuleTest {
         assertEquals(2, diagnostics.size)
         assertEquals(
             setOf(qualifiedRuleId("postgres:reindex-concurrently")),
-            diagnostics.map { diagnostic -> diagnostic.qualifiedRuleId }.toSet(),
+            diagnostics.map { diagnostic -> diagnostic.ruleId }.toSet(),
         )
         assertEquals(1, diagnostics.first().range?.start?.line)
         assertEquals(1, diagnostics.first().range?.start?.column)

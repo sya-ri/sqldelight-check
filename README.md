@@ -3,14 +3,13 @@
 SQLDelight formatter and rule-based linter for `.sq` and `.sqm` files.
 
 sqldelight-check is a Gradle plugin for projects that already use SQLDelight. It reads SQLDelight's Gradle model,
-delegates parsing and validation to SQLDelight, then runs sqldelight-check rule sets over the resolved source files.
+resolves database source files and dialect metadata, then runs sqldelight-check rule sets over those files.
 
 ## Status
 
 sqldelight-check is pre-release. The repository is being prepared for `v0.1.0`.
 
-The initial release targets stable SQLDelight `2.0.x` through `2.3.x`, with opt-in verification for
-`2.4.0-SNAPSHOT`, and focuses on Gradle plugin usage. There is no standalone CLI.
+The initial release focuses on Gradle plugin usage. There is no standalone CLI.
 
 ## Install
 
@@ -50,8 +49,8 @@ Use the Gradle tasks installed by the plugin:
 ./gradlew sqldelightFix
 ```
 
-- `sqldelightCheck`: run SQLDelight analysis, rules, and reports without modifying files.
-- `sqldelightFix`: apply allowed fixes, re-run analysis, then write reports.
+- `sqldelightCheck`: run rules and reports without modifying files.
+- `sqldelightFix`: apply allowed fixes, re-run rules, then write reports.
 
 The first rules are lint-style rules with safe fixes. Formatting rules can use the same check/fix task model when they
 are added.
@@ -182,8 +181,7 @@ Supported directives:
 - `-- sqldelight-check-disable [rule-id,...]`: start suppressing matching rule diagnostics.
 - `-- sqldelight-check-enable [rule-id,...]`: stop the matching `disable` block. Without rule IDs, all active disables stop.
 
-Omitting rule IDs suppresses all rule diagnostics covered by that directive. Directives do not suppress SQLDelight
-parser or compiler diagnostics.
+Omitting rule IDs suppresses all rule diagnostics covered by that directive.
 
 ## Rule Sets
 
@@ -203,9 +201,9 @@ See the rule-set README files for rule behavior, options, and examples:
 - [SQLite rules](rules/sqlite/README.md)
 - [HSQL rules](rules/hsql/README.md)
 
-Rules run after SQLDelight accepts the project input. SQLDelight parser and dialect behavior are not reimplemented by
-sqldelight-check.
-See [Architecture Notes](docs/architecture.md) for the SQLDelight compatibility and rule API boundaries.
+Rules run over source files resolved from SQLDelight's Gradle task model. SQLDelight parser and dialect behavior are
+not reimplemented by sqldelight-check.
+See [Architecture Notes](docs/architecture.md) for the Gradle model compatibility and rule API boundaries.
 See [Rule Rationale](docs/rule-rationale.md) for the criteria used to keep built-in rules grounded.
 
 sqldelight-check's standard rules are inspired by the practical SQL linting vocabulary established by
@@ -245,8 +243,8 @@ sqldelightCheck {
 }
 ```
 
-Invalid edits and overlapping edits are skipped. When a fix task changes files, sqldelight-check runs analysis again
-and writes reports for the remaining diagnostics.
+Invalid edits and overlapping edits are skipped. When a fix task changes files, sqldelight-check runs rules again and
+writes reports for the remaining diagnostics.
 
 ## Custom Providers
 
@@ -269,12 +267,10 @@ Authoring guides:
 
 sqldelight-check reads SQLDelight database tasks from Gradle and supports multiple SQLDelight databases in one project.
 Dialect metadata is inferred from SQLDelight's dialect configuration and passed to rules as stable sqldelight-check API
-data.
-
-The `v0.1.0` core analyzer targets stable SQLDelight `2.0.x`, `2.1.x`, `2.2.x`, and `2.3.x`. `2.4.0-SNAPSHOT` is
-covered by an opt-in compatibility test because the final SQLDelight 2.4.0 Gradle plugin marker is not available yet.
+data. The core rule engine does not invoke the SQLDelight compiler, so SQLDelight version compatibility is primarily
+bounded by the Gradle task model used to discover databases and source folders.
 
 ## Limitations
 
 - There is no standalone CLI.
-- SQLDelight parser/compiler diagnostics use best-effort source ranges derived from SQLDelight error output.
+- sqldelight-check reports rule diagnostics only; it does not replace SQLDelight parser or compiler diagnostics.

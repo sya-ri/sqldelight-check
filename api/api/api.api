@@ -8,16 +8,15 @@ public final class dev/s7a/sqldelight/check/api/DatabaseContext {
 }
 
 public final class dev/s7a/sqldelight/check/api/Diagnostic {
-	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)V
+	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
 	public final fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
 	public final fun getFixes ()Ljava/util/List;
 	public final fun getMessage ()Ljava/lang/String;
-	public final fun getQualifiedRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
 	public final fun getRange ()Ldev/s7a/sqldelight/check/api/SourceRange;
-	public final fun getRuleId-226TpoM ()Ljava/lang/String;
+	public final fun getRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
 	public final fun getSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -98,6 +97,20 @@ public final class dev/s7a/sqldelight/check/api/QualifiedRuleId {
 	public final fun getRuleId-cwxIa2A ()Ljava/lang/String;
 	public final fun getRuleSetId-wigqPlY ()Ljava/lang/String;
 	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/RuleDiagnostic {
+	public fun <init> (Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)V
+	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
+	public final fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
+	public final fun getFixes ()Ljava/util/List;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getRange ()Ldev/s7a/sqldelight/check/api/SourceRange;
+	public final fun getSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

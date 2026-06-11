@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -33,8 +33,7 @@ public class NoSelectDistinctWithGroupByRule : Rule {
             if (!statementTokens.containsKeywordPair("group", "by")) return@forEachIndexed
 
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "SELECT DISTINCT with GROUP BY is ambiguous; remove one of them.",
                     file = context.file,

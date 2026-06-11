@@ -24,7 +24,7 @@ class ExcessiveLocksRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
-        assertEquals(qualifiedRuleId("postgres:excessive-locks"), diagnostics.single().qualifiedRuleId)
+        assertEquals(qualifiedRuleId("postgres:excessive-locks"), diagnostics.single().ruleId)
         assertEquals(1, diagnostics.single().range?.start?.line)
         assertEquals(1, diagnostics.single().range?.start?.column)
         assertTrue(diagnostics.single().fixes.isEmpty())

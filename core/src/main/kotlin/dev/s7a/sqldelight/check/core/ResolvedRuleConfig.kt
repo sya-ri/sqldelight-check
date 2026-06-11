@@ -7,23 +7,23 @@ import dev.s7a.sqldelight.check.api.Severity
 /**
  * Resolved configuration for one rule after global and database-specific overrides are applied.
  */
-public class ResolvedRuleConfig(
+internal class ResolvedRuleConfig(
     /**
      * Rule ID being configured.
      */
-    public val ruleId: QualifiedRuleId,
+    val ruleId: QualifiedRuleId,
     /**
      * Final enablement before `Auto` applicability is evaluated.
      */
-    public val enablement: Enablement,
+    val enablement: Enablement,
     /**
      * Final severity assigned to diagnostics from this rule.
      */
-    public val severity: Severity,
+    val severity: Severity,
     /**
      * Final rule-specific string options after global and database-specific values are merged.
      */
-    public val options: Map<String, String>,
+    val options: Map<String, String>,
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -41,8 +41,7 @@ public class UseIsNullRule : Rule {
                 val replacement = replacementFor(operatorText, isUppercase = rightToken.text.first().isUpperCase())
                 val range = content.rangeAtOffsets(operator.startOffset, operator.endOffset)
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Use ${replacement} NULL instead of $operatorText NULL.",
                         file = context.file,

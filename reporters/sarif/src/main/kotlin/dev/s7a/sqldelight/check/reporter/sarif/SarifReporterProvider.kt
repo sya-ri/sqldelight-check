@@ -144,7 +144,7 @@ private fun Diagnostic.toSarifResult(): SarifResult =
         locations = sarifLocations(),
     )
 
-private fun Diagnostic.sarifRuleId(): String = qualifiedRuleId?.value ?: ruleId?.value ?: "sqldelight-check:diagnostic"
+private fun Diagnostic.sarifRuleId(): String = ruleId.value
 
 private fun Diagnostic.sarifLocations(): List<SarifLocation>? {
     val sourceFile = file ?: return null

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -30,8 +30,7 @@ public class PreferNamedParametersRule : Rule {
             .filterNot { character -> content.previousSqlTokenBefore(character.offset)?.isKeyword("in") == true }
             .forEach { character ->
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Use a named SQLDelight parameter instead of anonymous ?.",
                         file = context.file,

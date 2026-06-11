@@ -1,13 +1,8 @@
 package dev.s7a.sqldelight.check.gradle
 
-import app.cash.sqldelight.core.SqlDelightCompilationUnit
-import app.cash.sqldelight.core.SqlDelightDatabaseProperties
-import app.cash.sqldelight.core.SqlDelightSourceFolder
-import app.cash.sqldelight.dialect.api.SqlDelightDialect
 import app.cash.sqldelight.gradle.SqlDelightCompilationUnitImpl
 import app.cash.sqldelight.gradle.SqlDelightDatabasePropertiesImpl
 import app.cash.sqldelight.gradle.SqlDelightTask
-import com.alecstrong.sql.psi.core.SqlCoreEnvironment
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SourceFile
@@ -20,29 +15,14 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
-
-private const val DEFAULT_SQLDELIGHT_VERSION = "2.3.2"
-private val SQLDELIGHT_COMPILER_CLASSES =
-    listOf(
-        SqlDelightCompilationUnit::class.java,
-        SqlDelightDatabaseProperties::class.java,
-        SqlDelightSourceFolder::class.java,
-        SqlDelightDialect::class.java,
-        SqlCoreEnvironment::class.java,
-    )
 
 /**
  * SQLDelight database input resolved from a Gradle project.
  */
 internal data class ResolvedSqlDelightInput(
     /**
-     * SQLDelight version used for this database.
-     */
-    val sqlDelightVersion: String,
-    /**
-     * Core analysis input for sqldelight-check.
+     * Core check input for sqldelight-check.
      */
     val analysisInput: AnalysisInput,
 )
@@ -71,31 +51,17 @@ internal class SqlDelightProjectResolver(
         val properties = task.properties.get()
         val compilationUnit = task.compilationUnit(properties)
         val databaseName = properties.className
-        val packageName = properties.packageName
         val dialectConfiguration = project.configurations.findByName("${databaseName}DialectClasspath")
-        val intellijConfiguration = project.configurations.findByName("${databaseName}IntellijEnv")
         val dialect = resolveDialect(dialectConfiguration)
-        val version = resolveSqlDelightVersion(intellijConfiguration, dialect).orElse(DEFAULT_SQLDELIGHT_VERSION)
         val sourceFolders = resolveSourceFolders(compilationUnit)
         val localSourceFolders = sourceFolders.filterNot { folder -> folder.dependency }
-        val dependencySourceFolders = sourceFolders.filter { folder -> folder.dependency }
         val sourceFiles = resolveSourceFiles(localSourceFolders)
-        val dialectClasspath = dialectConfiguration?.files?.toList().orEmpty()
-        val intellijClasspath = intellijConfiguration?.files?.toList().orEmpty()
-        val compilerClasspath = task.sqlDelightCompilerClasspath() + dialectClasspath + intellijClasspath
 
         return ResolvedSqlDelightInput(
-            sqlDelightVersion = version,
             analysisInput =
                 AnalysisInput(
                     database = DatabaseContext(name = databaseName, dialect = dialect),
                     files = sourceFiles,
-                    sqlDelightVersion = version,
-                    packageName = packageName,
-                    sourceFolders = localSourceFolders.map { folder -> folder.file },
-                    dependencyFolders = dependencySourceFolders.map { folder -> folder.file },
-                    compilerClasspath = compilerClasspath.distinctBy { file -> file.absolutePath },
-                    dialectClasspath = dialectClasspath,
                 ),
         )
     }
@@ -155,20 +121,6 @@ internal class SqlDelightProjectResolver(
             ?: properties.compilationUnits.firstOrNull()
             ?: error("SQLDelight database properties ${properties.javaClass.name} do not expose a compilation unit.")
 
-    private fun resolveSqlDelightVersion(
-        configuration: Configuration?,
-        dialect: SqlDialect,
-    ): String? {
-        val compilerEnvVersion =
-            configuration
-                ?.moduleComponents()
-                ?.firstOrNull { component ->
-                    component.isSqlDelightModule(SqlDelightModule.CompilerEnv.moduleName)
-                }
-                ?.version
-        return compilerEnvVersion ?: dialect.version
-    }
-
     private fun resolveDialect(configuration: Configuration?): SqlDialect {
         val directDialect = configuration?.directModuleDependencies()?.firstOrNull()
         if (directDialect != null) {
@@ -203,8 +155,7 @@ internal class SqlDelightProjectResolver(
  * Combines SQLDelight inputs that Gradle exposes for the same logical database.
  *
  * SQLDelight can expose more than one task-backed input for a database. The
- * analyzer must see every source and dependency folder that contributed files;
- * otherwise reports can mention files that SQLDelight did not parse.
+ * checker runs over the union of local files resolved from those task inputs.
  */
 internal fun mergeResolvedSqlDelightInputs(inputs: List<ResolvedSqlDelightInput>): ResolvedSqlDelightInput {
     val first = inputs.first()
@@ -212,26 +163,13 @@ internal fun mergeResolvedSqlDelightInputs(inputs: List<ResolvedSqlDelightInput>
         require(input.analysisInput.database == first.analysisInput.database) {
             "Cannot merge SQLDelight inputs for different database contexts."
         }
-        require(input.sqlDelightVersion == first.sqlDelightVersion) {
-            "Cannot merge SQLDelight inputs for ${first.analysisInput.database.name} with different SQLDelight versions."
-        }
-        require(input.analysisInput.packageName == first.analysisInput.packageName) {
-            "Cannot merge SQLDelight inputs for ${first.analysisInput.database.name} with different package names."
-        }
     }
 
     return ResolvedSqlDelightInput(
-        sqlDelightVersion = first.sqlDelightVersion,
         analysisInput =
             AnalysisInput(
                 database = first.analysisInput.database,
                 files = inputs.flatMap { input -> input.analysisInput.files }.distinctBy { file -> file.path }.sortedBy { file -> file.path },
-                sqlDelightVersion = first.analysisInput.sqlDelightVersion,
-                packageName = first.analysisInput.packageName,
-                sourceFolders = inputs.flatMap { input -> input.analysisInput.sourceFolders }.distinctBy { file -> file.absolutePath },
-                dependencyFolders = inputs.flatMap { input -> input.analysisInput.dependencyFolders }.distinctBy { file -> file.absolutePath },
-                compilerClasspath = inputs.flatMap { input -> input.analysisInput.compilerClasspath }.distinctBy { file -> file.absolutePath },
-                dialectClasspath = inputs.flatMap { input -> input.analysisInput.dialectClasspath }.distinctBy { file -> file.absolutePath },
             ),
     )
 }
@@ -240,30 +178,6 @@ private data class ResolvedSourceFolder(
     val file: File,
     val dependency: Boolean,
 )
-
-private enum class SqlDelightModule(
-    val moduleName: String,
-) {
-    CompilerEnv("compiler-env"),
-}
-
-private fun SqlDelightTask.sqlDelightCompilerClasspath(): List<File> {
-    val taskClasspath =
-        (classpath as? FileCollection)
-            ?.files
-            ?.toList()
-            .orEmpty()
-    val implementationClasspath =
-        generateSequence(javaClass as Class<*>?) { type -> type.superclass }
-            .filter { type -> type.name.startsWith("app.cash.sqldelight.") }
-            .mapNotNull { type -> type.protectionDomain.codeSource?.location?.toURI()?.let(::File) }
-            .toList()
-    val compilerApiClasspath =
-        SQLDELIGHT_COMPILER_CLASSES.mapNotNull { type ->
-            type.protectionDomain.codeSource?.location?.toURI()?.let(::File)
-        }
-    return taskClasspath + implementationClasspath + compilerApiClasspath
-}
 
 private fun <T : Any> Property<T>.valueOrNull(): T? =
     if (isPresent) get() else null
@@ -279,13 +193,8 @@ private fun Configuration.moduleComponents(): List<ModuleComponentIdentifier> =
         .allComponents
         .mapNotNull { component -> component.id as? ModuleComponentIdentifier }
 
-private fun ModuleComponentIdentifier.isSqlDelightModule(moduleName: String): Boolean =
-    group == SQLDELIGHT_GROUP && module == moduleName
-
 private fun ModuleComponentIdentifier.isDialectArtifact(): Boolean =
     group == SQLDELIGHT_GROUP && module.endsWith(DIALECT_SUFFIX)
-
-private fun String?.orElse(fallback: String): String = this ?: fallback
 
 private fun File.normalizedRealPath(): Path {
     val path = toPath().toAbsolutePath().normalize()

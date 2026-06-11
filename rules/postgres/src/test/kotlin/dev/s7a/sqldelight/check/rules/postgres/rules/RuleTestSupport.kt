@@ -6,6 +6,8 @@ import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
@@ -45,24 +47,24 @@ internal fun Rule.diagnostics(
                 override val options: Map<String, String> = options
                 override val facts: SqlFacts = SqlFacts()
             },
-        reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic.withRuleSetPrefix("postgres") },
+        reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic.withRuleSetPrefix("postgres", id) },
     )
     return diagnostics
 }
 
-private fun Diagnostic.withRuleSetPrefix(prefix: String): Diagnostic {
-    val currentRuleId = ruleId ?: return this
-    return Diagnostic(
-        ruleId = currentRuleId,
+private fun RuleDiagnostic.withRuleSetPrefix(
+    prefix: String,
+    ruleId: RuleId,
+): Diagnostic =
+    Diagnostic(
         severity = severity,
         message = message,
         file = file,
         range = range,
         database = database,
-        qualifiedRuleId = QualifiedRuleId(RuleSetId(prefix), currentRuleId),
+        ruleId = QualifiedRuleId(RuleSetId(prefix), ruleId),
         fixes = fixes,
     )
-}
 
 internal fun Rule.assertOne(content: String) {
     assertEquals(1, diagnostics(content).size)

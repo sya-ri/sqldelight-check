@@ -7,7 +7,7 @@ import dev.s7a.sqldelight.check.rule.api.SqlToken
 import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
@@ -81,8 +81,7 @@ public abstract class RegexHsqlRule(
         val masked = content.maskSqlCommentsAndQuotedText()
         regex.findAll(masked).forEach { match ->
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = message,
                     file = context.file,

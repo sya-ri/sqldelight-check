@@ -61,7 +61,7 @@ private fun List<Diagnostic>.sorted(): List<Diagnostic> =
                 { it.value.range?.end?.line ?: 0 },
                 { it.value.range?.end?.column ?: 0 },
                 { it.value.severity.sortOrder },
-                { it.value.qualifiedRuleId?.value ?: it.value.ruleId?.value ?: "" },
+                { it.value.ruleId.value },
                 { it.value.message },
                 { it.index },
             ),
@@ -85,7 +85,7 @@ private fun StringBuilder.appendFix(
 }
 
 private val Diagnostic.ruleLabel: String
-    get() = qualifiedRuleId?.value ?: ruleId?.value ?: "sqldelight-check"
+    get() = ruleId.value
 
 private val Diagnostic.locationLabel: String
     get() = locationLabel(file?.path, range)

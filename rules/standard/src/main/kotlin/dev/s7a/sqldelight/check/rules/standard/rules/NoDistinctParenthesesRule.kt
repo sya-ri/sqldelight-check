@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -35,8 +35,7 @@ public class NoDistinctParenthesesRule : Rule {
 
             val range = content.rangeAtOffsets(distinct.startOffset, closeOffset + 1)
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "Do not wrap SELECT DISTINCT arguments in parentheses.",
                     file = context.file,

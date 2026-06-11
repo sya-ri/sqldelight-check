@@ -7,7 +7,7 @@ import dev.s7a.sqldelight.check.rule.api.SqlToken
 import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
@@ -44,8 +44,7 @@ public class NoReplaceIntoRule : Rule {
             if (intoToken?.isKeyword("into") != true) return@forEachIndexed
 
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message =
                         "Avoid MySQL REPLACE INTO because it can delete and insert rows instead of updating them.",

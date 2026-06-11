@@ -29,7 +29,7 @@ class RiskyAlterTableRuleTest {
         assertEquals(4, diagnostics.size)
         assertEquals(
             setOf(qualifiedRuleId("postgres:risky-alter-table")),
-            diagnostics.map { diagnostic -> diagnostic.qualifiedRuleId }.toSet(),
+            diagnostics.map { diagnostic -> diagnostic.ruleId }.toSet(),
         )
         assertEquals(1, diagnostics.first().range?.start?.line)
         assertEquals(1, diagnostics.first().range?.start?.column)

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -47,8 +47,7 @@ public class NoRedundantSemicolonsRule : Rule {
             val fixEnd = content.horizontalWhitespaceEndAfter(lastRedundant.offset + 1)
             val range = content.rangeAtOffsets(first.offset + 1, fixEnd)
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "Statement should not contain redundant semicolons.",
                     file = context.file,

@@ -4,7 +4,7 @@ import dev.s7a.sqldelight.check.rule.api.booleanOption
 import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
 import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -38,8 +38,7 @@ public class MaxLineLengthRule : Rule {
             }
             .forEach { line ->
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Line is longer than $maxLineLength characters.",
                         file = context.file,

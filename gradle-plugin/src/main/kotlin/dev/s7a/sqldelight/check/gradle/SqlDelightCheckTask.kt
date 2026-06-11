@@ -40,7 +40,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public abstract val logLevel: Property<LogLevel>
 
     /**
-     * Runs SQLDelight project detection, core analysis, and report writing.
+     * Runs SQLDelight project detection, rules, and report writing.
      */
     @TaskAction
     public fun run() {
@@ -269,7 +269,7 @@ private data class FileRuleTrace(
 
 internal fun diagnosticRuleHitsByFile(diagnostics: List<Diagnostic>): Map<FileRuleKey, Set<String>> =
     diagnostics
-        .filter { diagnostic -> diagnostic.file != null && diagnostic.qualifiedRuleId != null && diagnostic.database != null }
+        .filter { diagnostic -> diagnostic.file != null && diagnostic.database != null }
         .groupBy { diagnostic ->
             FileRuleKey(
                 databaseName = diagnostic.database!!.name,
@@ -277,7 +277,7 @@ internal fun diagnosticRuleHitsByFile(diagnostics: List<Diagnostic>): Map<FileRu
             )
         }
         .mapValues { (_, fileDiagnostics) ->
-            fileDiagnostics.mapTo(linkedSetOf()) { diagnostic -> diagnostic.qualifiedRuleId!!.value }
+            fileDiagnostics.mapTo(linkedSetOf()) { diagnostic -> diagnostic.ruleId.value }
         }
 
 internal data class FileRuleKey(

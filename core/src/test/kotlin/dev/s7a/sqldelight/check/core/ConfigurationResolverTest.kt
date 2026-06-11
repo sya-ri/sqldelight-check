@@ -86,28 +86,6 @@ class ConfigurationResolverTest {
     }
 
     @Test
-    fun `rule enablement overrides disabled rule set`() {
-        val result =
-            EnablementResolver.resolveRuleEnablement(
-                ruleSetEnablement = Enablement.Disabled,
-                ruleEnablement = Enablement.Enabled,
-            )
-
-        assertEquals(Enablement.Enabled, result)
-    }
-
-    @Test
-    fun `auto rule inherits rule set enablement`() {
-        val result =
-            EnablementResolver.resolveRuleEnablement(
-                ruleSetEnablement = Enablement.Disabled,
-                ruleEnablement = Enablement.Auto,
-            )
-
-        assertEquals(Enablement.Disabled, result)
-    }
-
-    @Test
     fun `database rule set overrides global rule set`() {
         val ruleSetId = RuleSetId("sqlite")
         val resolver =

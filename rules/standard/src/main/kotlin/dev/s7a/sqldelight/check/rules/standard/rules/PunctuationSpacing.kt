@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
@@ -35,8 +35,7 @@ internal fun String.reportNoSpaceBeforeToken(
 
             val range = rangeAtOffsets(whitespaceStart, character.offset)
             reporter.report(
-                Diagnostic(
-                    ruleId = rule.id,
+                RuleDiagnostic(
                     severity = rule.defaultSeverity,
                     message = message,
                     file = context.file,

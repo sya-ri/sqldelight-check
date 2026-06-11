@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -40,8 +40,7 @@ public class NoSelectStarRule : Rule {
                 .filter { character -> character.value == '*' && content.sqlParenthesisDepthAt(character.offset) == selectDepth }
                 .forEach { character ->
                     reporter.report(
-                        Diagnostic(
-                            ruleId = id,
+                        RuleDiagnostic(
                             severity = defaultSeverity,
                             message = "Avoid SELECT * and list result columns explicitly.",
                             file = context.file,

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -34,8 +34,7 @@ public class LineEndingLfRule : Rule {
             val endOffset = if (index + 1 < content.length && content[index + 1] == '\n') index + 2 else index + 1
             val range = content.rangeAtOffsets(index, endOffset)
             reporter.report(
-                Diagnostic(
-                    ruleId = id,
+                RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "Line ending should be LF.",
                     file = context.file,

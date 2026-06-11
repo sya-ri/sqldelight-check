@@ -26,7 +26,7 @@ class NoReplaceIntoRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
-        assertEquals(qualifiedRuleId("mysql:no-replace-into"), diagnostics.single().qualifiedRuleId)
+        assertEquals(qualifiedRuleId("mysql:no-replace-into"), diagnostics.single().ruleId)
         assertEquals(2, diagnostics.single().range?.start?.line)
         assertEquals(1, diagnostics.single().range?.start?.column)
         assertTrue(diagnostics.single().fixes.isEmpty())

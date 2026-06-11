@@ -15,7 +15,7 @@ public class ExampleReporter(
             writer.appendLine(options["title"] ?: "sqldelight-check")
             writer.appendLine("diagnostics=${report.diagnostics.size}")
             report.diagnostics.forEach { diagnostic ->
-                writer.appendLine("${diagnostic.ruleId?.value}: ${diagnostic.message}")
+                writer.appendLine("${diagnostic.ruleId.value}: ${diagnostic.message}")
             }
         }
     }

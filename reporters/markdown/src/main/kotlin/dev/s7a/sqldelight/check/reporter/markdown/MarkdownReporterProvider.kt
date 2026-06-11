@@ -62,7 +62,7 @@ private fun StringBuilder.appendDiagnosticRow(diagnostic: Diagnostic) {
     append("| ")
     append(diagnostic.severity.name.escapeMarkdownTableCell())
     append(" | `")
-    append((diagnostic.qualifiedRuleId?.value ?: diagnostic.ruleId?.value ?: "-").escapeMarkdownCode())
+    append(diagnostic.ruleId.value.escapeMarkdownCode())
     append("` | ")
     append(diagnostic.locationLabel().escapeMarkdownTableCell())
     append(" | ")

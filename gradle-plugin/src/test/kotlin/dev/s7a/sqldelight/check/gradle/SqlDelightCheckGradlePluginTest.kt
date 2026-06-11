@@ -601,44 +601,6 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
-    fun `check task fails after writing reports when sqldelight reports errors`() {
-        val project =
-            testProject(
-                """
-                plugins {
-                    kotlin("jvm") version "2.4.0"
-                    id("app.cash.sqldelight") version "2.3.2"
-                    id("dev.s7a.sqldelight.check")
-                }
-
-                repositories {
-                    mavenCentral()
-                }
-
-                sqldelight {
-                    databases {
-                        create("Database") {
-                            packageName.set("com.example")
-                            srcDirs("src/main/sqldelight")
-                            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
-                        }
-                    }
-                }
-                """.trimIndent(),
-            )
-        project.write("src/main/sqldelight/com/example/Broken.sq", "CREATE TABL broken;")
-
-        val result = project.runAndFail("sqldelightCheck")
-
-        val expectedOutput =
-            listOf(
-                "sqldelight-check analyzed 1 SQLDelight database(s).",
-            )
-        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
-        assertEquals(sqlDelightCompilerErrorJsonReport(), project.file("build/reports/sqldelight-check/report.json").readText())
-    }
-
-    @Test
     fun `check task applies rule overrides from the extension`() {
         val project =
             testProject(
@@ -968,9 +930,6 @@ class SqlDelightCheckGradlePluginTest {
 
         fun unsafeComparisonSpacingJsonReport(): String =
             """{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
-
-        fun sqlDelightCompilerErrorJsonReport(): String =
-            """{"formatVersion":"0.1.0","summary":{"diagnostics":2,"errors":1,"warnings":1,"infos":0},"diagnostics":[{"ruleId":null,"severity":"error","message":"<stmt identifier clojure real> expected, got 'CREATE'\n1    CREATE\n     ^^^^^^","file":"src/main/sqldelight/com/example/Broken.sq","range":{"start":{"line":1,"column":1},"end":{"line":1,"column":7}},"database":${sqliteDatabaseJson()},"fixes":[]},{"ruleId":"standard:final-newline","severity":"warning","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Broken.sq","range":{"start":{"line":1,"column":20},"end":{"line":1,"column":20}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":1,"column":20},"end":{"line":1,"column":20}},"replacement":"\n"}]}]}]}"""
 
         fun sqliteDatabaseJson(version: String = "2.3.2"): String =
             """{"name":"Database","dialect":{"family":"SQLite","displayName":"sqlite 3 38","artifact":"app.cash.sqldelight:sqlite-3-38-dialect","version":"$version","implementationClass":null,"capabilities":["sqlite"]}}"""

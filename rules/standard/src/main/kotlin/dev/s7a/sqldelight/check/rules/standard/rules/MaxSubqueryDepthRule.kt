@@ -4,7 +4,7 @@ import dev.s7a.sqldelight.check.rule.api.booleanOption
 import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
 import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -34,8 +34,7 @@ public class MaxSubqueryDepthRule : Rule {
                 val depth = content.sqlParenthesisDepthAt(token.startOffset)
                 if (depth <= maxDepth) return@forEach
                 reporter.report(
-                    Diagnostic(
-                        ruleId = id,
+                    RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Subquery nesting depth is greater than $maxDepth.",
                         file = context.file,

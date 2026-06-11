@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -33,8 +33,7 @@ public class UniqueTableAliasesRule : Rule {
                     val normalized = alias.text.lowercase()
                     if (seen.add(normalized)) return@forEach
                     reporter.report(
-                        Diagnostic(
-                            ruleId = id,
+                        RuleDiagnostic(
                             severity = defaultSeverity,
                             message = "Table aliases should be unique within a statement.",
                             file = context.file,

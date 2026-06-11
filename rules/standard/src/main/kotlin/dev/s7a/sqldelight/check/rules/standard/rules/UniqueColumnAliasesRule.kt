@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -32,8 +32,7 @@ public class UniqueColumnAliasesRule : Rule {
                 aliases.forEach { alias ->
                     if (seen.add(alias.token.text.lowercase())) return@forEach
                     reporter.report(
-                        Diagnostic(
-                            ruleId = id,
+                        RuleDiagnostic(
                             severity = defaultSeverity,
                             message = "Column aliases should be unique within a SELECT list.",
                             file = context.file,

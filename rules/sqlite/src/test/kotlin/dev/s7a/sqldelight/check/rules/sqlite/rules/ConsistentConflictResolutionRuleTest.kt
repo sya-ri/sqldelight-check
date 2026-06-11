@@ -39,7 +39,7 @@ class ConsistentConflictResolutionRuleTest {
         assertEquals(3, diagnostics.size)
         assertEquals(
             setOf(qualifiedRuleId("sqlite:consistent-conflict-resolution")),
-            diagnostics.map { diagnostic -> diagnostic.qualifiedRuleId }.toSet(),
+            diagnostics.map { diagnostic -> diagnostic.ruleId }.toSet(),
         )
         assertEquals(2, diagnostics.first().range?.start?.line)
         assertEquals(1, diagnostics.first().range?.start?.column)

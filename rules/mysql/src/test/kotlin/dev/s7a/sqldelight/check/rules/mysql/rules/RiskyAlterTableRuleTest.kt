@@ -28,7 +28,7 @@ class RiskyAlterTableRuleTest {
         assertEquals(3, diagnostics.size)
         assertEquals(
             setOf(qualifiedRuleId("mysql:risky-alter-table")),
-            diagnostics.map { diagnostic -> diagnostic.qualifiedRuleId }.toSet(),
+            diagnostics.map { diagnostic -> diagnostic.ruleId }.toSet(),
         )
         assertEquals(1, diagnostics.first().range?.start?.line)
         assertEquals(1, diagnostics.first().range?.start?.column)

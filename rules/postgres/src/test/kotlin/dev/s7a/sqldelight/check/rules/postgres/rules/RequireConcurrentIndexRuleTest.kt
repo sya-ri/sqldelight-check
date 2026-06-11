@@ -14,7 +14,7 @@ class RequireConcurrentIndexRuleTest {
         val diagnostics = RequireConcurrentIndexRule().diagnostics("CREATE INDEX player_name ON player(name);")
 
         assertEquals(1, diagnostics.size)
-        assertEquals(qualifiedRuleId("postgres:require-concurrent-index"), diagnostics.single().qualifiedRuleId)
+        assertEquals(qualifiedRuleId("postgres:require-concurrent-index"), diagnostics.single().ruleId)
     }
 
     @Test

@@ -38,7 +38,7 @@ private fun Report.toGitHubAnnotations(): String =
 
 private fun Diagnostic.toWorkflowCommand(): String {
     val properties = buildList {
-        add("title=${(qualifiedRuleId?.value ?: ruleId?.value ?: "sqldelight-check").escapeWorkflowCommandProperty()}")
+        add("title=${ruleId.value.escapeWorkflowCommandProperty()}")
         file?.path?.let { path ->
             add("file=${path.escapeWorkflowCommandProperty()}")
         }

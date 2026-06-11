@@ -7,9 +7,7 @@ import dev.s7a.sqldelight.check.api.SourceFile
 /**
  * Parses sqldelight-check disable comments for a single source file.
  *
- * Directives intentionally affect rule diagnostics only. SQLDelight compiler
- * diagnostics are left visible so invalid SQL cannot be hidden by lint
- * configuration comments.
+ * Directives affect diagnostics produced by configured rules.
  */
 internal class DisableDirectives private constructor(
     private val fileRules: RuleMatcher?,
@@ -17,7 +15,7 @@ internal class DisableDirectives private constructor(
     private val disabledLines: List<DisabledLine>,
 ) {
     fun suppresses(diagnostic: Diagnostic): Boolean {
-        val ruleId = diagnostic.qualifiedRuleId ?: return false
+        val ruleId = diagnostic.ruleId
         if (ruleId.value in unsuppressibleRuleIds) return false
         val line = diagnostic.range?.start?.line ?: return false
         if (fileRules?.matches(ruleId) == true) return true

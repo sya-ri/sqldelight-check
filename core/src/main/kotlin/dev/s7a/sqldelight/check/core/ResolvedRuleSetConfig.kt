@@ -6,15 +6,15 @@ import dev.s7a.sqldelight.check.api.RuleSetId
 /**
  * Resolved configuration for one rule set.
  */
-public class ResolvedRuleSetConfig(
+internal class ResolvedRuleSetConfig(
     /**
      * Rule set ID being configured.
      */
-    public val ruleSetId: RuleSetId,
+    val ruleSetId: RuleSetId,
     /**
      * Final enablement before rule-level overrides are applied.
      */
-    public val enablement: Enablement,
+    val enablement: Enablement,
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||

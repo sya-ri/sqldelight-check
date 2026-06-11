@@ -4,7 +4,7 @@ import dev.s7a.sqldelight.check.rule.api.booleanOption
 import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
 import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -41,12 +41,12 @@ public class BlockedWordsRule : Rule {
         content.sqlTokens().forEach { token ->
             val lookup = if (matchCase) token.text else token.text.lowercase()
             if (lookup !in blockedWords) return@forEach
-            reporter.reportBlockedWord(context, id, defaultSeverity, token.text, token.startOffset, token.endOffset)
+            reporter.reportBlockedWord(context, defaultSeverity, token.text, token.startOffset, token.endOffset)
         }
 
         if (!ignoreComments) {
             content.commentRanges().forEach { range ->
-                content.reportBlockedWordsInRange(context, reporter, id, defaultSeverity, range, blockedWords, matchCase)
+                content.reportBlockedWordsInRange(context, reporter, defaultSeverity, range, blockedWords, matchCase)
             }
         }
     }
@@ -66,7 +66,6 @@ private fun String.commentRanges(): Sequence<OffsetRange> =
 private fun String.reportBlockedWordsInRange(
     context: RuleContext,
     reporter: DiagnosticReporter,
-    ruleId: RuleId,
     severity: Severity,
     range: OffsetRange,
     blockedWords: Set<String>,
@@ -88,22 +87,20 @@ private fun String.reportBlockedWordsInRange(
         val word = substring(start, index)
         val lookup = if (matchCase) word else word.lowercase()
         if (lookup in blockedWords) {
-            reporter.reportBlockedWord(context, ruleId, severity, word, start, index)
+            reporter.reportBlockedWord(context, severity, word, start, index)
         }
     }
 }
 
 private fun DiagnosticReporter.reportBlockedWord(
     context: RuleContext,
-    ruleId: RuleId,
     severity: Severity,
     word: String,
     startOffset: Int,
     endOffset: Int,
 ) {
     report(
-        Diagnostic(
-            ruleId = ruleId,
+        RuleDiagnostic(
             severity = severity,
             message = "Blocked word '$word' is not allowed.",
             file = context.file,

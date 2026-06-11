@@ -48,13 +48,13 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         val taskGroup = "sqldelight-check"
         tasks.register("sqldelightCheck", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
-            task.description = "Runs SQLDelight analysis and configured rules without modifying files."
+            task.description = "Runs configured SQLDelight rules without modifying files."
             task.applyFixes.convention(false)
             task.logLevel.convention(resolveLogLevelOverride(extension))
         }
         tasks.register("sqldelightFix", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
-            task.description = "Applies allowed SQLDelight fixes, re-runs analysis, and writes reports."
+            task.description = "Applies allowed SQLDelight fixes, re-runs rules, and writes reports."
             task.applyFixes.convention(true)
             task.logLevel.convention(resolveLogLevelOverride(extension))
         }

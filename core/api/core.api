@@ -1,23 +1,7 @@
 public final class dev/s7a/sqldelight/check/core/AnalysisInput {
-	public fun <init> (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
-	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)V
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getCompilerClasspath ()Ljava/util/List;
 	public final fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
-	public final fun getDependencyFolders ()Ljava/util/List;
-	public final fun getDialectClasspath ()Ljava/util/List;
-	public final fun getFiles ()Ljava/util/List;
-	public final fun getPackageName ()Ljava/lang/String;
-	public final fun getSourceFolders ()Ljava/util/List;
-	public final fun getSqlDelightVersion ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class dev/s7a/sqldelight/check/core/AnalysisResult {
-	public fun <init> (Ljava/util/List;Ljava/util/List;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getDiagnostics ()Ljava/util/List;
 	public final fun getFiles ()Ljava/util/List;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -51,14 +35,6 @@ public final class dev/s7a/sqldelight/check/core/CheckConfig {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class dev/s7a/sqldelight/check/core/ConfigurationResolver {
-	public fun <init> (Ldev/s7a/sqldelight/check/core/CheckConfig;)V
-	public final fun resolveRule (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;)Ldev/s7a/sqldelight/check/core/ResolvedRuleConfig;
-	public static synthetic fun resolveRule$default (Ldev/s7a/sqldelight/check/core/ConfigurationResolver;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ResolvedRuleConfig;
-	public final fun resolveRuleSet-LV2AQIs (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;)Ldev/s7a/sqldelight/check/core/ResolvedRuleSetConfig;
-	public static synthetic fun resolveRuleSet-LV2AQIs$default (Ldev/s7a/sqldelight/check/core/ConfigurationResolver;Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ResolvedRuleSetConfig;
-}
-
 public final class dev/s7a/sqldelight/check/core/DatabaseConfig {
 	public fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -68,11 +44,6 @@ public final class dev/s7a/sqldelight/check/core/DatabaseConfig {
 	public final fun getRules ()Ljava/util/Map;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class dev/s7a/sqldelight/check/core/EnablementResolver {
-	public static final field INSTANCE Ldev/s7a/sqldelight/check/core/EnablementResolver;
-	public final fun resolveRuleEnablement (Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Enablement;)Ldev/s7a/sqldelight/check/api/Enablement;
 }
 
 public final class dev/s7a/sqldelight/check/core/FixApplicationResult {
@@ -114,26 +85,6 @@ public final class dev/s7a/sqldelight/check/core/ReporterRegistry {
 public final class dev/s7a/sqldelight/check/core/ReporterRegistry$Companion {
 	public final fun load (Ljava/lang/ClassLoader;)Ldev/s7a/sqldelight/check/core/ReporterRegistry;
 	public static synthetic fun load$default (Ldev/s7a/sqldelight/check/core/ReporterRegistry$Companion;Ljava/lang/ClassLoader;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/ReporterRegistry;
-}
-
-public final class dev/s7a/sqldelight/check/core/ResolvedRuleConfig {
-	public fun <init> (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;Ljava/util/Map;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
-	public final fun getOptions ()Ljava/util/Map;
-	public final fun getRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
-	public final fun getSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class dev/s7a/sqldelight/check/core/ResolvedRuleSetConfig {
-	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
-	public final fun getRuleSetId-wigqPlY ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/s7a/sqldelight/check/core/RuleConfig {

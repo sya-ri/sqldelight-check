@@ -129,7 +129,7 @@ private fun Report.toJsonReport(): JsonReport =
 
 private fun Diagnostic.toJsonDiagnostic(): JsonDiagnostic =
     JsonDiagnostic(
-        ruleId = qualifiedRuleId?.value ?: ruleId?.value,
+        ruleId = ruleId.value,
         severity = severity.name.lowercase(),
         message = message,
         file = file?.path,

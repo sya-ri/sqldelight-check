@@ -185,7 +185,7 @@ private fun FlowContent.diagnosticCard(
         h3 {
             a(href = "#diagnostic-$index") { +"#$index" }
             +" "
-            code { +(diagnostic.qualifiedRuleId?.value ?: diagnostic.ruleId?.value ?: "-") }
+            code { +diagnostic.ruleId.value }
         }
         div("meta") {
             span("severity-${diagnostic.severity.name.lowercase()}") { +diagnostic.severity.name }

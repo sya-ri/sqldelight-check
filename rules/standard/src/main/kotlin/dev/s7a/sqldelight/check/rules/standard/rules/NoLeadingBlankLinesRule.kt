@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -29,8 +29,7 @@ public class NoLeadingBlankLinesRule : Rule {
 
         val range = content.rangeAtOffsets(0, firstContentLine.startOffset)
         reporter.report(
-            Diagnostic(
-                ruleId = id,
+            RuleDiagnostic(
                 severity = defaultSeverity,
                 message = "File should not start with blank lines.",
                 file = context.file,

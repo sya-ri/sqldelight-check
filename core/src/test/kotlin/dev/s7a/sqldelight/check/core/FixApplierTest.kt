@@ -287,15 +287,14 @@ class FixApplierTest {
         range: SourceRange,
         replacement: String,
     ): Diagnostic {
-        val qualifiedRuleId = qualifiedRuleId("standard:test")
+        val ruleId = qualifiedRuleId("standard:test")
         return Diagnostic(
-            ruleId = qualifiedRuleId.ruleId,
+            ruleId = ruleId,
             severity = Severity.Warning,
             message = "test",
             file = file,
             range = range,
             database = null,
-            qualifiedRuleId = qualifiedRuleId,
             fixes =
                 listOf(
                     fix(title = title, safety = safety, range = range, replacement = replacement),
@@ -304,15 +303,14 @@ class FixApplierTest {
     }
 
     private fun diagnostic(fixes: List<Fix>): Diagnostic {
-        val qualifiedRuleId = qualifiedRuleId("standard:test")
+        val ruleId = qualifiedRuleId("standard:test")
         return Diagnostic(
-            ruleId = qualifiedRuleId.ruleId,
+            ruleId = ruleId,
             severity = Severity.Warning,
             message = "test",
             file = null,
             range = null,
             database = null,
-            qualifiedRuleId = qualifiedRuleId,
             fixes = fixes,
         )
     }

@@ -1,5 +1,5 @@
 public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticReporter {
-	public abstract fun report (Ldev/s7a/sqldelight/check/api/Diagnostic;)V
+	public abstract fun report (Ldev/s7a/sqldelight/check/api/RuleDiagnostic;)V
 }
 
 public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
