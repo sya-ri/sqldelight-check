@@ -1,5 +1,13 @@
 package dev.s7a.sqldelight.check.gradle
 
+import app.cash.sqldelight.core.SqlDelightCompilationUnit
+import app.cash.sqldelight.core.SqlDelightDatabaseProperties
+import app.cash.sqldelight.core.SqlDelightSourceFolder
+import app.cash.sqldelight.dialect.api.SqlDelightDialect
+import app.cash.sqldelight.gradle.SqlDelightCompilationUnitImpl
+import app.cash.sqldelight.gradle.SqlDelightDatabasePropertiesImpl
+import app.cash.sqldelight.gradle.SqlDelightTask
+import com.alecstrong.sql.psi.core.SqlCoreEnvironment
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SourceFile
@@ -13,16 +21,16 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.Property
 
-private const val SQLDELIGHT_TASK_CLASS_NAME = "app.cash.sqldelight.gradle.SqlDelightTask"
 private const val DEFAULT_SQLDELIGHT_VERSION = "2.3.2"
 private val SQLDELIGHT_COMPILER_CLASSES =
     listOf(
-        "app.cash.sqldelight.core.SqlDelightCompilationUnit",
-        "app.cash.sqldelight.core.SqlDelightDatabaseProperties",
-        "app.cash.sqldelight.core.SqlDelightSourceFolder",
-        "app.cash.sqldelight.dialect.api.SqlDelightDialect",
-        "com.alecstrong.sql.psi.core.SqlCoreEnvironment",
+        SqlDelightCompilationUnit::class.java,
+        SqlDelightDatabaseProperties::class.java,
+        SqlDelightSourceFolder::class.java,
+        SqlDelightDialect::class.java,
+        SqlCoreEnvironment::class.java,
     )
 
 /**
@@ -40,7 +48,7 @@ internal data class ResolvedSqlDelightInput(
 )
 
 /**
- * Reads SQLDelight's generated Gradle task model without linking sqldelight-check to SQLDelight Gradle classes.
+ * Reads SQLDelight's generated Gradle task model through the supported SQLDelight 2.x task API.
  */
 internal class SqlDelightProjectResolver(
     private val project: Project,
@@ -51,7 +59,7 @@ internal class SqlDelightProjectResolver(
     fun resolve(): List<ResolvedSqlDelightInput> {
         val resolved =
             project.tasks
-                .filter { task -> task.hasSuperclass(SQLDELIGHT_TASK_CLASS_NAME) }
+                .withType(SqlDelightTask::class.java)
                 .mapNotNull { task -> resolveTask(task) }
 
         return resolved
@@ -59,11 +67,11 @@ internal class SqlDelightProjectResolver(
             .map { (_, inputs) -> mergeResolvedSqlDelightInputs(inputs) }
     }
 
-    private fun resolveTask(task: Any): ResolvedSqlDelightInput? {
-        val properties = task.invokeNoArg("getProperties").unwrapGradleProvider()
+    private fun resolveTask(task: SqlDelightTask): ResolvedSqlDelightInput? {
+        val properties = task.properties.get()
         val compilationUnit = task.compilationUnit(properties)
-        val databaseName = properties.invokeNoArg("getClassName") as String
-        val packageName = properties.invokeNoArg("getPackageName") as String
+        val databaseName = properties.className
+        val packageName = properties.packageName
         val dialectConfiguration = project.configurations.findByName("${databaseName}DialectClasspath")
         val intellijConfiguration = project.configurations.findByName("${databaseName}IntellijEnv")
         val dialect = resolveDialect(dialectConfiguration)
@@ -92,16 +100,12 @@ internal class SqlDelightProjectResolver(
         )
     }
 
-    private fun resolveSourceFolders(compilationUnit: Any): List<ResolvedSourceFolder> {
-        val sourceFolders = compilationUnit.invokeNoArg("getSourceFolders") as Iterable<*>
-        return sourceFolders
-            .mapNotNull { sourceFolder ->
-                sourceFolder ?: return@mapNotNull null
-                val file = sourceFolder.invokeNoArg("getFolder") as? File ?: return@mapNotNull null
-                val dependency = sourceFolder.invokeNoArg("getDependency") as Boolean
-                ResolvedSourceFolder(file = file, dependency = dependency)
+    private fun resolveSourceFolders(compilationUnit: SqlDelightCompilationUnitImpl): List<ResolvedSourceFolder> =
+        compilationUnit
+            .sourceFolders
+            .map { sourceFolder ->
+                ResolvedSourceFolder(file = sourceFolder.folder, dependency = sourceFolder.dependency)
             }
-    }
 
     private fun resolveSourceFiles(sourceFolders: List<ResolvedSourceFolder>): List<SourceFile> =
         sourceFolders
@@ -146,14 +150,9 @@ internal class SqlDelightProjectResolver(
                 ?.takeIf { value -> value.isNotBlank() }
                 ?.let { value -> File(value).normalizedRealPath() }
 
-    private fun Any.compilationUnit(properties: Any): Any =
-        invokeNoArgOrNull("getCompilationUnit")
-            ?.unwrapGradleProvider()
-            ?: properties
-                .invokeNoArg("getCompilationUnits")
-                .unwrapGradleProvider()
-                .asIterable()
-                .firstOrNull()
+    private fun SqlDelightTask.compilationUnit(properties: SqlDelightDatabasePropertiesImpl): SqlDelightCompilationUnitImpl =
+        compilationUnit.valueOrNull()
+            ?: properties.compilationUnits.firstOrNull()
             ?: error("SQLDelight database properties ${properties.javaClass.name} do not expose a compilation unit.")
 
     private fun resolveSqlDelightVersion(
@@ -260,55 +259,9 @@ private enum class SqlDelightModule(
     CompilerEnv("compiler-env"),
 }
 
-private fun Any.hasSuperclass(className: String): Boolean {
-    var current: Class<*>? = javaClass
-    while (current != null) {
-        if (current.name == className) return true
-        current = current.superclass
-    }
-    return false
-}
-
-private fun Any.invokeNoArg(name: String): Any {
-    val method =
-        noArgMethod(name)
-            ?: error(
-                "SQLDelight model ${javaClass.name} does not expose $name(). " +
-                    "Available no-arg methods: ${javaClass.noArgMethodNames().joinToString()}",
-            )
-    return method.invoke(this)
-}
-
-private fun Any.invokeNoArgOrNull(name: String): Any? = noArgMethod(name)?.invoke(this)
-
-private fun Any.noArgMethod(name: String) = javaClass.methods.firstOrNull { method ->
-    method.name == name && method.parameterCount == 0
-}
-
-private fun Any.unwrapGradleProvider(): Any =
-    invokeNoArgOrNull("get") ?: this
-
-private fun Any.asIterable(): Iterable<*> =
-    when (this) {
-        is Iterable<*> -> this
-        is Array<*> -> asIterable()
-        else ->
-            error(
-                "SQLDelight model ${javaClass.name} is not iterable. " +
-                    "Available no-arg methods: ${javaClass.noArgMethodNames().joinToString()}",
-            )
-    }
-
-private fun Class<*>.noArgMethodNames(): List<String> =
-    methods
-        .filter { method -> method.parameterCount == 0 }
-        .map { method -> method.name }
-        .distinct()
-        .sorted()
-
-private fun Any.sqlDelightCompilerClasspath(): List<File> {
+private fun SqlDelightTask.sqlDelightCompilerClasspath(): List<File> {
     val taskClasspath =
-        (invokeNoArg("getClasspath") as? FileCollection)
+        (classpath as? FileCollection)
             ?.files
             ?.toList()
             .orEmpty()
@@ -318,19 +271,14 @@ private fun Any.sqlDelightCompilerClasspath(): List<File> {
             .mapNotNull { type -> type.protectionDomain.codeSource?.location?.toURI()?.let(::File) }
             .toList()
     val compilerApiClasspath =
-        SQLDELIGHT_COMPILER_CLASSES.mapNotNull { className ->
-            runCatching {
-                Class
-                    .forName(className, false, javaClass.classLoader)
-                    .protectionDomain
-                    .codeSource
-                    ?.location
-                    ?.toURI()
-                    ?.let(::File)
-            }.getOrNull()
+        SQLDELIGHT_COMPILER_CLASSES.mapNotNull { type ->
+            type.protectionDomain.codeSource?.location?.toURI()?.let(::File)
         }
     return taskClasspath + implementationClasspath + compilerApiClasspath
 }
+
+private fun <T : Any> Property<T>.valueOrNull(): T? =
+    if (isPresent) get() else null
 
 private fun Configuration.directModuleDependencies(): List<ModuleDependency> =
     dependencies

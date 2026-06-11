@@ -15,6 +15,10 @@ The compatibility code in `core.sqldelight` is intentionally narrow:
 
 - `SqlDelight2VersionSupport` accepts stable SQLDelight `2.0.x` through
   `2.3.x` and the explicitly tested `2.4.0-SNAPSHOT`.
+- `SqlDelightProjectResolver` reads SQLDelight's Gradle task model through
+  SQLDelight `2.3.2` task and property types. It does not use reflective
+  method lookup for database name, package name, source folders, or
+  compilation-unit discovery.
 - `SqlDelight2Analyzer` builds typed SQLDelight compilation-unit and database
   property models, then runs `SqlDelightEnvironment` without reflective
   compiler calls.
@@ -28,9 +32,9 @@ The compatibility code in `core.sqldelight` is intentionally narrow:
 
 Those pieces keep the public rule API independent from SQLDelight and IntelliJ
 internals while still letting SQLDelight own parsing and dialect validation.
-The Gradle plugin still reads SQLDelight's Gradle task model conservatively
-because that model is owned by another plugin and may be loaded through a
-different Gradle class loader.
+The Gradle plugin treats SQLDelight's Gradle task model as a compatibility
+surface for the supported `2.x` line and relies on TestKit coverage across the
+declared versions to catch task model changes.
 
 For SQLDelight `3.x`, sqldelight-check should treat compatibility as a larger
 update. The current `2.x` analyzer should not grow unbounded fallback logic for

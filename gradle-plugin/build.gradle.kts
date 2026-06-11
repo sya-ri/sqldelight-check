@@ -17,6 +17,8 @@ dependencies {
     implementation(project(":reporters:markdown"))
     implementation(project(":reporters:github-annotations"))
     compileOnly(kotlin("gradle-plugin-api"))
+    compileOnly(libs.sqldelight.gradle.plugin)
+    compileOnly(libs.sql.psi.environment)
     testImplementation(kotlin("test"))
     testImplementation(gradleTestKit())
 }
