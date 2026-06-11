@@ -67,14 +67,45 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
             task.description = "Runs configured SQLDelight rules without modifying files."
             task.applyFixes.convention(false)
             task.logLevel.convention(resolveLogLevelOverride(extension))
+            configureTaskInputs(task)
         }
         tasks.register("sqldelightFix", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Applies allowed SQLDelight fixes, re-runs rules, and writes reports."
             task.applyFixes.convention(true)
             task.logLevel.convention(resolveLogLevelOverride(extension))
+            configureTaskInputs(task)
         }
     }
+}
+
+private fun Project.configureSqlDelightSourceInputs(task: SqlDelightCheckTask) {
+    task.sqlDelightSources.from(
+        provider {
+            fileTree(rootProject.projectDir) { tree ->
+                tree.include("**/*.sq")
+                tree.include("**/*.sqm")
+                tree.exclude(".gradle/**")
+                tree.exclude("**/build/**")
+            }
+        },
+    )
+}
+
+private fun Project.configureProviderInputs(task: SqlDelightCheckTask) {
+    task.ruleSetClasspath.from(configurations.named("sqldelightCheckRuleSet"))
+    task.reporterClasspath.from(configurations.named("sqldelightCheckReporter"))
+    task.dialectClasspath.from(configurations.named("sqldelightCheckDialects"))
+}
+
+private fun Project.configureReportOutputs(task: SqlDelightCheckTask) {
+    task.reportOutputDirectory.convention(layout.buildDirectory.dir("reports/sqldelight-check"))
+}
+
+private fun Project.configureTaskInputs(task: SqlDelightCheckTask) {
+    configureSqlDelightSourceInputs(task)
+    configureProviderInputs(task)
+    configureReportOutputs(task)
 }
 
 /**

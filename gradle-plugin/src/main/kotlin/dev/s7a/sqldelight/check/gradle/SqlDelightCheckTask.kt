@@ -21,8 +21,15 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -40,6 +47,37 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
      */
     @get:Input
     public abstract val logLevel: Property<LogLevel>
+
+    /**
+     * SQLDelight source files that can influence diagnostics or fixes.
+     */
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    public abstract val sqlDelightSources: ConfigurableFileCollection
+
+    /**
+     * Runtime classpath used to discover rule set providers.
+     */
+    @get:Classpath
+    public abstract val ruleSetClasspath: ConfigurableFileCollection
+
+    /**
+     * Runtime classpath used to discover reporter providers.
+     */
+    @get:Classpath
+    public abstract val reporterClasspath: ConfigurableFileCollection
+
+    /**
+     * Runtime classpath used to discover dialect metadata providers.
+     */
+    @get:Classpath
+    public abstract val dialectClasspath: ConfigurableFileCollection
+
+    /**
+     * Default directory where built-in reports are written.
+     */
+    @get:OutputDirectory
+    public abstract val reportOutputDirectory: DirectoryProperty
 
     /**
      * Runs SQLDelight project detection, rules, and report writing.
@@ -160,8 +198,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
             .filter { diagnostic -> diagnostic.file != null }
             .groupBy { diagnostic -> diagnostic.file?.path.orEmpty() }
             .forEach { (path, fileDiagnostics) ->
-                val file = project.file(path)
-                if (!file.isFile) return@forEach
+                val file = sourceFile(path) ?: return@forEach
 
                 val original = file.readText(StandardCharsets.UTF_8)
                 val result = applier.apply(original, fileDiagnostics, allowUnsafe)
@@ -175,6 +212,27 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
             }
         return FixApplySummary(changedFiles = changedFiles, skippedReasons = skippedReasons)
     }
+
+    private fun sourceFile(path: String): File? {
+        val relativePath = path.normalizedRelativePath() ?: return null
+        return sequenceOf(
+            reportRootPath()?.resolve(relativePath)?.normalize()?.toFile(),
+            project.rootProject.file(relativePath.toString()),
+            project.file(relativePath.toString()),
+        ).firstOrNull { file -> file?.isFile == true }
+    }
+
+    private fun reportRootPath(): Path? =
+        project.providers
+            .gradleProperty("sqldelightCheck.reportRoot")
+            .orNull
+            ?.takeIf { value -> value.isNotBlank() }
+            ?.let { value -> project.file(value).toPath().toAbsolutePath().normalize() }
+            ?: project.providers
+                .environmentVariable("GITHUB_WORKSPACE")
+                .orNull
+                ?.takeIf { value -> value.isNotBlank() }
+                ?.let { value -> File(value).toPath().toAbsolutePath().normalize() }
 
     private fun writeReports(
         extension: SqlDelightCheckExtension,
@@ -249,6 +307,12 @@ private fun FixSkipReason.logLabel(): String =
         FixSkipReason.OverlappingEdits -> "overlapping-edits"
         FixSkipReason.OverlappingCandidate -> "overlapping-candidate"
     }
+
+private fun String.normalizedRelativePath(): Path? {
+    val path = runCatching { Path.of(this).normalize() }.getOrNull() ?: return null
+    if (path.isAbsolute || path.startsWith("..")) return null
+    return path
+}
 
 private data class RuleTraceCollector(
     val traces: MutableList<FileRuleTrace> = mutableListOf(),

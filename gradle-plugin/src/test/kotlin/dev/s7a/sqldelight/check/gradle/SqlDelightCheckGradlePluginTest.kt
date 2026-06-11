@@ -576,6 +576,83 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `fix task updates configured report root relative files when Gradle root is nested`() {
+        val workspace =
+            testProject(
+                buildScript = "",
+                settingsScript = """rootProject.name = "workspace"""",
+            )
+        workspace.write(
+            "app/settings.gradle.kts",
+            """rootProject.name = "sqldelight-check-nested-fix-test"""",
+        )
+        workspace.write(
+            "app/build.gradle.kts",
+            """
+            import dev.s7a.sqldelight.check.api.Enablement
+
+            plugins {
+                kotlin("jvm") version "2.4.0"
+                id("app.cash.sqldelight") version "2.3.2"
+                id("dev.s7a.sqldelight.check")
+            }
+
+            repositories {
+                mavenCentral()
+            }
+
+            sqldelight {
+                databases {
+                    create("Database") {
+                        packageName.set("com.example")
+                        srcDirs("src/main/sqldelight")
+                        dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                    }
+                }
+            }
+
+            sqldelightCheck {
+                ruleSets {
+                    standard {
+                        enabled.set(Enablement.Disabled)
+                    }
+                }
+                rules {
+                    rule("standard:final-newline") {
+                        enabled.set(Enablement.Enabled)
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        val path = "app/src/main/sqldelight/com/example/Player.sq"
+        workspace.write(
+            path,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent(),
+        )
+
+        val result =
+            workspace
+                .project("app")
+                .run("-PsqldelightCheck.reportRoot=${workspace.file("")}", "sqldelightFix")
+
+        assertEquals(SUCCESS, result.task(":sqldelightFix")?.outcome)
+        assertEquals(
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+            workspace.file(path).readText(),
+        )
+        assertEquals(EMPTY_JSON_REPORT, workspace.file("app/build/reports/sqldelight-check/report.json").readText())
+    }
+
+    @Test
     fun `check task supports published stable sqldelight 2 versions`() {
         stableSqlDelight2Versions.forEach { version ->
             val project = testProject(sqlDelightBuildScript(sqlDelightVersion = version))
