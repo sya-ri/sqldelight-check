@@ -42,43 +42,19 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
     }
 
     /**
-     * Registers aggregate task names modeled after Biome's check/lint/format/write commands.
+     * Registers check and fix tasks for SQLDelight sources.
      */
     private fun Project.registerSqlDelightCheckTasks(extension: SqlDelightCheckExtension) {
         val taskGroup = "sqldelight-check"
         tasks.register("sqldelightCheck", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
-            task.description = "Runs SQLDelight lint and format checks without modifying files."
+            task.description = "Runs SQLDelight analysis and configured rules without modifying files."
             task.applyFixes.convention(false)
             task.logLevel.convention(resolveLogLevelOverride(extension))
         }
-        tasks.register("sqldelightCheckWrite", SqlDelightCheckTask::class.java) { task ->
+        tasks.register("sqldelightFix", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
-            task.description = "Applies SQLDelight formatter output and safe lint fixes."
-            task.applyFixes.convention(true)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-        }
-        tasks.register("sqldelightLint", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
-            task.description = "Runs SQLDelight lint checks without modifying files."
-            task.applyFixes.convention(false)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-        }
-        tasks.register("sqldelightLintWrite", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
-            task.description = "Applies safe SQLDelight lint fixes."
-            task.applyFixes.convention(true)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-        }
-        tasks.register("sqldelightFormat", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
-            task.description = "Checks SQLDelight formatting without modifying files."
-            task.applyFixes.convention(false)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-        }
-        tasks.register("sqldelightFormatWrite", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
-            task.description = "Applies SQLDelight formatting."
+            task.description = "Applies allowed SQLDelight fixes, re-runs analysis, and writes reports."
             task.applyFixes.convention(true)
             task.logLevel.convention(resolveLogLevelOverride(extension))
         }

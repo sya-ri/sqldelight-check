@@ -36,11 +36,7 @@ class SqlDelightCheckGradlePluginTest {
                         println("hasReporterConfiguration=" + (configurations.findByName("sqldelightCheckReporter") != null))
                         listOf(
                             "sqldelightCheck",
-                            "sqldelightCheckWrite",
-                            "sqldelightLint",
-                            "sqldelightLintWrite",
-                            "sqldelightFormat",
-                            "sqldelightFormatWrite",
+                            "sqldelightFix",
                         ).forEach { taskName ->
                             println("task." + taskName + "=" + (tasks.findByName(taskName) != null))
                         }
@@ -58,11 +54,7 @@ class SqlDelightCheckGradlePluginTest {
                 "hasRuleSetConfiguration=true",
                 "hasReporterConfiguration=true",
                 "task.sqldelightCheck=true",
-                "task.sqldelightCheckWrite=true",
-                "task.sqldelightLint=true",
-                "task.sqldelightLintWrite=true",
-                "task.sqldelightFormat=true",
-                "task.sqldelightFormatWrite=true",
+                "task.sqldelightFix=true",
             ),
             result.output.lines().filter { line -> line.startsWith("has") || line.startsWith("task.") },
         )
@@ -708,7 +700,7 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
-    fun `write task applies safe fixes and reports remaining diagnostics`() {
+    fun `fix task applies safe fixes and reports remaining diagnostics`() {
         val project =
             testProject(
                 """
@@ -738,9 +730,9 @@ class SqlDelightCheckGradlePluginTest {
             "CREATE TABLE player (  \n  id INTEGER NOT NULL PRIMARY KEY  \n);",
         )
 
-        val result = project.run("sqldelightCheckWrite")
+        val result = project.run("sqldelightFix")
 
-        assertEquals(SUCCESS, result.task(":sqldelightCheckWrite")?.outcome)
+        assertEquals(SUCCESS, result.task(":sqldelightFix")?.outcome)
         assertEquals(
             "CREATE TABLE player (\n  id INTEGER NOT NULL PRIMARY KEY\n);\n",
             project.file("src/main/sqldelight/com/example/Player.sq").readText(),
@@ -749,7 +741,7 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
-    fun `write task does not apply unsafe fixes by default`() {
+    fun `fix task does not apply unsafe fixes by default`() {
         val project = testProject(sqlDelightBuildScript())
         val path = "src/main/sqldelight/com/example/Player.sq"
         val content =
@@ -765,22 +757,22 @@ class SqlDelightCheckGradlePluginTest {
             """.trimIndent() + "\n"
         project.write(path, content)
 
-        val result = project.run("sqldelightCheckWrite")
+        val result = project.run("sqldelightFix")
 
-        assertEquals(SUCCESS, result.task(":sqldelightCheckWrite")?.outcome)
+        assertEquals(SUCCESS, result.task(":sqldelightFix")?.outcome)
         assertEquals(content, project.file(path).readText())
         assertEquals(unsafeComparisonSpacingJsonReport(), project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
-    fun `write task applies unsafe fixes when enabled`() {
+    fun `fix task applies unsafe fixes when enabled`() {
         val project =
             testProject(
                 sqlDelightBuildScript(
                     extraConfiguration =
                         """
                     sqldelightCheck {
-                        write {
+                        fix {
                             unsafe.set(true)
                         }
                     }
@@ -802,9 +794,9 @@ class SqlDelightCheckGradlePluginTest {
             """.trimIndent() + "\n",
         )
 
-        val result = project.run("sqldelightCheckWrite")
+        val result = project.run("sqldelightFix")
 
-        assertEquals(SUCCESS, result.task(":sqldelightCheckWrite")?.outcome)
+        assertEquals(SUCCESS, result.task(":sqldelightFix")?.outcome)
         assertEquals(
             """
             CREATE TABLE player (

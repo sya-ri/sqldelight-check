@@ -134,7 +134,7 @@ whitespace, line endings, or redundant punctuation. Token rewrites should normal
 
 ```kotlin
 sqldelightCheck {
-    write {
+    fix {
         unsafe.set(true)
     }
 }

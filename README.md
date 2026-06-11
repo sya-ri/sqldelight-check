@@ -47,19 +47,18 @@ Use the Gradle tasks installed by the plugin:
 
 ```shell
 ./gradlew sqldelightCheck
-./gradlew sqldelightCheckWrite
+./gradlew sqldelightFix
 ```
 
 - `sqldelightCheck`: run SQLDelight analysis, rules, and reports without modifying files.
-- `sqldelightCheckWrite`: apply allowed fixes, re-run analysis, then write reports.
-- `sqldelightLint` and `sqldelightFormat`: stable task aliases for the command model.
-- `sqldelightLintWrite` and `sqldelightFormatWrite`: write-task aliases.
+- `sqldelightFix`: apply allowed fixes, re-run analysis, then write reports.
 
-The first rules are lint-style rules with safe fixes; SQL formatting rules will be added behind the same task model.
+The first rules are lint-style rules with safe fixes. Formatting rules can use the same check/fix task model when they
+are added.
 
 ## Configure
 
-Configure rule sets, rules, reports, write safety, and database-specific overrides in `build.gradle.kts`:
+Configure rule sets, rules, reports, fix safety, and database-specific overrides in `build.gradle.kts`:
 
 ```kotlin
 import dev.s7a.sqldelight.check.api.Enablement
@@ -127,7 +126,7 @@ sqldelightCheck {
         }
     }
 
-    write {
+    fix {
         unsafe.set(false)
     }
 
@@ -232,19 +231,19 @@ Actions when `GITHUB_ACTIONS=true`, unless explicitly disabled.
 See [Report Outputs](docs/reports.md) for GitHub Actions snippets and examples. The HTML report is intended to be the
 primary visual artifact for CI uploads.
 
-## Write Safety
+## Fix Safety
 
-Write tasks apply the first allowed fix from each diagnostic. Safe fixes are enabled by default. Unsafe fixes require:
+Fix tasks apply the first allowed fix from each diagnostic. Safe fixes are enabled by default. Unsafe fixes require:
 
 ```kotlin
 sqldelightCheck {
-    write {
+    fix {
         unsafe.set(true)
     }
 }
 ```
 
-Invalid edits and overlapping edits are skipped. When a write task changes files, sqldelight-check runs analysis again
+Invalid edits and overlapping edits are skipped. When a fix task changes files, sqldelight-check runs analysis again
 and writes reports for the remaining diagnostics.
 
 ## Custom Providers
@@ -276,4 +275,3 @@ covered by an opt-in compatibility test because the final SQLDelight 2.4.0 Gradl
 
 - There is no standalone CLI.
 - SQLDelight parser/compiler diagnostics use best-effort source ranges derived from SQLDelight error output.
-- `sqldelightLint` and `sqldelightFormat` currently share the same rule execution path.

@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Top-level Gradle DSL for configuring sqldelight-check.
  *
  * The extension owns global defaults, database-specific overrides, reporter
- * output settings, and write-task safety options.
+ * output settings, and fix safety options.
  */
 public open class SqlDelightCheckExtension
     @Inject
@@ -57,11 +57,9 @@ public open class SqlDelightCheckExtension
             }
 
         /**
-         * Write behavior shared by `*Write` tasks.
-         *
-         * The same safety options apply to check, lint, and format write aliases.
+         * Fix behavior shared by tasks that modify SQLDelight sources.
          */
-        public val write: WriteExtension = objects.newInstance(WriteExtension::class.java)
+        public val fix: FixExtension = objects.newInstance(FixExtension::class.java)
 
         /**
          * Controls how much execution detail the task emits.
@@ -114,10 +112,9 @@ public open class SqlDelightCheckExtension
         }
 
         /**
-         * Configures write behavior shared by check write, lint write, and
-         * format write tasks.
+         * Configures fix behavior for tasks that modify SQLDelight sources.
          */
-        public fun write(configure: Action<in WriteExtension>) {
-            configure.execute(write)
+        public fun fix(configure: Action<in FixExtension>) {
+            configure.execute(fix)
         }
     }

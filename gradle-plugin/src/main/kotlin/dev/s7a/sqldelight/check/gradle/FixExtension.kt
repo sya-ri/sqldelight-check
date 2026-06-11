@@ -5,15 +5,15 @@ import org.gradle.api.provider.Property
 import javax.inject.Inject
 
 /**
- * DSL object for write task behavior.
+ * DSL object for fix task behavior.
  */
-public open class WriteExtension
+public open class FixExtension
     @Inject
     constructor(
         objects: ObjectFactory,
     ) {
         /**
-         * Whether write tasks may apply unsafe fixes.
+         * Whether fix tasks may apply unsafe fixes.
          */
         public val unsafe: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     }

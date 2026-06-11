@@ -63,7 +63,7 @@ public data class SkippedFix(
  */
 public enum class FixSkipReason {
     /**
-     * The fix is unsafe and unsafe writes were not enabled.
+     * The fix is unsafe and unsafe fixes were not enabled.
      */
     Unsafe,
 

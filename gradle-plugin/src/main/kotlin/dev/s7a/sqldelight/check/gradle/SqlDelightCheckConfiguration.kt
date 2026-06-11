@@ -25,7 +25,7 @@ internal fun SqlDelightCheckExtension.toCheckConfig(logLevel: LogLevel = this.lo
                     )
                 database.name to config
         },
-        allowUnsafeWrites = write.unsafe.get(),
+        allowUnsafeFixes = fix.unsafe.get(),
         logLevel = logLevel,
     )
 

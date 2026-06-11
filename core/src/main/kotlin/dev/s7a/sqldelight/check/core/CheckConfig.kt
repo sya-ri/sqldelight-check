@@ -1,8 +1,8 @@
 package dev.s7a.sqldelight.check.core
 
+import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
-import dev.s7a.sqldelight.check.api.LogLevel
 
 /**
  * Global sqldelight-check configuration.
@@ -21,9 +21,9 @@ public data class CheckConfig(
      */
     public val databases: Map<String, DatabaseConfig> = emptyMap(),
     /**
-     * Whether write tasks may apply unsafe fixes.
+     * Whether fix tasks may apply unsafe fixes.
      */
-    public val allowUnsafeWrites: Boolean = false,
+    public val allowUnsafeFixes: Boolean = false,
     /**
      * Logging verbosity for task execution.
      */

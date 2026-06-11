@@ -47,7 +47,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         val trace = tracing(logLevel, traceCollector)
         var result = analyze(config, trace)
         if (applyFixes.get()) {
-            val fixResult = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeWrites)
+            val fixResult = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeFixes)
             if (fixResult.changedFiles > 0) {
                 logger.lifecycle("Applied sqldelight-check fixes to {} file(s).", fixResult.changedFiles)
                 result = analyze(config, trace)
