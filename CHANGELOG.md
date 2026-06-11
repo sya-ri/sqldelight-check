@@ -19,6 +19,9 @@ This version establishes the first Gradle plugin and API surface for checking SQ
 - Added API modules for shared models, rule authoring, reporter authoring, and SQLDelight dialect metadata providers.
 - Added built-in standard, PostgreSQL, MySQL, SQLite, and HSQL rule sets. The Gradle plugin installs the official rule
   sets by default and gates dialect-specific rules by detected dialect capabilities.
+- Added standard SQLDelight source-shape rules for import ordering, duplicate imports, wildcard imports, duplicate
+  query labels, query label operation matching, mapped type name casing, parameter/column name matching, result alias
+  casing, duplicate result-name aliases, grouped statement count limits, view naming, and `SELECT *` in views.
 - Added per-rule and per-rule-set enablement and severity overrides, including database-specific overrides.
 - Added inline disable directives with optional reason enforcement.
 - Added safe fix application through `sqldelightFix`; unsafe fixes require explicit opt-in.

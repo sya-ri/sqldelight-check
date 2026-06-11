@@ -204,7 +204,27 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/GroupByTargetNe
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
+public final class dev/s7a/sqldelight/check/rules/standard/rules/GroupStatementCountLimitRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
 public final class dev/s7a/sqldelight/check/rules/standard/rules/GroupedStatementHasSinglePurposeRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/ImportOrderRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -255,6 +275,16 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/LineEndingLfRul
 }
 
 public final class dev/s7a/sqldelight/check/rules/standard/rules/LiteralCaseRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/MappedTypeNameCaseRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -355,6 +385,26 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/NoDistinctParen
 }
 
 public final class dev/s7a/sqldelight/check/rules/standard/rules/NoDropTableInMigrationRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/NoDuplicateImportRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/NoDuplicateQueryLabelRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -485,6 +535,16 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/NoRightJoinRule
 }
 
 public final class dev/s7a/sqldelight/check/rules/standard/rules/NoSelectDistinctWithGroupByRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/NoSelectStarInViewRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -704,6 +764,16 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/NoUpdateWithout
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
+public final class dev/s7a/sqldelight/check/rules/standard/rules/NoWildcardImportRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
 public final class dev/s7a/sqldelight/check/rules/standard/rules/OperatorLinePositionRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
@@ -725,6 +795,16 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/OrderByTargetNe
 }
 
 public final class dev/s7a/sqldelight/check/rules/standard/rules/ParameterNameCaseRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/ParameterNameMatchesColumnRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -804,7 +884,27 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/PreferSimpleBoo
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
+public final class dev/s7a/sqldelight/check/rules/standard/rules/QueryLabelMatchesOperationRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
 public final class dev/s7a/sqldelight/check/rules/standard/rules/QueryNameCaseRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/RequireAliasForDuplicateResultNamesRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -915,6 +1015,16 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/RequireTableAli
 }
 
 public final class dev/s7a/sqldelight/check/rules/standard/rules/RequireWhereIndexFriendlyPredicateRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/ResultAliasNameCaseRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -1055,6 +1165,16 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/UniqueTableAlia
 }
 
 public final class dev/s7a/sqldelight/check/rules/standard/rules/UseIsNullRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/standard/rules/ViewNameCaseRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
