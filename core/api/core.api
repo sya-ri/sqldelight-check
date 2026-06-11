@@ -103,14 +103,18 @@ public final class dev/s7a/sqldelight/check/core/EnablementResolver {
 
 public final class dev/s7a/sqldelight/check/core/FixApplicationResult {
 	public fun <init> (Ljava/lang/String;II)V
+	public fun <init> (Ljava/lang/String;IILjava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;IILjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()I
 	public final fun component3 ()I
-	public final fun copy (Ljava/lang/String;II)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/core/FixApplicationResult;Ljava/lang/String;IIILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;IILjava/util/List;)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
+	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/core/FixApplicationResult;Ljava/lang/String;IILjava/util/List;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAppliedFixes ()I
 	public final fun getContent ()Ljava/lang/String;
+	public final fun getSkippedFixDetails ()Ljava/util/List;
 	public final fun getSkippedFixes ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -119,6 +123,16 @@ public final class dev/s7a/sqldelight/check/core/FixApplicationResult {
 public final class dev/s7a/sqldelight/check/core/FixApplier {
 	public fun <init> ()V
 	public final fun apply (Ljava/lang/String;Ljava/util/List;Z)Ldev/s7a/sqldelight/check/core/FixApplicationResult;
+}
+
+public final class dev/s7a/sqldelight/check/core/FixSkipReason : java/lang/Enum {
+	public static final field InvalidRange Ldev/s7a/sqldelight/check/core/FixSkipReason;
+	public static final field OverlappingCandidate Ldev/s7a/sqldelight/check/core/FixSkipReason;
+	public static final field OverlappingEdits Ldev/s7a/sqldelight/check/core/FixSkipReason;
+	public static final field Unsafe Ldev/s7a/sqldelight/check/core/FixSkipReason;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/s7a/sqldelight/check/core/FixSkipReason;
+	public static fun values ()[Ldev/s7a/sqldelight/check/core/FixSkipReason;
 }
 
 public final class dev/s7a/sqldelight/check/core/ReporterRegistry {
@@ -199,6 +213,23 @@ public final class dev/s7a/sqldelight/check/core/RuleSetConfig {
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
 	public final fun getId-wigqPlY ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/SkippedFix {
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/lang/String;Ldev/s7a/sqldelight/check/core/FixSkipReason;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-226TpoM ()Ljava/lang/String;
+	public final fun component2 ()Ldev/s7a/sqldelight/check/api/SourceFile;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ldev/s7a/sqldelight/check/core/FixSkipReason;
+	public final fun copy-8Z7HkzQ (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/lang/String;Ldev/s7a/sqldelight/check/core/FixSkipReason;)Ldev/s7a/sqldelight/check/core/SkippedFix;
+	public static synthetic fun copy-8Z7HkzQ$default (Ldev/s7a/sqldelight/check/core/SkippedFix;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/lang/String;Ldev/s7a/sqldelight/check/core/FixSkipReason;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/core/SkippedFix;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
+	public final fun getReason ()Ldev/s7a/sqldelight/check/core/FixSkipReason;
+	public final fun getRuleId-226TpoM ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

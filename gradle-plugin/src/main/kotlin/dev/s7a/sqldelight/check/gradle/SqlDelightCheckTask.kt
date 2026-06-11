@@ -9,6 +9,7 @@ import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.FixApplier
+import dev.s7a.sqldelight.check.core.FixSkipReason
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
 import java.nio.charset.StandardCharsets
@@ -46,10 +47,17 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         val trace = tracing(logLevel, traceCollector)
         var result = analyze(config, trace)
         if (applyFixes.get()) {
-            val changedFiles = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeWrites)
-            if (changedFiles > 0) {
-                logger.lifecycle("Applied sqldelight-check fixes to {} file(s).", changedFiles)
+            val fixResult = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeWrites)
+            if (fixResult.changedFiles > 0) {
+                logger.lifecycle("Applied sqldelight-check fixes to {} file(s).", fixResult.changedFiles)
                 result = analyze(config, trace)
+            }
+            if (fixResult.skippedReasons.isNotEmpty()) {
+                val skippedSummary =
+                    fixResult.skippedReasons.entries.joinToString(", ") { (reason, count) ->
+                        "${reason.logLabel()}=$count"
+                    }
+                logger.lifecycle("Skipped sqldelight-check fixes: {}.", skippedSummary)
             }
         }
 
@@ -136,22 +144,28 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     private fun applyDiagnosticFixes(
         diagnostics: List<Diagnostic>,
         allowUnsafe: Boolean,
-    ): Int {
+    ): FixApplySummary {
         val applier = FixApplier()
-        return diagnostics
+        var changedFiles = 0
+        val skippedReasons = linkedMapOf<FixSkipReason, Int>()
+        diagnostics
             .filter { diagnostic -> diagnostic.file != null }
             .groupBy { diagnostic -> diagnostic.file?.path.orEmpty() }
-            .count { (path, fileDiagnostics) ->
+            .forEach { (path, fileDiagnostics) ->
                 val file = project.file(path)
-                if (!file.isFile) return@count false
+                if (!file.isFile) return@forEach
 
                 val original = file.readText(StandardCharsets.UTF_8)
                 val result = applier.apply(original, fileDiagnostics, allowUnsafe)
-                if (result.content == original) return@count false
+                result.skippedFixDetails.forEach { skippedFix ->
+                    skippedReasons[skippedFix.reason] = skippedReasons.getOrDefault(skippedFix.reason, 0) + 1
+                }
+                if (result.content == original) return@forEach
 
                 file.writeText(result.content, StandardCharsets.UTF_8)
-                true
+                changedFiles++
             }
+        return FixApplySummary(changedFiles = changedFiles, skippedReasons = skippedReasons)
     }
 
     private fun writeReports(
@@ -181,6 +195,19 @@ private data class AnalysisRunResult(
     val databaseCount: Int,
     val diagnostics: List<Diagnostic>,
 )
+
+private data class FixApplySummary(
+    val changedFiles: Int,
+    val skippedReasons: Map<FixSkipReason, Int>,
+)
+
+private fun FixSkipReason.logLabel(): String =
+    when (this) {
+        FixSkipReason.Unsafe -> "unsafe"
+        FixSkipReason.InvalidRange -> "invalid-range"
+        FixSkipReason.OverlappingEdits -> "overlapping-edits"
+        FixSkipReason.OverlappingCandidate -> "overlapping-candidate"
+    }
 
 private data class RuleTraceCollector(
     val traces: MutableList<FileRuleTrace> = mutableListOf(),
