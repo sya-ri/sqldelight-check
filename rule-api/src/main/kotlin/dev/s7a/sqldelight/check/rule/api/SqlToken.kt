@@ -1,8 +1,5 @@
 package dev.s7a.sqldelight.check.rule.api
 
-import dev.s7a.sqldelight.check.api.SourcePosition
-import dev.s7a.sqldelight.check.api.SourceRange
-
 /**
  * SQL-like source token outside comments and quoted text.
  */
@@ -21,58 +18,6 @@ public data class SqlToken(
  * Returns true when this token matches [value] ignoring case.
  */
 public fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
-
-/**
- * Converts source offsets into a 1-based line/column range.
- */
-public fun String.rangeAtOffsets(
-    startOffset: Int,
-    endOffset: Int,
-): SourceRange =
-    SourceRange(
-        start = positionAt(startOffset),
-        end = positionAt(endOffset),
-    )
-
-/**
- * Converts a source offset into a 1-based line/column position.
- */
-public fun String.positionAt(offset: Int): SourcePosition {
-    val boundedOffset = offset.coerceIn(0, length)
-    var line = 1
-    var lineStart = 0
-    var index = 0
-    while (index < boundedOffset) {
-        if (this[index] == '\n') {
-            line++
-            lineStart = index + 1
-        }
-        index++
-    }
-    return SourcePosition(line = line, column = boundedOffset - lineStart + 1)
-}
-
-/**
- * Replaces comments and quoted text with spaces while preserving offsets.
- */
-public fun String.maskSqlCommentsAndQuotedText(hashLineComments: Boolean = false): String {
-    val chars = toCharArray()
-    var index = 0
-    while (index < chars.size) {
-        index =
-            when {
-                startsWith("--", index) -> maskLineComment(chars, index)
-                hashLineComments && chars[index] == '#' -> maskLineComment(chars, index)
-                startsWith("/*", index) -> maskBlockComment(chars, index)
-                chars[index] == '\'' -> maskQuoted(chars, index, '\'')
-                chars[index] == '"' -> maskQuoted(chars, index, '"')
-                chars[index] == '`' -> maskQuoted(chars, index, '`')
-                chars[index] == '[' -> maskBracketQuoted(chars, index)
-                else -> index + 1
-            }
-    }
-    return String(chars)
-}
 
 /**
  * Tokenizes SQL-like identifiers and semicolons outside comments and quoted text.
@@ -123,59 +68,6 @@ public fun List<SqlToken>.sqlStatements(): List<List<SqlToken>> {
     }
     if (current.isNotEmpty()) statements += current.toList()
     return statements
-}
-
-private fun String.maskLineComment(
-    chars: CharArray,
-    start: Int,
-): Int {
-    val end = indexOf('\n', startIndex = start).let { if (it == -1) length else it }
-    for (index in start until end) chars[index] = ' '
-    return end
-}
-
-private fun String.maskBlockComment(
-    chars: CharArray,
-    start: Int,
-): Int {
-    val end = indexOf("*/", startIndex = start + 2).let { if (it == -1) length else it + 2 }
-    for (index in start until end) chars[index] = ' '
-    return end
-}
-
-private fun maskQuoted(
-    chars: CharArray,
-    start: Int,
-    quote: Char,
-): Int {
-    var index = start + 1
-    chars[start] = ' '
-    while (index < chars.size) {
-        val current = chars[index]
-        chars[index] = ' '
-        if (current == quote) {
-            val next = index + 1
-            if (next < chars.size && chars[next] == quote) {
-                chars[next] = ' '
-                index += 2
-            } else {
-                return next
-            }
-        } else {
-            index++
-        }
-    }
-    return chars.size
-}
-
-private fun String.maskBracketQuoted(
-    chars: CharArray,
-    start: Int,
-): Int {
-    chars[start] = ' '
-    val end = indexOf(']', startIndex = start + 1).let { if (it == -1) length else it + 1 }
-    for (index in start + 1 until end) chars[index] = ' '
-    return end
 }
 
 private fun String.skipLineComment(start: Int): Int =

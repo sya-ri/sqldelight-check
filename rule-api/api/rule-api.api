@@ -43,15 +43,17 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleSetProvide
 	public abstract fun ruleProviders ()Ljava/util/Set;
 }
 
-public final class dev/s7a/sqldelight/check/rule/api/SourceTextKt {
-	public static final fun isKeyword (Ldev/s7a/sqldelight/check/rule/api/SqlToken;Ljava/lang/String;)Z
+public final class dev/s7a/sqldelight/check/rule/api/SourceMaskingKt {
 	public static final fun maskSqlCommentsAndQuotedText (Ljava/lang/String;Z)Ljava/lang/String;
 	public static synthetic fun maskSqlCommentsAndQuotedText$default (Ljava/lang/String;ZILjava/lang/Object;)Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/SourcePositionKt {
 	public static final fun positionAt (Ljava/lang/String;I)Ldev/s7a/sqldelight/check/api/SourcePosition;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/SourceRangeKt {
 	public static final fun rangeAtOffsets (Ljava/lang/String;II)Ldev/s7a/sqldelight/check/api/SourceRange;
-	public static final fun sqlStatements (Ljava/util/List;)Ljava/util/List;
-	public static final fun sqlTokens (Ljava/lang/String;Z)Lkotlin/sequences/Sequence;
-	public static synthetic fun sqlTokens$default (Ljava/lang/String;ZILjava/lang/Object;)Lkotlin/sequences/Sequence;
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/SqlFacts {
@@ -158,5 +160,12 @@ public final class dev/s7a/sqldelight/check/rule/api/SqlToken {
 	public final fun getText ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/SqlTokenKt {
+	public static final fun isKeyword (Ldev/s7a/sqldelight/check/rule/api/SqlToken;Ljava/lang/String;)Z
+	public static final fun sqlStatements (Ljava/util/List;)Ljava/util/List;
+	public static final fun sqlTokens (Ljava/lang/String;Z)Lkotlin/sequences/Sequence;
+	public static synthetic fun sqlTokens$default (Ljava/lang/String;ZILjava/lang/Object;)Lkotlin/sequences/Sequence;
 }
 
