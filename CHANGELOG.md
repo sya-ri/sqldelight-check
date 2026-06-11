@@ -9,20 +9,27 @@ This version establishes the first Gradle plugin and API surface for checking SQ
 ### Initial Scope
 
 - Added Gradle plugin `dev.s7a.sqldelight.check`.
-- Added tasks for check, lint, format, and write variants.
-- Added SQLDelight project detection for Gradle projects, including multiple databases.
-- Added built-in SQLDelight `2.x` analysis for stable `2.0.x` through `2.3.x` releases, with opt-in compatibility
-  verification for `2.4.0-SNAPSHOT`.
-- Added best-effort file and source range mapping for SQLDelight parser/compiler diagnostics.
-- Added stable API modules for diagnostics, rule sets, and reporters.
-- Added built-in rule sets for standard, PostgreSQL, MySQL, SQLite, and HSQL rule families. See the rule set READMEs,
-  including [the standard rule set README](rules/standard/README.md), for the maintained rule lists and examples.
-- Added safe fix application for write tasks.
-- Added JSON, SARIF, text, navigable HTML, GitHub Actions annotations, and GitHub Actions-friendly Markdown reporters.
-- Added reporter options in the Gradle DSL; JSON and SARIF support `prettyPrint`.
-- Added external provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.
+- Added `sqldelightCheck` and `sqldelightFix` tasks.
+- Added SQLDelight Gradle project detection for `.sq` and `.sqm` files, including multiple databases and nested
+  projects with configurable report roots.
+- Added SQLDelight `2.x` Gradle model support for stable `2.0.x` through `2.3.x` releases, with opt-in compatibility
+  checks for `2.4.0-SNAPSHOT`.
+- Added source-text rule analysis for SQLDelight files. sqldelight-check does not replace SQLDelight parser or compiler
+  diagnostics.
+- Added API modules for shared models, rule authoring, reporter authoring, and SQLDelight dialect metadata providers.
+- Added built-in standard, PostgreSQL, MySQL, SQLite, and HSQL rule sets. The Gradle plugin installs the official rule
+  sets by default and gates dialect-specific rules by detected dialect capabilities.
+- Added per-rule and per-rule-set enablement and severity overrides, including database-specific overrides.
+- Added inline disable directives with optional reason enforcement.
+- Added safe fix application through `sqldelightFix`; unsafe fixes require explicit opt-in.
+- Added Gradle diagnostic logging for rule hits at `info`, `warning`, and `error` severity levels.
+- Added JSON, SARIF, text, navigable HTML, Markdown, and GitHub Actions annotations reporters.
+- Added reporter options in the Gradle DSL, including `prettyPrint` for JSON and SARIF and configurable output files.
+- Added external provider discovery through `sqldelightCheckRuleSet`, `sqldelightCheckReporter`, and
+  `sqldelightCheckDialects`.
 - Added Qodana configuration and Gradle TestKit coverage for the plugin.
 
 ### Notes
 
 sqldelight-check is pre-1.0. API names and report schemas may change while the first real-world usage is incorporated.
+There is no standalone CLI in this release.
