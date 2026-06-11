@@ -97,6 +97,7 @@ The standard rule set uses two safety levels:
 | `standard:blank-line-between-statements` | 🔘 | ⚠️ | ✅ | Require a blank line between adjacent top-level SQLDelight statements. |
 | `standard:blocked-words` | 🔘 | ⚠️ |  | Report configured blocked words outside comments and quoted text by default. |
 | `standard:avoid-model-bound-insert-for-public-api` | 🔘 | ℹ️ |  | Discourage SQLDelight model-bound `INSERT ... VALUES ?` APIs. |
+| `standard:case-branch-newline` | 🔘 | ⚠️ |  | Require multiline `CASE` branch keywords to start their own line. |
 | `standard:clause-keyword-newline` | 🔘 | ⚠️ |  | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
 | `standard:consistent-column-references` | 🔘 | ⚠️ |  | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | `standard:consistent-not-equal-operator` | 🔘 | ⚠️ | 🛠️ | Keep `!=` and `<>` not-equal operators consistent within a file. |
@@ -104,6 +105,7 @@ The standard rule set uses two safety levels:
 | `standard:consistent-parameter-names` | 🔘 | ⚠️ |  | Require repeated predicates on the same column to reuse the same named parameter. |
 | `standard:consistent-reference-qualification` | 🔘 | ⚠️ |  | Require single-table SELECT result columns to qualify references consistently. |
 | `standard:consistent-set-operation-column-count` | 🔘 | ⚠️ |  | Require adjacent set-operation SELECT lists to return the same number of columns. |
+| `standard:constraint-newline` | 🔘 | ⚠️ |  | Require multiline `CREATE TABLE` constraints to start their own line. |
 | `standard:cte-newline` | 🔘 | ⚠️ |  | Require each CTE definition in a multiline `WITH` clause to start its own line. |
 | `standard:data-type-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL data type names outside comments and quoted text. |
 | `standard:explicit-cross-join` | 🔘 | ⚠️ |  | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
@@ -113,6 +115,7 @@ The standard rule set uses two safety levels:
 | `standard:function-name-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL function names outside comments and quoted text. |
 | `standard:group-by-target-newline` | 🔘 | ⚠️ |  | Require one grouping expression per line in multiline `GROUP BY` clauses. |
 | `standard:grouped-statement-has-single-purpose` | 🔘 | ℹ️ |  | Discourage SQLDelight grouped statements that mix reads and writes. |
+| `standard:insert-values-newline` | 🔘 | ⚠️ |  | Require multiline `INSERT` column and `VALUES` lists to use one item per line. |
 | `standard:join-newline` | 🔘 | ⚠️ |  | Require top-level `JOIN` clauses to start their own line in multiline statements. |
 | `standard:keyword-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
 | `standard:line-ending-lf` | 🔘 | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
@@ -2175,6 +2178,103 @@ Fix behavior:
 - No automatic fix is provided.
 - Single-line `WHERE` clauses are accepted.
 - Skips `AND` inside `BETWEEN ... AND ...`.
+
+## `standard:case-branch-newline`
+
+Reports multiline `CASE` expressions when `WHEN`, `THEN`, or `ELSE` branch keywords do not start their own line after
+indentation.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT CASE WHEN active = 1 THEN 'active'
+  ELSE 'inactive'
+END AS status
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT CASE
+  WHEN active = 1
+  THEN 'active'
+  ELSE 'inactive'
+END AS status
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line `CASE` expressions are accepted.
+- Skips comments, string literals, quoted identifiers, and nested branch keywords.
+
+## `standard:constraint-newline`
+
+Reports multiline `CREATE TABLE` definitions when table-level constraints or multiline column constraints do not start
+their own line after indentation.
+
+Invalid:
+
+```sql
+CREATE TABLE player (
+  id INTEGER PRIMARY KEY, name TEXT,
+  UNIQUE (name)
+);
+```
+
+Valid:
+
+```sql
+CREATE TABLE player (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  UNIQUE (name)
+);
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line `CREATE TABLE` definitions are accepted.
+- Skips commas in nested expressions.
+
+## `standard:insert-values-newline`
+
+Reports multiline `INSERT` column and `VALUES` lists when multiple items share a line.
+
+Invalid:
+
+```sql
+INSERT INTO player (id, name,
+  age)
+VALUES (1, 'Ada',
+  42);
+```
+
+Valid:
+
+```sql
+INSERT INTO player (
+  id,
+  name,
+  age
+)
+VALUES (
+  1,
+  'Ada',
+  42
+);
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line `INSERT` column and `VALUES` lists are accepted.
+- Skips commas in nested expressions.
 
 ## `standard:no-right-join`
 

@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rules.standard.rules.BlankLineBetweenStatementsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.BlockedWordsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.AvoidModelBoundInsertForPublicApiRule
+import dev.s7a.sqldelight.check.rules.standard.rules.CaseBranchNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ClauseKeywordNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentColumnReferencesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorRule
@@ -11,6 +12,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentOrderByDirectionR
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentParameterNamesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentReferenceQualificationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentSetOperationColumnCountRule
+import dev.s7a.sqldelight.check.rules.standard.rules.ConstraintNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.CteNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.DataTypeCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitCrossJoinRule
@@ -20,6 +22,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.FinalNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FunctionNameCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.GroupByTargetNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.JoinNewlineRule
+import dev.s7a.sqldelight.check.rules.standard.rules.InsertValuesNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.KeywordCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.LineEndingLfRule
 import dev.s7a.sqldelight.check.rules.standard.rules.LiteralCaseRule
@@ -117,6 +120,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::BlankLineBetweenStatementsRule),
             RuleProvider(::AvoidModelBoundInsertForPublicApiRule),
             RuleProvider(::BlockedWordsRule),
+            RuleProvider(::CaseBranchNewlineRule),
             RuleProvider(::ClauseKeywordNewlineRule),
             RuleProvider(::ConsistentColumnReferencesRule),
             RuleProvider(::ConsistentNotEqualOperatorRule),
@@ -124,6 +128,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::ConsistentParameterNamesRule),
             RuleProvider(::ConsistentReferenceQualificationRule),
             RuleProvider(::ConsistentSetOperationColumnCountRule),
+            RuleProvider(::ConstraintNewlineRule),
             RuleProvider(::CteNewlineRule),
             RuleProvider(::DataTypeCaseRule),
             RuleProvider(::ExplicitCrossJoinRule),
@@ -133,6 +138,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::FunctionNameCaseRule),
             RuleProvider(::GroupByTargetNewlineRule),
             RuleProvider(::GroupedStatementHasSinglePurposeRule),
+            RuleProvider(::InsertValuesNewlineRule),
             RuleProvider(::JoinNewlineRule),
             RuleProvider(::KeywordCaseRule),
             RuleProvider(::LineEndingLfRule),

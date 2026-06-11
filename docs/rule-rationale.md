@@ -49,11 +49,14 @@ Source hygiene:
 Deterministic formatting:
 
 - `standard:blank-line-between-statements`
+- `standard:case-branch-newline`
 - `standard:clause-keyword-newline`
+- `standard:constraint-newline`
 - `standard:cte-newline`
 - `standard:data-type-case`
 - `standard:function-name-case`
 - `standard:group-by-target-newline`
+- `standard:insert-values-newline`
 - `standard:join-newline`
 - `standard:keyword-case`
 - `standard:literal-case`
