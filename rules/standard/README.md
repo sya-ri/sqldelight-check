@@ -129,6 +129,7 @@ The standard rule set uses two safety levels:
 | `standard:no-consecutive-semicolons` | 🔘 | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
 | `standard:no-delete-without-where` | 🔘 | ⚠️ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
 | `standard:no-distinct-parentheses` | 🔘 | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
+| `standard:no-drop-table-in-migration` | 🔘 | ⚠️ |  | Disallow destructive `DROP TABLE` statements in SQLDelight migration files. |
 | `standard:no-else-null` | 🔘 | ⚠️ |  | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
 | `standard:no-from-subquery` | 🔘 | ⚠️ |  | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
 | `standard:no-implicit-cross-join-comma` | 🔘 | ⚠️ |  | Disallow comma-separated `FROM` sources that imply a cross join. |
@@ -137,6 +138,8 @@ The standard rule set uses two safety levels:
 | `standard:no-leading-whitespace` | 🔘 | ⚠️ | ✅ | Disallow any whitespace before the first file content. |
 | `standard:no-leading-wildcard-like` | 🔘 | ⚠️ |  | Disallow `LIKE` patterns that start with `%` or `_`. |
 | `standard:no-not-in-nullable-subquery` | 🔘 | ⚠️ |  | Require `NOT IN` subqueries to exclude `NULL` values or use `NOT EXISTS`. |
+| `standard:no-offset-pagination` | 🔘 | ℹ️ |  | Prefer keyset pagination over `OFFSET` pagination. |
+| `standard:no-order-by-ordinal` | 🔘 | ⚠️ |  | Disallow ordinal references in `GROUP BY` and `ORDER BY`. |
 | `standard:no-redundant-semicolons` | 🔘 | ⚠️ | ✅ | Disallow repeated semicolons separated only by whitespace. |
 | `standard:no-space-after-dot` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately after `.`. |
 | `standard:no-space-after-opening-parenthesis` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately after `(`. |
@@ -163,6 +166,7 @@ The standard rule set uses two safety levels:
 | `standard:no-update-without-where` | 🔘 | ⚠️ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
 | `standard:operator-line-position` | 🔘 | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
 | `standard:order-by-target-newline` | 🔘 | ⚠️ |  | Require one ordering expression per line in multiline `ORDER BY` clauses. |
+| `standard:parameter-name-case` | 🔘 | ⚠️ |  | Require SQLDelight named parameters to use lower camel case. |
 | `standard:prefer-between-for-inclusive-range` | 🔘 | ℹ️ |  | Prefer `BETWEEN` for simple inclusive ranges on the same expression. |
 | `standard:prefer-coalesce` | 🔘 | ⚠️ | 🛠️ | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | 🔘 | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
@@ -174,9 +178,11 @@ The standard rule set uses two safety levels:
 | `standard:require-column-alias-as` | 🔘 | ⚠️ |  | Require `AS` for SELECT result column aliases. |
 | `standard:require-explicit-null-ordering` | 🔘 | ℹ️ |  | Require `NULLS FIRST` or `NULLS LAST` with explicit `ORDER BY` directions. |
 | `standard:require-order-by-with-limit` | 🔘 | ⚠️ |  | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
+| `standard:require-like-escape-for-user-input` | 🔘 | ℹ️ |  | Require `ESCAPE` on parameterized `LIKE` predicates. |
 | `standard:require-parentheses-for-mixed-boolean-operators` | 🔘 | ⚠️ |  | Require parentheses when `AND` and `OR` are mixed at the same predicate level. |
 | `standard:require-query-label` | 🔘 | ⚠️ |  | Require executable statements in `.sq` files to have SQLDelight query labels. |
 | `standard:require-result-column-alias` | 🔘 | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
+| `standard:require-suppression-reason` | 🔘 | ⚠️ |  | Require sqldelight-check disable directives to include a reason. |
 | `standard:require-table-alias-as` | 🔘 | ⚠️ |  | Require `AS` for table aliases. |
 | `standard:require-table-alias-for-subquery` | 🔘 | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
 | `standard:require-where-index-friendly-predicate` | 🔘 | ℹ️ |  | Flag common function-wrapped `WHERE` predicates that can be hard to use with indexes. |
@@ -2863,6 +2869,89 @@ Fix behavior:
 - Reports `BEGIN`, `COMMIT`, `ROLLBACK`, and `END TRANSACTION` outside comments, string literals, and quoted
   identifiers.
 
+## `standard:no-drop-table-in-migration`
+
+Reports `DROP TABLE` statements in SQLDelight `.sqm` migration files.
+
+Dropping a table is a destructive migration. When it is intentional, keep the
+exception explicit with a suppression comment and a reason.
+
+Invalid in `.sqm` files:
+
+```sql
+DROP TABLE player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Applies only to `.sqm` files.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:no-offset-pagination`
+
+Reports top-level `OFFSET` clauses.
+
+Offset pagination can become slow on later pages and can skip or duplicate rows
+when concurrent writes happen. Prefer keyset pagination for long-lived
+SQLDelight APIs.
+
+Invalid:
+
+```sql
+listPlayers:
+SELECT id, name
+FROM player
+ORDER BY id
+LIMIT :limit OFFSET :offset;
+```
+
+Valid:
+
+```sql
+listPlayersAfter:
+SELECT id, name
+FROM player
+WHERE id > :lastSeenId
+ORDER BY id
+LIMIT :limit;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Defaults to `Severity.Info`.
+
+## `standard:no-order-by-ordinal`
+
+Reports ordinal references in `GROUP BY` and `ORDER BY`.
+
+Ordinal references silently change meaning when the select list changes. Named
+references are safer in reviewed SQL and generated SQLDelight APIs.
+
+Invalid:
+
+```sql
+listPlayers:
+SELECT id, name
+FROM player
+ORDER BY 2;
+```
+
+Valid:
+
+```sql
+listPlayers:
+SELECT id, name
+FROM player
+ORDER BY name;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Accepts named references and expressions.
+
 ## `standard:prefer-named-parameters`
 
 Reports anonymous SQLDelight `?` parameters in `.sq` files.
@@ -2896,6 +2985,36 @@ Fix behavior:
 - Applies only to `.sq` files.
 - Skips `IN ?` variable arguments.
 - Skips comments, string literals, and quoted identifiers.
+
+## `standard:parameter-name-case`
+
+Reports SQLDelight named parameters that are not lower camel case.
+
+Named parameters become generated Kotlin parameter names. Lower camel case
+keeps the generated API idiomatic and consistent with query label casing.
+
+Invalid:
+
+```sql
+selectByName:
+SELECT id, name
+FROM player
+WHERE name = :PlayerName;
+```
+
+Valid:
+
+```sql
+selectByName:
+SELECT id, name
+FROM player
+WHERE name = :playerName;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Applies only to `.sq` files.
 
 ## `standard:query-name-case`
 
@@ -3095,6 +3214,37 @@ Fix behavior:
 - Reports `NOT IN` subqueries that do not contain an `IS NOT NULL` predicate.
 - Skips `NOT IN` value lists.
 
+## `standard:require-like-escape-for-user-input`
+
+Reports parameterized `LIKE` predicates without an `ESCAPE` clause.
+
+`%` and `_` in user input are wildcards unless escaping is explicit. Adding an
+`ESCAPE` clause documents the escaping contract at the SQL boundary.
+
+Invalid:
+
+```sql
+searchPlayers:
+SELECT id, name
+FROM player
+WHERE name LIKE :namePattern;
+```
+
+Valid:
+
+```sql
+searchPlayers:
+SELECT id, name
+FROM player
+WHERE name LIKE :namePattern ESCAPE '\';
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Defaults to `Severity.Info`.
+- Reports parameterized patterns, not string literal patterns.
+
 ## `standard:require-where-index-friendly-predicate`
 
 Reports common function-wrapped `WHERE` predicates such as `LOWER(name) = :name`.
@@ -3156,6 +3306,32 @@ Fix behavior:
 - No automatic fix is provided.
 - Defaults to `Severity.Info`.
 - Reports only simple inclusive ranges on the same expression.
+
+## `standard:require-suppression-reason`
+
+Reports sqldelight-check disable directives without a reason.
+
+Suppressions are part of the long-term rule configuration surface. Requiring a
+short reason makes exceptions easier to audit and remove later.
+
+Invalid:
+
+```sql
+-- sqldelight-check-disable-next-line standard:no-select-star
+SELECT * FROM legacy_export;
+```
+
+Valid:
+
+```sql
+-- sqldelight-check-disable-next-line standard:no-select-star -- legacy export
+SELECT * FROM legacy_export;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Checks `disable-file`, `disable-next-line`, and `disable` directives.
 
 ## `standard:require-explicit-null-ordering`
 

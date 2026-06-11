@@ -18,6 +18,7 @@ internal class DisableDirectives private constructor(
 ) {
     fun suppresses(diagnostic: Diagnostic): Boolean {
         val ruleId = diagnostic.ruleId ?: return false
+        if (ruleId.value in unsuppressibleRuleIds) return false
         val line = diagnostic.range?.start?.line ?: return false
         if (fileRules?.matches(ruleId) == true) return true
         if (nextLineRules[line]?.any { matcher -> matcher.matches(ruleId) } == true) return true
@@ -71,8 +72,13 @@ internal class DisableDirectives private constructor(
             val withoutPrefix = body.removePrefix("sqldelight-check-")
             val command = withoutPrefix.takeWhile { character -> !character.isWhitespace() }
             if (command !in directiveCommands) return null
-            val ruleIds = withoutPrefix.drop(command.length).trim().ruleIds()
+            val ruleIds = withoutPrefix.drop(command.length).withoutReason().trim().ruleIds()
             return Directive(command = command, matcher = RuleMatcher(ruleIds = ruleIds))
+        }
+
+        private fun String.withoutReason(): String {
+            val delimiter = indexOf(" --")
+            return if (delimiter == -1) this else substring(0, delimiter)
         }
 
         private fun String.ruleIds(): Set<String>? {
@@ -86,6 +92,8 @@ internal class DisableDirectives private constructor(
         }
 
         private val directiveCommands = setOf("disable", "enable", "disable-next-line", "disable-file")
+
+        private val unsuppressibleRuleIds = setOf("standard:require-suppression-reason")
     }
 }
 

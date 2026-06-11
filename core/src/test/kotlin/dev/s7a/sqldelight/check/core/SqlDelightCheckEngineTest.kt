@@ -277,6 +277,26 @@ class SqlDelightCheckEngineTest {
     }
 
     @Test
+    fun `disable next line directive ignores trailing reason text`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-next-line standard:test -- legacy export
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 2))),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
     fun `disable file directive suppresses matching rule diagnostics`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
@@ -317,6 +337,35 @@ class SqlDelightCheckEngineTest {
     }
 
     @Test
+    fun `disable file directive does not suppress suppression reason diagnostics`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-file
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(
+                            testRule(
+                                message = { "suppression reason" },
+                                rangeLine = 1,
+                                id = RuleId("standard:require-suppression-reason"),
+                            ),
+                        ),
+                    ),
+            )
+
+        assertEquals(1, diagnostics.size)
+    }
+
+    @Test
     fun `disable and enable directives suppress diagnostics inside a block`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
@@ -345,13 +394,14 @@ class SqlDelightCheckEngineTest {
         }
 
     private fun testRule(
+        id: RuleId = ruleId,
         targetCapability: DialectCapability? = null,
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
         rangeLine: Int? = null,
     ): Rule =
         object : Rule {
-            override val id: RuleId = ruleId
+            override val id: RuleId = id
             override val defaultSeverity: Severity = Severity.Warning
             override val defaultEnablement: Enablement = Enablement.Auto
             override val targetCapability: DialectCapability? = targetCapability

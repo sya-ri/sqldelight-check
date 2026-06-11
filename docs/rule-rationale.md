@@ -121,9 +121,12 @@ Query safety:
 - `standard:no-delete-without-where`
 - `standard:no-leading-wildcard-like`
 - `standard:no-not-in-nullable-subquery`
+- `standard:no-offset-pagination`
+- `standard:no-order-by-ordinal`
 - `standard:no-select-distinct-with-group-by`
 - `standard:no-select-star`
 - `standard:no-update-without-where`
+- `standard:require-like-escape-for-user-input`
 - `standard:require-order-by-with-limit`
 
 Maintainability:
@@ -135,6 +138,7 @@ Maintainability:
 - `standard:max-line-length`
 - `standard:max-subquery-depth`
 - `standard:no-from-subquery`
+- `standard:require-suppression-reason`
 - `standard:no-unused-cte`
 - `standard:no-unused-join`
 - `standard:no-unknown-qualifier`
@@ -147,7 +151,9 @@ SQLDelight portability:
 
 - `standard:avoid-model-bound-insert-for-public-api`
 - `standard:grouped-statement-has-single-purpose`
+- `standard:no-drop-table-in-migration`
 - `standard:no-transaction-in-migration`
+- `standard:parameter-name-case`
 - `standard:prefer-named-parameters`
 - `standard:no-right-join`
 - `standard:no-special-character-identifiers`
