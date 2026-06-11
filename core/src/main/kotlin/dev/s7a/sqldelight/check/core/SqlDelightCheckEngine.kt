@@ -8,6 +8,7 @@ import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
@@ -101,7 +102,15 @@ public class SqlDelightCheckEngine {
                 diagnostics
             }.filterNot(disableDirectives::suppresses)
         trace.fileRules(database, file, executedRuleIds)
-        return diagnostics
+        return diagnostics +
+            redundantSuppressionSeverity(resolver, database.name).orEmptyDiagnostics { severity ->
+                disableDirectives.redundantDisableDiagnostics(
+                    file = file,
+                    ruleId = coreNoRedundantSuppressionRuleId,
+                    severity = severity,
+                    database = database,
+                )
+            }
     }
 
     private fun Rule.shouldRun(
@@ -137,3 +146,35 @@ private data class RuleCandidate(
     val ruleId: QualifiedRuleId,
     val rule: Rule,
 )
+
+private fun redundantSuppressionSeverity(
+    resolver: ConfigurationResolver,
+    databaseName: String,
+): Severity? {
+    val ruleSetConfig = resolver.resolveRuleSet(coreRuleSetId, databaseName, defaultEnablement = Enablement.Enabled)
+    val ruleConfig =
+        resolver.resolveRule(
+            ruleId = coreNoRedundantSuppressionRuleId,
+            databaseName = databaseName,
+            defaultEnablement = Enablement.Enabled,
+            defaultSeverity = Severity.Warning,
+        )
+    val enablement =
+        if (ruleConfig.enablement == Enablement.Auto) {
+            ruleSetConfig.enablement
+        } else {
+            ruleConfig.enablement
+        }
+    return if (enablement == Enablement.Disabled) null else ruleConfig.severity
+}
+
+private val coreRuleSetId = RuleSetId("core")
+
+private val coreNoRedundantSuppressionRuleId =
+    QualifiedRuleId(
+        ruleSetId = coreRuleSetId,
+        ruleId = RuleId("no-redundant-suppression"),
+    )
+
+private inline fun Severity?.orEmptyDiagnostics(block: (Severity) -> List<Diagnostic>): List<Diagnostic> =
+    this?.let(block).orEmpty()

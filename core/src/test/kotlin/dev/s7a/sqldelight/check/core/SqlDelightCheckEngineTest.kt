@@ -288,7 +288,13 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 2))),
             )
 
-        assertEquals(1, diagnostics.size)
+        assertEquals(
+            listOf(
+                qualifiedRuleId("standard:test"),
+                qualifiedRuleId("core:no-redundant-suppression"),
+            ),
+            diagnostics.map { diagnostic -> diagnostic.ruleId },
+        )
     }
 
     @Test
@@ -348,7 +354,13 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule())),
             )
 
-        assertEquals(1, diagnostics.size)
+        assertEquals(
+            listOf(
+                qualifiedRuleId("standard:test"),
+                qualifiedRuleId("core:no-redundant-suppression"),
+            ),
+            diagnostics.map { diagnostic -> diagnostic.ruleId },
+        )
     }
 
     @Test
@@ -377,7 +389,13 @@ class SqlDelightCheckEngineTest {
                     ),
             )
 
-        assertEquals(1, diagnostics.size)
+        assertEquals(
+            listOf(
+                qualifiedRuleId("standard:require-suppression-reason"),
+                qualifiedRuleId("core:no-redundant-suppression"),
+            ),
+            diagnostics.map { diagnostic -> diagnostic.ruleId },
+        )
     }
 
     @Test
@@ -396,6 +414,106 @@ class SqlDelightCheckEngineTest {
                         ),
                     ),
                 ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 2))),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `redundant suppression rule reports unused disable next line directives`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-next-line standard:test -- stale suppression
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+            )
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(qualifiedRuleId("core:no-redundant-suppression"), diagnostics.single().ruleId)
+        assertEquals(Severity.Warning, diagnostics.single().severity)
+        assertEquals(1, diagnostics.single().range?.start?.line)
+    }
+
+    @Test
+    fun `redundant suppression rule can be disabled`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-next-line standard:test -- stale suppression
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                config =
+                    CheckConfig(
+                        rules =
+                            mapOf(
+                                qualifiedRuleId("core:no-redundant-suppression") to
+                                    RuleConfig(
+                                        qualifiedRuleId("core:no-redundant-suppression"),
+                                        Enablement.Disabled,
+                                        Severity.Warning,
+                                    ),
+                            ),
+                    ),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `redundant suppression rule accepts used disable next line directives`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-next-line standard:test -- intentional
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(testRule(rangeLine = 2)),
+                    ),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `redundant suppression rule accepts used block disable directives`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable standard:test -- intentional
+                                SELECT 1;
+                                -- sqldelight-check-enable standard:test
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(testRule(rangeLine = 2)),
+                    ),
             )
 
         assertEquals(emptyList(), diagnostics)

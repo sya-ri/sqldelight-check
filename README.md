@@ -187,6 +187,9 @@ Supported directives:
 
 Omitting rule IDs suppresses all rule diagnostics covered by that directive.
 
+Unused disable directives are reported as `core:no-redundant-suppression`. This core diagnostic is emitted after
+sqldelight-check applies suppressions, so it can identify directives that did not suppress any rule diagnostics.
+
 ## Rule Sets
 
 Built-in rule set artifacts are installed with the Gradle plugin and are also published separately for custom setups:
