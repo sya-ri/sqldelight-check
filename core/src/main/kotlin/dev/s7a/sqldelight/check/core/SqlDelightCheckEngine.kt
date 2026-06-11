@@ -13,11 +13,16 @@ import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 
 /**
- * Entry point for sqldelight-check analysis.
+ * Runs SQLDelight analysis and sqldelight-check rules for resolved database inputs.
+ *
+ * The engine keeps Gradle- and reporter-specific behavior outside the core
+ * execution path so tests and custom integrations can exercise the same
+ * analysis model directly.
  */
 public class SqlDelightCheckEngine {
     /**
-     * Runs analysis for all resolved SQLDelight databases.
+     * Runs analysis for all resolved SQLDelight databases and returns every
+     * diagnostic that remains after source-level rule suppressions are applied.
      */
     public fun run(
         inputs: List<AnalysisInput> = emptyList(),
@@ -52,6 +57,7 @@ public class SqlDelightCheckEngine {
         resolver: ConfigurationResolver,
     ): List<Diagnostic> {
         val facts = SourceSqlFactsExtractor.extract(file)
+        val disableDirectives = DisableDirectives.parse(file)
         return rules.flatMap { candidate ->
             val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
             val ruleConfig =
@@ -79,7 +85,7 @@ public class SqlDelightCheckEngine {
                 },
             )
             diagnostics
-        }
+        }.filterNot(disableDirectives::suppresses)
     }
 
     private fun Rule.shouldRun(

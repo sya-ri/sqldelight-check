@@ -9,6 +9,8 @@ import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SourcePosition
+import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -184,6 +186,107 @@ class SqlDelightCheckEngineTest {
         assertEquals(SqlStatementKind.Select, SqlStatementKind.valueOf(diagnostics.single().message.substringBefore(":")))
     }
 
+    @Test
+    fun `disable next line directive suppresses next line rule diagnostics`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-next-line
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 2))),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `disable next line directive respects rule ids`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-next-line standard:other
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 2))),
+            )
+
+        assertEquals(1, diagnostics.size)
+    }
+
+    @Test
+    fun `disable file directive suppresses matching rule diagnostics`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-file standard:test
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 2))),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `disable file directive does not suppress diagnostics without source ranges`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-file standard:test
+                                SELECT 1;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders = listOf(testRuleSet(testRule())),
+            )
+
+        assertEquals(1, diagnostics.size)
+    }
+
+    @Test
+    fun `disable and enable directives suppress diagnostics inside a block`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable standard:test
+                                SELECT 1;
+                                -- sqldelight-check-enable standard:test
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 2))),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
     private fun testRuleSet(rule: Rule = testRule()): RuleSetProvider =
         object : RuleSetProvider {
             override val id: RuleSetId = ruleSetId
@@ -194,6 +297,7 @@ class SqlDelightCheckEngineTest {
     private fun testRule(
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
+        rangeLine: Int? = null,
     ): Rule =
         object : Rule {
             override val id: RuleId = ruleId
@@ -212,7 +316,7 @@ class SqlDelightCheckEngineTest {
                         severity = defaultSeverity,
                         message = message(context),
                         file = context.file,
-                        range = null,
+                        range = rangeLine?.let(::singleCharacterRange),
                         database = context.database,
                     ),
                 )
@@ -241,3 +345,9 @@ class SqlDelightCheckEngineTest {
         val ruleId = RuleId("standard:test")
     }
 }
+
+private fun singleCharacterRange(line: Int): SourceRange =
+    SourceRange(
+        start = SourcePosition(line = line, column = 1),
+        end = SourcePosition(line = line, column = 2),
+    )

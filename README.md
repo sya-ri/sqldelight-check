@@ -112,6 +112,34 @@ Enablement values:
 Rule-level explicit enablement overrides a rule set default. Severity values are `Info`, `Warning`, and `Error`; error
 diagnostics fail check tasks after reports are written.
 
+## Disable Diagnostics
+
+Use SQL comments when a source file needs a local rule suppression:
+
+```sql
+-- sqldelight-check-disable-next-line standard:use-is-null
+selectById:
+SELECT *
+FROM player
+WHERE deleted_at = NULL;
+
+-- sqldelight-check-disable standard:no-select-star
+selectEverything:
+SELECT *
+FROM player;
+-- sqldelight-check-enable standard:no-select-star
+```
+
+Supported directives:
+
+- `-- sqldelight-check-disable-next-line [rule-id,...]`: suppress matching rule diagnostics on the next line.
+- `-- sqldelight-check-disable-file [rule-id,...]`: suppress matching rule diagnostics for the whole file.
+- `-- sqldelight-check-disable [rule-id,...]`: start suppressing matching rule diagnostics.
+- `-- sqldelight-check-enable [rule-id,...]`: stop the matching `disable` block. Without rule IDs, all active disables stop.
+
+Omitting rule IDs suppresses all rule diagnostics covered by that directive. Directives do not suppress SQLDelight
+parser or compiler diagnostics.
+
 ## Rule Sets
 
 Built-in rule set artifacts:
