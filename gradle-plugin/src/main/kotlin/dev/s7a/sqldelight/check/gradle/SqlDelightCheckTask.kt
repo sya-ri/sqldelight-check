@@ -31,10 +31,12 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Base task for sqldelight-check operations.
  */
+@DisableCachingByDefault(because = "The fix task can rewrite source files, and reporters may write configurable outputs.")
 public abstract class SqlDelightCheckTask : DefaultTask() {
     /**
      * Whether this task should apply allowed fixes to source files.
@@ -106,6 +108,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         }
 
         writeReports(extension, result.diagnostics)
+        logDiagnostics(result.diagnostics)
         logRuleHits(logLevel, traceCollector.traces, result.diagnostics)
         logger.lifecycle("sqldelight-check analyzed {} SQLDelight database(s).", result.databaseCount)
 
@@ -261,6 +264,18 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 logger.lifecycle("Wrote sqldelight-check {} report to {}", reporter.name, outputFile)
             }
     }
+
+    private fun logDiagnostics(diagnostics: List<Diagnostic>) {
+        diagnostics.forEach { diagnostic ->
+            val message =
+                "sqldelight-check ${diagnostic.severity.logLabel()} ${diagnostic.ruleId.value} at ${diagnostic.locationLabel()}: ${diagnostic.message}"
+            when (diagnostic.severity) {
+                Severity.Info -> logger.info(message)
+                Severity.Warning -> logger.warn(message)
+                Severity.Error -> logger.error(message)
+            }
+        }
+    }
 }
 
 private class GradleReportOutput(
@@ -306,6 +321,27 @@ private fun FixSkipReason.logLabel(): String =
         FixSkipReason.InvalidRange -> "invalid-range"
         FixSkipReason.OverlappingEdits -> "overlapping-edits"
         FixSkipReason.OverlappingCandidate -> "overlapping-candidate"
+    }
+
+private fun Severity.logLabel(): String =
+    when (this) {
+        Severity.Info -> "info"
+        Severity.Warning -> "warning"
+        Severity.Error -> "error"
+    }
+
+private fun Diagnostic.locationLabel(): String =
+    buildString {
+        append(file?.path ?: "<unknown>")
+        val range = range ?: return@buildString
+        append(':')
+        append(range.start.line)
+        append(':')
+        append(range.start.column)
+        append('-')
+        append(range.end.line)
+        append(':')
+        append(range.end.column)
     }
 
 private fun String.normalizedRelativePath(): Path? {

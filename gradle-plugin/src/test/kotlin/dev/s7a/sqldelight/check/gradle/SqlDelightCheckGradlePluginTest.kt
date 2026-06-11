@@ -336,7 +336,6 @@ class SqlDelightCheckGradlePluginTest {
             listOf(
                 "sqldelight-check [Database] files (1):",
                 "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
-                "sqldelight-check [Database] src/main/sqldelight/com/example/Player.sq rules (1):",
                 "sqldelight-check [Database] - [x] standard:final-newline",
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
             )
@@ -379,6 +378,51 @@ class SqlDelightCheckGradlePluginTest {
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
             )
         assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
+    }
+
+    @Test
+    fun `check task writes diagnostics to Gradle log levels`() {
+        val infoProject = testProject(finalNewlineSeverityBuildScript("Info"))
+        infoProject.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            finalNewlineDiagnosticSql(),
+        )
+        val infoResult = infoProject.run("--info", "sqldelightCheck")
+
+        assertContentEquals(
+            listOf(
+                "sqldelight-check info standard:final-newline at src/main/sqldelight/com/example/Player.sq:3:3-3:3: File should end with a newline.",
+            ),
+            infoResult.sqldelightCheckDiagnosticLines(),
+        )
+
+        val warningProject = testProject(finalNewlineSeverityBuildScript("Warning"))
+        warningProject.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            finalNewlineDiagnosticSql(),
+        )
+        val warningResult = warningProject.run("sqldelightCheck")
+
+        assertContentEquals(
+            listOf(
+                "sqldelight-check warning standard:final-newline at src/main/sqldelight/com/example/Player.sq:3:3-3:3: File should end with a newline.",
+            ),
+            warningResult.sqldelightCheckDiagnosticLines(),
+        )
+
+        val errorProject = testProject(finalNewlineSeverityBuildScript("Error"))
+        errorProject.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            finalNewlineDiagnosticSql(),
+        )
+        val errorResult = errorProject.runAndFail("sqldelightCheck")
+
+        assertContentEquals(
+            listOf(
+                "sqldelight-check error standard:final-newline at src/main/sqldelight/com/example/Player.sq:3:3-3:3: File should end with a newline.",
+            ),
+            errorResult.sqldelightCheckDiagnosticLines(),
+        )
     }
 
     @Test
@@ -1044,6 +1088,38 @@ class SqlDelightCheckGradlePluginTest {
         $extraConfiguration
         """.trimIndent()
 
+    private fun finalNewlineSeverityBuildScript(severity: String): String =
+        sqlDelightBuildScript(
+            extraImports =
+                """
+                import dev.s7a.sqldelight.check.api.Enablement
+                import dev.s7a.sqldelight.check.api.Severity
+                """.trimIndent(),
+            extraConfiguration =
+                """
+                sqldelightCheck {
+                    ruleSets {
+                        standard {
+                            enabled.set(Enablement.Disabled)
+                        }
+                    }
+                    rules {
+                        rule("standard:final-newline") {
+                            enabled.set(Enablement.Enabled)
+                            severity.set(Severity.$severity)
+                        }
+                    }
+                }
+                """.trimIndent(),
+        )
+
+    private fun finalNewlineDiagnosticSql(): String =
+        """
+        CREATE TABLE player (
+          id INTEGER NOT NULL PRIMARY KEY
+        );
+        """.trimIndent()
+
     /**
      * Returns a settings script that can resolve SQLDelight snapshot plugin markers.
      */
@@ -1361,3 +1437,12 @@ private fun BuildResult.outputLinesMatching(expectedLines: List<String>): List<S
     output
         .lines()
         .filter { line -> line in expectedLines }
+
+private fun BuildResult.sqldelightCheckDiagnosticLines(): List<String> =
+    output
+        .lines()
+        .filter { line ->
+            line.startsWith("sqldelight-check info ") ||
+                line.startsWith("sqldelight-check warning ") ||
+                line.startsWith("sqldelight-check error ")
+        }
