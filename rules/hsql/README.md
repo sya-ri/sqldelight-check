@@ -27,11 +27,11 @@ Rule IDs use the `hsql:<rule-name>` form.
 
 ## Rule Summary
 
-| Rule ID | Default | Purpose |
-| --- | --- | --- |
-| `hsql:no-database-file-settings` | ⚠️ | Disallow database or file settings in schema and migration sources. |
-| `hsql:no-system-operations` | ⚠️ | Disallow HSQL system operations in schema and migration sources. |
-| `hsql:no-text-table-source` | ⚠️ | Disallow HSQL text-table sources in versioned SQLDelight files. |
+| Rule ID | Default | Fix | Purpose |
+| --- | --- | --- | --- |
+| `hsql:no-database-file-settings` | ⚠️ |  | Disallow database or file settings in schema and migration sources. |
+| `hsql:no-system-operations` | ⚠️ |  | Disallow HSQL system operations in schema and migration sources. |
+| `hsql:no-text-table-source` | ⚠️ |  | Disallow HSQL text-table sources in versioned SQLDelight files. |
 
 ## Notes
 

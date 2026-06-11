@@ -12,7 +12,9 @@ compiler internals.
 ```kotlin
 sqldelightCheck {
     ruleSets {
-        maybeCreate("standard")
+        standard {
+            enabled.set(Enablement.Enabled)
+        }
     }
 }
 ```
@@ -23,8 +25,8 @@ Rule IDs use the `standard:<rule-name>` form.
 
 Every rule has:
 
-- default enablement: `Auto`
-- default severity: `Warning`
+- default enablement: `🔘`
+- default severity: `⚠️`
 - optional fixes attached to diagnostics
 
 Users can override enablement and severity in `build.gradle.kts`:
@@ -35,7 +37,7 @@ import dev.s7a.sqldelight.check.api.Severity
 
 sqldelightCheck {
     rules {
-        maybeCreate("standard:keyword-case").apply {
+        rule("standard:keyword-case") {
             enabled.set(Enablement.Enabled)
             severity.set(Severity.Info)
         }
@@ -48,22 +50,26 @@ Database-specific overrides use the SQLDelight database name:
 ```kotlin
 sqldelightCheck {
     databases {
-        maybeCreate("MainDatabase").rules {
-            maybeCreate("standard:no-trailing-whitespace").severity.set(Severity.Error)
+        database("MainDatabase") {
+            rules {
+                rule("standard:no-trailing-whitespace") {
+                    severity.set(Severity.Error)
+                }
+            }
         }
     }
 }
 ```
 
-## Fix Safety
+## Fixes
 
-Write tasks apply safe fixes by default:
+Write tasks apply the fix set marked with ✅ by default:
 
 ```shell
 ./gradlew sqldelightCheckWrite
 ```
 
-Unsafe fixes require explicit opt-in:
+🛠️ fixes require explicit opt-in:
 
 ```kotlin
 sqldelightCheck {
@@ -75,128 +81,89 @@ sqldelightCheck {
 
 The standard rule set uses two safety levels:
 
-- `Safe`: whitespace or line-ending edits that are intended to preserve SQL behavior.
-- `Unsafe`: token edits that are usually style-only but may affect projects that intentionally use keyword-like
+- `✅`: whitespace or line-ending edits that are intended to preserve SQL behavior.
+- `🛠️`: token edits that are usually style-only but may affect projects that intentionally use keyword-like
   identifiers or dialect-specific edge cases.
 
 ## Rule Summary
 
-| Rule ID | Default | Fix | Safety | Purpose |
-| --- | --- | --- | --- | --- |
-| `standard:blocked-words` | Warning / Auto | No | None | Report configured blocked words outside comments and quoted text by default. |
-| `standard:clause-keyword-newline` | Warning / Auto | No | None | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
-| `standard:consistent-column-references` | Warning / Auto | No | None | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
-| `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
-| `standard:consistent-order-by-direction` | Warning / Auto | No | None | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
-| `standard:consistent-reference-qualification` | Warning / Auto | No | None | Require single-table SELECT result columns to qualify references consistently. |
-| `standard:consistent-set-operation-column-count` | Warning / Auto | No | None | Require adjacent set-operation SELECT lists to return the same number of columns. |
-| `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
-| `standard:explicit-cross-join` | Warning / Auto | No | None | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
-| `standard:explicit-inner-join` | Warning / Auto | No | None | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
-| `standard:explicit-union-operator` | Warning / Auto | No | None | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
-| `standard:final-newline` | Warning / Auto | Yes | Safe | Require files to end with one LF newline. |
-| `standard:function-name-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL function names outside comments and quoted text. |
-| `standard:keyword-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL keywords outside comments and quoted text. |
-| `standard:line-ending-lf` | Warning / Auto | Yes | Safe | Replace CRLF or CR line endings with LF. |
-| `standard:literal-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
-| `standard:max-blank-lines` | Warning / Auto | Yes | Safe | Disallow more than one consecutive blank line. |
-| `standard:max-case-depth` | Warning / Auto | No | None | Disallow `CASE` expressions nested deeper than `maxDepth`. |
-| `standard:max-joins` | Warning / Auto | No | None | Disallow statements with more than `max` `JOIN` clauses. |
-| `standard:max-line-length` | Warning / Auto | No | None | Report non-blank lines longer than 120 characters. |
-| `standard:max-subquery-depth` | Warning / Auto | No | None | Disallow nested `SELECT` statements deeper than `maxDepth`. |
-| `standard:no-consecutive-semicolons` | Warning / Auto | Yes | Safe | Disallow directly repeated semicolon tokens. |
-| `standard:no-delete-without-where` | Warning / Auto | No | None | Disallow `DELETE` statements without a top-level `WHERE`. |
-| `standard:no-distinct-parentheses` | Warning / Auto | Yes | Safe | Disallow parentheses immediately after `SELECT DISTINCT`. |
-| `standard:no-else-null` | Warning / Auto | No | None | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
-| `standard:no-from-subquery` | Warning / Auto | No | None | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
-| `standard:no-leading-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines before the first content line. |
-| `standard:no-leading-comma` | Warning / Auto | No | None | Disallow comma tokens as the first non-whitespace character on a line. |
-| `standard:no-leading-whitespace` | Warning / Auto | Yes | Safe | Disallow any whitespace before the first file content. |
-| `standard:no-leading-wildcard-like` | Warning / Auto | No | None | Disallow `LIKE` patterns that start with `%` or `_`. |
-| `standard:no-redundant-semicolons` | Warning / Auto | Yes | Safe | Disallow repeated semicolons separated only by whitespace. |
-| `standard:no-space-after-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `.`. |
-| `standard:no-space-after-opening-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `(`. |
-| `standard:no-space-before-closing-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `)`. |
-| `standard:no-space-before-comma` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `,`. |
-| `standard:no-space-before-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `.`. |
-| `standard:no-space-before-function-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace between common SQL function names and `(`. |
-| `standard:no-space-before-semicolon` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `;`. |
-| `standard:no-right-join` | Warning / Auto | No | None | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
-| `standard:no-select-distinct-with-group-by` | Warning / Auto | No | None | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
-| `standard:no-select-star` | Warning / Auto | No | None | Disallow `SELECT *` result columns. |
-| `standard:no-select-trailing-comma` | Warning / Auto | Yes | Unsafe | Disallow trailing commas at the end of `SELECT` clauses. |
-| `standard:no-self-column-alias` | Warning / Auto | No | None | Disallow SELECT result aliases that repeat the source column name. |
-| `standard:no-self-alias` | Warning / Auto | No | None | Disallow table aliases that repeat the table name they alias. |
-| `standard:no-special-character-identifiers` | Warning / Auto | No | None | Disallow quoted identifiers that need non-portable special characters. |
-| `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
-| `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
-| `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
-| `standard:no-unknown-qualifier` | Warning / Auto | No | None | Disallow qualified column references whose qualifier is not visible in `FROM`. |
-| `standard:no-unused-cte` | Warning / Auto | No | None | Disallow CTEs that are not referenced by the main query. |
-| `standard:no-unused-join` | Warning / Auto | No | None | Disallow JOIN sources that are not referenced by later qualified column reads. |
-| `standard:no-unnecessary-statement-parentheses` | Warning / Auto | No | None | Disallow redundant parentheses around whole top-level `SELECT` statements. |
-| `standard:no-update-without-where` | Warning / Auto | No | None | Disallow `UPDATE` statements without a top-level `WHERE`. |
-| `standard:operator-line-position` | Warning / Auto | No | None | Require multiline comparison and binary operators to trail the previous line. |
-| `standard:prefer-coalesce` | Warning / Auto | Yes | Unsafe | Prefer `COALESCE` over `IFNULL` and `NVL`. |
-| `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
-| `standard:prefer-explicit-column-list-in-insert` | Warning / Auto | No | None | Require explicit target columns in `INSERT` statements. |
-| `standard:prefer-simple-boolean-case` | Warning / Auto | No | None | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
-| `standard:require-column-alias-as` | Warning / Auto | No | None | Require `AS` for SELECT result column aliases. |
-| `standard:require-order-by-with-limit` | Warning / Auto | No | None | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
-| `standard:require-result-column-alias` | Warning / Auto | No | None | Require aliases for computed `SELECT` result columns. |
-| `standard:require-table-alias-as` | Warning / Auto | No | None | Require `AS` for table aliases. |
-| `standard:require-table-alias-for-subquery` | Warning / Auto | No | None | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
-| `standard:select-modifier-line-position` | Warning / Auto | No | None | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
-| `standard:set-operator-line-position` | Warning / Auto | No | None | Require multiline set operators to begin their own line after indentation. |
-| `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
-| `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
-| `standard:space-after-line-comment-marker` | Warning / Auto | Yes | Safe | Require one space after `--` when comment text follows. |
-| `standard:space-around-binary-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around binary arithmetic and concatenation operators. |
-| `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
-| `standard:space-before-block-comment-end` | Warning / Auto | Yes | Safe | Require one space before a block comment closing marker. |
-| `standard:statement-terminator` | Warning / Auto | No | None | Require statement blocks to end with semicolons. |
-| `standard:unique-column-aliases` | Warning / Auto | No | None | Require SELECT result column aliases to be unique within a SELECT list. |
-| `standard:unique-table-aliases` | Warning / Auto | No | None | Require top-level table aliases to be unique within a statement. |
-| `standard:use-is-null` | Warning / Auto | Yes | Unsafe | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
-
-## SQLFluff References
-
-The initial standard rules are intentionally modeled after common sqlfluff layout, capitalisation, and structure rules,
-but they are not a compatibility layer for sqlfluff rule codes. sqldelight-check keeps its own IDs because the rule
-engine runs in SQLDelight projects, reports SQLDelight database metadata, and needs a stable API for custom rule sets.
-
-Useful sqlfluff concepts reflected here:
-
-- Capitalisation checks: `standard:keyword-case`, `standard:function-name-case`, `standard:data-type-case`, and
-  `standard:literal-case`.
-- Layout checks around dots, commas, semicolons, parentheses, function calls, comments, operators, blank lines, and line
-  endings: the `standard:no-*` and `standard:space-*` spacing rules.
-- Structure checks for repeated semicolons: `standard:no-consecutive-semicolons` and
-  `standard:no-redundant-semicolons`.
-- Convention checks for row counts, `NULL` comparisons, and join direction: `standard:prefer-count-star`,
-  `standard:use-is-null`, and `standard:no-right-join`.
-- Convention and ambiguity checks for operator, `CASE`, and set-operation clarity:
-  `standard:consistent-not-equal-operator`, `standard:prefer-coalesce`, `standard:no-else-null`,
-  `standard:prefer-simple-boolean-case`, `standard:explicit-union-operator`, `standard:operator-line-position`, and
-  `standard:set-operator-line-position`.
-- Ambiguity checks for `SELECT` and `ORDER BY`: `standard:no-select-distinct-with-group-by`,
-  `standard:consistent-order-by-direction`, `standard:consistent-column-references`,
-  `standard:require-order-by-with-limit`, `standard:explicit-cross-join`, `standard:explicit-inner-join`,
-  `standard:no-distinct-parentheses`, `standard:no-select-trailing-comma`,
-  `standard:select-modifier-line-position`, `standard:clause-keyword-newline`,
-  `standard:no-unnecessary-statement-parentheses`, `standard:no-from-subquery`, and
-  `standard:consistent-set-operation-column-count`.
-- Parse-light convention checks for blocked words and table aliases: `standard:blocked-words`,
-  `standard:no-self-alias`, `standard:require-table-alias-for-subquery`, and
-  `standard:unique-table-aliases`.
-- Parse-light alias and identifier checks from SQLFluff AL01, AL02, AL08, and RF05:
-  `standard:require-table-alias-as`, `standard:require-column-alias-as`,
-  `standard:unique-column-aliases`, `standard:no-self-column-alias`, and
-  `standard:no-special-character-identifiers`.
-- Parse-light reference checks from SQLFluff ST03 and ST11: `standard:no-unused-cte` and
-  `standard:no-unused-join`.
-- Source-facts reference checks from SQLFluff RF01 and RF03: `standard:no-unknown-qualifier` and
-  `standard:consistent-reference-qualification`.
+| Rule ID | Default | Fix | Purpose |
+| --- | --- | --- | --- |
+| `standard:blocked-words` | ⚠️ |  | Report configured blocked words outside comments and quoted text by default. |
+| `standard:clause-keyword-newline` | ⚠️ |  | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
+| `standard:consistent-column-references` | ⚠️ |  | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
+| `standard:consistent-not-equal-operator` | ⚠️ | 🛠️ | Keep `!=` and `<>` not-equal operators consistent within a file. |
+| `standard:consistent-order-by-direction` | ⚠️ |  | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
+| `standard:consistent-reference-qualification` | ⚠️ |  | Require single-table SELECT result columns to qualify references consistently. |
+| `standard:consistent-set-operation-column-count` | ⚠️ |  | Require adjacent set-operation SELECT lists to return the same number of columns. |
+| `standard:data-type-case` | ⚠️ | 🛠️ | Prefer uppercase common SQL data type names outside comments and quoted text. |
+| `standard:explicit-cross-join` | ⚠️ |  | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
+| `standard:explicit-inner-join` | ⚠️ |  | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
+| `standard:explicit-union-operator` | ⚠️ |  | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
+| `standard:final-newline` | ⚠️ | ✅ | Require files to end with one LF newline. |
+| `standard:function-name-case` | ⚠️ | 🛠️ | Prefer uppercase common SQL function names outside comments and quoted text. |
+| `standard:keyword-case` | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
+| `standard:line-ending-lf` | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
+| `standard:literal-case` | ⚠️ | 🛠️ | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
+| `standard:max-blank-lines` | ⚠️ | ✅ | Disallow more than one consecutive blank line. |
+| `standard:max-case-depth` | ⚠️ |  | Disallow `CASE` expressions nested deeper than `maxDepth`. |
+| `standard:max-joins` | ⚠️ |  | Disallow statements with more than `max` `JOIN` clauses. |
+| `standard:max-line-length` | ⚠️ |  | Report non-blank lines longer than 120 characters. |
+| `standard:max-subquery-depth` | ⚠️ |  | Disallow nested `SELECT` statements deeper than `maxDepth`. |
+| `standard:no-consecutive-semicolons` | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
+| `standard:no-delete-without-where` | ⚠️ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
+| `standard:no-distinct-parentheses` | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
+| `standard:no-else-null` | ⚠️ |  | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
+| `standard:no-from-subquery` | ⚠️ |  | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
+| `standard:no-leading-blank-lines` | ⚠️ | ✅ | Disallow blank lines before the first content line. |
+| `standard:no-leading-comma` | ⚠️ |  | Disallow comma tokens as the first non-whitespace character on a line. |
+| `standard:no-leading-whitespace` | ⚠️ | ✅ | Disallow any whitespace before the first file content. |
+| `standard:no-leading-wildcard-like` | ⚠️ |  | Disallow `LIKE` patterns that start with `%` or `_`. |
+| `standard:no-redundant-semicolons` | ⚠️ | ✅ | Disallow repeated semicolons separated only by whitespace. |
+| `standard:no-space-after-dot` | ⚠️ | ✅ | Disallow inline whitespace immediately after `.`. |
+| `standard:no-space-after-opening-parenthesis` | ⚠️ | ✅ | Disallow inline whitespace immediately after `(`. |
+| `standard:no-space-before-closing-parenthesis` | ⚠️ | ✅ | Disallow inline whitespace immediately before `)`. |
+| `standard:no-space-before-comma` | ⚠️ | ✅ | Disallow inline whitespace before `,`. |
+| `standard:no-space-before-dot` | ⚠️ | ✅ | Disallow inline whitespace immediately before `.`. |
+| `standard:no-space-before-function-parenthesis` | ⚠️ | ✅ | Disallow inline whitespace between common SQL function names and `(`. |
+| `standard:no-space-before-semicolon` | ⚠️ | ✅ | Disallow inline whitespace before `;`. |
+| `standard:no-right-join` | ⚠️ |  | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
+| `standard:no-select-distinct-with-group-by` | ⚠️ |  | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
+| `standard:no-select-star` | ⚠️ |  | Disallow `SELECT *` result columns. |
+| `standard:no-select-trailing-comma` | ⚠️ | 🛠️ | Disallow trailing commas at the end of `SELECT` clauses. |
+| `standard:no-self-column-alias` | ⚠️ |  | Disallow SELECT result aliases that repeat the source column name. |
+| `standard:no-self-alias` | ⚠️ |  | Disallow table aliases that repeat the table name they alias. |
+| `standard:no-special-character-identifiers` | ⚠️ |  | Disallow quoted identifiers that need non-portable special characters. |
+| `standard:no-tab-indentation` | ⚠️ | ✅ | Replace leading indentation tabs with spaces. |
+| `standard:no-trailing-blank-lines` | ⚠️ | ✅ | Disallow blank lines after the last content line. |
+| `standard:no-trailing-whitespace` | ⚠️ | ✅ | Remove spaces or tabs at line ends. |
+| `standard:no-unknown-qualifier` | ⚠️ |  | Disallow qualified column references whose qualifier is not visible in `FROM`. |
+| `standard:no-unused-cte` | ⚠️ |  | Disallow CTEs that are not referenced by the main query. |
+| `standard:no-unused-join` | ⚠️ |  | Disallow JOIN sources that are not referenced by later qualified column reads. |
+| `standard:no-unnecessary-statement-parentheses` | ⚠️ |  | Disallow redundant parentheses around whole top-level `SELECT` statements. |
+| `standard:no-update-without-where` | ⚠️ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
+| `standard:operator-line-position` | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
+| `standard:prefer-coalesce` | ⚠️ | 🛠️ | Prefer `COALESCE` over `IFNULL` and `NVL`. |
+| `standard:prefer-count-star` | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
+| `standard:prefer-explicit-column-list-in-insert` | ⚠️ |  | Require explicit target columns in `INSERT` statements. |
+| `standard:prefer-simple-boolean-case` | ⚠️ |  | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
+| `standard:require-column-alias-as` | ⚠️ |  | Require `AS` for SELECT result column aliases. |
+| `standard:require-order-by-with-limit` | ⚠️ |  | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
+| `standard:require-result-column-alias` | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
+| `standard:require-table-alias-as` | ⚠️ |  | Require `AS` for table aliases. |
+| `standard:require-table-alias-for-subquery` | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
+| `standard:select-modifier-line-position` | ⚠️ |  | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
+| `standard:set-operator-line-position` | ⚠️ |  | Require multiline set operators to begin their own line after indentation. |
+| `standard:space-after-block-comment-start` | ⚠️ | ✅ | Require one space after a block comment opening marker. |
+| `standard:space-after-comma` | ⚠️ | ✅ | Require one inline space after `,` when another token follows. |
+| `standard:space-after-line-comment-marker` | ⚠️ | ✅ | Require one space after `--` when comment text follows. |
+| `standard:space-around-binary-operators` | ⚠️ | 🛠️ | Prefer one inline space around binary arithmetic and concatenation operators. |
+| `standard:space-around-comparison-operators` | ⚠️ | 🛠️ | Prefer one inline space around comparison operators. |
+| `standard:space-before-block-comment-end` | ⚠️ | ✅ | Require one space before a block comment closing marker. |
+| `standard:statement-terminator` | ⚠️ |  | Require statement blocks to end with semicolons. |
+| `standard:unique-column-aliases` | ⚠️ |  | Require SELECT result column aliases to be unique within a SELECT list. |
+| `standard:unique-table-aliases` | ⚠️ |  | Require top-level table aliases to be unique within a statement. |
+| `standard:use-is-null` | ⚠️ | 🛠️ | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
 
 ## `standard:blocked-words`
 
@@ -552,7 +519,7 @@ Fix behavior:
 
 - Inserts `\n` at end of file.
 - Does not report empty files.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:line-ending-lf`
 
@@ -581,7 +548,7 @@ Fix behavior:
 
 - Replaces CRLF and CR with LF.
 - Reports each non-LF line ending.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-trailing-whitespace`
 
@@ -608,7 +575,7 @@ Fix behavior:
 
 - Removes trailing spaces and tabs from each affected line.
 - Keeps the line ending unchanged.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-tab-indentation`
 
@@ -637,7 +604,7 @@ Fix behavior:
 
 - Replaces each indentation tab with four spaces.
 - Leaves non-leading tab characters alone.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 Rationale:
 
@@ -678,7 +645,7 @@ Fix behavior:
 
 - Removes extra blank lines after the first blank line in a run.
 - Treats whitespace-only lines as blank.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-leading-blank-lines`
 
@@ -708,7 +675,7 @@ Fix behavior:
 
 - Removes all blank lines before the first non-blank line.
 - Does not report files that contain only blank lines.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-trailing-blank-lines`
 
@@ -735,7 +702,7 @@ Fix behavior:
 
 - Removes blank or whitespace-only lines after the final content line.
 - Leaves the final newline itself to `standard:final-newline`.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-space-before-comma`
 
@@ -769,13 +736,13 @@ Fix behavior:
 
 - Removes inline spaces and tabs immediately before `,`.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-leading-comma`
 
 Reports comma tokens in multiline SQL when the comma is the first non-whitespace character on a line.
 
-This rule is inspired by sqlfluff's leading-comma layout checks. The standard style keeps commas trailing, matching the
+This rule follows the standard rule set's conservative SQL style. The standard style keeps commas trailing, matching the
 other comma spacing rules in this rule set.
 
 Invalid:
@@ -842,7 +809,7 @@ Fix behavior:
 - Collapses repeated spaces or tabs after `,` to one space.
 - Does not require a space before `)`, `]`, `}`, `;`, or another comma.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-space-before-semicolon`
 
@@ -867,7 +834,7 @@ Fix behavior:
 
 - Removes inline spaces and tabs immediately before `;`.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-space-before-dot`
 
@@ -896,7 +863,7 @@ Fix behavior:
 
 - Removes inline spaces and tabs immediately before `.`.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-space-after-dot`
 
@@ -922,13 +889,13 @@ Fix behavior:
 
 - Removes inline spaces and tabs immediately after `.`.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-consecutive-semicolons`
 
 Reports directly repeated semicolon tokens outside comments and quoted text.
 
-This is a small structure rule inspired by sqlfluff's repeated-semicolon checks. In SQLDelight source, consecutive
+This is a small structure rule for repeated punctuation. In SQLDelight source, consecutive
 terminators normally represent accidental empty statements rather than useful syntax.
 
 Invalid:
@@ -954,7 +921,7 @@ Fix behavior:
 
 - Removes extra adjacent semicolons and leaves the first semicolon.
 - Only targets directly adjacent semicolon runs such as `;;`.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-space-after-opening-parenthesis`
 
@@ -982,7 +949,7 @@ Fix behavior:
 - Removes inline spaces and tabs immediately after `(`.
 - Does not remove newlines.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-space-before-closing-parenthesis`
 
@@ -1007,7 +974,7 @@ Fix behavior:
 - Removes inline spaces and tabs immediately before `)`.
 - Does not remove newlines.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:no-space-before-function-parenthesis`
 
@@ -1045,7 +1012,7 @@ Fix behavior:
 - Removes inline spaces and tabs between a recognized function token and `(`.
 - Skips grouping parentheses that are not preceded by a recognized function name.
 - Skips comments, string literals, and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:space-around-binary-operators`
 
@@ -1089,9 +1056,9 @@ Fix behavior:
 - Skips operators split across lines.
 - Skips common unary plus/minus cases and `*` in `SELECT *` or `COUNT(*)`.
 - Skips comments, string literals, and quoted identifiers.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - Dialects and extensions can define operator behavior that is difficult to infer from source text alone.
 - Unary and binary operator roles can be context-sensitive.
@@ -1128,9 +1095,9 @@ Fix behavior:
 - Replaces surrounding inline spaces or tabs with one space on each side.
 - Skips operators split across lines.
 - Skips comments, string literals, and quoted identifiers.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - SQL dialects have operator families beyond the common comparison set.
 - Some dialect-specific operators are visually similar to comparison operators.
@@ -1141,7 +1108,7 @@ Why unsafe:
 Reports comparison and binary operators in multiline SQL when the operator is the first non-whitespace character on a
 line.
 
-This rule is inspired by sqlfluff's operator line-position rule. The standard style uses trailing operators because the
+This rule follows the standard rule set's conservative SQL style. The standard style uses trailing operators because the
 existing operator spacing rules keep operators between operands.
 
 Invalid:
@@ -1208,7 +1175,7 @@ Fix behavior:
 
 - Inserts one space after `--` when another character follows on the same line.
 - Skips `--` sequences inside string literals and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:space-after-block-comment-start`
 
@@ -1247,7 +1214,7 @@ Fix behavior:
 - Inserts one space after the opening marker when comment text follows immediately.
 - Skips empty block comments and `/*+` comments.
 - Skips block comment markers inside string literals and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:space-before-block-comment-end`
 
@@ -1276,13 +1243,13 @@ Fix behavior:
 - Inserts one space before the closing marker when comment text touches it.
 - Skips empty block comments.
 - Skips block comment markers inside string literals and quoted identifiers.
-- Safe to apply in write tasks.
+- Applied automatically in write tasks.
 
 ## `standard:function-name-case`
 
 Reports common SQL function names that are not uppercase.
 
-This rule is inspired by sqlfluff's function capitalisation rule. sqldelight-check only checks recognized function-name
+This rule follows the standard rule set's conservative SQL style. sqldelight-check only checks recognized function-name
 tokens followed by `(`, so function-like column names are left alone.
 
 Invalid:
@@ -1304,10 +1271,10 @@ FROM player;
 Fix behavior:
 
 - Replaces recognized function tokens with uppercase text.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 - Skips comments, string literals, and quoted identifiers.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - Function names can be dialect-specific.
 - User-defined functions can use project-specific naming conventions.
@@ -1325,7 +1292,7 @@ RTRIM, STRFTIME, SUBSTR, SUBSTRING, SUM, TIME, TRIM, TYPEOF, UPPER
 
 Reports common SQL data type names that are not uppercase.
 
-This rule is inspired by sqlfluff's data type capitalisation rule. It is intentionally conservative and only recognizes
+This rule follows the standard rule set's conservative SQL style. It is intentionally conservative and only recognizes
 common type names that appear in SQLDelight schema and migration files.
 
 Invalid:
@@ -1349,10 +1316,10 @@ CREATE TABLE player (
 Fix behavior:
 
 - Replaces recognized data type tokens with uppercase text.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 - Skips comments, string literals, and quoted identifiers.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - SQLDelight supports dialects and custom column adapters.
 - Some projects may intentionally use custom type names or type aliases.
@@ -1369,8 +1336,8 @@ NUMERIC, REAL, SMALLINT, TEXT, TIMESTAMP, VARCHAR
 
 Reports SQL literal tokens that are not uppercase.
 
-This rule is inspired by sqlfluff's literal capitalisation rule and owns literal casing separately from
-`standard:keyword-case`.
+This rule owns literal casing separately from `standard:keyword-case`, so projects can configure keyword and literal
+style independently.
 
 Invalid:
 
@@ -1393,10 +1360,10 @@ WHERE deleted_at IS NULL AND active = TRUE;
 Fix behavior:
 
 - Replaces `null`, `true`, and `false` variants with uppercase text.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 - Skips comments, string literals, and quoted identifiers.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - Literal case is normally behavior-preserving, but without SQLDelight PSI the rule cannot prove every unquoted token is
   syntactically a literal.
@@ -1406,7 +1373,7 @@ Why unsafe:
 
 Reports `IFNULL` and `NVL` calls.
 
-This rule is inspired by sqlfluff's coalesce convention rule. `COALESCE` is the portable spelling and accepts more than
+This rule follows the standard rule set's conservative SQL style. `COALESCE` is the portable spelling and accepts more than
 two arguments, so the standard rule set prefers it for SQLDelight projects that target multiple dialects.
 
 Invalid:
@@ -1430,9 +1397,9 @@ Fix behavior:
 - Replaces the function token with `COALESCE`.
 - Skips identifiers named `ifnull` or `nvl` when they are not followed by `(`.
 - Skips comments, string literals, and quoted identifiers.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - `IFNULL`, `NVL`, and `COALESCE` can differ in dialect support, type inference, and evaluation details.
 - Users must opt in before write tasks apply fixes.
@@ -1441,7 +1408,7 @@ Why unsafe:
 
 Reports `COUNT(1)` and `COUNT(0)` when they are used as row-counting syntax.
 
-This rule is inspired by sqlfluff's row-count convention rule. The standard rule set defaults to `COUNT(*)` because it
+This rule follows the standard rule set's conservative SQL style. The standard rule set defaults to `COUNT(*)` because it
 is the explicit SQL spelling for counting rows.
 
 Invalid:
@@ -1465,9 +1432,9 @@ Fix behavior:
 - Replaces the single `0` or `1` argument with `*`.
 - Leaves `COUNT(column)`, `COUNT(DISTINCT column)`, and other aggregate expressions alone.
 - Skips comments, string literals, and quoted identifiers.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - `COUNT(1)` and `COUNT(*)` are equivalent for common row-counting use, but projects may still choose a house style or
   rely on dialect-specific explanation plans.
@@ -1477,7 +1444,7 @@ Why unsafe:
 
 Reports equality comparisons where `NULL` appears on the right-hand side.
 
-SQL `NULL` semantics require `IS NULL` and `IS NOT NULL` for presence checks. This rule follows sqlfluff's convention
+SQL `NULL` semantics require `IS NULL` and `IS NOT NULL` for presence checks. This rule follows the standard rule set convention
 rule while staying conservative around assignment contexts.
 
 Invalid:
@@ -1504,9 +1471,9 @@ Fix behavior:
 - Replaces `!=` and `<>` with `IS NOT`.
 - Skips `SET` clause assignments such as `SET deleted_at = NULL`.
 - Skips comments, string literals, and quoted identifiers.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - The replacement intentionally changes SQL behavior from equality comparison semantics to `NULL` predicate semantics.
 - The first implementation uses source text to avoid `SET` clause assignments, not SQLDelight expression facts.
@@ -1541,9 +1508,9 @@ Fix behavior:
 
 - Replaces later mismatched not-equal operators with the first not-equal operator spelling seen in the file.
 - Skips comments, string literals, and quoted identifiers.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - Not every dialect supports both not-equal spellings equally.
 - Users must opt in before write tasks apply fixes.
@@ -1552,7 +1519,7 @@ Why unsafe:
 
 Reports `UNION` operators that do not explicitly specify `ALL` or `DISTINCT`.
 
-This rule is inspired by sqlfluff's ambiguous union rule. Bare `UNION` has distinct semantics, but requiring
+This rule follows the standard rule set's conservative SQL style. Bare `UNION` has distinct semantics, but requiring
 `UNION DISTINCT` makes that choice visible in code review.
 
 Invalid:
@@ -1583,7 +1550,7 @@ Fix behavior:
 Reports `UNION`, `EXCEPT`, and `INTERSECT` in multiline SQL when the set operator is not at the start of its own line
 after indentation.
 
-This rule is inspired by sqlfluff's set-operator line-position rule. Keeping set operators line-leading makes compound
+This rule follows the standard rule set's conservative SQL style. Keeping set operators line-leading makes compound
 queries easier to scan and diff.
 
 Invalid:
@@ -1613,7 +1580,7 @@ Fix behavior:
 
 Reports statements that use both `SELECT DISTINCT` and `GROUP BY`.
 
-This rule is inspired by sqlfluff's ambiguous distinct rule. `GROUP BY` already creates grouped output, so combining it
+This rule follows the standard rule set's conservative SQL style. `GROUP BY` already creates grouped output, so combining it
 with `DISTINCT` is usually redundant or unclear.
 
 Invalid:
@@ -1651,7 +1618,7 @@ Fix behavior:
 
 Reports `ORDER BY` clauses that mix explicit and implicit sort directions.
 
-This rule is inspired by sqlfluff's ambiguous ordering rule. If one item specifies `ASC` or `DESC`, all items should do
+This rule follows the standard rule set's conservative SQL style. If one item specifies `ASC` or `DESC`, all items should do
 so; otherwise all items can rely on the default direction.
 
 Invalid:
@@ -1755,7 +1722,7 @@ Fix behavior:
 
 Reports trailing commas at the end of a `SELECT` clause.
 
-This rule is inspired by sqlfluff's select trailing comma convention rule. Some dialects accept trailing select-list
+This rule follows the standard rule set's conservative SQL style. Some dialects accept trailing select-list
 commas, but sqldelight-check's standard style forbids them by default.
 
 Invalid:
@@ -1778,9 +1745,9 @@ Fix behavior:
 
 - Removes the trailing comma before `FROM`.
 - Skips comments, string literals, and quoted identifiers.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - Dialects differ on whether trailing select-list commas are accepted.
 - The first implementation uses source text rather than SQLDelight select-clause facts.
@@ -1790,7 +1757,7 @@ Why unsafe:
 
 Reports `SELECT DISTINCT` and `SELECT ALL` modifiers when the modifier is not on the same line as `SELECT`.
 
-This rule is inspired by sqlfluff's `SELECT` modifier layout rule. Keeping the modifier next to `SELECT` makes the row
+This rule follows the standard rule set's conservative SQL style. Keeping the modifier next to `SELECT` makes the row
 deduplication or all-row intent visible at the statement start.
 
 Invalid:
@@ -1820,7 +1787,7 @@ Fix behavior:
 Reports major top-level `SELECT` clause keywords in multiline statements when the keyword does not start its own line
 after indentation.
 
-This is a conservative source-text subset inspired by sqlfluff's clause newline rule. It checks top-level `SELECT`
+This is a conservative source-text rule. It checks top-level `SELECT`
 statements and skips clauses inside parentheses.
 
 Checked clauses:
@@ -1858,7 +1825,7 @@ Fix behavior:
 
 Reports `RIGHT JOIN` and `RIGHT OUTER JOIN`.
 
-This rule is inspired by sqlfluff's left-join convention rule. It has no automatic fix because rewriting the join safely
+This rule follows the standard rule set's conservative SQL style. It has no automatic fix because rewriting the join safely
 requires swapping relation order and preserving join predicates.
 
 Invalid:
@@ -1888,9 +1855,8 @@ Fix behavior:
 
 Reports common SQL keywords that are not uppercase.
 
-This rule is inspired by sqlfluff's keyword capitalisation checks, but sqldelight-check keeps the first version simpler:
-it uses a conservative token scanner over SQLDelight source text and intentionally skips comments, string literals,
-double-quoted identifiers, backtick identifiers, and bracket identifiers.
+This rule uses a conservative token scanner over SQLDelight source text and intentionally skips comments, string
+literals, double-quoted identifiers, backtick identifiers, and bracket identifiers.
 
 Invalid:
 
@@ -1919,10 +1885,10 @@ SELECT "from" FROM player;
 Fix behavior:
 
 - Replaces recognized keyword tokens with uppercase text.
-- Marks fixes as `Unsafe`.
+- Requires write-task opt-in.
 - Does not apply during normal write tasks unless `write.unsafe.set(true)` is configured.
 
-Why unsafe:
+Why this fix is opt-in:
 
 - SQL keywords are generally case-insensitive, but some dialects allow keyword-like identifiers in contexts that are
   difficult to classify without exposing SQLDelight PSI.
@@ -1943,7 +1909,7 @@ UNION, UNIQUE, UPDATE, VALUES, WHEN, WHERE
 
 Reports non-blank lines longer than 120 characters.
 
-This rule is inspired by sqlfluff's long-line layout rule. The first implementation is lint-only: it reports the
+This rule follows the standard rule set's conservative SQL style. The first implementation is lint-only: it reports the
 overflow range but does not attempt to reflow SQL, comments, or string literals.
 
 Invalid:
@@ -1994,7 +1960,7 @@ CREATE TABLE player (
 Fix behavior:
 
 - Removes the leading whitespace range.
-- Marks fixes as `Safe`.
+- Applied automatically in write tasks.
 - Leaves empty files unchanged.
 
 ## `standard:statement-terminator`
@@ -2055,7 +2021,7 @@ FROM player;
 Fix behavior:
 
 - Keeps the first semicolon and removes the redundant semicolons plus safe surrounding whitespace.
-- Marks fixes as `Safe`.
+- Applied automatically in write tasks.
 - Skips comments, string literals, and quoted identifiers.
 
 ## `standard:consistent-column-references`
@@ -2209,7 +2175,7 @@ FROM player;
 Fix behavior:
 
 - Removes parentheses for simple identifiers, dotted identifiers, and `*`.
-- Marks simple fixes as `Safe`.
+- Applied automatically in write tasks.
 - Reports complex or multiline expressions without a fix.
 
 ## `standard:no-else-null`
@@ -2249,9 +2215,9 @@ Fix behavior:
 
 Reports redundant parentheses around a whole top-level `SELECT` statement.
 
-This is a conservative source-text subset of SQLFluff CV07. It only reports statement-level shapes such as a SQLDelight
-query body or migration statement written as `(SELECT ...);`; expression parentheses and subquery parentheses are left
-alone.
+This is a conservative source-text rule for statement parentheses. It only reports statement-level shapes such as a
+SQLDelight query body or migration statement written as `(SELECT ...);`; expression parentheses and subquery parentheses
+are left alone.
 
 Invalid:
 
@@ -2309,7 +2275,7 @@ Fix behavior:
 
 Reports top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries.
 
-This is a conservative source-text subset of SQLFluff ST05. It encourages moving the subquery to a CTE when the
+This is a conservative source-text rule for subquery structure. It encourages moving the subquery to a CTE when the
 subquery is a direct table expression in the top-level `FROM` or `JOIN` list.
 
 Invalid:

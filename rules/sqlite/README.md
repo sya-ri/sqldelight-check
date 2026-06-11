@@ -27,14 +27,14 @@ Rule IDs use the `sqlite:<rule-name>` form.
 
 ## Rule Summary
 
-| Rule ID | Default | Purpose |
-| --- | --- | --- |
-| `sqlite:consistent-conflict-resolution` | ⚠️ | Require conflict resolution syntax to stay consistent within a file. |
-| `sqlite:foreign-keys-restored` | ⚠️ | Require foreign key enforcement to be restored after temporary disablement. |
-| `sqlite:prefer-integer-primary-key` | ⚠️ | Prefer exact `INTEGER PRIMARY KEY` for rowid alias behavior. |
-| `sqlite:no-autoincrement-without-need` | ⚠️ | Disallow `AUTOINCREMENT` when the stricter rowid behavior is not needed. |
-| `sqlite:no-alter-table-complex-change` | ⚠️ | Disallow complex `ALTER TABLE` changes that SQLite cannot apply in place. |
-| `sqlite:prefer-without-rowid-for-composite-pk` | ⚠️ | Prefer `WITHOUT ROWID` for tables with composite primary keys. |
+| Rule ID | Default | Fix | Purpose |
+| --- | --- | --- | --- |
+| `sqlite:consistent-conflict-resolution` | ⚠️ |  | Require conflict resolution syntax to stay consistent within a file. |
+| `sqlite:foreign-keys-restored` | ⚠️ |  | Require foreign key enforcement to be restored after temporary disablement. |
+| `sqlite:prefer-integer-primary-key` | ⚠️ |  | Prefer exact `INTEGER PRIMARY KEY` for rowid alias behavior. |
+| `sqlite:no-autoincrement-without-need` | ⚠️ |  | Disallow `AUTOINCREMENT` when the stricter rowid behavior is not needed. |
+| `sqlite:no-alter-table-complex-change` | ⚠️ |  | Disallow complex `ALTER TABLE` changes that SQLite cannot apply in place. |
+| `sqlite:prefer-without-rowid-for-composite-pk` | ⚠️ |  | Prefer `WITHOUT ROWID` for tables with composite primary keys. |
 
 ## Notes
 
