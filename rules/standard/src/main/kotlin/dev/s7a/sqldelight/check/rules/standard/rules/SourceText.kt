@@ -152,6 +152,19 @@ internal fun String.statementEndAfter(offset: Int): Int =
         ?.offset
         ?: length
 
+internal fun String.sqlParenthesisDepthAt(offset: Int): Int {
+    var depth = 0
+    sqlCharacters()
+        .takeWhile { character -> character.offset < offset }
+        .forEach { character ->
+            when (character.value) {
+                '(' -> depth++
+                ')' -> if (depth > 0) depth--
+            }
+        }
+    return depth
+}
+
 internal fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
 
 internal fun List<SqlToken>.containsKeywordPair(

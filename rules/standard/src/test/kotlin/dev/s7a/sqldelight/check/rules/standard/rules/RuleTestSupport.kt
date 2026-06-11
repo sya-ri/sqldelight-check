@@ -3,8 +3,10 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.Diagnostic
-import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SourcePosition
+import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -90,6 +92,32 @@ internal fun Rule.singleReplacement(
         .edits
         .single()
         .replacement
+
+internal fun Rule.applySingleFix(
+    content: String,
+    path: String = PLAYER_SQ_PATH,
+): String = content.applyEdit(diagnostics(content, path).single().fixes.single().edits.single())
+
+private fun String.applyEdit(edit: TextEdit): String {
+    val startOffset = offsetAt(edit.range.start)
+    val endOffset = offsetAt(edit.range.end)
+    return replaceRange(startOffset, endOffset, edit.replacement)
+}
+
+private fun String.offsetAt(position: SourcePosition): Int {
+    var line = 1
+    var column = 1
+    for (index in indices) {
+        if (line == position.line && column == position.column) return index
+        if (this[index] == '\n') {
+            line++
+            column = 1
+        } else {
+            column++
+        }
+    }
+    return length
+}
 
 internal fun String.asSqlDelightFile(): String = trimIndent() + "\n"
 

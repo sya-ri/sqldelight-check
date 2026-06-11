@@ -83,9 +83,11 @@ The standard rule set uses two safety levels:
 
 | Rule ID | Default | Fix | Safety | Purpose |
 | --- | --- | --- | --- | --- |
+| `standard:consistent-column-references` | Warning / Auto | No | None | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
 | `standard:consistent-order-by-direction` | Warning / Auto | No | None | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
 | `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
+| `standard:explicit-cross-join` | Warning / Auto | No | None | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
 | `standard:explicit-union-operator` | Warning / Auto | No | None | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
 | `standard:final-newline` | Warning / Auto | Yes | Safe | Require files to end with one LF newline. |
 | `standard:function-name-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL function names outside comments and quoted text. |
@@ -93,8 +95,12 @@ The standard rule set uses two safety levels:
 | `standard:line-ending-lf` | Warning / Auto | Yes | Safe | Replace CRLF or CR line endings with LF. |
 | `standard:literal-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
 | `standard:max-blank-lines` | Warning / Auto | Yes | Safe | Disallow more than one consecutive blank line. |
+| `standard:max-line-length` | Warning / Auto | No | None | Report non-blank lines longer than 120 characters. |
 | `standard:no-consecutive-semicolons` | Warning / Auto | Yes | Safe | Disallow directly repeated semicolon tokens. |
+| `standard:no-distinct-parentheses` | Warning / Auto | Yes | Safe | Disallow parentheses immediately after `SELECT DISTINCT`. |
 | `standard:no-leading-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines before the first content line. |
+| `standard:no-leading-whitespace` | Warning / Auto | Yes | Safe | Disallow any whitespace before the first file content. |
+| `standard:no-redundant-semicolons` | Warning / Auto | Yes | Safe | Disallow repeated semicolons separated only by whitespace. |
 | `standard:no-space-after-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `.`. |
 | `standard:no-space-after-opening-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `(`. |
 | `standard:no-space-before-closing-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately before `)`. |
@@ -110,12 +116,14 @@ The standard rule set uses two safety levels:
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
 | `standard:prefer-coalesce` | Warning / Auto | Yes | Unsafe | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
+| `standard:require-order-by-with-limit` | Warning / Auto | No | None | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
 | `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
 | `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
 | `standard:space-after-line-comment-marker` | Warning / Auto | Yes | Safe | Require one space after `--` when comment text follows. |
 | `standard:space-around-binary-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around binary arithmetic and concatenation operators. |
 | `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
 | `standard:space-before-block-comment-end` | Warning / Auto | Yes | Safe | Require one space before a block comment closing marker. |
+| `standard:statement-terminator` | Warning / Auto | No | None | Require statement blocks to end with semicolons. |
 | `standard:use-is-null` | Warning / Auto | Yes | Unsafe | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
 
 ## SQLFluff References
@@ -130,13 +138,16 @@ Useful sqlfluff concepts reflected here:
   `standard:literal-case`.
 - Layout checks around dots, commas, semicolons, parentheses, function calls, comments, operators, blank lines, and line
   endings: the `standard:no-*` and `standard:space-*` spacing rules.
-- Structure checks for repeated semicolons: `standard:no-consecutive-semicolons`.
+- Structure checks for repeated semicolons: `standard:no-consecutive-semicolons` and
+  `standard:no-redundant-semicolons`.
 - Convention checks for row counts, `NULL` comparisons, and join direction: `standard:prefer-count-star`,
   `standard:use-is-null`, and `standard:no-right-join`.
 - Convention and ambiguity checks for operator and set-operation clarity: `standard:consistent-not-equal-operator`,
   `standard:prefer-coalesce`, and `standard:explicit-union-operator`.
 - Ambiguity checks for `SELECT` and `ORDER BY`: `standard:no-select-distinct-with-group-by`,
-  `standard:consistent-order-by-direction`, and `standard:no-select-trailing-comma`.
+  `standard:consistent-order-by-direction`, `standard:consistent-column-references`,
+  `standard:require-order-by-with-limit`, `standard:explicit-cross-join`, `standard:no-distinct-parentheses`, and
+  `standard:no-select-trailing-comma`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
@@ -1326,6 +1337,249 @@ HAVING, IN, INDEX, INNER, INSERT, INTO, IS, JOIN, KEY, LEFT, LIKE, LIMIT, NOT,
 ON, OR, ORDER, OUTER, PRIMARY, REFERENCES, RIGHT, SELECT, SET, TABLE, THEN,
 UNION, UNIQUE, UPDATE, VALUES, WHEN, WHERE
 ```
+
+## `standard:max-line-length`
+
+Reports non-blank lines longer than 120 characters.
+
+This rule is inspired by sqlfluff's long-line layout rule. The first implementation is lint-only: it reports the
+overflow range but does not attempt to reflow SQL, comments, or string literals.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id, name, email, phone_number, address_line_1, address_line_2, city, region, postal_code, country, created_at, updated_at FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name, email
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Blank lines and whitespace-only lines are ignored.
+- Comments and string literals count toward the line length because the rule checks source text length.
+
+## `standard:no-leading-whitespace`
+
+Reports files that start with spaces, tabs, CR, or LF before the first content character.
+
+This is stricter than `standard:no-leading-blank-lines`: it also catches indentation before the first SQLDelight import,
+schema statement, query label, or migration statement.
+
+Invalid:
+
+```sql
+
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Valid:
+
+```sql
+CREATE TABLE player (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Fix behavior:
+
+- Removes the leading whitespace range.
+- Marks fixes as `Safe`.
+- Leaves empty files unchanged.
+
+## `standard:statement-terminator`
+
+Reports SQLDelight statement blocks that do not end with `;`.
+
+For `.sqm` files, the rule checks migration statements. For `.sq` files, the rule uses SQLDelight labels and conservative
+statement starts to avoid treating import lines or text inside strings as SQL statements.
+
+Invalid:
+
+```sql
+selectAll:
+SELECT id, name
+FROM player
+ORDER BY name
+```
+
+Valid:
+
+```sql
+selectAll:
+SELECT id, name
+FROM player
+ORDER BY name;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
+- Skips trigger bodies until SQLDelight parser-backed statement ranges are exposed to rules.
+
+## `standard:no-redundant-semicolons`
+
+Reports repeated semicolon tokens separated only by whitespace.
+
+This extends `standard:no-consecutive-semicolons`: it also catches cases such as `; ;` and a semicolon repeated on the
+next line.
+
+Invalid:
+
+```sql
+selectAll:
+SELECT id
+FROM player;
+;
+```
+
+Valid:
+
+```sql
+selectAll:
+SELECT id
+FROM player;
+```
+
+Fix behavior:
+
+- Keeps the first semicolon and removes the redundant semicolons plus safe surrounding whitespace.
+- Marks fixes as `Safe`.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:consistent-column-references`
+
+Reports `GROUP BY` and `ORDER BY` clauses that mix ordinal references with named or expression references.
+
+Ordinal references such as `GROUP BY 1` are concise but become hard to read when mixed with names. The rule reports the
+clause header and leaves the rewrite to the user.
+
+Invalid:
+
+```sql
+selectScores:
+SELECT team_id, name, SUM(score)
+FROM player
+GROUP BY 1, name;
+```
+
+Valid:
+
+```sql
+selectScores:
+SELECT team_id, name, SUM(score)
+FROM player
+GROUP BY team_id, name;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- `ORDER BY 1 DESC` and `ORDER BY 1 NULLS LAST` are treated as ordinal references.
+- Parenthesized `ORDER BY` clauses, such as window clauses, are skipped by the source-text implementation.
+
+## `standard:require-order-by-with-limit`
+
+Reports top-level `SELECT` statements that use `LIMIT` or `OFFSET` without `ORDER BY`.
+
+Rows returned by a limited query are not stable unless the query defines an ordering. The rule checks top-level SELECT
+statements and ignores nested subqueries while the rule model remains source-text based.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id, name
+FROM player
+LIMIT 10;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name
+FROM player
+ORDER BY name
+LIMIT 10;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, quoted identifiers, and parenthesized nested query text.
+- Compound SELECT and dialect-specific limit syntax may need parser-backed refinement.
+
+## `standard:explicit-cross-join`
+
+Reports `JOIN` clauses that do not provide `ON` or `USING` and are not explicitly written as `CROSS JOIN` or
+`NATURAL JOIN`.
+
+The rule makes intentional cartesian joins visible. It does not rewrite joins automatically because changing join type
+syntax can affect readability and dialect behavior.
+
+Invalid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM player
+JOIN team;
+```
+
+Valid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM player
+CROSS JOIN team;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- `JOIN ... ON ...` and `JOIN ... USING (...)` are accepted.
+- Complex nested join syntax is handled conservatively until parser-backed join ranges are exposed.
+
+## `standard:no-distinct-parentheses`
+
+Reports `SELECT DISTINCT(...)` syntax.
+
+`DISTINCT` applies to the selected row, not to a function argument. Removing the parentheses makes the SQL intent match
+the syntax more directly.
+
+Invalid:
+
+```sql
+selectNames:
+SELECT DISTINCT(name)
+FROM player;
+```
+
+Valid:
+
+```sql
+selectNames:
+SELECT DISTINCT name
+FROM player;
+```
+
+Fix behavior:
+
+- Removes parentheses for simple identifiers, dotted identifiers, and `*`.
+- Marks simple fixes as `Safe`.
+- Reports complex or multiline expressions without a fix.
 
 ## Current Boundaries
 
