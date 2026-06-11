@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.core.AnalysisInput
 import java.io.File
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleDependency
@@ -128,11 +129,34 @@ internal class SqlDelightProjectResolver(
             tree.include("**/*.sqm")
         }.files.map { file ->
             SourceFile(
-                path = project.relativePath(file),
+                path = sourcePath(file),
                 content = file.readText(StandardCharsets.UTF_8),
             )
         }
     }
+
+    private fun sourcePath(file: File): String {
+        val filePath = file.normalizedRealPath()
+        val reportRootPath = reportRootPath()
+
+        if (reportRootPath != null && filePath.startsWith(reportRootPath)) {
+            return reportRootPath.relativize(filePath).toString().normalizePathSeparators()
+        }
+
+        return project.rootProject.relativePath(file)
+    }
+
+    private fun reportRootPath(): Path? =
+        project.providers
+            .gradleProperty("sqldelightCheck.reportRoot")
+            .orNull
+            ?.takeIf { value -> value.isNotBlank() }
+            ?.let { value -> project.file(value).normalizedRealPath() }
+            ?: project.providers
+                .environmentVariable("GITHUB_WORKSPACE")
+                .orNull
+                ?.takeIf { value -> value.isNotBlank() }
+                ?.let { value -> File(value).normalizedRealPath() }
 
     private fun Any.compilationUnit(properties: Any): Any =
         invokeNoArgOrNull("getCompilationUnit")
@@ -289,3 +313,10 @@ private fun ModuleComponentIdentifier.isDialectArtifact(): Boolean =
     group == SQLDELIGHT_GROUP && module.endsWith(DIALECT_SUFFIX)
 
 private fun String?.orElse(fallback: String): String = this ?: fallback
+
+private fun File.normalizedRealPath(): Path {
+    val path = toPath().toAbsolutePath().normalize()
+    return runCatching { path.toRealPath() }.getOrDefault(path)
+}
+
+private fun String.normalizePathSeparators(): String = replace(File.separatorChar, '/')

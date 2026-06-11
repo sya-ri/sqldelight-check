@@ -74,6 +74,10 @@ sqldelightCheck {
             severity.set(Severity.Warning)
         }
         maybeCreate("standard:no-trailing-whitespace").severity.set(Severity.Error)
+        maybeCreate("standard:max-line-length").options.put("max", "120")
+        maybeCreate("standard:max-joins").options.put("max", "8")
+        maybeCreate("standard:max-subquery-depth").options.put("maxDepth", "3")
+        maybeCreate("standard:max-case-depth").options.put("maxDepth", "2")
     }
 
     databases {
@@ -114,69 +118,93 @@ Built-in rule set artifacts:
 
 - `sqldelight-check-rules-standard`: dialect-independent rules for `.sq` and `.sqm` files.
 - `sqldelight-check-rules-postgres`: PostgreSQL-specific rules gated by `DialectCapabilities.PostgreSql`.
-- `sqldelight-check-rules-mysql`: MySQL-specific rule-set slot gated by `DialectCapabilities.MySql`.
-- `sqldelight-check-rules-sqlite`: SQLite-specific rule-set slot gated by `DialectCapabilities.SQLite`.
+- `sqldelight-check-rules-mysql`: MySQL-specific rules gated by `DialectCapabilities.MySql`.
+- `sqldelight-check-rules-sqlite`: SQLite-specific rules gated by `DialectCapabilities.SQLite`.
 - `sqldelight-check-rules-hsql`: HSQL-specific rule-set slot gated by `DialectCapabilities.Hsql`.
 
 Rules in dialect-specific rule sets can use SQLDelight's resolved dialect capability to stay inactive for unrelated
-databases. Empty dialect slots are published intentionally so third-party and future built-in dialect rules follow the
+databases. The empty HSQL slot is published intentionally so third-party and future built-in dialect rules follow the
 same shape.
 
 ## Reports
 
 Built-in reporters are installed with the Gradle plugin:
 
-- `json`
-- `sarif`
-- `text`
+- `json`: machine-readable summary and diagnostics.
+- `sarif`: SARIF 2.1.0 results for code scanning and artifact upload.
+- `text`: compact human-readable diagnostic count.
 - `html`: navigable diagnostics table for uploaded CI artifacts.
 - `markdown`: summary and diagnostics table suitable for GitHub Actions job summaries.
 - `github-annotations`: GitHub Actions workflow command annotations for changed files and check logs.
 
 Default report outputs are written under `build/reports/sqldelight-check/`. JSON, SARIF, and text are enabled by
-default. HTML and Markdown are available but disabled by default. Reporter-specific options can be set with
-`options`; the built-in JSON and SARIF reporters support `prettyPrint`.
+default. HTML and Markdown are available but disabled by default. GitHub annotations are enabled automatically on GitHub
+Actions when `GITHUB_ACTIONS=true`, unless explicitly disabled. Reporter-specific options can be set with `options`;
+the built-in JSON and SARIF reporters support `prettyPrint`.
 
-### GitHub Actions annotations
-
-Enable the `github-annotations` reporter and print its output after `sqldelightCheck`. GitHub Actions turns the printed
-workflow commands into inline annotations on the workflow run and pull request diff when the diagnostic location is part
-of the diff.
+Enable or disable reporters in `build.gradle.kts`:
 
 ```kotlin
 sqldelightCheck {
     reports {
-        maybeCreate("github-annotations").required.set(true)
+        maybeCreate("json").required.set(true)
+        maybeCreate("sarif").required.set(true)
+        maybeCreate("text").required.set(false)
+        maybeCreate("html").required.set(true)
+        maybeCreate("markdown").required.set(true)
+        maybeCreate("github-annotations").required.set(false)
+
+        maybeCreate("json").options.put("prettyPrint", "true")
     }
 }
 ```
 
+Report output examples:
+
+```text
+sqldelight-check diagnostics: 1
+```
+
+```json
+{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[...]}
+```
+
+```text
+::error title=standard%3Afinal-newline,file=src/main/sqldelight/com/example/Player.sq,line=3,col=3,endLine=3,endColumn=3::File should end with a newline.
+```
+
+To publish annotations in GitHub Actions, run `sqldelightCheck` and print the generated workflow command file after the
+task, including on failure:
+
 ```yaml
-name: Check
+- name: Run sqldelight-check
+  id: sqldelight-check
+  run: ./gradlew sqldelightCheck
 
-on:
-  pull_request:
-  push:
-    branches:
-      - main
+- name: Publish sqldelight-check annotations
+  if: always()
+  run: |
+    if [ -f build/reports/sqldelight-check/report.github-annotations ]; then
+      cat build/reports/sqldelight-check/report.github-annotations
+    fi
+```
 
-jobs:
-  sqldelight-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 25
-      - name: Run sqldelight-check
-        run: ./gradlew --no-daemon sqldelightCheck
-      - name: Publish sqldelight-check annotations
-        if: always()
-        run: |
-          if [ -f build/reports/sqldelight-check/report.github-annotations ]; then
-            cat build/reports/sqldelight-check/report.github-annotations
-          fi
+SARIF and GitHub annotation paths are written relative to `GITHUB_WORKSPACE` on GitHub Actions so uploaded reports match
+the checkout root. Outside GitHub Actions, paths are relative to the Gradle root project. If the Gradle root is nested
+under the repository checkout, pass an explicit report root.
+
+When the Gradle wrapper is at the checkout root:
+
+```shell
+./gradlew -p path/to/gradle-root -PsqldelightCheck.reportRoot="$PWD" sqldelightCheck
+```
+
+When the Gradle wrapper is inside the nested Gradle root:
+
+```shell
+repo_root="$PWD"
+cd path/to/gradle-root
+./gradlew -PsqldelightCheck.reportRoot="$repo_root" sqldelightCheck
 ```
 
 ## Rule Sets
@@ -198,8 +226,13 @@ The initial standard rule set contains:
 - `standard:line-ending-lf`: reports CRLF and CR line endings. Safe fix: replace them with LF.
 - `standard:literal-case`: reports SQL literal tokens that are not uppercase. Unsafe fix: uppercase the literal token.
 - `standard:max-blank-lines`: reports more than one consecutive blank line. Safe fix: remove extra blank lines.
+- `standard:max-case-depth`: reports nested `CASE` expressions deeper than `maxDepth`. No automatic fix.
+- `standard:max-joins`: reports statements with more than `max` `JOIN` clauses. No automatic fix.
 - `standard:no-consecutive-semicolons`: reports directly repeated semicolon tokens. Safe fix: remove extra semicolons.
+- `standard:max-subquery-depth`: reports nested `SELECT` statements deeper than `maxDepth`. No automatic fix.
+- `standard:no-delete-without-where`: reports `DELETE` statements without a top-level `WHERE`. No automatic fix.
 - `standard:no-leading-blank-lines`: reports blank lines before the first content line. Safe fix: remove them.
+- `standard:no-leading-wildcard-like`: reports `LIKE` patterns that start with `%` or `_`. No automatic fix.
 - `standard:no-space-after-dot`: reports inline whitespace after `.`. Safe fix: remove it.
 - `standard:no-space-after-opening-parenthesis`: reports inline whitespace after `(`. Safe fix: remove it.
 - `standard:no-space-before-closing-parenthesis`: reports inline whitespace before `)`. Safe fix: remove it.
@@ -211,14 +244,19 @@ The initial standard rule set contains:
 - `standard:no-right-join`: reports `RIGHT JOIN` and `RIGHT OUTER JOIN`. No automatic fix.
 - `standard:no-select-distinct-with-group-by`: reports `SELECT DISTINCT` statements that also contain `GROUP BY`. No
   automatic fix.
+- `standard:no-select-star`: reports `SELECT *` result columns. No automatic fix.
 - `standard:no-select-trailing-comma`: reports trailing commas at the end of `SELECT` clauses. Unsafe fix: remove the
   comma.
 - `standard:no-tab-indentation`: reports tabs in leading indentation. Safe fix: replace indentation tabs with spaces.
 - `standard:no-trailing-blank-lines`: reports blank lines after the last content line. Safe fix: remove them.
 - `standard:no-trailing-whitespace`: reports spaces or tabs at the end of a line. Safe fix: remove trailing whitespace.
+- `standard:no-update-without-where`: reports `UPDATE` statements without a top-level `WHERE`. No automatic fix.
 - `standard:prefer-coalesce`: reports `IFNULL` and `NVL` calls. Unsafe fix: replace the function name with `COALESCE`.
 - `standard:prefer-count-star`: reports `COUNT(1)` and `COUNT(0)` row counts. Unsafe fix: replace the argument with
   `*`.
+- `standard:prefer-explicit-column-list-in-insert`: reports `INSERT` statements without explicit target columns. No
+  automatic fix.
+- `standard:require-result-column-alias`: reports computed `SELECT` result columns without aliases. No automatic fix.
 - `standard:space-after-block-comment-start`: reports block comments where the opening marker is not followed by a
   space. Safe fix: insert the space.
 - `standard:space-after-comma`: reports missing or repeated inline spaces after `,`. Safe fix: use one space.

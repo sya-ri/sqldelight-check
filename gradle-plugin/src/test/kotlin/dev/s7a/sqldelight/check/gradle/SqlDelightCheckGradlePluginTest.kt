@@ -85,9 +85,51 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
         assertEquals(true, project.file("build/reports/sqldelight-check/report.sarif").exists())
         assertEquals(true, project.file("build/reports/sqldelight-check/report.text").exists())
+        assertEquals(false, project.file("build/reports/sqldelight-check/report.github-annotations").exists())
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
         assertEquals(EMPTY_SARIF_REPORT, project.file("build/reports/sqldelight-check/report.sarif").readText())
         assertEquals("sqldelight-check diagnostics: 0\n", project.file("build/reports/sqldelight-check/report.text").readText())
+    }
+
+    @Test
+    fun `check task enables github annotations report on GitHub Actions`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    id("dev.s7a.sqldelight.check")
+                }
+                """.trimIndent(),
+            )
+
+        val result = project.runWithEnvironment(mapOf("GITHUB_ACTIONS" to "true"), "sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(true, project.file("build/reports/sqldelight-check/report.github-annotations").exists())
+        assertEquals("", project.file("build/reports/sqldelight-check/report.github-annotations").readText())
+    }
+
+    @Test
+    fun `check task respects disabled github annotations report on GitHub Actions`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                sqldelightCheck {
+                    reports {
+                        maybeCreate("github-annotations").required.set(false)
+                    }
+                }
+                """.trimIndent(),
+            )
+
+        val result = project.runWithEnvironment(mapOf("GITHUB_ACTIONS" to "true"), "sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(false, project.file("build/reports/sqldelight-check/report.github-annotations").exists())
     }
 
     @Test
@@ -168,6 +210,138 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertContentEquals(listOf("sqldelight-check analyzed 2 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
+    }
+
+    @Test
+    fun `sarif report uses root project relative paths for subprojects`() {
+        val project =
+            testProject(
+                buildScript = "",
+                settingsScript =
+                    """
+                    rootProject.name = "sqldelight-check-test"
+                    include(":app")
+                    """.trimIndent(),
+            )
+        project.write(
+            "app/build.gradle.kts",
+            """
+            import dev.s7a.sqldelight.check.api.Enablement
+            import dev.s7a.sqldelight.check.api.Severity
+
+            plugins {
+                kotlin("jvm") version "2.4.0"
+                id("app.cash.sqldelight") version "2.3.2"
+                id("dev.s7a.sqldelight.check")
+            }
+
+            repositories {
+                mavenCentral()
+            }
+
+            sqldelight {
+                databases {
+                    create("Database") {
+                        packageName.set("com.example")
+                        srcDirs("src/main/sqldelight")
+                        dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                    }
+                }
+            }
+
+            sqldelightCheck {
+                ruleSets {
+                    maybeCreate("standard").enabled.set(Enablement.Disabled)
+                }
+                rules {
+                    maybeCreate("standard:final-newline").apply {
+                        enabled.set(Enablement.Enabled)
+                        severity.set(Severity.Error)
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        project.write(
+            "app/src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent(),
+        )
+
+        project.runAndFail(":app:sqldelightCheck")
+
+        val sarif = project.file("app/build/reports/sqldelight-check/report.sarif").readText()
+        assertEquals(true, """"uri":"app/src/main/sqldelight/com/example/Player.sq"""" in sarif)
+    }
+
+    @Test
+    fun `sarif report uses configured report root relative paths when Gradle root is nested`() {
+        val workspace =
+            testProject(
+                buildScript = "",
+                settingsScript = """rootProject.name = "workspace"""",
+            )
+        workspace.write(
+            "app/settings.gradle.kts",
+            """rootProject.name = "sqldelight-check-nested-test"""",
+        )
+        workspace.write(
+            "app/build.gradle.kts",
+            """
+            import dev.s7a.sqldelight.check.api.Enablement
+            import dev.s7a.sqldelight.check.api.Severity
+
+            plugins {
+                kotlin("jvm") version "2.4.0"
+                id("app.cash.sqldelight") version "2.3.2"
+                id("dev.s7a.sqldelight.check")
+            }
+
+            repositories {
+                mavenCentral()
+            }
+
+            sqldelight {
+                databases {
+                    create("Database") {
+                        packageName.set("com.example")
+                        srcDirs("src/main/sqldelight")
+                        dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+                    }
+                }
+            }
+
+            sqldelightCheck {
+                ruleSets {
+                    maybeCreate("standard").enabled.set(Enablement.Disabled)
+                }
+                rules {
+                    maybeCreate("standard:final-newline").apply {
+                        enabled.set(Enablement.Enabled)
+                        severity.set(Severity.Warning)
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        workspace.write(
+            "app/src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent(),
+        )
+
+        workspace
+            .project("app")
+            .run("-PsqldelightCheck.reportRoot=${workspace.file("")}", "sqldelightCheck")
+
+        val sarif = workspace.file("app/build/reports/sqldelight-check/report.sarif").readText()
+        assertEquals(true, """"uri":"app/src/main/sqldelight/com/example/Player.sq"""" in sarif)
     }
 
     @Test
@@ -579,6 +753,11 @@ class SqlDelightCheckGradlePluginTest {
         fun file(path: String): Path = directory.resolve(path)
 
         /**
+         * Returns a nested Gradle project fixture inside this temporary project.
+         */
+        fun project(path: String): TestProject = TestProject(file(path))
+
+        /**
          * Writes [content] to a file inside this temporary project.
          */
         fun write(
@@ -694,6 +873,20 @@ class SqlDelightCheckGradlePluginTest {
                 .withArguments(*arguments, "--stacktrace")
                 .withPluginClasspath()
                 .build()
+
+        /**
+         * Runs Gradle with additional environment variables.
+         */
+        fun runWithEnvironment(
+            environment: Map<String, String>,
+            vararg arguments: String,
+        ) = GradleRunner
+            .create()
+            .withProjectDir(directory.toFile())
+            .withArguments(*arguments, "--stacktrace")
+            .withPluginClasspath()
+            .withEnvironment(System.getenv() + environment)
+            .build()
 
         /**
          * Runs Gradle and expects the build to fail.

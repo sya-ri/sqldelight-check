@@ -5,7 +5,7 @@ package dev.s7a.sqldelight.check.api
  */
 public data class SourceFile(
     /**
-     * Project-relative path used in diagnostics and reports.
+     * Root-project-relative path used in diagnostics and reports.
      */
     public val path: String,
     /**

@@ -88,6 +88,11 @@ internal fun Project.sqldelightCheckReporterRegistry(): ReporterRegistry =
  * Registers default reporters and output locations.
  */
 private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension) {
+    val isGitHubActions =
+        providers
+            .environmentVariable("GITHUB_ACTIONS")
+            .map { value -> value.equals("true", ignoreCase = true) }
+            .orElse(false)
     val defaults =
         mapOf(
             "json" to true,
@@ -103,6 +108,7 @@ private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension)
             outputFile.convention(layout.buildDirectory.file("reports/sqldelight-check/report.$name"))
         }
     }
+    extension.reports.maybeCreate("github-annotations").required.convention(isGitHubActions)
 }
 
 /**
