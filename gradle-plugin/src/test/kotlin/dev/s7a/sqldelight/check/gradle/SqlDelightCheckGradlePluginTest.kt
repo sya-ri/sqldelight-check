@@ -85,6 +85,24 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `gradle check task runs sqldelight check task`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    id("dev.s7a.sqldelight.check")
+                }
+                """.trimIndent(),
+            )
+
+        val result = project.run("check")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(SUCCESS, result.task(":check")?.outcome)
+        assertEquals(null, result.task(":sqldelightFix"))
+    }
+
+    @Test
     fun `check task runs official dialect rule sets without extra dependencies`() {
         val project =
             testProject(
