@@ -95,8 +95,14 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 ruleIds: List<RuleId>,
             ) {
                 if (!logLevel.logsRules) return
-                val renderedRules = if (ruleIds.isEmpty()) "(none)" else ruleIds.joinToString(", ") { ruleId -> ruleId.value }
-                logger.lifecycle("sqldelight-check [{}] {} rules: {}", database.name, file.path, renderedRules)
+                logger.lifecycle("sqldelight-check [{}] {} rules ({}):", database.name, file.path, ruleIds.size)
+                if (ruleIds.isEmpty()) {
+                    logger.lifecycle("sqldelight-check [{}]   - (none)", database.name)
+                    return
+                }
+                ruleIds.forEach { ruleId ->
+                    logger.lifecycle("sqldelight-check [{}]   - {}", database.name, ruleId.value)
+                }
             }
         }
 

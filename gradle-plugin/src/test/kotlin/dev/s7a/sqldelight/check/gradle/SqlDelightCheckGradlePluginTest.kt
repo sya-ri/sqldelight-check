@@ -299,7 +299,8 @@ class SqlDelightCheckGradlePluginTest {
             listOf(
                 "sqldelight-check [Database] files (1):",
                 "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
-                "sqldelight-check [Database] src/main/sqldelight/com/example/Player.sq rules: standard:final-newline",
+                "sqldelight-check [Database] src/main/sqldelight/com/example/Player.sq rules (1):",
+                "sqldelight-check [Database]   - standard:final-newline",
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
             ),
             result.sqldelightCheckOutputLines(),
