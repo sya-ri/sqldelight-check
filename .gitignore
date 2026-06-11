@@ -1,7 +1,4 @@
 .gradle/
-.idea/
 build/
-out/
-
-local.properties
-
+**/build/
+.kotlin
