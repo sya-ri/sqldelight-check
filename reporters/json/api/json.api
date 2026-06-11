@@ -3,3 +3,4 @@ public final class dev/s7a/sqldelight/check/reporter/json/JsonReporterProvider :
 	public fun create (Ljava/util/Map;)Ldev/s7a/sqldelight/check/reporter/api/Reporter;
 	public fun getId ()Ljava/lang/String;
 }
+

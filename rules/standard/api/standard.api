@@ -753,3 +753,4 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/UseIsNullRule :
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
+

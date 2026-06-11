@@ -207,3 +207,4 @@ public final class dev/s7a/sqldelight/check/api/TextEdit {
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
+
