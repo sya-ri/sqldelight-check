@@ -11,6 +11,7 @@ import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
+import kotlin.test.assertEquals
 
 internal fun Rule.diagnostics(
     content: String,
@@ -45,4 +46,8 @@ internal fun Rule.diagnostics(
         reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic },
     )
     return diagnostics
+}
+
+internal fun Rule.assertOne(content: String) {
+    assertEquals(1, diagnostics(content).size)
 }
