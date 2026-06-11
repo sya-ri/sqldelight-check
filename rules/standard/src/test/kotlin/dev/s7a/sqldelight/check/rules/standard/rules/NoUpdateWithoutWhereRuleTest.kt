@@ -35,6 +35,21 @@ class NoUpdateWithoutWhereRuleTest {
     }
 
     @Test
+    fun `accepts upsert do update action`() {
+        NoUpdateWithoutWhereRule().assertDiagnosticCount(
+            """
+            upsertItem:
+            INSERT INTO item(id, name, quantity)
+            VALUES (?, ?, ?)
+            ON CONFLICT(id) DO UPDATE
+            SET name = excluded.name,
+                quantity = excluded.quantity;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
     fun `does not use nested where clause for update statement`() {
         NoUpdateWithoutWhereRule().assertDiagnosticCount(
             """
