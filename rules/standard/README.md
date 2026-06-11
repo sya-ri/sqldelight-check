@@ -88,6 +88,7 @@ The standard rule set uses two safety levels:
 | `standard:consistent-order-by-direction` | Warning / Auto | No | None | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
 | `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
 | `standard:explicit-cross-join` | Warning / Auto | No | None | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
+| `standard:explicit-inner-join` | Warning / Auto | No | None | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
 | `standard:explicit-union-operator` | Warning / Auto | No | None | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
 | `standard:final-newline` | Warning / Auto | Yes | Safe | Require files to end with one LF newline. |
 | `standard:function-name-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL function names outside comments and quoted text. |
@@ -98,6 +99,7 @@ The standard rule set uses two safety levels:
 | `standard:max-line-length` | Warning / Auto | No | None | Report non-blank lines longer than 120 characters. |
 | `standard:no-consecutive-semicolons` | Warning / Auto | Yes | Safe | Disallow directly repeated semicolon tokens. |
 | `standard:no-distinct-parentheses` | Warning / Auto | Yes | Safe | Disallow parentheses immediately after `SELECT DISTINCT`. |
+| `standard:no-else-null` | Warning / Auto | No | None | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
 | `standard:no-leading-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines before the first content line. |
 | `standard:no-leading-whitespace` | Warning / Auto | Yes | Safe | Disallow any whitespace before the first file content. |
 | `standard:no-redundant-semicolons` | Warning / Auto | Yes | Safe | Disallow repeated semicolons separated only by whitespace. |
@@ -117,6 +119,7 @@ The standard rule set uses two safety levels:
 | `standard:prefer-coalesce` | Warning / Auto | Yes | Unsafe | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
 | `standard:require-order-by-with-limit` | Warning / Auto | No | None | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
+| `standard:set-operator-line-position` | Warning / Auto | No | None | Require multiline set operators to begin their own line after indentation. |
 | `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
 | `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
 | `standard:space-after-line-comment-marker` | Warning / Auto | Yes | Safe | Require one space after `--` when comment text follows. |
@@ -142,12 +145,13 @@ Useful sqlfluff concepts reflected here:
   `standard:no-redundant-semicolons`.
 - Convention checks for row counts, `NULL` comparisons, and join direction: `standard:prefer-count-star`,
   `standard:use-is-null`, and `standard:no-right-join`.
-- Convention and ambiguity checks for operator and set-operation clarity: `standard:consistent-not-equal-operator`,
-  `standard:prefer-coalesce`, and `standard:explicit-union-operator`.
+- Convention and ambiguity checks for operator, `CASE`, and set-operation clarity:
+  `standard:consistent-not-equal-operator`, `standard:prefer-coalesce`, `standard:no-else-null`,
+  `standard:explicit-union-operator`, and `standard:set-operator-line-position`.
 - Ambiguity checks for `SELECT` and `ORDER BY`: `standard:no-select-distinct-with-group-by`,
   `standard:consistent-order-by-direction`, `standard:consistent-column-references`,
-  `standard:require-order-by-with-limit`, `standard:explicit-cross-join`, `standard:no-distinct-parentheses`, and
-  `standard:no-select-trailing-comma`.
+  `standard:require-order-by-with-limit`, `standard:explicit-cross-join`, `standard:explicit-inner-join`,
+  `standard:no-distinct-parentheses`, and `standard:no-select-trailing-comma`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
@@ -1141,6 +1145,37 @@ Fix behavior:
 - No automatic fix is provided because the rule cannot know whether the intended set operation is `ALL` or `DISTINCT`.
 - Skips comments, string literals, and quoted identifiers.
 
+## `standard:set-operator-line-position`
+
+Reports `UNION`, `EXCEPT`, and `INTERSECT` in multiline SQL when the set operator is not at the start of its own line
+after indentation.
+
+This rule is inspired by sqlfluff's set-operator line-position rule. Keeping set operators line-leading makes compound
+queries easier to scan and diff.
+
+Invalid:
+
+```sql
+selectAllNames:
+SELECT name FROM active_player UNION
+SELECT name FROM archived_player;
+```
+
+Valid:
+
+```sql
+selectAllNames:
+SELECT name FROM active_player
+UNION
+SELECT name FROM archived_player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line SQL is accepted.
+- Skips comments, string literals, and quoted identifiers.
+
 ## `standard:no-select-distinct-with-group-by`
 
 Reports statements that use both `SELECT DISTINCT` and `GROUP BY`.
@@ -1552,6 +1587,36 @@ Fix behavior:
 - `JOIN ... ON ...` and `JOIN ... USING (...)` are accepted.
 - Complex nested join syntax is handled conservatively until parser-backed join ranges are exposed.
 
+## `standard:explicit-inner-join`
+
+Reports bare `JOIN` clauses that provide `ON` or `USING` instead of explicitly writing `INNER JOIN`.
+
+The rule keeps conditioned joins explicit while leaving outer, cross, and natural join syntax alone.
+
+Invalid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM player
+JOIN team ON team.id = player.team_id;
+```
+
+Valid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM player
+INNER JOIN team ON team.id = player.team_id;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- `LEFT`, `RIGHT`, `FULL`, `CROSS`, `NATURAL`, and `INNER` joins are accepted.
+- Complex nested join syntax is handled conservatively until parser-backed join ranges are exposed.
+
 ## `standard:no-distinct-parentheses`
 
 Reports `SELECT DISTINCT(...)` syntax.
@@ -1580,6 +1645,39 @@ Fix behavior:
 - Removes parentheses for simple identifiers, dotted identifiers, and `*`.
 - Marks simple fixes as `Safe`.
 - Reports complex or multiline expressions without a fix.
+
+## `standard:no-else-null`
+
+Reports `CASE` expressions with an explicit `ELSE NULL` branch.
+
+`CASE` already returns `NULL` when no branch matches and no `ELSE` branch is provided, so the explicit null branch is
+usually redundant.
+
+Invalid:
+
+```sql
+selectPlayerStatus:
+SELECT CASE
+  WHEN score > 10 THEN 'starter'
+  ELSE NULL
+END AS status
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayerStatus:
+SELECT CASE
+  WHEN score > 10 THEN 'starter'
+END AS status
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
 
 ## Current Boundaries
 

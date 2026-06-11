@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorR
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentOrderByDirectionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.DataTypeCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitCrossJoinRule
+import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitInnerJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitUnionOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FinalNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.FunctionNameCaseRule
@@ -16,6 +17,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.MaxBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxLineLengthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoConsecutiveSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDistinctParenthesesRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoElseNullRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingWhitespaceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoRedundantSemicolonsRule
@@ -35,6 +37,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCoalesceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireOrderByWithLimitRule
+import dev.s7a.sqldelight.check.rules.standard.rules.SetOperatorLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterBlockCommentStartRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterLineCommentMarkerRule
@@ -63,6 +66,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::ConsistentOrderByDirectionRule),
             RuleProvider(::DataTypeCaseRule),
             RuleProvider(::ExplicitCrossJoinRule),
+            RuleProvider(::ExplicitInnerJoinRule),
             RuleProvider(::ExplicitUnionOperatorRule),
             RuleProvider(::FinalNewlineRule),
             RuleProvider(::FunctionNameCaseRule),
@@ -73,6 +77,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::MaxLineLengthRule),
             RuleProvider(::NoConsecutiveSemicolonsRule),
             RuleProvider(::NoDistinctParenthesesRule),
+            RuleProvider(::NoElseNullRule),
             RuleProvider(::NoLeadingBlankLinesRule),
             RuleProvider(::NoLeadingWhitespaceRule),
             RuleProvider(::NoRedundantSemicolonsRule),
@@ -92,6 +97,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::PreferCoalesceRule),
             RuleProvider(::PreferCountStarRule),
             RuleProvider(::RequireOrderByWithLimitRule),
+            RuleProvider(::SetOperatorLinePositionRule),
             RuleProvider(::SpaceAfterBlockCommentStartRule),
             RuleProvider(::SpaceAfterCommaRule),
             RuleProvider(::SpaceAfterLineCommentMarkerRule),
