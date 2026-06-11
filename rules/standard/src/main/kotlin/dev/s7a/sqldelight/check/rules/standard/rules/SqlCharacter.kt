@@ -56,33 +56,27 @@ internal fun String.nextSqlCharacterAfter(offset: Int): SqlCharacter? =
         .firstOrNull { character -> !character.value.isWhitespace() }
 
 internal fun String.matchingClosingParenthesisOffset(openOffset: Int): Int? {
-    if (getOrNull(openOffset) != '(') return null
-
-    var depth = 0
-    sqlCharacters()
-        .dropWhile { character -> character.offset < openOffset }
-        .forEach { character ->
-            when (character.value) {
-                '(' -> depth++
-                ')' -> {
-                    depth--
-                    if (depth == 0) return character.offset
-                }
-            }
-    }
-    return null
+    return matchingClosingDelimiterOffset(openOffset, open = '(', close = ')')
 }
 
 internal fun String.matchingClosingBraceOffset(openOffset: Int): Int? {
-    if (getOrNull(openOffset) != '{') return null
+    return matchingClosingDelimiterOffset(openOffset, open = '{', close = '}')
+}
+
+private fun String.matchingClosingDelimiterOffset(
+    openOffset: Int,
+    open: Char,
+    close: Char,
+): Int? {
+    if (getOrNull(openOffset) != open) return null
 
     var depth = 0
     sqlCharacters()
         .dropWhile { character -> character.offset < openOffset }
         .forEach { character ->
             when (character.value) {
-                '{' -> depth++
-                '}' -> {
+                open -> depth++
+                close -> {
                     depth--
                     if (depth == 0) return character.offset
                 }

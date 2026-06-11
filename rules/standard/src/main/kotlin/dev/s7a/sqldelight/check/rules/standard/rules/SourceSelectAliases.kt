@@ -9,6 +9,7 @@ internal data class ResultColumnAlias(
 )
 
 internal data class SelectFromRange(
+    val select: SqlToken,
     val selectStartOffset: Int,
     val selectEndOffset: Int,
     val fromStartOffset: Int,
@@ -32,6 +33,7 @@ internal fun String.selectFromRanges(): Sequence<SelectFromRange> =
                     } ?: return@forEachIndexed
             yield(
                 SelectFromRange(
+                    select = token,
                     selectStartOffset = token.startOffset,
                     selectEndOffset = token.endOffset,
                     fromStartOffset = fromToken.startOffset,

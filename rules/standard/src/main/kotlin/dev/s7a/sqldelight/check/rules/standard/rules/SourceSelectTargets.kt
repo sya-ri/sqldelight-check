@@ -14,28 +14,15 @@ internal data class SourceSelectTarget(
 )
 
 internal fun String.sourceSelectClauseTargets(): List<SourceSelectClauseTargets> {
-    val tokens = sqlTokens().toList()
     val clauses = mutableListOf<SourceSelectClauseTargets>()
-    tokens.forEachIndexed { index, token ->
-        if (!token.isKeyword("select")) return@forEachIndexed
-
-        val selectDepth = sqlParenthesisDepthAt(token.startOffset)
-        val statementEnd = statementEndAfter(token.startOffset)
-        val fromToken =
-            tokens
-                .drop(index + 1)
-                .firstOrNull { candidate ->
-                    candidate.startOffset < statementEnd &&
-                        sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
-                        candidate.isKeyword("from")
-                } ?: return@forEachIndexed
-        val targets = selectTargetsWithCommas(token.endOffset, fromToken.startOffset, selectDepth)
+    selectFromRanges().forEach { select ->
+        val targets = selectTargetsWithCommas(select.selectEndOffset, select.fromStartOffset, select.depth)
         if (targets.isNotEmpty()) {
             clauses +=
                 SourceSelectClauseTargets(
-                    select = token,
-                    listStartOffset = token.endOffset,
-                    listEndOffset = fromToken.startOffset,
+                    select = select.select,
+                    listStartOffset = select.selectEndOffset,
+                    listEndOffset = select.fromStartOffset,
                     targets = targets,
                 )
         }
