@@ -94,6 +94,7 @@ The standard rule set uses two safety levels:
 
 | Rule ID | Enable | Severity | Fix | Purpose |
 | --- | --- | --- | --- | --- |
+| `standard:blank-line-between-statements` | 🔘 | ⚠️ | ✅ | Require a blank line between adjacent top-level SQLDelight statements. |
 | `standard:blocked-words` | 🔘 | ⚠️ |  | Report configured blocked words outside comments and quoted text by default. |
 | `standard:clause-keyword-newline` | 🔘 | ⚠️ |  | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
 | `standard:consistent-column-references` | 🔘 | ⚠️ |  | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
@@ -115,6 +116,7 @@ The standard rule set uses two safety levels:
 | `standard:max-joins` | 🔘 | ⚠️ |  | Disallow statements with more than `max` `JOIN` clauses. |
 | `standard:max-line-length` | 🔘 | ⚠️ |  | Report non-blank lines longer than 120 characters. |
 | `standard:max-subquery-depth` | 🔘 | ⚠️ |  | Disallow nested `SELECT` statements deeper than `maxDepth`. |
+| `standard:no-blank-line-after-query-label` | 🔘 | ⚠️ | ✅ | Disallow blank lines between a SQLDelight query label and its statement body. |
 | `standard:no-consecutive-semicolons` | 🔘 | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
 | `standard:no-delete-without-where` | 🔘 | ⚠️ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
 | `standard:no-distinct-parentheses` | 🔘 | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
@@ -653,6 +655,42 @@ Fix behavior:
 - Treats whitespace-only lines as blank.
 - Applied automatically in write tasks.
 
+## `standard:blank-line-between-statements`
+
+Reports adjacent top-level SQLDelight statements that are not separated by a
+blank line.
+
+SQLDelight files commonly mix schema declarations, migrations, and generated
+query declarations. Keeping statement boundaries visually separated makes the
+generated API surface easier to scan and keeps diffs stable when new statements
+are added.
+
+Invalid:
+
+```sql
+selectAll:
+SELECT * FROM player;
+selectById:
+SELECT * FROM player WHERE id = :id;
+```
+
+Valid:
+
+```sql
+selectAll:
+SELECT * FROM player;
+
+selectById:
+SELECT * FROM player WHERE id = :id;
+```
+
+Fix behavior:
+
+- Inserts one blank line before the next adjacent statement or query label.
+- Only considers top-level semicolon statement boundaries.
+- Leaves runs of multiple blank lines to `standard:max-blank-lines`.
+- Applied automatically in write tasks.
+
 ## `standard:no-leading-blank-lines`
 
 Reports blank lines before the first non-blank line in a file.
@@ -681,6 +719,37 @@ Fix behavior:
 
 - Removes all blank lines before the first non-blank line.
 - Does not report files that contain only blank lines.
+- Applied automatically in write tasks.
+
+## `standard:no-blank-line-after-query-label`
+
+Reports blank lines between a SQLDelight query label and the statement body it
+names.
+
+SQLDelight labels define generated API members. Keeping the label attached to
+the statement body makes it clear which SQL text belongs to the generated
+function.
+
+Invalid:
+
+```sql
+selectAll:
+
+SELECT * FROM player;
+```
+
+Valid:
+
+```sql
+selectAll:
+SELECT * FROM player;
+```
+
+Fix behavior:
+
+- Removes blank lines after SQLDelight `name:` labels and grouped `name {`
+  labels.
+- Applies only to `.sq` files.
 - Applied automatically in write tasks.
 
 ## `standard:no-trailing-blank-lines`

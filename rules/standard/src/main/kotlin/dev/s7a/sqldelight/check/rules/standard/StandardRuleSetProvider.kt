@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rules.standard.rules.BlankLineBetweenStatementsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.BlockedWordsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ClauseKeywordNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentColumnReferencesRule
@@ -23,6 +24,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.MaxJoinsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxLineLengthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxSubqueryDepthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoConsecutiveSemicolonsRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoBlankLineAfterQueryLabelRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDistinctParenthesesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoElseNullRule
@@ -92,6 +94,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
      */
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
+            RuleProvider(::BlankLineBetweenStatementsRule),
             RuleProvider(::BlockedWordsRule),
             RuleProvider(::ClauseKeywordNewlineRule),
             RuleProvider(::ConsistentColumnReferencesRule),
@@ -114,6 +117,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::MaxLineLengthRule),
             RuleProvider(::MaxSubqueryDepthRule),
             RuleProvider(::NoConsecutiveSemicolonsRule),
+            RuleProvider(::NoBlankLineAfterQueryLabelRule),
             RuleProvider(::NoDeleteWithoutWhereRule),
             RuleProvider(::NoDistinctParenthesesRule),
             RuleProvider(::NoElseNullRule),

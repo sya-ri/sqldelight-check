@@ -48,12 +48,14 @@ Source hygiene:
 
 Deterministic formatting:
 
+- `standard:blank-line-between-statements`
 - `standard:clause-keyword-newline`
 - `standard:data-type-case`
 - `standard:function-name-case`
 - `standard:keyword-case`
 - `standard:literal-case`
 - `standard:no-distinct-parentheses`
+- `standard:no-blank-line-after-query-label`
 - `standard:no-leading-comma`
 - `standard:no-select-trailing-comma`
 - `standard:no-space-after-dot`

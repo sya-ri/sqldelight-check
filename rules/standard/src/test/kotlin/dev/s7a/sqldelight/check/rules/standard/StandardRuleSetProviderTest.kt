@@ -18,6 +18,7 @@ class StandardRuleSetProviderTest {
 
         assertEquals(
             setOf(
+                RuleId("standard:blank-line-between-statements"),
                 RuleId("standard:blocked-words"),
                 RuleId("standard:clause-keyword-newline"),
                 RuleId("standard:consistent-column-references"),
@@ -39,6 +40,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:max-joins"),
                 RuleId("standard:max-line-length"),
                 RuleId("standard:max-subquery-depth"),
+                RuleId("standard:no-blank-line-after-query-label"),
                 RuleId("standard:no-consecutive-semicolons"),
                 RuleId("standard:no-delete-without-where"),
                 RuleId("standard:no-distinct-parentheses"),
