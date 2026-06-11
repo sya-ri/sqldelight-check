@@ -5,6 +5,7 @@ import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SourcesJar
 import org.gradle.api.tasks.PathSensitivity
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
@@ -105,6 +106,10 @@ subprojects {
         apply(plugin = "org.jetbrains.dokka")
         apply(plugin = "org.jetbrains.dokka-javadoc")
         apply(plugin = "com.vanniktech.maven.publish")
+
+        extensions.configure<DokkaExtension>("dokka") {
+            moduleName.set(publishedArtifactId)
+        }
 
         pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
             extensions.configure<KotlinJvmProjectExtension>("kotlin") {
