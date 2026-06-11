@@ -20,4 +20,8 @@ public data class ResolvedRuleConfig(
      * Final severity assigned to diagnostics from this rule.
      */
     public val severity: Severity,
+    /**
+     * Final rule-specific string options after global and database-specific values are merged.
+     */
+    public val options: Map<String, String>,
 )

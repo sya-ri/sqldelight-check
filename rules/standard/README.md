@@ -97,13 +97,19 @@ The standard rule set uses two safety levels:
 | `standard:line-ending-lf` | Warning / Auto | Yes | Safe | Replace CRLF or CR line endings with LF. |
 | `standard:literal-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
 | `standard:max-blank-lines` | Warning / Auto | Yes | Safe | Disallow more than one consecutive blank line. |
+| `standard:max-case-depth` | Warning / Auto | No | None | Disallow `CASE` expressions nested deeper than `maxDepth`. |
+| `standard:max-joins` | Warning / Auto | No | None | Disallow statements with more than `max` `JOIN` clauses. |
 | `standard:max-line-length` | Warning / Auto | No | None | Report non-blank lines longer than 120 characters. |
+| `standard:max-subquery-depth` | Warning / Auto | No | None | Disallow nested `SELECT` statements deeper than `maxDepth`. |
 | `standard:no-consecutive-semicolons` | Warning / Auto | Yes | Safe | Disallow directly repeated semicolon tokens. |
+| `standard:no-delete-without-where` | Warning / Auto | No | None | Disallow `DELETE` statements without a top-level `WHERE`. |
 | `standard:no-distinct-parentheses` | Warning / Auto | Yes | Safe | Disallow parentheses immediately after `SELECT DISTINCT`. |
 | `standard:no-else-null` | Warning / Auto | No | None | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
+| `standard:no-from-subquery` | Warning / Auto | No | None | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
 | `standard:no-leading-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines before the first content line. |
 | `standard:no-leading-comma` | Warning / Auto | No | None | Disallow comma tokens as the first non-whitespace character on a line. |
 | `standard:no-leading-whitespace` | Warning / Auto | Yes | Safe | Disallow any whitespace before the first file content. |
+| `standard:no-leading-wildcard-like` | Warning / Auto | No | None | Disallow `LIKE` patterns that start with `%` or `_`. |
 | `standard:no-redundant-semicolons` | Warning / Auto | Yes | Safe | Disallow repeated semicolons separated only by whitespace. |
 | `standard:no-space-after-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `.`. |
 | `standard:no-space-after-opening-parenthesis` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `(`. |
@@ -114,14 +120,20 @@ The standard rule set uses two safety levels:
 | `standard:no-space-before-semicolon` | Warning / Auto | Yes | Safe | Disallow inline whitespace before `;`. |
 | `standard:no-right-join` | Warning / Auto | No | None | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
 | `standard:no-select-distinct-with-group-by` | Warning / Auto | No | None | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
+| `standard:no-select-star` | Warning / Auto | No | None | Disallow `SELECT *` result columns. |
 | `standard:no-select-trailing-comma` | Warning / Auto | Yes | Unsafe | Disallow trailing commas at the end of `SELECT` clauses. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:no-unnecessary-statement-parentheses` | Warning / Auto | No | None | Disallow redundant parentheses around whole top-level `SELECT` statements. |
+| `standard:no-update-without-where` | Warning / Auto | No | None | Disallow `UPDATE` statements without a top-level `WHERE`. |
 | `standard:operator-line-position` | Warning / Auto | No | None | Require multiline comparison and binary operators to trail the previous line. |
 | `standard:prefer-coalesce` | Warning / Auto | Yes | Unsafe | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
+| `standard:prefer-explicit-column-list-in-insert` | Warning / Auto | No | None | Require explicit target columns in `INSERT` statements. |
+| `standard:prefer-simple-boolean-case` | Warning / Auto | No | None | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
 | `standard:require-order-by-with-limit` | Warning / Auto | No | None | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
+| `standard:require-result-column-alias` | Warning / Auto | No | None | Require aliases for computed `SELECT` result columns. |
 | `standard:select-modifier-line-position` | Warning / Auto | No | None | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
 | `standard:set-operator-line-position` | Warning / Auto | No | None | Require multiline set operators to begin their own line after indentation. |
 | `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
@@ -151,13 +163,14 @@ Useful sqlfluff concepts reflected here:
   `standard:use-is-null`, and `standard:no-right-join`.
 - Convention and ambiguity checks for operator, `CASE`, and set-operation clarity:
   `standard:consistent-not-equal-operator`, `standard:prefer-coalesce`, `standard:no-else-null`,
-  `standard:explicit-union-operator`, `standard:operator-line-position`, and
+  `standard:prefer-simple-boolean-case`, `standard:explicit-union-operator`, `standard:operator-line-position`, and
   `standard:set-operator-line-position`.
 - Ambiguity checks for `SELECT` and `ORDER BY`: `standard:no-select-distinct-with-group-by`,
   `standard:consistent-order-by-direction`, `standard:consistent-column-references`,
   `standard:require-order-by-with-limit`, `standard:explicit-cross-join`, `standard:explicit-inner-join`,
   `standard:no-distinct-parentheses`, `standard:no-select-trailing-comma`,
-  `standard:select-modifier-line-position`, and `standard:clause-keyword-newline`.
+  `standard:select-modifier-line-position`, `standard:clause-keyword-newline`,
+  `standard:no-unnecessary-statement-parentheses`, and `standard:no-from-subquery`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
@@ -1817,6 +1830,99 @@ Fix behavior:
 
 - No automatic fix is provided.
 - Skips comments, string literals, and quoted identifiers.
+
+## `standard:no-unnecessary-statement-parentheses`
+
+Reports redundant parentheses around a whole top-level `SELECT` statement.
+
+This is a conservative source-text subset of SQLFluff CV07. It only reports statement-level shapes such as a SQLDelight
+query body or migration statement written as `(SELECT ...);`; expression parentheses and subquery parentheses are left
+alone.
+
+Invalid:
+
+```sql
+selectPlayers:
+(SELECT id, name
+FROM player);
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
+- Skips compound or ambiguous parenthesized constructs.
+
+## `standard:prefer-simple-boolean-case`
+
+Reports `CASE WHEN predicate THEN TRUE ELSE FALSE END` and the inverse
+`CASE WHEN predicate THEN FALSE ELSE TRUE END`.
+
+These expressions can often be written as the predicate or its negation, but no fix is provided because SQL
+three-valued logic can make an automatic rewrite change `NULL` behavior.
+
+Invalid:
+
+```sql
+selectActive:
+SELECT CASE WHEN score > 10 THEN TRUE ELSE FALSE END AS active
+FROM player;
+```
+
+Valid:
+
+```sql
+selectActive:
+SELECT score > 10 AS active
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Reports only exact single-branch boolean literal cases.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:no-from-subquery`
+
+Reports top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries.
+
+This is a conservative source-text subset of SQLFluff ST05. It encourages moving the subquery to a CTE when the
+subquery is a direct table expression in the top-level `FROM` or `JOIN` list.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT ranked.id
+FROM (SELECT id FROM player) AS ranked;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+WITH ranked AS (
+  SELECT id
+  FROM player
+)
+SELECT ranked.id
+FROM ranked;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, quoted identifiers, and nested subqueries.
+- Skips ambiguous constructs until parser-backed table-expression ranges are exposed.
 
 ## Current Boundaries
 

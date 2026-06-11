@@ -56,6 +56,7 @@ internal val cleanMigrationSqm: String =
 internal fun Rule.diagnostics(
     content: String,
     path: String = PLAYER_SQ_PATH,
+    options: Map<String, String> = emptyMap(),
 ): List<Diagnostic> {
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -67,6 +68,7 @@ internal fun Rule.diagnostics(
                         dialect = SqlDialect(family = DialectFamily.SQLite, displayName = "SQLite"),
                     )
                 override val file: SourceFile = SourceFile(path = path, content = content)
+                override val options: Map<String, String> = options
             },
         reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic },
     )
@@ -77,15 +79,17 @@ internal fun Rule.assertDiagnosticCount(
     content: String,
     expected: Int,
     path: String = PLAYER_SQ_PATH,
+    options: Map<String, String> = emptyMap(),
 ) {
-    assertEquals(expected, diagnostics(content, path).size)
+    assertEquals(expected, diagnostics(content, path, options).size)
 }
 
 internal fun Rule.singleReplacement(
     content: String,
     path: String = PLAYER_SQ_PATH,
+    options: Map<String, String> = emptyMap(),
 ): String =
-    diagnostics(content, path)
+    diagnostics(content, path, options)
         .single()
         .fixes
         .single()
@@ -96,7 +100,8 @@ internal fun Rule.singleReplacement(
 internal fun Rule.applySingleFix(
     content: String,
     path: String = PLAYER_SQ_PATH,
-): String = content.applyEdit(diagnostics(content, path).single().fixes.single().edits.single())
+    options: Map<String, String> = emptyMap(),
+): String = content.applyEdit(diagnostics(content, path, options).single().fixes.single().edits.single())
 
 private fun String.applyEdit(edit: TextEdit): String {
     val startOffset = offsetAt(edit.range.start)

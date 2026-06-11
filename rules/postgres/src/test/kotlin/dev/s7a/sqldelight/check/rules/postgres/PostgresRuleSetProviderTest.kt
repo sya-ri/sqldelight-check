@@ -23,6 +23,15 @@ class PostgresRuleSetProviderTest {
         assertEquals(
             setOf(
                 RuleId("postgres:excessive-locks"),
+                RuleId("postgres:require-concurrent-index"),
+                RuleId("postgres:no-concurrent-index-in-transaction"),
+                RuleId("postgres:require-not-valid-constraint"),
+                RuleId("postgres:no-set-not-null-on-existing-column"),
+                RuleId("postgres:no-add-column-with-volatile-default"),
+                RuleId("postgres:prefer-identity-over-serial"),
+                RuleId("postgres:no-drop-column"),
+                RuleId("postgres:no-rename-column"),
+                RuleId("postgres:no-rename-table"),
                 RuleId("postgres:reindex-concurrently"),
                 RuleId("postgres:risky-alter-table"),
             ),

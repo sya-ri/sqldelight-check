@@ -2,6 +2,7 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class MaxLineLengthRuleTest {
@@ -83,5 +84,46 @@ class MaxLineLengthRuleTest {
             """.asSqlDelightFile()
 
         MaxLineLengthRule().assertDiagnosticCount(content, 2)
+    }
+
+    @Test
+    fun `uses configured max length`() {
+        val diagnostics =
+            MaxLineLengthRule().diagnostics(
+                """
+                selectShort:
+                SELECT id, name FROM player;
+                """.asSqlDelightFile(),
+                options = mapOf("max" to "20"),
+            )
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(21, diagnostics.single().range?.start?.column)
+        assertEquals("Line is longer than 20 characters.", diagnostics.single().message)
+    }
+
+    @Test
+    fun `can ignore comment lines`() {
+        val content =
+            """
+            -- This comment is intentionally long enough to exceed a small configured line limit.
+            selectShort:
+            SELECT id, name, score, created_at, updated_at FROM player;
+            """.asSqlDelightFile()
+
+        MaxLineLengthRule().assertDiagnosticCount(content, 1, options = mapOf("max" to "40", "ignoreComments" to "true"))
+    }
+
+    @Test
+    fun `rejects invalid max length option`() {
+        assertFailsWith<IllegalArgumentException> {
+            MaxLineLengthRule().diagnostics(
+                """
+                selectShort:
+                SELECT id FROM player;
+                """.asSqlDelightFile(),
+                options = mapOf("max" to "zero"),
+            )
+        }
     }
 }

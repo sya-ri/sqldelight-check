@@ -24,6 +24,10 @@ class SQLiteRuleSetProviderTest {
             setOf(
                 RuleId("sqlite:consistent-conflict-resolution"),
                 RuleId("sqlite:foreign-keys-restored"),
+                RuleId("sqlite:prefer-integer-primary-key"),
+                RuleId("sqlite:no-autoincrement-without-need"),
+                RuleId("sqlite:no-alter-table-complex-change"),
+                RuleId("sqlite:prefer-without-rowid-for-composite-pk"),
             ),
             ruleIds,
         )

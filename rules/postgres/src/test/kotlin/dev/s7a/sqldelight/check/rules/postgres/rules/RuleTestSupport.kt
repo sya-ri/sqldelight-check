@@ -14,6 +14,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 internal fun Rule.diagnostics(
     content: String,
     capabilities: Set<DialectCapability> = setOf(DialectCapabilities.PostgreSql),
+    options: Map<String, String> = emptyMap(),
 ): List<Diagnostic> {
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -34,7 +35,7 @@ internal fun Rule.diagnostics(
                         path = "src/main/sqldelight/com/example/1.sqm",
                         content = content.trimIndent() + "\n",
                     )
-                override val options: Map<String, String> = emptyMap()
+                override val options: Map<String, String> = options
             },
         reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic },
     )

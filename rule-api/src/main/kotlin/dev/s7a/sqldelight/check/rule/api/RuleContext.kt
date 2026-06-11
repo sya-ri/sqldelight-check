@@ -19,4 +19,9 @@ public interface RuleContext {
      * File being analyzed.
      */
     public val file: SourceFile
+
+    /**
+     * Resolved string options for the rule currently being executed.
+     */
+    public val options: Map<String, String>
 }

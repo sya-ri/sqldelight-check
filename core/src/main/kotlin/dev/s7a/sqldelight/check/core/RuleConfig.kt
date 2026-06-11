@@ -20,4 +20,8 @@ public data class RuleConfig(
      * Configured rule severity.
      */
     public val severity: Severity,
+    /**
+     * Rule-specific string options.
+     */
+    public val options: Map<String, String> = emptyMap(),
 )

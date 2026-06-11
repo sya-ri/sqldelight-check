@@ -23,19 +23,25 @@ public class MaxLineLengthRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val maxLineLength = context.options.positiveIntOption("max", DEFAULT_MAX_LINE_LENGTH)
+        val ignoreComments = context.options.booleanOption("ignoreComments", false)
         content
             .linesWithRanges()
-            .filter { line -> line.text.isNotBlank() && line.text.length > DEFAULT_MAX_LINE_LENGTH }
+            .filter { line ->
+                line.text.isNotBlank() &&
+                    line.text.length > maxLineLength &&
+                    !(ignoreComments && line.text.isCommentLine())
+            }
             .forEach { line ->
                 reporter.report(
                     Diagnostic(
                         ruleId = id,
                         severity = defaultSeverity,
-                        message = "Line is longer than $DEFAULT_MAX_LINE_LENGTH characters.",
+                        message = "Line is longer than $maxLineLength characters.",
                         file = context.file,
                         range =
                             content.rangeAtOffsets(
-                                line.startOffset + DEFAULT_MAX_LINE_LENGTH,
+                                line.startOffset + maxLineLength,
                                 line.endOffset,
                             ),
                         database = context.database,
@@ -43,4 +49,9 @@ public class MaxLineLengthRule : Rule {
                 )
             }
     }
+}
+
+private fun String.isCommentLine(): Boolean {
+    val trimmed = trimStart()
+    return trimmed.startsWith("--") || trimmed.startsWith("/*") || trimmed.startsWith("*")
 }

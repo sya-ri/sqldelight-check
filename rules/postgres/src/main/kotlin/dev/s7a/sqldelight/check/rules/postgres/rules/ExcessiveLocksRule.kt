@@ -1,7 +1,6 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
-import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -47,9 +46,6 @@ public class ExcessiveLocksRule : Rule {
         }
     }
 }
-
-private fun RuleContext.isPostgreSql(): Boolean =
-    DialectCapabilities.PostgreSql in database.dialect.capabilities
 
 private fun List<SqlToken>.createIndexToken(createIndex: Int): SqlToken? {
     val first = getOrNull(createIndex + 1) ?: return null

@@ -17,6 +17,7 @@ public final class dev/s7a/sqldelight/check/rule/api/Rule$DefaultImpls {
 public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleContext {
 	public abstract fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
 	public abstract fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
+	public abstract fun getOptions ()Ljava/util/Map;
 }
 
 public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleProvider {

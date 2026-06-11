@@ -1,0 +1,87 @@
+package dev.s7a.sqldelight.check.rules.standard.rules
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class NoUnnecessaryStatementParenthesesRuleTest {
+    @Test
+    fun `reports parenthesized top level select statements`() {
+        val diagnostics =
+            NoUnnecessaryStatementParenthesesRule().diagnostics(
+                """
+                selectPlayers:
+                (SELECT id, name
+                FROM player);
+                """.asSqlDelightFile(),
+            )
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(0, diagnostics.single().fixes.size)
+    }
+
+    @Test
+    fun `reports parenthesized select statements in migration files`() {
+        NoUnnecessaryStatementParenthesesRule().assertDiagnosticCount(
+            """
+            (SELECT id
+            FROM player);
+            """.asSqlDelightFile(),
+            1,
+            path = MIGRATION_SQM_PATH,
+        )
+    }
+
+    @Test
+    fun `accepts unparenthesized top level select statements`() {
+        NoUnnecessaryStatementParenthesesRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT id, name
+            FROM player;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
+    fun `ignores expression and subquery parentheses`() {
+        NoUnnecessaryStatementParenthesesRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT (score + 1) AS next_score
+            FROM (SELECT id, score FROM player) AS ranked
+            WHERE id IN (SELECT id FROM player);
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
+    fun `ignores compound or ambiguous parenthesized statements`() {
+        NoUnnecessaryStatementParenthesesRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            (SELECT id FROM player)
+            UNION ALL
+            SELECT id FROM player_archive;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
+    fun `ignores comments strings and quoted identifiers`() {
+        NoUnnecessaryStatementParenthesesRule().assertDiagnosticCount(
+            """
+            selectLiteral:
+            -- (SELECT id FROM player);
+            SELECT '(SELECT id FROM player);',
+              "(SELECT id FROM player);",
+              `(SELECT id FROM player);`,
+              [(SELECT id FROM player);]
+            FROM player;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+}

@@ -22,7 +22,13 @@ class MySqlRuleSetProviderTest {
         assertEquals(DialectCapabilities.MySql, provider.targetCapability)
         assertEquals(
             setOf(
+                RuleId("mysql:no-utf8-charset"),
+                RuleId("mysql:no-copy-algorithm"),
+                RuleId("mysql:no-exclusive-lock"),
                 RuleId("mysql:no-replace-into"),
+                RuleId("mysql:no-zero-date-default"),
+                RuleId("mysql:no-display-width-integer"),
+                RuleId("mysql:require-index-prefix-length"),
                 RuleId("mysql:risky-alter-table"),
             ),
             ruleIds,

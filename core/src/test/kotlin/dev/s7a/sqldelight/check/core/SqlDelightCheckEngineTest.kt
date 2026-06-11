@@ -94,6 +94,54 @@ class SqlDelightCheckEngineTest {
         assertEquals(1, diagnostics.size)
     }
 
+    @Test
+    fun `resolved rule options are exposed to rule context`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput()),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(
+                            testRule(
+                                message = { context -> context.options.getValue("max") + ":" + context.options.getValue("mode") },
+                            ),
+                        ),
+                    ),
+                config =
+                    CheckConfig(
+                        rules =
+                            mapOf(
+                                ruleId to
+                                    RuleConfig(
+                                        ruleId,
+                                        Enablement.Enabled,
+                                        Severity.Warning,
+                                        options = mapOf("max" to "8", "mode" to "global"),
+                                    ),
+                            ),
+                        databases =
+                            mapOf(
+                                "Database" to
+                                    DatabaseConfig(
+                                        name = "Database",
+                                        rules =
+                                            mapOf(
+                                                ruleId to
+                                                    RuleConfig(
+                                                        ruleId,
+                                                        Enablement.Auto,
+                                                        Severity.Warning,
+                                                        options = mapOf("max" to "12"),
+                                                    ),
+                                            ),
+                                    ),
+                            ),
+                    ),
+            )
+
+        assertEquals("12:global", diagnostics.single().message)
+    }
+
     private fun testRuleSet(rule: Rule = testRule()): RuleSetProvider =
         object : RuleSetProvider {
             override val id: RuleSetId = ruleSetId
@@ -103,6 +151,7 @@ class SqlDelightCheckEngineTest {
 
     private fun testRule(
         isApplicable: (RuleContext) -> Boolean = { true },
+        message: (RuleContext) -> String = { "test diagnostic" },
     ): Rule =
         object : Rule {
             override val id: RuleId = ruleId
@@ -119,7 +168,7 @@ class SqlDelightCheckEngineTest {
                     Diagnostic(
                         ruleId = id,
                         severity = defaultSeverity,
-                        message = "test diagnostic",
+                        message = message(context),
                         file = context.file,
                         range = null,
                         database = context.database,

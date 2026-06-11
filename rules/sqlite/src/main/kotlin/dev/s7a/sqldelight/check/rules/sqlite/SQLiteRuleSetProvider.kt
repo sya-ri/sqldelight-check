@@ -7,6 +7,10 @@ import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rules.sqlite.rules.ConsistentConflictResolutionRule
 import dev.s7a.sqldelight.check.rules.sqlite.rules.ForeignKeysRestoredRule
+import dev.s7a.sqldelight.check.rules.sqlite.rules.NoAlterTableComplexChangeRule
+import dev.s7a.sqldelight.check.rules.sqlite.rules.NoAutoincrementWithoutNeedRule
+import dev.s7a.sqldelight.check.rules.sqlite.rules.PreferIntegerPrimaryKeyRule
+import dev.s7a.sqldelight.check.rules.sqlite.rules.PreferWithoutRowidForCompositePkRule
 
 /**
  * Provides rules for SQLite dialect projects.
@@ -25,5 +29,9 @@ public class SQLiteRuleSetProvider : RuleSetProvider {
         setOf(
             RuleProvider(::ConsistentConflictResolutionRule),
             RuleProvider(::ForeignKeysRestoredRule),
+            RuleProvider(::PreferIntegerPrimaryKeyRule),
+            RuleProvider(::NoAutoincrementWithoutNeedRule),
+            RuleProvider(::NoAlterTableComplexChangeRule),
+            RuleProvider(::PreferWithoutRowidForCompositePkRule),
         )
 }

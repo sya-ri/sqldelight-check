@@ -174,6 +174,35 @@ internal fun String.sqlParenthesisDepthAt(offset: Int): Int {
     return depth
 }
 
+internal fun String.previousSqlCharacterBefore(offset: Int): SqlCharacter? =
+    sqlCharacters()
+        .takeWhile { character -> character.offset < offset }
+        .filterNot { character -> character.value.isWhitespace() }
+        .lastOrNull()
+
+internal fun String.nextSqlCharacterAfter(offset: Int): SqlCharacter? =
+    sqlCharacters()
+        .dropWhile { character -> character.offset < offset }
+        .firstOrNull { character -> !character.value.isWhitespace() }
+
+internal fun String.matchingClosingParenthesisOffset(openOffset: Int): Int? {
+    if (getOrNull(openOffset) != '(') return null
+
+    var depth = 0
+    sqlCharacters()
+        .dropWhile { character -> character.offset < openOffset }
+        .forEach { character ->
+            when (character.value) {
+                '(' -> depth++
+                ')' -> {
+                    depth--
+                    if (depth == 0) return character.offset
+                }
+            }
+        }
+    return null
+}
+
 internal fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
 
 internal fun List<SqlToken>.containsKeywordPair(

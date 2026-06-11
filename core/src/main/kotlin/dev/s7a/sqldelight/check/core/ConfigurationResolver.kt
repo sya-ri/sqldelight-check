@@ -42,6 +42,9 @@ public class ConfigurationResolver(
             ruleId = ruleId,
             enablement = database?.enablement ?: global?.enablement ?: defaultEnablement,
             severity = database?.severity ?: global?.severity ?: defaultSeverity,
+            options = global.optionsOrEmpty() + database.optionsOrEmpty(),
         )
     }
+
+    private fun RuleConfig?.optionsOrEmpty(): Map<String, String> = this?.options ?: emptyMap()
 }

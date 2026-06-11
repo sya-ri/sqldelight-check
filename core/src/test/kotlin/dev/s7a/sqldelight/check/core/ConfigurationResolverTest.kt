@@ -42,6 +42,47 @@ class ConfigurationResolverTest {
     }
 
     @Test
+    fun `database rule options override and extend global rule options`() {
+        val ruleId = RuleId("standard:max-joins")
+        val resolver =
+            ConfigurationResolver(
+                CheckConfig(
+                    rules =
+                        mapOf(
+                            ruleId to
+                                RuleConfig(
+                                    ruleId,
+                                    Enablement.Auto,
+                                    Severity.Warning,
+                                    options = mapOf("max" to "8", "mode" to "global"),
+                                ),
+                        ),
+                    databases =
+                        mapOf(
+                            "MainDb" to
+                                DatabaseConfig(
+                                    name = "MainDb",
+                                    rules =
+                                        mapOf(
+                                            ruleId to
+                                                RuleConfig(
+                                                    ruleId,
+                                                    Enablement.Auto,
+                                                    Severity.Warning,
+                                                    options = mapOf("max" to "12"),
+                                                ),
+                                        ),
+                                ),
+                        ),
+                ),
+            )
+
+        val resolved = resolver.resolveRule(ruleId, "MainDb")
+
+        assertEquals(mapOf("max" to "12", "mode" to "global"), resolved.options)
+    }
+
+    @Test
     fun `rule enablement overrides disabled rule set`() {
         val result =
             EnablementResolver.resolveRuleEnablement(
@@ -92,4 +133,3 @@ class ConfigurationResolverTest {
         assertEquals(Enablement.Enabled, resolved.enablement)
     }
 }
-

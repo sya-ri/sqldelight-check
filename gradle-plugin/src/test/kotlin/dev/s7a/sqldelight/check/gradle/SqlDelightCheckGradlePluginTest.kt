@@ -388,7 +388,7 @@ class SqlDelightCheckGradlePluginTest {
             );
 
             selectById:
-            SELECT *
+            SELECT id
             FROM player
             WHERE id=?;
             """.trimIndent() + "\n"
@@ -425,7 +425,7 @@ class SqlDelightCheckGradlePluginTest {
             );
 
             selectById:
-            SELECT *
+            SELECT id
             FROM player
             WHERE id=?;
             """.trimIndent() + "\n",
@@ -441,7 +441,7 @@ class SqlDelightCheckGradlePluginTest {
             );
 
             selectById:
-            SELECT *
+            SELECT id
             FROM player
             WHERE id = ?;
             """.trimIndent() + "\n",

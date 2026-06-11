@@ -50,11 +50,6 @@ public class SqlDelightCheckEngine {
         rules: List<RuleCandidate>,
         resolver: ConfigurationResolver,
     ): List<Diagnostic> {
-        val context =
-            object : RuleContext {
-                override val database: DatabaseContext = database
-                override val file: SourceFile = file
-            }
         return rules.flatMap { candidate ->
             val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
             val ruleConfig =
@@ -64,6 +59,12 @@ public class SqlDelightCheckEngine {
                     defaultEnablement = candidate.rule.defaultEnablement,
                     defaultSeverity = candidate.rule.defaultSeverity,
                 )
+            val context =
+                object : RuleContext {
+                    override val database: DatabaseContext = database
+                    override val file: SourceFile = file
+                    override val options: Map<String, String> = ruleConfig.options
+                }
             val enablement = EnablementResolver.resolveRuleEnablement(ruleSetConfig.enablement, ruleConfig.enablement)
             if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
 

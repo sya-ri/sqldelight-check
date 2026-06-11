@@ -36,5 +36,11 @@ private fun Iterable<RuleSetExtension>.toRuleSetConfigs(): Map<RuleSetId, RuleSe
 private fun Iterable<RuleExtension>.toRuleConfigs(): Map<RuleId, RuleConfig> =
     associate { rule ->
         val id = RuleId(rule.name)
-        id to RuleConfig(id = id, enablement = rule.enabled.get(), severity = rule.severity.get())
+        id to
+            RuleConfig(
+                id = id,
+                enablement = rule.enabled.get(),
+                severity = rule.severity.get(),
+                options = rule.options.get(),
+            )
     }
