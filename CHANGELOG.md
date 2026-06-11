@@ -29,7 +29,7 @@ This version establishes the first Gradle plugin and API surface for checking SQ
   `sqldelightCheckDialects`.
 - Added Qodana configuration and Gradle TestKit coverage for the plugin.
 
-### Notes
+### Release Notes
 
 sqldelight-check is pre-1.0. API names and report schemas may change while the first real-world usage is incorporated.
 There is no standalone CLI in this release.
