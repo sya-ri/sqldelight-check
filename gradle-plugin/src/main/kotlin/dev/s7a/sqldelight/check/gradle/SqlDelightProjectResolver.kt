@@ -19,6 +19,9 @@ import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.provider.Property
 
+private const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
+private const val DIALECT_SUFFIX = "-dialect"
+
 /**
  * SQLDelight database input resolved from a Gradle project.
  */

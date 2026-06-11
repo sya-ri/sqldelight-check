@@ -4,7 +4,10 @@ import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.core.DialectRegistry
 import dev.s7a.sqldelight.check.core.ReporterRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
+import java.net.URL
 import java.net.URLClassLoader
+import java.util.Collections
+import java.util.Enumeration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -44,13 +47,13 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
     }
 
     /**
-     * Registers the dependency bucket for external dialect providers.
+     * Registers the dependency bucket for external dialects.
      */
     private fun Project.createDialectConfiguration() {
         configurations.create("sqldelightCheckDialect") { configuration ->
             configuration.isCanBeConsumed = false
             configuration.isCanBeResolved = true
-            configuration.description = "External sqldelight-check dialect provider artifacts."
+            configuration.description = "External sqldelight-check dialect artifacts."
         }
     }
 
@@ -134,10 +137,7 @@ internal fun Project.sqldelightCheckRuleRegistry(): RuleRegistry =
  * Returns the dialect registry attached to this project.
  */
 internal fun Project.sqldelightCheckDialectRegistry(): DialectRegistry =
-    DialectRegistry.create(
-        DialectRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckDialect")).providers() +
-            BuiltInSqlDialectProvider(),
-    )
+    DialectRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckDialect"))
 
 private fun Project.sqldelightCheckProviderClassLoader(configurationName: String): ClassLoader {
     val urls =
@@ -146,5 +146,18 @@ private fun Project.sqldelightCheckProviderClassLoader(configurationName: String
             .files
             .map { file -> file.toURI().toURL() }
             .toTypedArray()
-    return URLClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
+    return ProviderClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
+}
+
+private class ProviderClassLoader(
+    urls: Array<URL>,
+    parent: ClassLoader,
+) : URLClassLoader(urls, parent) {
+    override fun getResource(name: String): URL? = findResource(name) ?: parent.getResource(name)
+
+    override fun getResources(name: String): Enumeration<URL> {
+        val localResources = findResources(name).iterator().asSequence().toList()
+        val parentResources = parent.getResources(name).iterator().asSequence().toList()
+        return Collections.enumeration(localResources + parentResources)
+    }
 }

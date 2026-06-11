@@ -246,14 +246,15 @@ sqldelightCheck {
 Invalid edits and overlapping edits are skipped. When a fix task changes files, sqldelight-check runs rules again and
 writes reports for the remaining diagnostics.
 
-## Custom Providers
+## Custom Extensions
 
-External rule sets and reporters are loaded through Gradle configurations:
+Add custom rule set, reporter, and dialect artifacts through Gradle configurations:
 
 ```kotlin
 dependencies {
     sqldelightCheckRuleSet("com.example:my-sqldelight-rules:1.0.0")
     sqldelightCheckReporter("com.example:my-sqldelight-reporter:1.0.0")
+    sqldelightCheckDialect("com.example:my-sqldelight-dialect:1.0.0")
 }
 ```
 
@@ -261,6 +262,7 @@ Authoring guides:
 
 - [Rule Set Author Guide](docs/rule-set-authors.md)
 - [Reporter Author Guide](docs/reporter-authors.md)
+- [Dialect Author Guide](docs/dialect-authors.md)
 - [Branch Protection](docs/branch-protection.md)
 
 ## SQLDelight And Dialects

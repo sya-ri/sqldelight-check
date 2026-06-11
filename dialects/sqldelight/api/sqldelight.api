@@ -1,0 +1,5 @@
+public final class dev/s7a/sqldelight/check/dialects/sqldelight/SqlDelightDialectProvider : dev/s7a/sqldelight/check/api/SqlDialectProvider {
+	public fun <init> ()V
+	public fun resolve (Ldev/s7a/sqldelight/check/api/SqlDialectCoordinate;)Ldev/s7a/sqldelight/check/api/SqlDialect;
+}
+

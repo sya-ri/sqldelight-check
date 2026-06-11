@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":api"))
     implementation(project(":core"))
     implementation(project(":rules:standard"))
+    implementation(project(":dialects:sqldelight"))
     implementation(project(":reporters:json"))
     implementation(project(":reporters:sarif"))
     implementation(project(":reporters:text"))

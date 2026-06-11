@@ -1,18 +1,21 @@
-package dev.s7a.sqldelight.check.gradle
+package dev.s7a.sqldelight.check.dialects.sqldelight
 
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
+import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import java.util.ServiceLoader
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 /**
  * Tests for SQLDelight built-in dialect resolution.
  */
-class BuiltInSqlDialectProviderTest {
+class SqlDelightDialectProviderTest {
     @Test
     fun `maps official sqldelight dialect artifacts`() {
         assertEquals(
@@ -21,7 +24,7 @@ class BuiltInSqlDialectProviderTest {
                 capabilities = setOf(DialectCapabilities.SQLite),
                 sourceKeywords = SqlDialectSourceKeywords.SQLite,
             ),
-            BuiltInSqlDialectProvider().resolve(
+            SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
                     group = "app.cash.sqldelight",
                     module = "sqlite-3-38-dialect",
@@ -35,7 +38,7 @@ class BuiltInSqlDialectProviderTest {
                 capabilities = setOf(DialectCapabilities.MySql),
                 sourceKeywords = SqlDialectSourceKeywords.MySql,
             ),
-            BuiltInSqlDialectProvider().resolve(
+            SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
                     group = "app.cash.sqldelight",
                     module = "mysql-dialect",
@@ -49,7 +52,7 @@ class BuiltInSqlDialectProviderTest {
                 capabilities = setOf(DialectCapabilities.PostgreSql),
                 sourceKeywords = SqlDialectSourceKeywords.PostgreSql,
             ),
-            BuiltInSqlDialectProvider().resolve(
+            SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
                     group = "app.cash.sqldelight",
                     module = "postgresql-dialect",
@@ -63,7 +66,7 @@ class BuiltInSqlDialectProviderTest {
                 capabilities = setOf(DialectCapabilities.Hsql),
                 sourceKeywords = SqlDialectSourceKeywords.Hsql,
             ),
-            BuiltInSqlDialectProvider().resolve(
+            SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
                     group = "app.cash.sqldelight",
                     module = "hsql-dialect",
@@ -76,7 +79,7 @@ class BuiltInSqlDialectProviderTest {
     @Test
     fun `ignores third party artifacts`() {
         assertNull(
-            BuiltInSqlDialectProvider().resolve(
+            SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
                     group = "com.example",
                     module = "spanner-dialect",
@@ -84,5 +87,12 @@ class BuiltInSqlDialectProviderTest {
                 ),
             ),
         )
+    }
+
+    @Test
+    fun `sqldelight dialect provider is visible to service loader`() {
+        val providers = ServiceLoader.load(SqlDialectProvider::class.java).toList()
+
+        assertNotNull(providers.firstOrNull { provider -> provider is SqlDelightDialectProvider })
     }
 }

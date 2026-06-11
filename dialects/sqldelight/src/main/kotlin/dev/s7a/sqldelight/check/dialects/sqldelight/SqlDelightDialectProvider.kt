@@ -1,4 +1,4 @@
-package dev.s7a.sqldelight.check.gradle
+package dev.s7a.sqldelight.check.dialects.sqldelight
 
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectFamily
@@ -7,13 +7,13 @@ import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
 
-internal const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
-internal const val DIALECT_SUFFIX = "-dialect"
+private const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
+private const val DIALECT_SUFFIX = "-dialect"
 
 /**
  * Resolves SQLDelight's built-in dialect artifacts.
  */
-internal class BuiltInSqlDialectProvider : SqlDialectProvider {
+public class SqlDelightDialectProvider : SqlDialectProvider {
     override fun resolve(coordinate: SqlDialectCoordinate): SqlDialect? {
         if (coordinate.group != SQLDELIGHT_GROUP) return null
         return when (coordinate.module) {

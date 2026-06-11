@@ -3,8 +3,8 @@ package dev.s7a.sqldelight.check.api
 /**
  * Resolves rule-relevant dialect metadata for a SQLDelight dialect artifact.
  *
- * Implementations can be published on the sqldelight-check dialect provider
- * classpath and discovered with Java `ServiceLoader`.
+ * Implementations can be published on the sqldelight-check dialect classpath
+ * and discovered with Java `ServiceLoader`.
  */
 public fun interface SqlDialectProvider {
     /**

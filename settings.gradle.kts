@@ -24,6 +24,7 @@ include(
     ":rules:mysql",
     ":rules:sqlite",
     ":rules:hsql",
+    ":dialects:sqldelight",
     ":reporters:json",
     ":reporters:sarif",
     ":reporters:text",
