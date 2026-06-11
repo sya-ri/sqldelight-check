@@ -1,15 +1,30 @@
 package dev.s7a.sqldelight.check.api
 
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.BooleanOperator
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CoalesceAlternativeFunction
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnConstraintStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CommonFunctionName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ExpressionContinuation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.GroupByBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinConditionBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinModifier
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarget
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.MajorClauseStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OrderByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ParenthesizedExpressionContinuation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IndexUnfriendlyFunction
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SelectListStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SetOperator
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableConstraintStart
 
 /**
  * Dialect-specific source patterns used by conservative source-text scanners.
@@ -72,6 +87,13 @@ public class SqlDialectSourcePatterns(
                             roles = arrayOf(StatementStart, SqlDelightStatementStart),
                         ) +
                         sourcePatterns(
+                            "DELETE",
+                            "INSERT",
+                            "SELECT",
+                            "UPDATE",
+                            roles = arrayOf(SqlDelightExecutableStatementStart),
+                        ) +
+                        sourcePatterns(
                             "DROP",
                             roles = arrayOf(StatementStart, SqlDelightStatementStart),
                         ) +
@@ -114,6 +136,7 @@ public class SqlDialectSourcePatterns(
                             "JOIN",
                             "LEFT",
                             "LIMIT",
+                            "NATURAL",
                             "OFFSET",
                             "ON",
                             "ORDER",
@@ -129,6 +152,7 @@ public class SqlDialectSourcePatterns(
                             "INNER",
                             "JOIN",
                             "LEFT",
+                            "NATURAL",
                             "OUTER",
                             "RIGHT",
                             roles = arrayOf(JoinModifier),
@@ -164,6 +188,221 @@ public class SqlDialectSourcePatterns(
                             "WHERE",
                             "WINDOW",
                             roles = arrayOf(ClauseBoundary),
+                        ) +
+                        sourcePatterns(
+                            "WHERE",
+                            "HAVING",
+                            "ON",
+                            roles = arrayOf(PredicateStart),
+                        ) +
+                        sourcePatterns(
+                            "FROM",
+                            "GROUP BY",
+                            "HAVING",
+                            "LIMIT",
+                            "OFFSET",
+                            "ORDER BY",
+                            "WHERE",
+                            roles = arrayOf(MajorClauseStart),
+                        ) +
+                        sourcePatterns(
+                            "EXCEPT",
+                            "FETCH",
+                            "GROUP",
+                            "GROUP BY",
+                            "HAVING",
+                            "INTERSECT",
+                            "LIMIT",
+                            "OFFSET",
+                            "ORDER",
+                            "ORDER BY",
+                            "UNION",
+                            "WHERE",
+                            "WINDOW",
+                            roles = arrayOf(PredicateBoundary),
+                        ) +
+                        sourcePatterns(
+                            "CROSS JOIN",
+                            "EXCEPT",
+                            "FETCH",
+                            "FULL [OUTER] JOIN",
+                            "GROUP",
+                            "GROUP BY",
+                            "HAVING",
+                            "INNER JOIN",
+                            "INTERSECT",
+                            "JOIN",
+                            "LEFT [OUTER] JOIN",
+                            "LIMIT",
+                            "NATURAL JOIN",
+                            "NATURAL LEFT [OUTER] JOIN",
+                            "OFFSET",
+                            "ORDER",
+                            "ORDER BY",
+                            "RIGHT [OUTER] JOIN",
+                            "UNION",
+                            "WHERE",
+                            "WINDOW",
+                            roles = arrayOf(JoinConditionBoundary),
+                        ) +
+                        sourcePatterns(
+                            "AND",
+                            "OR",
+                            roles = arrayOf(BooleanOperator),
+                        ) +
+                        sourcePatterns(
+                            "EXCEPT",
+                            "INTERSECT",
+                            "UNION",
+                            roles = arrayOf(SetOperator),
+                        ) +
+                        sourcePatterns(
+                            "CHECK",
+                            "COLLATE",
+                            "CONSTRAINT",
+                            "DEFAULT",
+                            "GENERATED",
+                            "NOT NULL",
+                            "NULL",
+                            "PRIMARY KEY",
+                            "REFERENCES",
+                            "UNIQUE",
+                            roles = arrayOf(ColumnConstraintStart),
+                        ) +
+                        sourcePatterns(
+                            "CHECK",
+                            "CONSTRAINT",
+                            "FOREIGN KEY",
+                            "PRIMARY KEY",
+                            "UNIQUE",
+                            roles = arrayOf(TableConstraintStart),
+                        ) +
+                        sourcePatterns(
+                            "EXCEPT",
+                            "HAVING",
+                            "INTERSECT",
+                            "LIMIT",
+                            "OFFSET",
+                            "ORDER",
+                            "ORDER BY",
+                            "UNION",
+                            "WHERE",
+                            "WINDOW",
+                            roles = arrayOf(GroupByBoundary),
+                        ) +
+                        sourcePatterns(
+                            "EXCEPT",
+                            "FETCH",
+                            "INTERSECT",
+                            "LIMIT",
+                            "OFFSET",
+                            "UNION",
+                            "WHERE",
+                            roles = arrayOf(OrderByBoundary),
+                        ) +
+                        sourcePatterns(
+                            "ADD",
+                            "ALTER",
+                            "AND",
+                            "AS",
+                            "ASC",
+                            "BETWEEN",
+                            "BY",
+                            "CASE",
+                            "CHECK",
+                            "COLUMN",
+                            "CONSTRAINT",
+                            "CREATE",
+                            "DEFAULT",
+                            "DELETE",
+                            "DESC",
+                            "DISTINCT",
+                            "DROP",
+                            "ELSE",
+                            "END",
+                            "EXISTS",
+                            "FOREIGN",
+                            "FROM",
+                            "GROUP",
+                            "HAVING",
+                            "IN",
+                            "INDEX",
+                            "INNER",
+                            "INSERT",
+                            "INTO",
+                            "IS",
+                            "JOIN",
+                            "KEY",
+                            "LEFT",
+                            "LIKE",
+                            "LIMIT",
+                            "NOT",
+                            "ON",
+                            "OR",
+                            "ORDER",
+                            "OUTER",
+                            "PRIMARY",
+                            "REFERENCES",
+                            "RIGHT",
+                            "SELECT",
+                            "SET",
+                            "TABLE",
+                            "THEN",
+                            "UNION",
+                            "UNIQUE",
+                            "UPDATE",
+                            "VALUES",
+                            "WHEN",
+                            "WHERE",
+                            roles = arrayOf(KeywordCaseTarget),
+                        ) +
+                        sourcePatterns(
+                            "ABS",
+                            "AVG",
+                            "COALESCE",
+                            "COUNT",
+                            "DATE",
+                            "DATETIME",
+                            "GROUP_CONCAT",
+                            "HEX",
+                            "IFNULL",
+                            "INSTR",
+                            "JSON_EXTRACT",
+                            "LENGTH",
+                            "LOWER",
+                            "LTRIM",
+                            "MAX",
+                            "MIN",
+                            "NULLIF",
+                            "RANDOM",
+                            "REPLACE",
+                            "ROUND",
+                            "RTRIM",
+                            "STRFTIME",
+                            "SUBSTR",
+                            "SUBSTRING",
+                            "SUM",
+                            "TIME",
+                            "TRIM",
+                            "TYPEOF",
+                            "UPPER",
+                            roles = arrayOf(CommonFunctionName),
+                        ) +
+                        sourcePatterns(
+                            "IFNULL",
+                            "NVL",
+                            roles = arrayOf(CoalesceAlternativeFunction),
+                        ) +
+                        sourcePatterns(
+                            "COALESCE",
+                            "DATE",
+                            "IFNULL",
+                            "LOWER",
+                            "SUBSTR",
+                            "SUBSTRING",
+                            "TRIM",
+                            "UPPER",
+                            roles = arrayOf(IndexUnfriendlyFunction),
                         ) +
                         sourcePatterns(
                             "SELECT",

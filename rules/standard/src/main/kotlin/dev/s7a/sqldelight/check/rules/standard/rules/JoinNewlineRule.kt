@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,14 +28,16 @@ public class JoinNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("join")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             if (depth != 0) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val statementStart = tokens.statementStartOffsetBefore(index, content) ?: return@forEachIndexed
+            val statementStart =
+                tokens.statementStartOffsetBefore(index, content, context.database.dialect.sourcePatterns)
+                    ?: return@forEachIndexed
             if (!content.substring(statementStart, statementEnd).contains('\n')) return@forEachIndexed
 
-            val clauseStart = tokens.joinClauseStartOffset(index, depth, content)
+            val clauseStart = tokens.joinClauseStartOffset(index, depth, content, context.database.dialect.sourcePatterns)
             val line = lines.lineContaining(clauseStart) ?: return@forEachIndexed
             if (line.firstNonWhitespaceOffset == clauseStart) return@forEachIndexed
 
@@ -53,11 +58,12 @@ private fun List<SqlToken>.joinClauseStartOffset(
     joinIndex: Int,
     depth: Int,
     content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int {
     val previous = getOrNull(joinIndex - 1)
     return if (
         previous != null &&
-        previous.normalizedText in joinModifiers &&
+        previous.matches(sourcePatterns, SqlDialectSourcePatternRole.JoinModifier) &&
         content.sqlParenthesisDepthAt(previous.startOffset) == depth &&
         content.onlyInlineWhitespaceBetween(previous.endOffset, this[joinIndex].startOffset)
     ) {
@@ -70,10 +76,11 @@ private fun List<SqlToken>.joinClauseStartOffset(
 private fun List<SqlToken>.statementStartOffsetBefore(
     tokenIndex: Int,
     content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int? =
     asSequence()
         .take(tokenIndex + 1)
-        .filter { token -> token.normalizedText in topLevelStatementStartKeywords }
+        .filter { token -> token.matches(sourcePatterns, SqlDialectSourcePatternRole.SqlDelightStatementStart) }
         .lastOrNull { token -> content.sqlParenthesisDepthAt(token.startOffset) == 0 }
         ?.startOffset
 
@@ -82,7 +89,3 @@ private fun String.onlyInlineWhitespaceBetween(
     endOffset: Int,
 ): Boolean =
     substring(startOffset, endOffset).all { character -> character == ' ' || character == '\t' }
-
-private val joinModifiers = setOf("cross", "full", "inner", "join", "left", "right")
-
-private val topLevelStatementStartKeywords = setOf("delete", "insert", "select", "update", "with")

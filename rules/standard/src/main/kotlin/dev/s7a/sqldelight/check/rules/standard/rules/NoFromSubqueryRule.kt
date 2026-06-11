@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,7 +25,7 @@ public class NoFromSubqueryRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEach { token ->
-            if (!token.isKeyword("from") && !token.isKeyword("join")) return@forEach
+            if (!token.isTerm(SqlDialectSourceTerm.From) && !token.isTerm(SqlDialectSourceTerm.Join)) return@forEach
             if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEach
 
             val open = content.nextSqlCharacterAfter(token.endOffset) ?: return@forEach
@@ -32,9 +33,9 @@ public class NoFromSubqueryRule : Rule {
             val closeOffset = content.matchingClosingParenthesisOffset(open.offset) ?: return@forEach
             val select =
                 tokens.firstOrNull { candidate ->
-                    candidate.startOffset > open.offset &&
+                        candidate.startOffset > open.offset &&
                         candidate.startOffset < closeOffset &&
-                        candidate.isKeyword("select")
+                        candidate.isTerm(SqlDialectSourceTerm.Select)
                 } ?: return@forEach
             if (content.sqlParenthesisDepthAt(select.startOffset) != 1) return@forEach
             if (tokens.any { candidate -> candidate.startOffset in (open.offset + 1)..<select.startOffset }) {

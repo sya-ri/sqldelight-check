@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -26,7 +27,7 @@ public class RequireResultColumnAliasRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
             val selectDepth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
             val fromToken =
@@ -35,7 +36,7 @@ public class RequireResultColumnAliasRule : Rule {
                     .firstOrNull { candidate ->
                         candidate.startOffset < statementEnd &&
                             content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
-                            candidate.isKeyword("from")
+                            candidate.isTerm(SqlDialectSourceTerm.From)
                     } ?: return@forEachIndexed
 
             content.selectTargets(token.endOffset, fromToken.startOffset, selectDepth).forEach { target ->
@@ -94,7 +95,7 @@ private fun SelectTarget.requiresAlias(content: String): Boolean {
     if (text == "*") return false
     val tokens = text.sqlTokens().toList()
     if (tokens.size == 1 && text.isSimpleColumnReference()) return false
-    return text.any { character -> character in "()+-*/|<>= " } || tokens.any { token -> token.isKeyword("case") }
+    return text.any { character -> character in "()+-*/|<>= " } || tokens.any { token -> token.isTerm(SqlDialectSourceTerm.Case) }
 }
 
 private fun SelectTarget.hasAlias(
@@ -103,7 +104,7 @@ private fun SelectTarget.hasAlias(
 ): Boolean {
     val text = content.substring(startOffset, endOffset)
     val tokens = text.sqlTokens().toList()
-    if (tokens.any { token -> token.isKeyword("as") }) return true
+    if (tokens.any { token -> token.isTerm(SqlDialectSourceTerm.As) }) return true
     if (tokens.size < 2) return false
     val last = tokens.last()
     val previous = tokens[tokens.lastIndex - 1]

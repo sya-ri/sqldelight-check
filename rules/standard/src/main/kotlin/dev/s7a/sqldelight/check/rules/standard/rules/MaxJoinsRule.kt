@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -29,14 +30,17 @@ public class MaxJoinsRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
             val selectDepth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
             val joins =
                 tokens
                     .drop(index + 1)
                     .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                    .filter { candidate -> candidate.isKeyword("join") && content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth }
+                    .filter { candidate ->
+                        candidate.isTerm(SqlDialectSourceTerm.Join) &&
+                            content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth
+                    }
             if (joins.size <= max) return@forEachIndexed
 
             val firstExcessJoin = joins[max]

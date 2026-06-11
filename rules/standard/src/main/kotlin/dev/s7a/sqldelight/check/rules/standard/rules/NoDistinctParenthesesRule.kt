@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -27,8 +28,8 @@ public class NoDistinctParenthesesRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
-            val distinct = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("distinct") }
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
+            val distinct = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.Distinct) }
                 ?: return@forEachIndexed
             val openOffset = content.nextNonHorizontalWhitespaceOffset(distinct.endOffset) ?: return@forEachIndexed
             if (content[openOffset] != '(') return@forEachIndexed

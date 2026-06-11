@@ -3,6 +3,9 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -21,7 +24,7 @@ public class MappedTypeNameCaseRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content.mappedTypeTokens().forEach { token ->
+        content.mappedTypeTokens(context.database.dialect.sourcePatterns).forEach { token ->
             if (token.text.substringAfterLast('.').firstOrNull()?.isUpperCase() == true) return@forEach
             reporter.report(
                 RuleDiagnostic(
@@ -36,15 +39,15 @@ public class MappedTypeNameCaseRule : Rule {
     }
 }
 
-private fun String.mappedTypeTokens(): Sequence<SqlToken> =
+private fun String.mappedTypeTokens(sourcePatterns: SqlDialectSourcePatterns): Sequence<SqlToken> =
     sequence {
         val tokens = sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("as")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.As)) return@forEachIndexed
             val previous = tokens.getOrNull(index - 1) ?: return@forEachIndexed
             val next = tokens.getOrNull(index + 1) ?: return@forEachIndexed
             if (previous.normalizedText !in sqlStorageTypeNames) return@forEachIndexed
-            if (next.normalizedText in sqlTypeMappingBoundaryKeywords) return@forEachIndexed
+            if (next.matches(sourcePatterns, SqlDialectSourcePatternRole.ColumnConstraintStart)) return@forEachIndexed
             yield(next)
         }
     }
@@ -70,6 +73,3 @@ private val sqlStorageTypeNames =
         "timestamp",
         "varchar",
     )
-
-private val sqlTypeMappingBoundaryKeywords =
-    setOf("not", "null", "primary", "unique", "check", "default", "collate", "references", "constraint")

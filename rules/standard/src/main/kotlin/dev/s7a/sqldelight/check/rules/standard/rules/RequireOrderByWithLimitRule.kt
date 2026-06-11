@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,7 +25,7 @@ public class RequireOrderByWithLimitRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
             if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
 
             val statementEnd = content.statementEndAfter(token.startOffset)
@@ -34,9 +35,11 @@ public class RequireOrderByWithLimitRule : Rule {
                     .takeWhile { candidate -> candidate.startOffset < statementEnd }
                     .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == 0 }
             val limitOrOffset =
-                statementTokens.firstOrNull { candidate -> candidate.isKeyword("limit") || candidate.isKeyword("offset") }
+                statementTokens.firstOrNull { candidate ->
+                    candidate.isTerm(SqlDialectSourceTerm.Limit) || candidate.isTerm(SqlDialectSourceTerm.Offset)
+                }
                     ?: return@forEachIndexed
-            if (statementTokens.containsKeywordPair("order", "by")) return@forEachIndexed
+            if (statementTokens.containsTermPair(SqlDialectSourceTerm.Order, SqlDialectSourceTerm.By)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(

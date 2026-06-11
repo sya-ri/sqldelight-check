@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -28,7 +29,7 @@ public class MaxSubqueryDepthRule : Rule {
         val maxDepth = context.options.positiveIntOption("maxDepth", DEFAULT_MAX_SUBQUERY_DEPTH)
         val content = context.file.content
         content.sqlTokens()
-            .filter { token -> token.isKeyword("select") }
+            .filter { token -> token.isTerm(SqlDialectSourceTerm.Select) }
             .forEach { token ->
                 val depth = content.sqlParenthesisDepthAt(token.startOffset)
                 if (depth <= maxDepth) return@forEach

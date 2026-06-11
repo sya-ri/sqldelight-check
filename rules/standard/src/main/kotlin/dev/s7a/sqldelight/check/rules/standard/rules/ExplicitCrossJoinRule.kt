@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,18 +27,19 @@ public class ExplicitCrossJoinRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("join")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
             if (tokens.isExplicitConditionlessJoin(index)) return@forEachIndexed
 
             val joinDepth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val segmentEnd = tokens.joinSegmentEnd(index + 1, statementEnd, joinDepth, content)
+            val segmentEnd =
+                tokens.joinSegmentEnd(index + 1, statementEnd, joinDepth, content, context.database.dialect.sourcePatterns)
             val segmentTokens =
                 tokens
                     .drop(index + 1)
                     .takeWhile { candidate -> candidate.startOffset < segmentEnd }
                     .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == joinDepth }
-            if (segmentTokens.any { candidate -> candidate.isKeyword("on") || candidate.isKeyword("using") }) {
+            if (segmentTokens.any { candidate -> candidate.isTerm(SqlDialectSourceTerm.On) || candidate.isTerm(SqlDialectSourceTerm.Using) }) {
                 return@forEachIndexed
             }
 
@@ -53,8 +57,8 @@ public class ExplicitCrossJoinRule : Rule {
 }
 
 private fun List<SqlToken>.isExplicitConditionlessJoin(joinIndex: Int): Boolean {
-    val previous = getOrNull(joinIndex - 1)?.normalizedText
-    return previous == "cross" || previous == "natural"
+    val previous = getOrNull(joinIndex - 1) ?: return false
+    return previous.isTerm(SqlDialectSourceTerm.Cross) || previous.isTerm(SqlDialectSourceTerm.Natural)
 }
 
 private fun List<SqlToken>.joinSegmentEnd(
@@ -62,27 +66,22 @@ private fun List<SqlToken>.joinSegmentEnd(
     statementEnd: Int,
     joinDepth: Int,
     content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     asSequence()
         .drop(startIndex)
-        .firstOrNull { token ->
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
                 content.sqlParenthesisDepthAt(token.startOffset) == joinDepth &&
-                (token.isKeyword("join") || token.normalizedText in joinBoundaryKeywords)
+                (
+                    token.isTerm(SqlDialectSourceTerm.Join) ||
+                        sourcePatterns.matches(
+                            SqlDialectSourcePatternRole.JoinConditionBoundary,
+                            normalizedTextsFrom(startIndex + relativeIndex),
+                        )
+                )
         }
+        ?.value
         ?.startOffset
         ?: statementEnd
-
-private val joinBoundaryKeywords =
-    setOf(
-        "except",
-        "group",
-        "having",
-        "intersect",
-        "limit",
-        "offset",
-        "order",
-        "union",
-        "where",
-        "window",
-    )

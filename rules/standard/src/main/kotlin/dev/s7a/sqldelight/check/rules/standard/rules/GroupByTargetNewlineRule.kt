@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,8 +27,8 @@ public class GroupByTargetNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("group")) return@forEachIndexed
-            val by = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("by") } ?: return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Group)) return@forEachIndexed
+            val by = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.By) } ?: return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
             val clauseEnd =
@@ -35,7 +37,8 @@ public class GroupByTargetNewlineRule : Rule {
                     startIndex = index + 2,
                     statementEnd = statementEnd,
                     depth = depth,
-                    boundaryKeywords = groupByBoundaryKeywords,
+                    sourcePatterns = context.database.dialect.sourcePatterns,
+                    role = SqlDialectSourcePatternRole.GroupByBoundary,
                 )
             val items = content.commaSeparatedClauseItems(by.endOffset, clauseEnd, depth)
             if (!content.isMultilineItemList(items)) return@forEachIndexed
@@ -53,12 +56,3 @@ public class GroupByTargetNewlineRule : Rule {
         }
     }
 }
-
-private val groupByBoundaryKeywords =
-    setOf(
-        "having",
-        "limit",
-        "offset",
-        "order",
-        "union",
-    )

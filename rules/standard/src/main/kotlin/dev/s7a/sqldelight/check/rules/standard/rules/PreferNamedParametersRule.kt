@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -28,7 +29,7 @@ public class PreferNamedParametersRule : Rule {
         content
             .sqlCharacters()
             .filter { character -> character.value == '?' }
-            .filterNot { character -> content.previousSqlTokenBefore(character.offset)?.isKeyword("in") == true }
+            .filterNot { character -> content.previousSqlTokenBefore(character.offset)?.isTerm(SqlDialectSourceTerm.In) == true }
             .forEach { character ->
                 reporter.report(
                     RuleDiagnostic(

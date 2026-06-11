@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -59,7 +60,7 @@ public class DataTypeCaseRule : Rule {
             index: Int,
             content: String,
         ): Boolean =
-            tokens.getOrNull(index - 1)?.isKeyword("as") == true ||
+            tokens.getOrNull(index - 1)?.isTerm(SqlDialectSourceTerm.As) == true ||
                 content.isQualifiedIdentifierSegment(this)
 
         fun String.isQualifiedIdentifierSegment(token: SqlToken): Boolean =

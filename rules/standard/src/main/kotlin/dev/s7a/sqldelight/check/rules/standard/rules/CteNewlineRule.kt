@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,11 +28,18 @@ public class CteNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("with")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.With)) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             if (depth != 0) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val mainStatementIndex = tokens.mainStatementIndexAfterWith(index + 1, statementEnd, depth, content)
+            val mainStatementIndex =
+                tokens.mainStatementIndexAfterWith(
+                    startIndex = index + 1,
+                    statementEnd = statementEnd,
+                    depth = depth,
+                    content = content,
+                    sourcePatterns = context.database.dialect.sourcePatterns,
+                )
                 ?: return@forEachIndexed
             val cteStarts = tokens.cteStartTokens(index + 1, mainStatementIndex, depth, content)
             if (cteStarts.size < 2) return@forEachIndexed
@@ -59,17 +69,18 @@ private fun List<SqlToken>.mainStatementIndexAfterWith(
     statementEnd: Int,
     depth: Int,
     content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int? {
     var sawCteBody = false
     for (index in startIndex until size) {
         val token = this[index]
         if (token.startOffset >= statementEnd) return null
         if (content.sqlParenthesisDepthAt(token.startOffset) != depth) continue
-        if (token.isKeyword("as")) continue
+        if (token.isTerm(SqlDialectSourceTerm.As)) continue
         if (content.previousSqlCharacterBefore(token.startOffset)?.value == ')') {
             sawCteBody = true
         }
-        if (sawCteBody && token.normalizedText in cteMainStatementKeywords) return index
+        if (sawCteBody && token.matches(sourcePatterns, SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart)) return index
     }
     return null
 }
@@ -91,5 +102,3 @@ private fun List<SqlToken>.cteStartTokens(
     }
     return starts
 }
-
-private val cteMainStatementKeywords = setOf("delete", "insert", "select", "update")

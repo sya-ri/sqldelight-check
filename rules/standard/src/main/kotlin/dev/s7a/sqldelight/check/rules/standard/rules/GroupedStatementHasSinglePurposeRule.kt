@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -31,10 +33,15 @@ public class GroupedStatementHasSinglePurposeRule : Rule {
                     .sqlTokens()
                     .filter { token -> token.startOffset in group.bodyStartOffset until group.bodyEndOffset }
                     .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == group.bodyDepth }
-                    .map { token -> token.normalizedText }
-                    .filter { token -> token in groupedStatementVerbs }
+                    .filter { token ->
+                        token.matches(
+                            context.database.dialect.sourcePatterns,
+                            SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart,
+                        )
+                    }
                     .toSet()
-            if ("select" !in verbs || verbs.none { verb -> verb in writeStatementVerbs }) return@forEach
+            if (verbs.none { token -> token.isTerm(SqlDialectSourceTerm.Select) }) return@forEach
+            if (verbs.none { token -> writeStatementTerms.any { term -> token.isTerm(term) } }) return@forEach
 
             reporter.report(
                 RuleDiagnostic(
@@ -57,9 +64,7 @@ private data class GroupedStatementRange(
     val bodyDepth: Int,
 )
 
-private val groupedStatementVerbs = setOf("delete", "insert", "select", "update")
-
-private val writeStatementVerbs = setOf("delete", "insert", "update")
+private val writeStatementTerms = setOf(SqlDialectSourceTerm.Delete, SqlDialectSourceTerm.Insert, SqlDialectSourceTerm.Update)
 
 private fun String.groupedStatementRanges(): Sequence<GroupedStatementRange> =
     sequence {

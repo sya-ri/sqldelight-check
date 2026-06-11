@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,16 +26,26 @@ public class NoOrderByOrdinalRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("group") && !token.isKeyword("order")) return@forEachIndexed
-            val by = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("by") } ?: return@forEachIndexed
+            val clause =
+                when {
+                    token.isTerm(SqlDialectSourceTerm.Group) -> OrdinalClause.GroupBy
+                    token.isTerm(SqlDialectSourceTerm.Order) -> OrdinalClause.OrderBy
+                    else -> return@forEachIndexed
+                }
+            val by = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.By) } ?: return@forEachIndexed
             val clauseDepth = content.sqlParenthesisDepthAt(token.startOffset)
             if (clauseDepth != 0) return@forEachIndexed
 
-            val boundaryKeywords =
-                if (token.isKeyword("group")) groupByOrdinalBoundaryKeywords else orderByOrdinalBoundaryKeywords
+            val boundaryRole =
+                if (clause == OrdinalClause.GroupBy) {
+                    SqlDialectSourcePatternRole.GroupByBoundary
+                } else {
+                    SqlDialectSourcePatternRole.OrderByBoundary
+                }
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val clauseEnd = tokens.firstBoundaryOffsetAfter(index + 2, statementEnd, boundaryKeywords)
-            content.topLevelOrdinalReferenceOffsets(by.endOffset, clauseEnd, token.normalizedText)
+            val clauseEnd =
+                tokens.firstBoundaryOffsetAfter(index + 2, statementEnd, context.database.dialect.sourcePatterns, boundaryRole)
+            content.topLevelOrdinalReferenceOffsets(by.endOffset, clauseEnd, clause)
                 .forEach { ordinal ->
                     reporter.report(
                         RuleDiagnostic(
@@ -49,6 +61,11 @@ public class NoOrderByOrdinalRule : Rule {
     }
 }
 
+private enum class OrdinalClause {
+    GroupBy,
+    OrderBy,
+}
+
 private data class OrdinalReference(
     val startOffset: Int,
     val endOffset: Int,
@@ -57,12 +74,12 @@ private data class OrdinalReference(
 private fun String.topLevelOrdinalReferenceOffsets(
     startOffset: Int,
     endOffset: Int,
-    clauseKeyword: String,
+    clause: OrdinalClause,
 ): List<OrdinalReference> =
     topLevelOrdinalItems(startOffset, endOffset)
         .mapNotNull { item ->
             val reference =
-                if (clauseKeyword == "order") {
+                if (clause == OrdinalClause.OrderBy) {
                     substring(item.startOffset, item.endOffset).withoutOrderByOrdinalSuffix()
                 } else {
                     substring(item.startOffset, item.endOffset).trim()
@@ -129,8 +146,3 @@ private fun String.isOrdinalNullsPlacement(): Boolean = equals("first", ignoreCa
 private val ordinalReferenceRegex = Regex("[0-9]+")
 
 private val ordinalHorizontalWhitespaceRegex = Regex("[ \\t\\r\\n]+")
-
-private val groupByOrdinalBoundaryKeywords =
-    setOf("except", "having", "intersect", "limit", "offset", "order", "union", "where", "window")
-
-private val orderByOrdinalBoundaryKeywords = setOf("except", "fetch", "intersect", "limit", "offset", "union", "where")

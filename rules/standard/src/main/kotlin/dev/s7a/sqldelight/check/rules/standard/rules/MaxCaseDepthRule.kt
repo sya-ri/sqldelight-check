@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -30,7 +31,7 @@ public class MaxCaseDepthRule : Rule {
         var depth = 0
         content.sqlTokens().forEach { token ->
             when {
-                token.isKeyword("case") -> {
+                token.isTerm(SqlDialectSourceTerm.Case) -> {
                     depth++
                     if (depth > maxDepth) {
                         reporter.report(
@@ -44,7 +45,7 @@ public class MaxCaseDepthRule : Rule {
                         )
                     }
                 }
-                token.isKeyword("end") && depth > 0 -> depth--
+                token.isTerm(SqlDialectSourceTerm.End) && depth > 0 -> depth--
             }
         }
     }

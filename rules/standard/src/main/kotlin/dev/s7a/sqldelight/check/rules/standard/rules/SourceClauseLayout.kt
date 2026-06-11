@@ -50,17 +50,10 @@ internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
     startIndex: Int,
     statementEnd: Int,
     depth: Int,
-    boundaryKeywords: Set<String>,
+    sourcePatterns: SqlDialectSourcePatterns,
+    role: SqlDialectSourcePatternRole,
 ): Int =
-    asSequence()
-        .drop(startIndex)
-        .firstOrNull { token ->
-            token.startOffset < statementEnd &&
-                content.sqlParenthesisDepthAt(token.startOffset) == depth &&
-                token.normalizedText in boundaryKeywords
-        }
-        ?.startOffset
-        ?: statementEnd
+    firstBoundaryOffsetAfterAtDepth(content, startIndex, statementEnd, depth, sourcePatterns, setOf(role))
 
 internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
     content: String,
@@ -68,7 +61,7 @@ internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
     statementEnd: Int,
     depth: Int,
     sourcePatterns: SqlDialectSourcePatterns,
-    role: SqlDialectSourcePatternRole,
+    roles: Set<SqlDialectSourcePatternRole>,
 ): Int =
     asSequence()
         .drop(startIndex)
@@ -76,7 +69,7 @@ internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
         .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
                 content.sqlParenthesisDepthAt(token.startOffset) == depth &&
-                sourcePatterns.matches(role, normalizedTextsFrom(startIndex + relativeIndex))
+                roles.any { role -> sourcePatterns.matches(role, normalizedTextsFrom(startIndex + relativeIndex)) }
         }
         ?.value
         ?.startOffset

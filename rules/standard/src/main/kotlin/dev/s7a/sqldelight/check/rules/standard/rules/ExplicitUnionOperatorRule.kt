@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,9 +25,9 @@ public class ExplicitUnionOperatorRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.text.equals("union", ignoreCase = true)) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Union)) return@forEachIndexed
             val next = tokens.getOrNull(index + 1)
-            if (next?.text?.lowercase() in setOf("all", "distinct")) return@forEachIndexed
+            if (next != null && unionModifierTerms.any { term -> next.isTerm(term) }) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(
@@ -40,3 +41,9 @@ public class ExplicitUnionOperatorRule : Rule {
         }
     }
 }
+
+private val unionModifierTerms =
+    setOf(
+        SqlDialectSourceTerm.All,
+        SqlDialectSourceTerm.Distinct,
+    )

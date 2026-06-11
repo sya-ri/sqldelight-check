@@ -160,6 +160,10 @@ public sealed interface SqlDialectSourceTerm {
         override val normalizedText: String = "between"
     }
 
+    public data object Begin : SqlDialectSourceTerm {
+        override val normalizedText: String = "begin"
+    }
+
     public data object By : SqlDialectSourceTerm {
         override val normalizedText: String = "by"
     }
@@ -168,12 +172,36 @@ public sealed interface SqlDialectSourceTerm {
         override val normalizedText: String = "case"
     }
 
+    public data object Check : SqlDialectSourceTerm {
+        override val normalizedText: String = "check"
+    }
+
     public data object Count : SqlDialectSourceTerm {
         override val normalizedText: String = "count"
     }
 
+    public data object Collate : SqlDialectSourceTerm {
+        override val normalizedText: String = "collate"
+    }
+
+    public data object Commit : SqlDialectSourceTerm {
+        override val normalizedText: String = "commit"
+    }
+
+    public data object Constraint : SqlDialectSourceTerm {
+        override val normalizedText: String = "constraint"
+    }
+
     public data object Create : SqlDialectSourceTerm {
         override val normalizedText: String = "create"
+    }
+
+    public data object Cross : SqlDialectSourceTerm {
+        override val normalizedText: String = "cross"
+    }
+
+    public data object Default : SqlDialectSourceTerm {
+        override val normalizedText: String = "default"
     }
 
     public data object Delete : SqlDialectSourceTerm {
@@ -208,6 +236,10 @@ public sealed interface SqlDialectSourceTerm {
         override val normalizedText: String = "escape"
     }
 
+    public data object Except : SqlDialectSourceTerm {
+        override val normalizedText: String = "except"
+    }
+
     public data object Exists : SqlDialectSourceTerm {
         override val normalizedText: String = "exists"
     }
@@ -228,6 +260,18 @@ public sealed interface SqlDialectSourceTerm {
         override val normalizedText: String = "first"
     }
 
+    public data object Foreign : SqlDialectSourceTerm {
+        override val normalizedText: String = "foreign"
+    }
+
+    public data object Full : SqlDialectSourceTerm {
+        override val normalizedText: String = "full"
+    }
+
+    public data object Generated : SqlDialectSourceTerm {
+        override val normalizedText: String = "generated"
+    }
+
     public data object From : SqlDialectSourceTerm {
         override val normalizedText: String = "from"
     }
@@ -244,8 +288,16 @@ public sealed interface SqlDialectSourceTerm {
         override val normalizedText: String = "in"
     }
 
+    public data object Inner : SqlDialectSourceTerm {
+        override val normalizedText: String = "inner"
+    }
+
     public data object Insert : SqlDialectSourceTerm {
         override val normalizedText: String = "insert"
+    }
+
+    public data object Intersect : SqlDialectSourceTerm {
+        override val normalizedText: String = "intersect"
     }
 
     public data object Into : SqlDialectSourceTerm {
@@ -264,6 +316,10 @@ public sealed interface SqlDialectSourceTerm {
         override val normalizedText: String = "last"
     }
 
+    public data object Left : SqlDialectSourceTerm {
+        override val normalizedText: String = "left"
+    }
+
     public data object Like : SqlDialectSourceTerm {
         override val normalizedText: String = "like"
     }
@@ -274,6 +330,10 @@ public sealed interface SqlDialectSourceTerm {
 
     public data object Not : SqlDialectSourceTerm {
         override val normalizedText: String = "not"
+    }
+
+    public data object Natural : SqlDialectSourceTerm {
+        override val normalizedText: String = "natural"
     }
 
     public data object Null : SqlDialectSourceTerm {
@@ -306,6 +366,14 @@ public sealed interface SqlDialectSourceTerm {
 
     public data object Outer : SqlDialectSourceTerm {
         override val normalizedText: String = "outer"
+    }
+
+    public data object Primary : SqlDialectSourceTerm {
+        override val normalizedText: String = "primary"
+    }
+
+    public data object References : SqlDialectSourceTerm {
+        override val normalizedText: String = "references"
     }
 
     public data object Right : SqlDialectSourceTerm {
@@ -346,6 +414,10 @@ public sealed interface SqlDialectSourceTerm {
 
     public data object Union : SqlDialectSourceTerm {
         override val normalizedText: String = "union"
+    }
+
+    public data object Unique : SqlDialectSourceTerm {
+        override val normalizedText: String = "unique"
     }
 
     public data object Update : SqlDialectSourceTerm {
@@ -395,11 +467,41 @@ public sealed interface SqlDialectSourcePatternRole {
 
     public data object SqlDelightStatementStart : SqlDialectSourcePatternRole
 
+    public data object SqlDelightExecutableStatementStart : SqlDialectSourcePatternRole
+
     public data object StatementContinuation : SqlDialectSourcePatternRole
 
     public data object SelectListStart : SqlDialectSourcePatternRole
 
     public data object ClauseBoundary : SqlDialectSourcePatternRole
+
+    public data object MajorClauseStart : SqlDialectSourcePatternRole
+
+    public data object PredicateStart : SqlDialectSourcePatternRole
+
+    public data object PredicateBoundary : SqlDialectSourcePatternRole
+
+    public data object JoinConditionBoundary : SqlDialectSourcePatternRole
+
+    public data object BooleanOperator : SqlDialectSourcePatternRole
+
+    public data object SetOperator : SqlDialectSourcePatternRole
+
+    public data object ColumnConstraintStart : SqlDialectSourcePatternRole
+
+    public data object TableConstraintStart : SqlDialectSourcePatternRole
+
+    public data object GroupByBoundary : SqlDialectSourcePatternRole
+
+    public data object OrderByBoundary : SqlDialectSourcePatternRole
+
+    public data object KeywordCaseTarget : SqlDialectSourcePatternRole
+
+    public data object CommonFunctionName : SqlDialectSourcePatternRole
+
+    public data object CoalesceAlternativeFunction : SqlDialectSourcePatternRole
+
+    public data object IndexUnfriendlyFunction : SqlDialectSourcePatternRole
 
     public data object ExpressionContinuation : SqlDialectSourcePatternRole
 
