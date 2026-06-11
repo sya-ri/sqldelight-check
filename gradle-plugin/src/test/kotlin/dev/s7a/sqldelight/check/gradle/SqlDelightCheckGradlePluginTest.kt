@@ -307,6 +307,45 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `check task overrides log level from gradle property`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.LogLevel
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            logLevel.set(LogLevel.Info)
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+        )
+
+        val result = project.run("-PsqldelightCheck.logLevel=verbose", "sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertContentEquals(
+            listOf(
+                "sqldelight-check [Database] files (1):",
+                "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
+                "sqldelight-check analyzed 1 SQLDelight database(s).",
+            ),
+            result.sqldelightCheckOutputLines(),
+        )
+    }
+
+    @Test
     fun `check task resolves multiple sqldelight databases`() {
         val project =
             testProject(

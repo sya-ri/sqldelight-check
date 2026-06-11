@@ -1,5 +1,6 @@
 package dev.s7a.sqldelight.check.gradle
 
+import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.core.ReporterRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
 import java.net.URLClassLoader
@@ -15,7 +16,7 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         target.configureDefaultReports(extension)
         target.createRuleSetConfiguration()
         target.createReporterConfiguration()
-        target.registerSqlDelightCheckTasks()
+        target.registerSqlDelightCheckTasks(extension)
     }
 
     /**
@@ -43,40 +44,62 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
     /**
      * Registers aggregate task names modeled after Biome's check/lint/format/write commands.
      */
-    private fun Project.registerSqlDelightCheckTasks() {
+    private fun Project.registerSqlDelightCheckTasks(extension: SqlDelightCheckExtension) {
         val taskGroup = "sqldelight-check"
         tasks.register("sqldelightCheck", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Runs SQLDelight lint and format checks without modifying files."
             task.applyFixes.convention(false)
+            task.logLevel.convention(resolveLogLevelOverride(extension))
         }
         tasks.register("sqldelightCheckWrite", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Applies SQLDelight formatter output and safe lint fixes."
             task.applyFixes.convention(true)
+            task.logLevel.convention(resolveLogLevelOverride(extension))
         }
         tasks.register("sqldelightLint", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Runs SQLDelight lint checks without modifying files."
             task.applyFixes.convention(false)
+            task.logLevel.convention(resolveLogLevelOverride(extension))
         }
         tasks.register("sqldelightLintWrite", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Applies safe SQLDelight lint fixes."
             task.applyFixes.convention(true)
+            task.logLevel.convention(resolveLogLevelOverride(extension))
         }
         tasks.register("sqldelightFormat", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Checks SQLDelight formatting without modifying files."
             task.applyFixes.convention(false)
+            task.logLevel.convention(resolveLogLevelOverride(extension))
         }
         tasks.register("sqldelightFormatWrite", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Applies SQLDelight formatting."
             task.applyFixes.convention(true)
+            task.logLevel.convention(resolveLogLevelOverride(extension))
         }
     }
 }
+
+/**
+ * Resolves the effective task log level from the CLI override or extension default.
+ */
+private fun Project.resolveLogLevelOverride(extension: SqlDelightCheckExtension) =
+    providers
+        .gradleProperty("sqldelightCheck.logLevel")
+        .map { value ->
+            when (value.lowercase()) {
+                "info" -> LogLevel.Info
+                "verbose" -> LogLevel.Verbose
+                "debug" -> LogLevel.Debug
+                else -> throw IllegalArgumentException(value)
+            }
+        }
+        .orElse(extension.logLevel)
 
 /**
  * Returns the reporter registry attached to this project.

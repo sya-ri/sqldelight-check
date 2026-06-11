@@ -29,13 +29,20 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public abstract val applyFixes: Property<Boolean>
 
     /**
+     * Log output detail for this task execution.
+     */
+    @get:Input
+    public abstract val logLevel: Property<LogLevel>
+
+    /**
      * Runs SQLDelight project detection, core analysis, and report writing.
      */
     @TaskAction
     public fun run() {
         val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
-        val config = extension.toCheckConfig()
-        val trace = tracing(extension.logLevel.get())
+        val logLevel = logLevel.get()
+        val config = extension.toCheckConfig(logLevel)
+        val trace = tracing(logLevel)
         var result = analyze(config, trace)
         if (applyFixes.get()) {
             val changedFiles = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeWrites)

@@ -150,6 +150,12 @@ Log levels control task output detail:
 - `Verbose`: summary plus resolved file inventory.
 - `Debug`: summary, resolved file inventory, and per-file rule traces.
 
+You can override the configured level temporarily from the command line:
+
+```shell
+./gradlew -PsqldelightCheck.logLevel=debug sqldelightCheck
+```
+
 ## Disable Diagnostics
 
 Use SQL comments when a source file needs a local rule suppression:
