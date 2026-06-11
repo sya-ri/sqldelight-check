@@ -189,7 +189,6 @@ The standard rule set uses two safety levels:
 | [`standard:require-parentheses-for-mixed-boolean-operators`](#standardrequire-parentheses-for-mixed-boolean-operators) | 🟢 | ⚠️ |  | Require parentheses when `AND` and `OR` are mixed at the same predicate level. |
 | [`standard:require-query-label`](#standardrequire-query-label) | 🟢 | ⚠️ |  | Require executable statements in `.sq` files to have SQLDelight query labels. |
 | [`standard:require-result-column-alias`](#standardrequire-result-column-alias) | 🟢 | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
-| [`standard:require-suppression-reason`](#standardrequire-suppression-reason) | 🟢 | ⚠️ |  | Require sqldelight-check disable directives to include a reason. |
 | [`standard:require-table-alias-as`](#standardrequire-table-alias-as) | 🟢 | ⚠️ |  | Require `AS` for table aliases. |
 | [`standard:require-table-alias-for-subquery`](#standardrequire-table-alias-for-subquery) | 🟢 | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
 | [`standard:require-where-index-friendly-predicate`](#standardrequire-where-index-friendly-predicate) | 🟢 | ℹ️ |  | Flag common function-wrapped `WHERE` predicates that can be hard to use with indexes. |
@@ -3316,44 +3315,6 @@ Fix behavior:
 - No automatic fix is provided.
 - Defaults to `Severity.Info`.
 - Reports only simple inclusive ranges on the same expression.
-
-## `standard:require-suppression-reason`
-
-Reports sqldelight-check disable directives without a reason.
-
-Suppressions are part of the long-term rule configuration surface. Requiring a
-short reason makes exceptions easier to audit and remove later.
-
-Invalid:
-
-```sql
--- sqldelight-check-disable-next-line standard:no-select-star
-SELECT * FROM legacy_export;
-```
-
-Valid:
-
-```sql
--- sqldelight-check-disable-next-line standard:no-select-star -- legacy export
-SELECT * FROM legacy_export;
-```
-
-The reason must be in the same SQL line comment after a second `--`. For file
-or block suppressions, put the reason on the `disable-file` or `disable`
-directive line:
-
-```sql
--- sqldelight-check-disable-file -- generated fixture
-
--- sqldelight-check-disable standard:no-select-star -- legacy export shape
-SELECT * FROM legacy_export;
--- sqldelight-check-enable standard:no-select-star
-```
-
-Fix behavior:
-
-- No automatic fix is provided.
-- Checks `disable-file`, `disable-next-line`, and `disable` directives.
 
 ## `standard:require-explicit-null-ordering`
 

@@ -121,7 +121,6 @@ class StandardRuleSetProviderTest {
                 qualifiedRuleId("standard:require-parentheses-for-mixed-boolean-operators"),
                 qualifiedRuleId("standard:require-query-label"),
                 qualifiedRuleId("standard:require-result-column-alias"),
-                qualifiedRuleId("standard:require-suppression-reason"),
                 qualifiedRuleId("standard:require-table-alias-as"),
                 qualifiedRuleId("standard:require-table-alias-for-subquery"),
                 qualifiedRuleId("standard:require-where-index-friendly-predicate"),

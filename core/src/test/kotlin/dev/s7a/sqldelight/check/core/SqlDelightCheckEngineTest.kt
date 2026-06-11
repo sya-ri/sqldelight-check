@@ -260,7 +260,7 @@ class SqlDelightCheckEngineTest {
                         testInput(
                             content =
                                 """
-                                -- sqldelight-check-disable-next-line
+                                -- sqldelight-check-disable-next-line -- intentional
                                 SELECT 1;
                                 """.trimIndent(),
                         ),
@@ -280,7 +280,7 @@ class SqlDelightCheckEngineTest {
                         testInput(
                             content =
                                 """
-                                -- sqldelight-check-disable-next-line standard:other
+                                -- sqldelight-check-disable-next-line standard:other -- wrong rule
                                 SELECT 1;
                                 """.trimIndent(),
                         ),
@@ -326,7 +326,7 @@ class SqlDelightCheckEngineTest {
                         testInput(
                             content =
                                 """
-                                -- sqldelight-check-disable-file standard:test
+                                -- sqldelight-check-disable-file standard:test -- intentional
                                 SELECT 1;
                                 """.trimIndent(),
                         ),
@@ -346,7 +346,7 @@ class SqlDelightCheckEngineTest {
                         testInput(
                             content =
                                 """
-                                -- sqldelight-check-disable-file standard:test
+                                -- sqldelight-check-disable-file standard:test -- intentional
                                 SELECT 1;
                                 """.trimIndent(),
                         ),
@@ -377,21 +377,47 @@ class SqlDelightCheckEngineTest {
                                 """.trimIndent(),
                         ),
                     ),
-                ruleSetProviders =
+            )
+
+        assertEquals(
+            listOf(
+                qualifiedRuleId("core:require-suppression-reason"),
+                qualifiedRuleId("core:no-redundant-suppression"),
+            ),
+            diagnostics.map { it.ruleId },
+        )
+    }
+
+    @Test
+    fun `suppression reason diagnostic can be disabled`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
                     listOf(
-                        testRuleSet(
-                            testRule(
-                                message = { "suppression reason" },
-                                rangeLine = 1,
-                                id = "require-suppression-reason",
-                            ),
+                        testInput(
+                            content =
+                                """
+                                -- sqldelight-check-disable-file
+                                SELECT 1;
+                                """.trimIndent(),
                         ),
+                    ),
+                config =
+                    CheckConfig(
+                        rules =
+                            mapOf(
+                                qualifiedRuleId("core:require-suppression-reason") to
+                                    RuleConfig(
+                                        qualifiedRuleId("core:require-suppression-reason"),
+                                        Enablement.Disabled,
+                                        Severity.Warning,
+                                    ),
+                            ),
                     ),
             )
 
         assertEquals(
             listOf(
-                qualifiedRuleId("standard:require-suppression-reason"),
                 qualifiedRuleId("core:no-redundant-suppression"),
             ),
             diagnostics.map { diagnostic -> diagnostic.ruleId },
@@ -407,7 +433,7 @@ class SqlDelightCheckEngineTest {
                         testInput(
                             content =
                                 """
-                                -- sqldelight-check-disable standard:test
+                                -- sqldelight-check-disable standard:test -- intentional
                                 SELECT 1;
                                 -- sqldelight-check-enable standard:test
                                 """.trimIndent(),
