@@ -165,13 +165,13 @@ You can override the configured level temporarily from the command line:
 Use SQL comments when a source file needs a local rule suppression:
 
 ```sql
--- sqldelight-check-disable-next-line standard:use-is-null
+-- sqldelight-check-disable-next-line standard:use-is-null -- legacy nullable marker
 selectById:
 SELECT *
 FROM player
 WHERE deleted_at = NULL;
 
--- sqldelight-check-disable standard:no-select-star
+-- sqldelight-check-disable standard:no-select-star -- legacy export shape
 selectEverything:
 SELECT *
 FROM player;
@@ -186,6 +186,10 @@ Supported directives:
 - `-- sqldelight-check-enable [rule-id,...]`: stop the matching `disable` block. Without rule IDs, all active disables stop.
 
 Omitting rule IDs suppresses all rule diagnostics covered by that directive.
+
+When `standard:require-suppression-reason` is enabled, put the reason in the same SQL line comment after a second
+`--`. The reason belongs on the `disable-file`, `disable-next-line`, or `disable` directive line, not on the suppressed
+SQL statement or the later `enable` line.
 
 Unused disable directives are reported as `core:no-redundant-suppression`. This core diagnostic is emitted after
 sqldelight-check applies suppressions, so it can identify directives that did not suppress any rule diagnostics.
