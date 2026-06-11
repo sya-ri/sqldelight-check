@@ -6,27 +6,31 @@ This document records the implementation boundaries that matter for the
 ## SQLDelight 2.x Compatibility
 
 sqldelight-check uses SQLDelight itself for parser and compiler diagnostics.
-The Gradle plugin resolves the SQLDelight compiler and dialect classpath from
-the checked project, then core analysis loads those classes in an isolated
-class loader.
+The Gradle plugin resolves SQLDelight database metadata and the configured
+dialect classpath from the checked project. Core analysis links to the
+SQLDelight 2.x compiler API directly and loads the checked project's dialect
+implementation through a small child class loader.
 
 The compatibility code in `core.sqldelight` is intentionally narrow:
 
 - `SqlDelight2VersionSupport` accepts stable SQLDelight `2.0.x` through
   `2.3.x` and the explicitly tested `2.4.0-SNAPSHOT`.
-- `SqlDelightReflection` centralizes SQLDelight class names, dialect service
-  loading, and proxy creation.
-- `SqlDelight2Analyzer` handles the SQLDelight environment constructor shape
-  used by supported `2.x` lines.
+- `SqlDelight2Analyzer` builds typed SQLDelight compilation-unit and database
+  property models, then runs `SqlDelightEnvironment` without reflective
+  compiler calls.
+- The analyzer is compiled against SQLDelight `2.3.2`. Compatibility with
+  earlier stable `2.x` Gradle plugin and dialect combinations is verified by
+  Gradle TestKit projects that actually apply those versions.
+- The dialect child class loader is only used for `ServiceLoader` discovery of
+  the configured `SqlDelightDialect` implementation.
 - `SourceFileMatching` maps SQLDelight compiler error paths back to
   sqldelight-check `SourceFile` values.
 
-Those pieces are required because the checked project supplies the SQLDelight
-version. Linking directly to every supported SQLDelight minor line would make
-the plugin classpath fragile for consumers and would still need a version
-selection layer. The current approach keeps the public API independent from
-SQLDelight internals while still letting SQLDelight own parsing and dialect
-validation.
+Those pieces keep the public rule API independent from SQLDelight and IntelliJ
+internals while still letting SQLDelight own parsing and dialect validation.
+The Gradle plugin still reads SQLDelight's Gradle task model conservatively
+because that model is owned by another plugin and may be loaded through a
+different Gradle class loader.
 
 For SQLDelight `3.x`, sqldelight-check should treat compatibility as a larger
 update. The current `2.x` analyzer should not grow unbounded fallback logic for

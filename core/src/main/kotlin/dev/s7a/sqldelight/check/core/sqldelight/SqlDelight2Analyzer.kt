@@ -1,16 +1,19 @@
 package dev.s7a.sqldelight.check.core.sqldelight
 
+import app.cash.sqldelight.core.SqlDelightCompilationUnit
+import app.cash.sqldelight.core.SqlDelightDatabaseName
+import app.cash.sqldelight.core.SqlDelightDatabaseProperties
+import app.cash.sqldelight.core.SqlDelightEnvironment
+import app.cash.sqldelight.core.SqlDelightSourceFolder
+import app.cash.sqldelight.dialect.api.SqlDelightDialect
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.AnalysisResult
 import java.io.File
-import java.lang.reflect.Constructor
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
-import java.lang.reflect.Proxy
 import java.net.URLClassLoader
 import java.nio.file.Files
+import java.util.ServiceLoader
 
 /**
  * SQLDelight analyzer backed by SQLDelight 2.x runtime classes.
@@ -53,20 +56,20 @@ internal object SqlDelight2Analyzer {
         input: AnalysisInput,
         packageName: String,
     ): List<Diagnostic> {
-        val classpath = (input.compilerClasspath + input.dialectClasspath).distinctBy { file -> file.absolutePath }
+        val classpath = (input.dialectClasspath + input.compilerClasspath).distinctBy { file -> file.absolutePath }
         if (classpath.isEmpty()) {
-            return listOf(input.errorDiagnostic("SQLDelight compiler classpath was not resolved."))
+            return listOf(input.errorDiagnostic("SQLDelight dialect classpath was not resolved."))
         }
 
         val outputDirectory = Files.createTempDirectory("sqldelight-check-${input.database.name}").toFile()
         try {
             return URLClassLoader(
                 classpath.map { file -> file.toURI().toURL() }.toTypedArray(),
-                ClassLoader.getPlatformClassLoader(),
+                SqlDelightDialect::class.java.classLoader,
             )
                 .use { loader ->
                     withContextClassLoader(loader) {
-                        analyzeWithClassLoader(input, packageName, outputDirectory, loader)
+                        analyzeWithDialectClassLoader(input, packageName, outputDirectory, loader)
                     }
                 }
         } finally {
@@ -74,75 +77,60 @@ internal object SqlDelight2Analyzer {
         }
     }
 
-    private fun analyzeWithClassLoader(
+    private fun analyzeWithDialectClassLoader(
         input: AnalysisInput,
         packageName: String,
         outputDirectory: File,
         loader: ClassLoader,
     ): List<Diagnostic> {
-        val dialect = loader.loadDialect() ?: return listOf(input.errorDiagnostic("SQLDelight dialect implementation was not found."))
+        val dialect =
+            ServiceLoader.load(SqlDelightDialect::class.java, loader).firstOrNull()
+                ?: return listOf(input.errorDiagnostic("SQLDelight dialect implementation was not found."))
         val compilationUnit =
-            loader.proxy(
-                interfaceName = SQL_DELIGHT_COMPILATION_UNIT_CLASS,
-                values =
-                    mapOf(
-                        "getName" to input.database.name,
-                        "getSourceFolders" to input.toSqlDelightSourceFolders(loader),
-                        "getOutputDirectoryFile" to outputDirectory,
-                    ),
+            SqlDelightCheckCompilationUnit(
+                name = input.database.name,
+                sourceFolders = input.toSqlDelightSourceFolders(),
+                outputDirectoryFile = outputDirectory,
             )
         val properties =
-            loader.proxy(
-                interfaceName = SQL_DELIGHT_DATABASE_PROPERTIES_CLASS,
-                values =
-                    mapOf(
-                        "getPackageName" to packageName,
-                        "getCompilationUnits" to listOf(compilationUnit),
-                        "getClassName" to input.database.name,
-                        "getDependencies" to emptyList<Any>(),
-                        "getDeriveSchemaFromMigrations" to false,
-                        "getTreatNullAsUnknownForEquality" to false,
-                        "getRootDirectory" to input.rootDirectory(),
-                        "getGenerateAsync" to false,
-                        "getExpandSelectStar" to true,
-                    ),
+            SqlDelightCheckDatabaseProperties(
+                packageName = packageName,
+                compilationUnits = listOf(compilationUnit),
+                className = input.database.name,
+                dependencies = emptyList(),
+                deriveSchemaFromMigrations = false,
+                treatNullAsUnknownForEquality = false,
+                rootDirectory = input.rootDirectory(),
+                generateAsync = false,
+                expandSelectStar = true,
             )
-        val dialectClass = Class.forName(SQL_DELIGHT_DIALECT_CLASS, true, loader)
-        val environmentClass = Class.forName(SQL_DELIGHT_ENVIRONMENT_CLASS, true, loader)
-        val environment = environmentClass.newEnvironment(properties, compilationUnit, dialectClass.cast(dialect), input)
-        val status =
-            environmentClass
-                .methodWithParameterCount("generateSqlDelightFiles", 1)
-                .let { method -> method.invoke(environment, loader.noOpFunction(method.parameterTypes.single())) }
+        val environment =
+            SqlDelightEnvironment(
+                properties = properties,
+                compilationUnit = compilationUnit,
+                verifyMigrations = false,
+                dialect = dialect,
+                moduleName = "sqldelight-check",
+                sourceFolders = input.sourceFolders,
+                dependencyFolders = input.dependencyFolders,
+            )
+        val status = environment.generateSqlDelightFiles {}
 
         return when {
-            status.javaClass.name.endsWith("\$Failure") ->
-                status.invokeNoArg("getErrors")
+            status is SqlDelightEnvironment.CompilationStatus.Failure ->
+                status.errors
                     .asSequence()
-                    .map { error -> input.sqlDelightErrorDiagnostic(error.toString()) }
+                    .map { error -> input.sqlDelightErrorDiagnostic(error) }
                     .toList()
             else -> emptyList()
         }
     }
 
-    private fun AnalysisInput.toSqlDelightSourceFolders(loader: ClassLoader): Set<Any> {
-        val local = sourceFolders.map { folder -> loader.sourceFolder(folder = folder, dependency = false) }
-        val dependencies = dependencyFolders.map { folder -> loader.sourceFolder(folder = folder, dependency = true) }
+    private fun AnalysisInput.toSqlDelightSourceFolders(): Set<SqlDelightSourceFolder> {
+        val local = sourceFolders.map { folder -> SqlDelightCheckSourceFolder(folder = folder, dependency = false) }
+        val dependencies = dependencyFolders.map { folder -> SqlDelightCheckSourceFolder(folder = folder, dependency = true) }
         return (local + dependencies).toSet()
     }
-
-    private fun ClassLoader.sourceFolder(
-        folder: File,
-        dependency: Boolean,
-    ): Any =
-        proxy(
-            interfaceName = SQL_DELIGHT_SOURCE_FOLDER_CLASS,
-            values =
-                mapOf(
-                    "getFolder" to folder,
-                    "getDependency" to dependency,
-                ),
-        )
 
     private fun AnalysisInput.rootDirectory(): File =
         sourceFolders
@@ -173,77 +161,38 @@ internal object SqlDelight2Analyzer {
             database = database,
         )
     }
-
-    private fun Class<*>.newEnvironment(
-        properties: Any,
-        compilationUnit: Any,
-        dialect: Any,
-        input: AnalysisInput,
-    ): Any {
-        val constructor =
-            constructors.firstOrNull { candidate -> candidate.parameterCount == 7 }
-                ?: constructors.firstOrNull { candidate -> candidate.parameterCount == 8 }
-                ?: error(
-                    "SQLDelight class $name does not expose a supported constructor. " +
-                        "Available constructors: ${constructors.joinToString { constructor -> constructor.signature() }}",
-                )
-        val arguments =
-            when (constructor.parameterCount) {
-                7 ->
-                    arrayOf(
-                        properties,
-                        compilationUnit,
-                        false,
-                        dialect,
-                        "sqldelight-check",
-                        input.sourceFolders,
-                        input.dependencyFolders,
-                    )
-                8 ->
-                    arrayOf(
-                        properties,
-                        compilationUnit,
-                        false,
-                        dialect,
-                        "sqldelight-check",
-                        emptySet<Any>(),
-                        input.sourceFolders,
-                        input.dependencyFolders,
-                    )
-                else -> error("Unsupported SQLDelightEnvironment constructor: ${constructor.signature()}")
-            }
-        return constructor.newInstance(*arguments)
-    }
-
-    private fun Class<*>.methodWithParameterCount(
-        name: String,
-        parameterCount: Int,
-    ): Method =
-        methods.firstOrNull { method -> method.name == name && method.parameterCount == parameterCount }
-            ?: error(
-                "SQLDelight class ${this.name} does not expose $name with $parameterCount argument(s). " +
-                    "Available methods: ${methods.joinToString { method -> method.signature() }}",
-            )
-
-    private fun Constructor<*>.signature(): String =
-        parameterTypes.joinToString(prefix = "(", postfix = ")") { type -> type.name }
-
-    private fun Method.signature(): String =
-        "$name${parameterTypes.joinToString(prefix = "(", postfix = ")") { type -> type.name }}"
-}
-
-private fun ClassLoader.noOpFunction(functionType: Class<*>): Any {
-    val unit = Class.forName("kotlin.Unit", true, this).getField("INSTANCE").get(null)
-    return Proxy.newProxyInstance(this, arrayOf(functionType)) { _, _, _ -> unit }
 }
 
 private fun Throwable.rootCause(): Throwable {
     var current = this
-    while (current is InvocationTargetException && current.targetException != null) {
-        current = current.targetException
+    while (current.cause != null && current.cause !== current) {
+        current = current.cause ?: break
     }
     return current
 }
+
+private data class SqlDelightCheckCompilationUnit(
+    override val name: String,
+    override val sourceFolders: Set<SqlDelightSourceFolder>,
+    override val outputDirectoryFile: File,
+) : SqlDelightCompilationUnit
+
+private data class SqlDelightCheckDatabaseProperties(
+    override val packageName: String,
+    override val compilationUnits: List<SqlDelightCompilationUnit>,
+    override val className: String,
+    override val dependencies: List<SqlDelightDatabaseName>,
+    override val deriveSchemaFromMigrations: Boolean,
+    override val treatNullAsUnknownForEquality: Boolean,
+    override val rootDirectory: File,
+    override val generateAsync: Boolean,
+    override val expandSelectStar: Boolean,
+) : SqlDelightDatabaseProperties
+
+private data class SqlDelightCheckSourceFolder(
+    override val folder: File,
+    override val dependency: Boolean,
+) : SqlDelightSourceFolder
 
 private inline fun <T> withContextClassLoader(
     classLoader: ClassLoader,

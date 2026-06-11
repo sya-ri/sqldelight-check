@@ -22,6 +22,8 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPubli
 
 [libraries]
 sqldelight-compiler-env = { module = "app.cash.sqldelight:compiler-env", version.ref = "sqldelight" }
+sqldelight-core = { module = "app.cash.sqldelight:core", version.ref = "sqldelight" }
+sqldelight-dialect-api = { module = "app.cash.sqldelight:dialect-api", version.ref = "sqldelight" }
 sqldelight-gradle-plugin = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
 sqldelight-sqlite338-dialect = { module = "app.cash.sqldelight:sqlite-3-38-dialect", version.ref = "sqldelight" }
 sql-psi-environment = { module = "app.cash.sql-psi:environment", version.ref = "sqlPsi" }
