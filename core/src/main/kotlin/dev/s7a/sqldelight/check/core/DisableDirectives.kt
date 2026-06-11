@@ -1,10 +1,16 @@
+@file:OptIn(dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi::class)
+
 package dev.s7a.sqldelight.check.core
 
+import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SourcePosition
+import dev.s7a.sqldelight.check.api.SourceRange
 
 /**
  * Parses sqldelight-check disable comments for a single source file.
@@ -12,59 +18,103 @@ import dev.s7a.sqldelight.check.api.SourceFile
  * Directives affect diagnostics produced by configured rules.
  */
 internal class DisableDirectives private constructor(
-    private val fileRules: RuleMatcher?,
-    private val nextLineRules: Map<Int, List<RuleMatcher>>,
+    private val fileDirective: DisableDirective?,
+    private val nextLineRules: Map<Int, List<DisableDirective>>,
     private val disabledLines: List<DisabledLine>,
+    private val disableDirectives: List<DisableDirective>,
 ) {
     fun suppresses(diagnostic: Diagnostic): Boolean {
         val ruleId = diagnostic.ruleId
         if (ruleId in rulesThatMustNotBeSuppressed) return false
         val line = diagnostic.range?.start?.line ?: return false
-        if (fileRules?.matches(ruleId) == true) return true
-        if (nextLineRules[line]?.any { matcher -> matcher.matches(ruleId) } == true) return true
-        return disabledLines.any { disabledLine -> disabledLine.matches(line, ruleId) }
+        if (fileDirective?.suppresses(ruleId) == true) return true
+        if (nextLineRules[line]?.any { directive -> directive.suppresses(ruleId) } == true) return true
+        return disabledLines.any { disabledLine -> disabledLine.suppresses(line, ruleId) }
     }
+
+    fun redundantDisableDiagnostics(
+        file: SourceFile,
+        ruleId: QualifiedRuleId,
+        severity: Severity,
+        database: DatabaseContext,
+    ): List<Diagnostic> =
+        disableDirectives
+            .filterNot { directive -> directive.used }
+            .map { directive ->
+                Diagnostic(
+                    ruleId = ruleId,
+                    severity = severity,
+                    message = "sqldelight-check disable directive does not suppress any diagnostics.",
+                    file = file,
+                    range = directive.range,
+                    database = database,
+                )
+            }
+
+    fun suppressionReasonDiagnostics(
+        file: SourceFile,
+        ruleId: QualifiedRuleId,
+        severity: Severity,
+        database: DatabaseContext,
+    ): List<Diagnostic> =
+        disableDirectives
+            .filter { directive -> directive.requiresReason && !directive.hasReason }
+            .map { directive ->
+                Diagnostic(
+                    ruleId = ruleId,
+                    severity = severity,
+                    message = "sqldelight-check disable directives should include a reason after '--'.",
+                    file = file,
+                    range = directive.range,
+                    database = database,
+                )
+            }
 
     internal companion object {
         fun parse(file: SourceFile): DisableDirectives {
             val state = ParserState()
-            val activeBlocks = mutableListOf<RuleMatcher>()
+            val activeBlocks = mutableListOf<DisableDirective>()
             file.content.lineSequence().forEachIndexed { index, line ->
                 val lineNumber = index + 1
-                val directive = line.directive() ?: run {
-                    activeBlocks.forEach { matcher ->
-                        state.disabledLines += DisabledLine(lineNumber, listOf(matcher))
+                val directive = line.directive(lineNumber) ?: run {
+                    activeBlocks.forEach { activeDirective ->
+                        state.disabledLines += DisabledLine(lineNumber, listOf(activeDirective))
                     }
                     return@forEachIndexed
                 }
-
                 when (directive.command) {
-                    DirectiveCommand.DisableFile -> state.fileRules = directive.matcher
+                    DirectiveCommand.DisableFile -> {
+                        val disableDirective = directive.disableDirective()
+                        state.fileDirective = disableDirective
+                        state.disableDirectives += disableDirective
+                    }
                     DirectiveCommand.DisableNextLine ->
                         state.nextLineRules.getOrPut(lineNumber + 1) {
                             mutableListOf()
-                        } += directive.matcher
+                        } += directive.disableDirective().also(state.disableDirectives::add)
 
-                    DirectiveCommand.Disable -> activeBlocks += directive.matcher
+                    DirectiveCommand.Disable ->
+                        activeBlocks += directive.disableDirective().also(state.disableDirectives::add)
                     DirectiveCommand.Enable -> activeBlocks.removeMatching(directive.matcher)
                 }
             }
             return DisableDirectives(
-                fileRules = state.fileRules,
+                fileDirective = state.fileDirective,
                 nextLineRules = state.nextLineRules,
                 disabledLines = state.disabledLines,
+                disableDirectives = state.disableDirectives,
             )
         }
 
-        private fun MutableList<RuleMatcher>.removeMatching(matcher: RuleMatcher) {
+        private fun MutableList<DisableDirective>.removeMatching(matcher: RuleMatcher) {
             if (matcher.ruleIds == null) {
                 clear()
                 return
             }
-            removeAll { active -> active.ruleIds == matcher.ruleIds }
+            removeAll { active -> active.matcher.ruleIds == matcher.ruleIds }
         }
 
-        private fun String.directive(): Directive? {
+        private fun String.directive(lineNumber: Int): Directive? {
             val trimmed = trimStart()
             if (!trimmed.startsWith("--")) return null
             val body = trimmed.removePrefix("--").trimStart()
@@ -72,13 +122,28 @@ internal class DisableDirectives private constructor(
             val withoutPrefix = body.removePrefix("sqldelight-check-")
             val commandText = withoutPrefix.takeWhile { character -> !character.isWhitespace() }
             val command = DirectiveCommand.fromToken(commandText) ?: return null
-            val ruleIds = withoutPrefix.drop(command.token.length).withoutReason().trim().ruleIds()
-            return Directive(command = command, matcher = RuleMatcher(ruleIds = ruleIds))
+            val payload = withoutPrefix.drop(command.token.length)
+            val ruleIds = payload.withoutReason().trim().ruleIds()
+            return Directive(
+                command = command,
+                hasReason = payload.hasReason(),
+                matcher = RuleMatcher(ruleIds = ruleIds),
+                range =
+                    SourceRange(
+                        start = SourcePosition(line = lineNumber, column = 1),
+                        end = SourcePosition(line = lineNumber, column = length + 1),
+                    ),
+            )
         }
 
         private fun String.withoutReason(): String {
             val delimiter = indexOf(" --")
             return if (delimiter == -1) this else substring(0, delimiter)
+        }
+
+        private fun String.hasReason(): Boolean {
+            val delimiter = indexOf(" --")
+            return delimiter != -1 && drop(delimiter + 3).isNotBlank()
         }
 
         private fun String.ruleIds(): Set<String>? {
@@ -98,8 +163,12 @@ internal class DisableDirectives private constructor(
         private val rulesThatMustNotBeSuppressed =
             setOf(
                 QualifiedRuleId(
-                    ruleSetId = RuleSetId("standard"),
+                    ruleSetId = RuleSetId("core"),
                     ruleId = RuleId("require-suppression-reason"),
+                ),
+                QualifiedRuleId(
+                    ruleSetId = RuleSetId("core"),
+                    ruleId = RuleId("no-redundant-suppression"),
                 ),
             )
     }
@@ -110,11 +179,12 @@ internal class DisableDirectives private constructor(
  */
 private enum class DirectiveCommand(
     val token: String,
+    val requiresReason: Boolean,
 ) {
-    Disable("disable"),
-    Enable("enable"),
-    DisableNextLine("disable-next-line"),
-    DisableFile("disable-file"),
+    Disable("disable", requiresReason = true),
+    Enable("enable", requiresReason = false),
+    DisableNextLine("disable-next-line", requiresReason = true),
+    DisableFile("disable-file", requiresReason = true),
     ;
 
     companion object {
@@ -127,9 +197,10 @@ private enum class DirectiveCommand(
  * Mutable parser state while scanning a source file for disable directives.
  */
 private data class ParserState(
-    var fileRules: RuleMatcher? = null,
-    val nextLineRules: MutableMap<Int, MutableList<RuleMatcher>> = mutableMapOf(),
+    var fileDirective: DisableDirective? = null,
+    val nextLineRules: MutableMap<Int, MutableList<DisableDirective>> = mutableMapOf(),
     val disabledLines: MutableList<DisabledLine> = mutableListOf(),
+    val disableDirectives: MutableList<DisableDirective> = mutableListOf(),
 )
 
 /**
@@ -137,12 +208,15 @@ private data class ParserState(
  */
 private data class DisabledLine(
     val line: Int,
-    val rules: List<RuleMatcher>,
+    val directives: List<DisableDirective>,
 ) {
-    fun matches(
+    fun suppresses(
         diagnosticLine: Int,
         ruleId: QualifiedRuleId,
-    ): Boolean = diagnosticLine == line && rules.any { matcher -> matcher.matches(ruleId) }
+    ): Boolean {
+        if (diagnosticLine != line) return false
+        return directives.any { directive -> directive.suppresses(ruleId) }
+    }
 }
 
 /**
@@ -155,9 +229,37 @@ private data class RuleMatcher(
 }
 
 /**
+ * Disable directive that can be reported when it never suppresses diagnostics.
+ */
+private data class DisableDirective(
+    val matcher: RuleMatcher,
+    val requiresReason: Boolean,
+    val hasReason: Boolean,
+    val range: SourceRange,
+) {
+    var used: Boolean = false
+
+    fun suppresses(ruleId: QualifiedRuleId): Boolean {
+        if (!matcher.matches(ruleId)) return false
+        used = true
+        return true
+    }
+}
+
+/**
  * Parsed disable directive command and target matcher.
  */
 private data class Directive(
     val command: DirectiveCommand,
+    val hasReason: Boolean,
     val matcher: RuleMatcher,
-)
+    val range: SourceRange,
+) {
+    fun disableDirective(): DisableDirective =
+        DisableDirective(
+            matcher = matcher,
+            requiresReason = command.requiresReason,
+            hasReason = hasReason,
+            range = range,
+        )
+}

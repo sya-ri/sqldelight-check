@@ -63,7 +63,7 @@ publish pull request based on the previous published merge point.
 After the publish pull request is merged, publish artifacts from `main`, verify that they are available, then create the
 GitHub Release.
 
-`v0.1.0` publishing is not automated yet. Before merging a publish pull request, verify:
+`v0.1.1` publishing is not automated yet. Before merging a publish pull request, verify:
 
 - `./gradlew --no-daemon releaseCheck`
 - The CI Qodana job is green for the release commit, or run the local Qodana Docker command above with the repository

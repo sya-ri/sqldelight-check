@@ -10,12 +10,14 @@ import java.util.Collections
 import java.util.Enumeration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 /**
  * Gradle plugin entry point for sqldelight-check.
  */
 public class SqlDelightCheckGradlePlugin : Plugin<Project> {
     override fun apply(target: Project) {
+        target.pluginManager.apply(LifecycleBasePlugin::class.java)
         val extension = target.extensions.create("sqldelightCheck", SqlDelightCheckExtension::class.java)
         target.configureDefaultReports(extension)
         target.createRuleSetConfiguration()
@@ -68,6 +70,13 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
             task.applyFixes.convention(false)
             task.logLevel.convention(resolveLogLevelOverride(extension))
             configureTaskInputs(task)
+            task.notCompatibleWithConfigurationCache(
+                "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
+            )
+        }.also { sqldelightCheck ->
+            tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) { task ->
+                task.dependsOn(sqldelightCheck)
+            }
         }
         tasks.register("sqldelightFix", SqlDelightCheckTask::class.java) { task ->
             task.group = taskGroup
@@ -75,6 +84,9 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
             task.applyFixes.convention(true)
             task.logLevel.convention(resolveLogLevelOverride(extension))
             configureTaskInputs(task)
+            task.notCompatibleWithConfigurationCache(
+                "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
+            )
         }
     }
 }

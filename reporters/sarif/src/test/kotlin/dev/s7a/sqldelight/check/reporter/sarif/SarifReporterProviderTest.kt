@@ -25,7 +25,7 @@ class SarifReporterProviderTest {
         val sarif = SarifReporterProvider().render(Report(diagnostics = emptyList()))
 
         assertEquals(
-            """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.0","rules":[]}},"results":[]}]}""",
+            """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.1","rules":[]}},"results":[]}]}""",
             sarif,
         )
     }
@@ -35,7 +35,7 @@ class SarifReporterProviderTest {
         val sarif = SarifReporterProvider().render(Report(diagnostics = listOf(diagnostic())))
 
         assertEquals(
-            """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.0","rules":[{"id":"standard:use-is-null"}]}},"results":[{"ruleId":"standard:use-is-null","level":"warning","message":{"text":"Use `IS NULL` instead of = NULL & keep <safe>."},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"src/commonMain/sqldelight/Player.sq"},"region":{"startLine":2,"startColumn":8,"endLine":2,"endColumn":16}}}]}]}]}""",
+            """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.1","rules":[{"id":"standard:use-is-null"}]}},"results":[{"ruleId":"standard:use-is-null","level":"warning","message":{"text":"Use `IS NULL` instead of = NULL & keep <safe>."},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"src/commonMain/sqldelight/Player.sq"},"region":{"startLine":2,"startColumn":8,"endLine":2,"endColumn":16}}}]}]}]}""",
             sarif,
         )
     }
@@ -57,7 +57,7 @@ class SarifReporterProviderTest {
                         "tool": {
                             "driver": {
                                 "name": "sqldelight-check",
-                                "semanticVersion": "0.1.0",
+                                "semanticVersion": "0.1.1",
                                 "rules": []
                             }
                         },

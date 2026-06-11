@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
@@ -101,7 +102,23 @@ public class SqlDelightCheckEngine {
                 diagnostics
             }.filterNot(disableDirectives::suppresses)
         trace.fileRules(database, file, executedRuleIds)
-        return diagnostics
+        return diagnostics +
+            coreRuleSeverity(resolver, database.name, coreRequireSuppressionReasonRuleId).orEmptyDiagnostics { severity ->
+                disableDirectives.suppressionReasonDiagnostics(
+                    file = file,
+                    ruleId = coreRequireSuppressionReasonRuleId,
+                    severity = severity,
+                    database = database,
+                )
+            } +
+            coreRuleSeverity(resolver, database.name, coreNoRedundantSuppressionRuleId).orEmptyDiagnostics { severity ->
+                disableDirectives.redundantDisableDiagnostics(
+                    file = file,
+                    ruleId = coreNoRedundantSuppressionRuleId,
+                    severity = severity,
+                    database = database,
+                )
+            }
     }
 
     private fun Rule.shouldRun(
@@ -137,3 +154,42 @@ private data class RuleCandidate(
     val ruleId: QualifiedRuleId,
     val rule: Rule,
 )
+
+private fun coreRuleSeverity(
+    resolver: ConfigurationResolver,
+    databaseName: String,
+    ruleId: QualifiedRuleId,
+): Severity? {
+    val ruleSetConfig = resolver.resolveRuleSet(coreRuleSetId, databaseName, defaultEnablement = Enablement.Enabled)
+    val ruleConfig =
+        resolver.resolveRule(
+            ruleId = ruleId,
+            databaseName = databaseName,
+            defaultEnablement = Enablement.Enabled,
+            defaultSeverity = Severity.Warning,
+        )
+    val enablement =
+        if (ruleConfig.enablement == Enablement.Auto) {
+            ruleSetConfig.enablement
+        } else {
+            ruleConfig.enablement
+        }
+    return if (enablement == Enablement.Disabled) null else ruleConfig.severity
+}
+
+private inline fun Severity?.orEmptyDiagnostics(block: (Severity) -> List<Diagnostic>): List<Diagnostic> =
+    this?.let(block).orEmpty()
+
+private val coreRuleSetId = RuleSetId("core")
+
+private val coreRequireSuppressionReasonRuleId =
+    QualifiedRuleId(
+        ruleSetId = coreRuleSetId,
+        ruleId = RuleId("require-suppression-reason"),
+    )
+
+private val coreNoRedundantSuppressionRuleId =
+    QualifiedRuleId(
+        ruleSetId = coreRuleSetId,
+        ruleId = RuleId("no-redundant-suppression"),
+    )

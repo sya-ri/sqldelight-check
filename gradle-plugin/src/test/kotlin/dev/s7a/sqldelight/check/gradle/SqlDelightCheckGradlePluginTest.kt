@@ -85,6 +85,24 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `gradle check task runs sqldelight check task`() {
+        val project =
+            testProject(
+                """
+                plugins {
+                    id("dev.s7a.sqldelight.check")
+                }
+                """.trimIndent(),
+            )
+
+        val result = project.run("check")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(SUCCESS, result.task(":check")?.outcome)
+        assertEquals(null, result.task(":sqldelightFix"))
+    }
+
+    @Test
     fun `check task runs official dialect rule sets without extra dependencies`() {
         val project =
             testProject(
@@ -1163,7 +1181,7 @@ class SqlDelightCheckGradlePluginTest {
                 "    \"diagnostics\": []\n" +
                 "}"
         private const val EMPTY_SARIF_REPORT =
-            """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.0","rules":[]}},"results":[]}]}"""
+            """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.1","rules":[]}},"results":[]}]}"""
 
         val stableSqlDelight2Versions = listOf("2.0.0", "2.0.2", "2.1.0", "2.2.1", "2.3.1", "2.3.2")
         val snapshotSqlDelight2Versions = listOf("2.4.0-SNAPSHOT")
