@@ -1,4 +1,4 @@
-package dev.s7a.sqldelight.check.rules.postgres.rules
+package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectCapabilities
@@ -13,7 +13,8 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 internal fun Rule.diagnostics(
     content: String,
-    capabilities: Set<DialectCapability> = setOf(DialectCapabilities.PostgreSql),
+    capabilities: Set<DialectCapability> = setOf(DialectCapabilities.SQLite),
+    path: String = "src/main/sqldelight/com/example/1.sqm",
 ): List<Diagnostic> {
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -24,14 +25,14 @@ internal fun Rule.diagnostics(
                         name = "Database",
                         dialect =
                             SqlDialect(
-                                family = DialectFamily.PostgreSql,
-                                displayName = "PostgreSQL",
+                                family = DialectFamily.SQLite,
+                                displayName = "SQLite",
                                 capabilities = capabilities,
                             ),
                     )
                 override val file: SourceFile =
                     SourceFile(
-                        path = "src/main/sqldelight/com/example/1.sqm",
+                        path = path,
                         content = content.trimIndent() + "\n",
                     )
                 override val options: Map<String, String> = emptyMap()

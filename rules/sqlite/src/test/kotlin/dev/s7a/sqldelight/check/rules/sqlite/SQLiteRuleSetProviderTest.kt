@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rules.sqlite
 
 import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import java.util.ServiceLoader
@@ -13,12 +14,13 @@ import kotlin.test.assertTrue
  */
 class SQLiteRuleSetProviderTest {
     @Test
-    fun `sqlite rule set starts empty`() {
+    fun `sqlite rule set provides sqlite rules`() {
         val provider = SQLiteRuleSetProvider()
+        val ruleIds = provider.ruleProviders().map { ruleProvider -> ruleProvider.create().id }.toSet()
 
         assertEquals(RuleSetId("sqlite"), provider.id)
         assertEquals(DialectCapabilities.SQLite, provider.targetCapability)
-        assertEquals(emptySet(), provider.ruleProviders())
+        assertEquals(setOf(RuleId("sqlite:foreign-keys-restored")), ruleIds)
     }
 
     @Test

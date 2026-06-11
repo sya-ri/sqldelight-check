@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+import dev.s7a.sqldelight.check.rules.sqlite.rules.ForeignKeysRestoredRule
 
 /**
  * Provides rules for SQLite dialect projects.
@@ -19,5 +20,8 @@ public class SQLiteRuleSetProvider : RuleSetProvider {
      */
     public val targetCapability: DialectCapability = DialectCapabilities.SQLite
 
-    override fun ruleProviders(): Set<RuleProvider> = emptySet()
+    override fun ruleProviders(): Set<RuleProvider> =
+        setOf(
+            RuleProvider(::ForeignKeysRestoredRule),
+        )
 }

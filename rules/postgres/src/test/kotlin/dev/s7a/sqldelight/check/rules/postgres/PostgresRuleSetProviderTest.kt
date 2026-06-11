@@ -20,7 +20,13 @@ class PostgresRuleSetProviderTest {
 
         assertEquals(RuleSetId("postgres"), provider.id)
         assertEquals(DialectCapabilities.PostgreSql, provider.targetCapability)
-        assertEquals(setOf(RuleId("postgres:excessive-locks")), ruleIds)
+        assertEquals(
+            setOf(
+                RuleId("postgres:excessive-locks"),
+                RuleId("postgres:reindex-concurrently"),
+            ),
+            ruleIds,
+        )
     }
 
     @Test
