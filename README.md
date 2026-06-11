@@ -204,6 +204,7 @@ See the rule-set README files for rule behavior, options, and examples:
 
 Rules run after SQLDelight accepts the project input. SQLDelight parser and dialect behavior are not reimplemented by
 sqldelight-check.
+See [Architecture Notes](docs/architecture.md) for the SQLDelight compatibility and rule API boundaries.
 
 sqldelight-check's standard rules are inspired by the practical SQL linting vocabulary established by
 [SQLFluff](https://sqlfluff.com/). Thanks to the SQLFluff project for making those rule categories familiar and useful

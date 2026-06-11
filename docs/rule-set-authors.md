@@ -89,6 +89,20 @@ class ExampleRule : Rule {
 `RuleContext` intentionally exposes sqldelight-check-owned models instead of SQLDelight compiler internals. This keeps
 custom rules stable across supported SQLDelight `2.x` versions.
 
+## PSI And Stable Facts
+
+Custom rules should not depend on SQLDelight PSI or IntelliJ PSI classes. Those
+types are implementation details of the SQLDelight version selected by the
+checked project, so exposing them from `rule-api` would make third-party rule
+sets version-sensitive.
+
+Use `RuleContext.facts` for parser-backed structure that sqldelight-check
+intends to keep stable. Use `RuleContext.file.source` only for conservative
+source-text checks such as comments, line endings, or token-level policies.
+
+When a rule needs structure that `SqlFacts` does not expose yet, prefer adding a
+stable fact type to `rule-api` over reaching into SQLDelight internals.
+
 ## IDs And Configuration
 
 Use `rule-set:rule-name` IDs. The rule set part should match the provider ID:
