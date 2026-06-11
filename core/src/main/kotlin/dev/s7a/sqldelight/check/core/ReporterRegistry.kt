@@ -9,6 +9,10 @@ import java.util.ServiceLoader
 public class ReporterRegistry(
     private val providers: List<ReporterProvider>,
 ) {
+    init {
+        validateReporterProviders(providers)
+    }
+
     /**
      * Finds a reporter provider by DSL ID.
      */
@@ -30,5 +34,17 @@ public class ReporterRegistry(
                     .toList()
                     .sortedBy { provider -> provider.id },
             )
+    }
+}
+
+private fun validateReporterProviders(providers: List<ReporterProvider>) {
+    val duplicates =
+        providers
+            .groupBy { provider -> provider.id }
+            .filterValues { matches -> matches.size > 1 }
+            .keys
+            .sorted()
+    require(duplicates.isEmpty()) {
+        "Duplicate sqldelight-check reporter provider ID(s): ${duplicates.joinToString()}"
     }
 }

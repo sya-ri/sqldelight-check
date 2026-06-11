@@ -9,12 +9,18 @@ import java.util.ServiceLoader
 public class RuleRegistry private constructor(
     private val ruleSetProviders: List<RuleSetProvider>,
 ) {
+    init {
+        validateRuleSetProviders(ruleSetProviders)
+    }
+
     /**
      * Returns discovered rule set providers.
      */
     public fun providers(): List<RuleSetProvider> = ruleSetProviders
 
     public companion object {
+        internal fun create(providers: List<RuleSetProvider>): RuleRegistry = RuleRegistry(providers)
+
         /**
          * Loads rule set providers visible to [classLoader].
          */
@@ -25,5 +31,40 @@ public class RuleRegistry private constructor(
                     .toList()
             return RuleRegistry(providers)
         }
+    }
+}
+
+private fun validateRuleSetProviders(providers: List<RuleSetProvider>) {
+    val duplicateRuleSetIds =
+        providers
+            .groupBy { provider -> provider.id.value }
+            .filterValues { matches -> matches.size > 1 }
+            .keys
+            .sorted()
+    require(duplicateRuleSetIds.isEmpty()) {
+        "Duplicate sqldelight-check rule set provider ID(s): ${duplicateRuleSetIds.joinToString()}"
+    }
+
+    val duplicateRuleIds =
+        providers
+            .flatMap { provider ->
+                provider.ruleProviders().map { ruleProvider ->
+                    provider.id.value to ruleProvider.create().id.value
+                }
+            }
+            .groupBy { (_, ruleId) -> ruleId }
+            .filterValues { matches -> matches.size > 1 }
+            .mapValues { (_, matches) ->
+                matches.map { (ruleSetId, _) -> ruleSetId }.distinct().sorted()
+            }
+            .toSortedMap()
+    require(duplicateRuleIds.isEmpty()) {
+        duplicateRuleIds
+            .entries
+            .joinToString(
+                prefix = "Duplicate sqldelight-check rule ID(s): ",
+            ) { (ruleId, ruleSetIds) ->
+                "$ruleId in ${ruleSetIds.joinToString()}"
+            }
     }
 }

@@ -1,0 +1,108 @@
+package dev.s7a.sqldelight.check.core
+
+import dev.s7a.sqldelight.check.api.Enablement
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.reporter.api.Report
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
+import dev.s7a.sqldelight.check.reporter.api.Reporter
+import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleProvider
+import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+import kotlin.test.Test
+import kotlin.test.assertContains
+import kotlin.test.assertFailsWith
+
+/**
+ * Tests for provider registry validation before task execution starts.
+ */
+class ProviderRegistryTest {
+    @Test
+    fun `reporter registry rejects duplicate reporter IDs`() {
+        val error =
+            assertFailsWith<IllegalArgumentException> {
+                ReporterRegistry(
+                    listOf(
+                        reporterProvider("json"),
+                        reporterProvider("json"),
+                    ),
+                )
+            }
+
+        assertContains(error.message.orEmpty(), "Duplicate sqldelight-check reporter provider ID(s): json")
+    }
+
+    @Test
+    fun `rule registry rejects duplicate rule set IDs`() {
+        val error =
+            assertFailsWith<IllegalArgumentException> {
+                RuleRegistry.create(
+                    listOf(
+                        ruleSetProvider("standard", "standard:first"),
+                        ruleSetProvider("standard", "standard:second"),
+                    ),
+                )
+            }
+
+        assertContains(error.message.orEmpty(), "Duplicate sqldelight-check rule set provider ID(s): standard")
+    }
+
+    @Test
+    fun `rule registry rejects duplicate rule IDs`() {
+        val error =
+            assertFailsWith<IllegalArgumentException> {
+                RuleRegistry.create(
+                    listOf(
+                        ruleSetProvider("first", "custom:duplicate"),
+                        ruleSetProvider("second", "custom:duplicate"),
+                    ),
+                )
+            }
+
+        assertContains(error.message.orEmpty(), "Duplicate sqldelight-check rule ID(s): custom:duplicate in first, second")
+    }
+
+    private fun reporterProvider(id: String): ReporterProvider =
+        object : ReporterProvider {
+            override val id: String = id
+
+            override fun create(options: Map<String, String>): Reporter =
+                object : Reporter {
+                    override fun write(
+                        report: Report,
+                        output: ReportOutput,
+                    ) = Unit
+                }
+        }
+
+    private fun ruleSetProvider(
+        ruleSetId: String,
+        ruleId: String,
+    ): RuleSetProvider =
+        object : RuleSetProvider {
+            override val id: RuleSetId = RuleSetId(ruleSetId)
+
+            override fun ruleProviders(): Set<RuleProvider> =
+                setOf(
+                    RuleProvider {
+                        testRule(ruleId)
+                    },
+                )
+        }
+
+    private fun testRule(ruleId: String): Rule =
+        object : Rule {
+            override val id: RuleId = RuleId(ruleId)
+            override val defaultSeverity: Severity = Severity.Warning
+            override val defaultEnablement: Enablement = Enablement.Enabled
+
+            override fun run(
+                context: RuleContext,
+                reporter: DiagnosticReporter,
+            ) = Unit
+        }
+}
