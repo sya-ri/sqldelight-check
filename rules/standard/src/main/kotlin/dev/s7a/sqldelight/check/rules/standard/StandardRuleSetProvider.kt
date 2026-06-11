@@ -101,7 +101,6 @@ import dev.s7a.sqldelight.check.rules.standard.rules.RequireResultColumnAliasRul
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireLikeEscapeForUserInputRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasAsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasForSubqueryRule
-import dev.s7a.sqldelight.check.rules.standard.rules.RequireSuppressionReasonRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireWhereIndexFriendlyPredicateRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ResultAliasNameCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SelectCommaLinePositionRule
@@ -233,7 +232,6 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::RequireParenthesesForMixedBooleanOperatorsRule),
             RuleProvider(::RequireQueryLabelRule),
             RuleProvider(::RequireResultColumnAliasRule),
-            RuleProvider(::RequireSuppressionReasonRule),
             RuleProvider(::RequireTableAliasAsRule),
             RuleProvider(::RequireTableAliasForSubqueryRule),
             RuleProvider(::RequireWhereIndexFriendlyPredicateRule),

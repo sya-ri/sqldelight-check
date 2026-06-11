@@ -187,20 +187,22 @@ Supported directives:
 
 Omitting rule IDs suppresses all rule diagnostics covered by that directive.
 
-When `standard:require-suppression-reason` is enabled, put the reason in the same SQL line comment after a second
+When `core:require-suppression-reason` is enabled, put the reason in the same SQL line comment after a second
 `--`. The reason belongs on the `disable-file`, `disable-next-line`, or `disable` directive line, not on the suppressed
 SQL statement or the later `enable` line.
 
 Unused disable directives are reported as `core:no-redundant-suppression`. This core diagnostic is emitted after
 sqldelight-check applies suppressions, so it can identify directives that did not suppress any rule diagnostics.
 
+See [Core diagnostics](core/README.md) for core diagnostic behavior and configuration.
+
 ## Rule Sets
 
 Built-in rule set artifacts are installed with the Gradle plugin and are also published separately for custom setups:
 
-The built-in rule sets currently include 148 rules:
+The built-in rule sets currently include 147 rules:
 
-- `sqldelight-check-rules-standard`: 119 dialect-independent rules for `.sq` and `.sqm` files.
+- `sqldelight-check-rules-standard`: 118 dialect-independent rules for `.sq` and `.sqm` files.
 - `sqldelight-check-rules-postgres`: 12 PostgreSQL-specific rules gated by `DialectCapability.PostgreSql`.
 - `sqldelight-check-rules-mysql`: 8 MySQL-specific rules gated by `DialectCapability.MySql`.
 - `sqldelight-check-rules-sqlite`: 6 SQLite-specific rules gated by `DialectCapability.SQLite`.
@@ -208,6 +210,7 @@ The built-in rule sets currently include 148 rules:
 
 See the rule-set README files for rule behavior, options, and examples:
 
+- [Core diagnostics](core/README.md)
 - [Standard rules](rules/standard/README.md)
 - [PostgreSQL rules](rules/postgres/README.md)
 - [MySQL rules](rules/mysql/README.md)

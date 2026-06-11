@@ -137,7 +137,7 @@ internal class DisableDirectives private constructor(
         private val rulesThatMustNotBeSuppressed =
             setOf(
                 QualifiedRuleId(
-                    ruleSetId = RuleSetId("standard"),
+                    ruleSetId = RuleSetId("core"),
                     ruleId = RuleId("require-suppression-reason"),
                 ),
                 QualifiedRuleId(
