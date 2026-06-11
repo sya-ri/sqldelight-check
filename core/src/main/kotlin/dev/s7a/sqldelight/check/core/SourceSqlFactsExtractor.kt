@@ -2,7 +2,6 @@ package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
-import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import dev.s7a.sqldelight.check.rule.api.SqlJoinFacts
 import dev.s7a.sqldelight.check.rule.api.SqlQualifiedReferenceFacts
@@ -11,6 +10,7 @@ import dev.s7a.sqldelight.check.rule.api.SqlSelectFacts
 import dev.s7a.sqldelight.check.rule.api.SqlStatementFacts
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
 import dev.s7a.sqldelight.check.rule.api.SqlTableReferenceFacts
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
 /**
  * Conservative source scanner that populates stable SQL facts.
@@ -296,30 +296,6 @@ private data class SqlCharacter(
     val value: Char,
     val offset: Int,
 )
-
-private fun String.rangeAtOffsets(
-    startOffset: Int,
-    endOffset: Int,
-): SourceRange =
-    SourceRange(
-        start = positionAt(startOffset),
-        end = positionAt(endOffset),
-    )
-
-private fun String.positionAt(offset: Int): SourcePosition {
-    val boundedOffset = offset.coerceIn(0, length)
-    var line = 1
-    var lineStart = 0
-    var index = 0
-    while (index < boundedOffset) {
-        if (this[index] == '\n') {
-            line++
-            lineStart = index + 1
-        }
-        index++
-    }
-    return SourcePosition(line = line, column = boundedOffset - lineStart + 1)
-}
 
 private fun SourcePosition.toOffsetIn(content: String): Int {
     var line = 1

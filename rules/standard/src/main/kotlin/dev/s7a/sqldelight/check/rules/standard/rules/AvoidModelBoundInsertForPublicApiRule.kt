@@ -1,5 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId

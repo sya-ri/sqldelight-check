@@ -1,8 +1,5 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.SourcePosition
-import dev.s7a.sqldelight.check.api.SourceRange
-
 internal data class LineInfo(
     val number: Int,
     val startOffset: Int,
@@ -39,30 +36,6 @@ internal data class BlockComment(
     val startOffset: Int,
     val endOffset: Int,
 )
-
-internal fun String.rangeAtOffsets(
-    startOffset: Int,
-    endOffset: Int,
-): SourceRange =
-    SourceRange(
-        start = positionAt(startOffset),
-        end = positionAt(endOffset),
-    )
-
-internal fun String.positionAt(offset: Int): SourcePosition {
-    val boundedOffset = offset.coerceIn(0, length)
-    var line = 1
-    var lineStart = 0
-    var index = 0
-    while (index < boundedOffset) {
-        if (this[index] == '\n') {
-            line++
-            lineStart = index + 1
-        }
-        index++
-    }
-    return SourcePosition(line = line, column = boundedOffset - lineStart + 1)
-}
 
 internal fun String.linesWithRanges(): List<LineInfo> {
     val lines = mutableListOf<LineInfo>()
