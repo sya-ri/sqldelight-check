@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rules.standard.rules.BlockedWordsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ClauseKeywordNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentColumnReferencesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorRule
@@ -40,6 +41,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoRightJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectDistinctWithGroupByRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectTrailingCommaRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoSelfAliasRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
@@ -52,6 +54,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.PreferExplicitColumnListInI
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferSimpleBooleanCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireOrderByWithLimitRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireResultColumnAliasRule
+import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasForSubqueryRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SelectModifierLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SetOperatorLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterBlockCommentStartRule
@@ -61,6 +64,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAroundBinaryOperatorsR
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAroundComparisonOperatorsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceBeforeBlockCommentEndRule
 import dev.s7a.sqldelight.check.rules.standard.rules.StatementTerminatorRule
+import dev.s7a.sqldelight.check.rules.standard.rules.UniqueTableAliasesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UseIsNullRule
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -77,6 +81,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
      */
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
+            RuleProvider(::BlockedWordsRule),
             RuleProvider(::ClauseKeywordNewlineRule),
             RuleProvider(::ConsistentColumnReferencesRule),
             RuleProvider(::ConsistentNotEqualOperatorRule),
@@ -116,6 +121,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoSelectDistinctWithGroupByRule),
             RuleProvider(::NoSelectStarRule),
             RuleProvider(::NoSelectTrailingCommaRule),
+            RuleProvider(::NoSelfAliasRule),
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
@@ -128,6 +134,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::PreferSimpleBooleanCaseRule),
             RuleProvider(::RequireOrderByWithLimitRule),
             RuleProvider(::RequireResultColumnAliasRule),
+            RuleProvider(::RequireTableAliasForSubqueryRule),
             RuleProvider(::SelectModifierLinePositionRule),
             RuleProvider(::SetOperatorLinePositionRule),
             RuleProvider(::SpaceAfterBlockCommentStartRule),
@@ -137,6 +144,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::SpaceAroundComparisonOperatorsRule),
             RuleProvider(::SpaceBeforeBlockCommentEndRule),
             RuleProvider(::StatementTerminatorRule),
+            RuleProvider(::UniqueTableAliasesRule),
             RuleProvider(::UseIsNullRule),
         )
 }

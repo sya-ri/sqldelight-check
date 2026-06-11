@@ -83,6 +83,7 @@ The standard rule set uses two safety levels:
 
 | Rule ID | Default | Fix | Safety | Purpose |
 | --- | --- | --- | --- | --- |
+| `standard:blocked-words` | Warning / Auto | No | None | Report configured blocked words outside comments and quoted text by default. |
 | `standard:clause-keyword-newline` | Warning / Auto | No | None | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
 | `standard:consistent-column-references` | Warning / Auto | No | None | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
@@ -122,6 +123,7 @@ The standard rule set uses two safety levels:
 | `standard:no-select-distinct-with-group-by` | Warning / Auto | No | None | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
 | `standard:no-select-star` | Warning / Auto | No | None | Disallow `SELECT *` result columns. |
 | `standard:no-select-trailing-comma` | Warning / Auto | Yes | Unsafe | Disallow trailing commas at the end of `SELECT` clauses. |
+| `standard:no-self-alias` | Warning / Auto | No | None | Disallow table aliases that repeat the table name they alias. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
@@ -134,6 +136,7 @@ The standard rule set uses two safety levels:
 | `standard:prefer-simple-boolean-case` | Warning / Auto | No | None | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
 | `standard:require-order-by-with-limit` | Warning / Auto | No | None | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
 | `standard:require-result-column-alias` | Warning / Auto | No | None | Require aliases for computed `SELECT` result columns. |
+| `standard:require-table-alias-for-subquery` | Warning / Auto | No | None | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
 | `standard:select-modifier-line-position` | Warning / Auto | No | None | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
 | `standard:set-operator-line-position` | Warning / Auto | No | None | Require multiline set operators to begin their own line after indentation. |
 | `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
@@ -143,6 +146,7 @@ The standard rule set uses two safety levels:
 | `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
 | `standard:space-before-block-comment-end` | Warning / Auto | Yes | Safe | Require one space before a block comment closing marker. |
 | `standard:statement-terminator` | Warning / Auto | No | None | Require statement blocks to end with semicolons. |
+| `standard:unique-table-aliases` | Warning / Auto | No | None | Require top-level table aliases to be unique within a statement. |
 | `standard:use-is-null` | Warning / Auto | Yes | Unsafe | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
 
 ## SQLFluff References
@@ -171,6 +175,114 @@ Useful sqlfluff concepts reflected here:
   `standard:no-distinct-parentheses`, `standard:no-select-trailing-comma`,
   `standard:select-modifier-line-position`, `standard:clause-keyword-newline`,
   `standard:no-unnecessary-statement-parentheses`, and `standard:no-from-subquery`.
+- Parse-light convention checks for blocked words and table aliases: `standard:blocked-words`,
+  `standard:no-self-alias`, `standard:require-table-alias-for-subquery`, and
+  `standard:unique-table-aliases`.
+
+## `standard:blocked-words`
+
+Reports configured words that should not appear in SQL source.
+
+Configure words with the comma-separated `words` option. Matching is case-insensitive by default. Set `matchCase=true`
+to require exact-case matches. Comments are ignored by default; set `ignoreComments=false` to also scan line and block
+comments.
+
+Invalid with `words=deprecated`:
+
+```sql
+selectDeprecated:
+SELECT deprecated
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayer:
+SELECT id
+FROM player;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- String literals and quoted identifiers are ignored.
+
+## `standard:no-self-alias`
+
+Reports table aliases that repeat the table name they alias.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT player.id
+FROM player AS player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player AS p;
+```
+
+Fix behavior:
+
+- No fix is provided.
+
+## `standard:require-table-alias-for-subquery`
+
+Reports top-level `FROM` and `JOIN` subqueries that do not declare a table alias.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM (SELECT id FROM player);
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT ranked.id
+FROM (SELECT id FROM player) AS ranked;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- Nested subqueries are ignored until SQLDelight-derived parse facts are available.
+
+## `standard:unique-table-aliases`
+
+Reports duplicate top-level table aliases within the same statement.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player AS p
+JOIN team AS p ON p.id = player.team_id;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player AS p
+JOIN team AS t ON t.id = p.team_id;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- Nested aliases are not compared with outer statement aliases.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,

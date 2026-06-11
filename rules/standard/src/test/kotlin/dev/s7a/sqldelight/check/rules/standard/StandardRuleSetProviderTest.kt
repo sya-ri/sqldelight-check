@@ -18,6 +18,7 @@ class StandardRuleSetProviderTest {
 
         assertEquals(
             setOf(
+                RuleId("standard:blocked-words"),
                 RuleId("standard:clause-keyword-newline"),
                 RuleId("standard:consistent-column-references"),
                 RuleId("standard:consistent-not-equal-operator"),
@@ -57,6 +58,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:no-select-distinct-with-group-by"),
                 RuleId("standard:no-select-star"),
                 RuleId("standard:no-select-trailing-comma"),
+                RuleId("standard:no-self-alias"),
                 RuleId("standard:no-tab-indentation"),
                 RuleId("standard:no-trailing-blank-lines"),
                 RuleId("standard:no-trailing-whitespace"),
@@ -69,6 +71,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:prefer-simple-boolean-case"),
                 RuleId("standard:require-order-by-with-limit"),
                 RuleId("standard:require-result-column-alias"),
+                RuleId("standard:require-table-alias-for-subquery"),
                 RuleId("standard:select-modifier-line-position"),
                 RuleId("standard:set-operator-line-position"),
                 RuleId("standard:space-after-block-comment-start"),
@@ -78,6 +81,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:space-around-comparison-operators"),
                 RuleId("standard:space-before-block-comment-end"),
                 RuleId("standard:statement-terminator"),
+                RuleId("standard:unique-table-aliases"),
                 RuleId("standard:use-is-null"),
             ),
             ruleIds,
