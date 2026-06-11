@@ -1,5 +1,9 @@
 # sqldelight-check
 
+[![CI](https://github.com/sya-ri/sqldelight-check/actions/workflows/ci.yml/badge.svg)](https://github.com/sya-ri/sqldelight-check/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.s7a/sqldelight-check-api?label=maven%20central)](https://central.sonatype.com/artifact/dev.s7a/sqldelight-check-api)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/dev.s7a.sqldelight.check?label=gradle%20plugin)](https://plugins.gradle.org/plugin/dev.s7a.sqldelight.check)
+
 SQLDelight formatter and rule-based linter for `.sq` and `.sqm` files.
 
 sqldelight-check is a Gradle plugin for projects that already use SQLDelight. It reads SQLDelight's Gradle model,
