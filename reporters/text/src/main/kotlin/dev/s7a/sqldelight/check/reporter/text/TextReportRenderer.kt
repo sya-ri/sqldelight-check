@@ -30,7 +30,7 @@ internal fun Report.render(): String =
 private fun List<Diagnostic>.sorted(): List<Diagnostic> =
     withIndex()
         .sortedWith(
-            compareBy<IndexedValue<Diagnostic>>(
+            compareBy(
                 { it.value.file?.path ?: "" },
                 { it.value.range?.start?.line ?: 0 },
                 { it.value.range?.start?.column ?: 0 },

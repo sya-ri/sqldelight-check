@@ -53,7 +53,7 @@ internal class SqlDelightProjectResolver(
             .map { (_, inputs) -> mergeResolvedSqlDelightInputs(inputs) }
     }
 
-    private fun resolveTask(task: SqlDelightTask): ResolvedSqlDelightInput? {
+    private fun resolveTask(task: SqlDelightTask): ResolvedSqlDelightInput {
         val properties = task.properties.get()
         val compilationUnit = task.compilationUnit(properties)
         val databaseName = properties.className

@@ -96,12 +96,9 @@ public class SqlDelightCheckEngine {
 
                 executedRuleIds += candidate.ruleId
                 val diagnostics = mutableListOf<Diagnostic>()
-                candidate.rule.run(
-                    context,
-                    DiagnosticReporter { diagnostic ->
-                        diagnostics += diagnostic.withRuleIdentity(candidate.ruleId, ruleConfig.severity)
-                    },
-                )
+                candidate.rule.run(context) { diagnostic ->
+                    diagnostics += diagnostic.withRuleIdentity(candidate.ruleId, ruleConfig.severity)
+                }
                 diagnostics
             }.filterNot(disableDirectives::suppresses)
         trace.fileRules(database, file, executedRuleIds)

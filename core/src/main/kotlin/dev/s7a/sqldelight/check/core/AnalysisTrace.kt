@@ -17,7 +17,7 @@ public interface AnalysisTrace {
     public fun databaseFiles(
         database: DatabaseContext,
         files: List<SourceFile>,
-    ): Unit
+    )
 
     /**
      * Signals the rules that executed for one file after suppression handling.
@@ -26,7 +26,7 @@ public interface AnalysisTrace {
         database: DatabaseContext,
         file: SourceFile,
         ruleIds: List<QualifiedRuleId>,
-    ): Unit
+    )
 
     /**
      * A trace sink that ignores every event.
@@ -35,12 +35,14 @@ public interface AnalysisTrace {
         override fun databaseFiles(
             database: DatabaseContext,
             files: List<SourceFile>,
-        ): Unit = Unit
+        ) {
+        }
 
         override fun fileRules(
             database: DatabaseContext,
             file: SourceFile,
             ruleIds: List<QualifiedRuleId>,
-        ): Unit = Unit
+        ) {
+        }
     }
 }
