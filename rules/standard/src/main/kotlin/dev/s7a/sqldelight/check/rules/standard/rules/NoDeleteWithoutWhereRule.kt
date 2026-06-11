@@ -25,6 +25,7 @@ public class NoDeleteWithoutWhereRule : Rule {
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isKeyword("delete")) return@forEachIndexed
+            if (content.isReferentialDeleteAction(tokens, index)) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
             if (content.hasWhereClauseAfter(tokens, index, statementEnd, depth)) return@forEachIndexed
@@ -40,4 +41,14 @@ public class NoDeleteWithoutWhereRule : Rule {
             )
         }
     }
+}
+
+private fun String.isReferentialDeleteAction(
+    tokens: List<SqlToken>,
+    deleteIndex: Int,
+): Boolean {
+    val previous = tokens.getOrNull(deleteIndex - 1) ?: return false
+    val delete = tokens[deleteIndex]
+    return previous.isKeyword("on") &&
+        sqlParenthesisDepthAt(previous.startOffset) == sqlParenthesisDepthAt(delete.startOffset)
 }
