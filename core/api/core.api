@@ -113,6 +113,8 @@ public final class dev/s7a/sqldelight/check/core/RuleConfig {
 public final class dev/s7a/sqldelight/check/core/RuleRegistry {
 	public static final field Companion Ldev/s7a/sqldelight/check/core/RuleRegistry$Companion;
 	public final fun providers ()Ljava/util/List;
+	public final fun ruleIds ()Ljava/util/Set;
+	public final fun ruleSetIds ()Ljava/util/Set;
 }
 
 public final class dev/s7a/sqldelight/check/core/RuleRegistry$Companion {
