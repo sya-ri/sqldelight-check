@@ -5,7 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -39,7 +40,7 @@ public class RequireResultColumnAliasRule : Rule {
 
             content.selectTargets(token.endOffset, fromToken.startOffset, selectDepth).forEach { target ->
                 if (!target.requiresAlias(content)) return@forEach
-                if (target.hasAlias(content, context.database.dialect.sourceKeywords)) return@forEach
+                if (target.hasAlias(content, context.database.dialect.sourcePatterns)) return@forEach
 
                 reporter.report(
                     RuleDiagnostic(
@@ -98,7 +99,7 @@ private fun SelectTarget.requiresAlias(content: String): Boolean {
 
 private fun SelectTarget.hasAlias(
     content: String,
-    sourceKeywords: SqlDialectSourceKeywords,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Boolean {
     val text = content.substring(startOffset, endOffset)
     val tokens = text.sqlTokens().toList()
@@ -106,7 +107,7 @@ private fun SelectTarget.hasAlias(
     if (tokens.size < 2) return false
     val last = tokens.last()
     val previous = tokens[tokens.lastIndex - 1]
-    return last.normalizedText !in sourceKeywords.aliasBoundaryKeywords && previous.endOffset < last.startOffset
+    return !sourcePatterns.matches(AliasBoundary, listOf(last.normalizedText)) && previous.endOffset < last.startOffset
 }
 
 private fun String.isSimpleColumnReference(): Boolean =

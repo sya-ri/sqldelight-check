@@ -203,7 +203,6 @@ The standard rule set uses two safety levels:
 | [`standard:space-around-binary-operators`](#standardspace-around-binary-operators) | 🟢 | ⚠️ | 🛠️ | Prefer one inline space around binary arithmetic and concatenation operators. |
 | [`standard:space-around-comparison-operators`](#standardspace-around-comparison-operators) | 🟢 | ⚠️ | 🛠️ | Prefer one inline space around comparison operators. |
 | [`standard:space-before-block-comment-end`](#standardspace-before-block-comment-end) | 🟢 | ⚠️ | ✅ | Require one space before a block comment closing marker. |
-| [`standard:statement-indentation`](#standardstatement-indentation) | 🟢 | ⚠️ | ✅ | Normalize leading indentation in multiline SQL statements. |
 | [`standard:statement-terminator`](#standardstatement-terminator) | 🟢 | ⚠️ |  | Require statement blocks to end with semicolons. |
 | [`standard:unique-column-aliases`](#standardunique-column-aliases) | 🟢 | ⚠️ |  | Require SELECT result column aliases to be unique within a SELECT list. |
 | [`standard:unique-table-aliases`](#standardunique-table-aliases) | 🟢 | ⚠️ |  | Require top-level table aliases to be unique within a statement. |
@@ -1390,73 +1389,6 @@ Fix behavior:
 - Inserts one space before the closing marker when comment text touches it.
 - Skips empty block comments.
 - Skips block comment markers inside string literals and quoted identifiers.
-- Applied automatically in write tasks.
-
-## `standard:statement-indentation`
-
-Reports leading indentation that does not match the standard two-space layout for multiline SQL statements.
-
-The rule is source-text based and dialect-independent. It does not require SQLDelight parser support for a custom
-dialect, and it only rewrites leading whitespace at the start of lines. Single-line SQL statements are intentionally
-ignored.
-
-Invalid:
-
-```sql
-selectDashboard:
-      WITH recent_orders AS (
-SELECT
- o.id,
-        SUM(item.price) AS total
-FROM orders AS o
-       JOIN order_items AS item ON item.order_id = o.id
-  WHERE o.created_at >= :since
-AND (
-o.status = 'PAID'
-      OR o.status = 'SHIPPED'
-)
-)
- SELECT
-     id,
- total
-FROM recent_orders;
-```
-
-Valid:
-
-```sql
-selectDashboard:
-WITH recent_orders AS (
-  SELECT
-    o.id,
-    SUM(item.price) AS total
-  FROM orders AS o
-  JOIN order_items AS item ON item.order_id = o.id
-  WHERE o.created_at >= :since
-    AND (
-      o.status = 'PAID'
-      OR o.status = 'SHIPPED'
-    )
-)
-SELECT
-  id,
-  total
-FROM recent_orders;
-```
-
-Ignored:
-
-```sql
-selectById:
-    SELECT id, name FROM player WHERE id = :id;
-```
-
-Fix behavior:
-
-- Replaces only the leading whitespace before each affected line.
-- Uses two spaces per indentation level.
-- Handles nested parentheses in common CTE, `EXISTS`, window-function, `CHECK`, `INSERT`, and `UPDATE` layouts.
-- Skips single-line SQL statements.
 - Applied automatically in write tasks.
 
 ## `standard:function-name-case`

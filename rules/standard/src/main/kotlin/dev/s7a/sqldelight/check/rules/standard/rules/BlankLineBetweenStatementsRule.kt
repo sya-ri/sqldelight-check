@@ -8,6 +8,9 @@ import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFileKind
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -42,7 +45,7 @@ public class BlankLineBetweenStatementsRule : Rule {
             if (hasBlankLineBetween) return@forEach
 
             val nextLine = lines[nextContentLineIndex]
-            if (!nextLine.startsSqlDelightStatementOrLabel(context.file.kind)) return@forEach
+            if (!nextLine.startsSqlDelightStatementOrLabel(context.file.kind, context.database.dialect.sourcePatterns)) return@forEach
 
             val range = content.rangeAtOffsets(nextLine.startOffset, nextLine.startOffset)
             reporter.report(
@@ -83,24 +86,16 @@ private fun List<LineInfo>.indexOfLineContaining(offset: Int): Int? =
     indexOfLast { line -> line.startOffset <= offset }
         .takeIf { index -> index >= 0 }
 
-private fun LineInfo.startsSqlDelightStatementOrLabel(kind: SourceFileKind): Boolean {
+private fun LineInfo.startsSqlDelightStatementOrLabel(
+    kind: SourceFileKind,
+    sourcePatterns: SqlDialectSourcePatterns,
+): Boolean {
     val trimmed = text.trimStart()
     if (trimmed.isEmpty()) return false
     if (kind == SourceFileKind.Query && sqlDelightStatementLabelRegex.matches(text)) return true
     val token = trimmed.takeWhile { character -> character == '_' || character.isLetterOrDigit() }
-    return token.lowercase() in statementStartKeywordsForBlankLines
+    val role = if (kind == SourceFileKind.Query) SqlDelightStatementStart else StatementStart
+    return sourcePatterns.matches(role, listOf(token))
 }
 
 private val sqlDelightStatementLabelRegex = Regex("""\s*[A-Za-z_][A-Za-z0-9_]*\s*[:{]\s*""")
-
-private val statementStartKeywordsForBlankLines =
-    setOf(
-        "alter",
-        "create",
-        "delete",
-        "drop",
-        "insert",
-        "select",
-        "update",
-        "with",
-    )

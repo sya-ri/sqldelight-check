@@ -105,8 +105,9 @@ internal fun Rule.assertDiagnosticCount(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
     facts: SqlFacts = SqlFacts(),
+    dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
 ) {
-    assertEquals(expected, diagnostics(content, path, options, facts).size)
+    assertEquals(expected, diagnostics(content, path, options, facts, dialect).size)
 }
 
 internal fun Rule.singleReplacement(

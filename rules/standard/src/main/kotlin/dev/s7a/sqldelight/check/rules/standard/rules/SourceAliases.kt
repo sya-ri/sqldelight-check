@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
 
 internal data class TableReference(
     val statementStartOffset: Int,
@@ -20,7 +21,7 @@ internal enum class TableReferenceIntroducer {
 }
 
 internal fun String.tableReferences(
-    sourceKeywords: SqlDialectSourceKeywords = SqlDialectSourceKeywords.SourceScannerDefault,
+    sourcePatterns: SqlDialectSourcePatterns = SqlDialectSourcePatterns.SourceScannerDefault,
 ): List<TableReference> {
     val tokens = sqlTokens().toList()
     val references = mutableListOf<TableReference>()
@@ -30,7 +31,7 @@ internal fun String.tableReferences(
         val depth = sqlParenthesisDepthAt(token.startOffset)
         val statementStart = statementStartBefore(token.startOffset)
         val statementEnd = statementEndAfter(token.startOffset)
-        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth, sourceKeywords)
+        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth, sourcePatterns)
         references +=
             tableReferencesAfterKeyword(
                 tokens = tokens,
@@ -169,17 +170,21 @@ private fun String.firstReferenceBoundaryAfter(
     startIndex: Int,
     statementEnd: Int,
     depth: Int,
-    sourceKeywords: SqlDialectSourceKeywords,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     tokens
         .asSequence()
         .drop(startIndex)
-        .firstOrNull { token ->
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
                 token.startOffset < statementEnd &&
                 sqlParenthesisDepthAt(token.startOffset) == depth &&
-                token.normalizedText in sourceKeywords.tableReferenceBoundaryKeywords
-        }?.startOffset
+                sourcePatterns.matches(TableReferenceBoundary, tokens.normalizedTextsFrom(startIndex + relativeIndex))
+        }?.value?.startOffset
         ?: statementEnd
+
+private fun List<SqlToken>.normalizedTextsFrom(index: Int): List<String> =
+    drop(index).map { token -> token.normalizedText }
 
 private fun String.statementStartBefore(offset: Int): Int =
     sqlCharacters()

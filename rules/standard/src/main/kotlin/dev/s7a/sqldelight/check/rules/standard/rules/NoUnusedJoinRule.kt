@@ -25,7 +25,7 @@ public class NoUnusedJoinRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content.tableReferences(context.database.dialect.sourceKeywords)
+        content.tableReferences(context.database.dialect.sourcePatterns)
             .filter { reference -> reference.depth == 0 && reference.introducedBy == TableReferenceIntroducer.Join }
             .forEach { reference ->
                 val qualifier = reference.alias?.text ?: reference.tableName ?: return@forEach

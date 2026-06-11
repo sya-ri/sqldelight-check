@@ -1,5 +1,10 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -85,6 +90,30 @@ class BlankLineBetweenStatementsRuleTest {
             SELECT 2;
             """.asSqlDelightFile(),
             1,
+        )
+    }
+
+    @Test
+    fun `uses dialect source patterns for custom statement starts`() {
+        val dialect =
+            SqlDialect(
+                family = DialectFamily.Custom,
+                sourcePatterns =
+                    SqlDialectSourcePatterns(
+                        patterns =
+                            SqlDialectSourcePatterns.SourceScannerDefault.patterns +
+                                SqlDialectSourcePattern.parse("ANALYZE", StatementStart),
+                    ),
+            )
+
+        BlankLineBetweenStatementsRule().assertDiagnosticCount(
+            """
+            SELECT 1;
+            ANALYZE player;
+            """.asSqlDelightFile(),
+            1,
+            path = MIGRATION_SQM_PATH,
+            dialect = dialect,
         )
     }
 }
