@@ -39,7 +39,7 @@ gradlePlugin {
             id = "dev.s7a.sqldelight.check"
             displayName = "SQLDelight Check Gradle Plugin"
             description = "Formatter and rule-based linter for SQLDelight .sq and .sqm files."
-            tags.set(listOf("sqldelight", "sql", "lint", "formatter", "gradle"))
+            tags.set(listOf("sqldelight", "sql", "lint", "formatter", "static-analysis"))
             implementationClass = "dev.s7a.sqldelight.check.gradle.SqlDelightCheckGradlePlugin"
         }
     }
