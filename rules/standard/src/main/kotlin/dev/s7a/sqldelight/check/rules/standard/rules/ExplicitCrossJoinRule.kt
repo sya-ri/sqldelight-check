@@ -38,8 +38,6 @@ public class ExplicitCrossJoinRule : Rule {
                 return@forEachIndexed
             }
 
-            // FIXME: This source-text check treats top-level join segments conservatively.
-            // Parser-backed handling would be safer for vendor-specific join syntax.
             reporter.report(
                 Diagnostic(
                     ruleId = id,

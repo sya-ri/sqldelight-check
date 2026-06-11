@@ -38,8 +38,6 @@ public class RequireOrderByWithLimitRule : Rule {
                     ?: return@forEachIndexed
             if (statementTokens.containsKeywordPair("order", "by")) return@forEachIndexed
 
-            // FIXME: This source-text pass intentionally checks only depth-0 SELECT statements.
-            // Compound SELECT and dialect-specific clauses may need parser-backed handling.
             reporter.report(
                 Diagnostic(
                     ruleId = id,

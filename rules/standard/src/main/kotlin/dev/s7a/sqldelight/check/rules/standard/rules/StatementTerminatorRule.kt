@@ -108,7 +108,6 @@ private fun isCreateTrigger(
 ): Boolean {
     val createIndex = tokens.indexOf(createToken)
     val nextToken = tokens.getOrNull(createIndex + 1) ?: return false
-    // FIXME: Trigger bodies contain nested statement-like blocks. Skip them until SQLDelight parsing is available here.
     return nextToken.isKeyword("trigger")
 }
 
