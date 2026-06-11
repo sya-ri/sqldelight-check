@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class SarifReport(
     val version: String,
-    @SerialName("\$schema")
+    @SerialName($$"$schema")
     val schema: String,
     val runs: List<SarifRun>,
 )

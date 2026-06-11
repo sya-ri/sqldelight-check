@@ -91,7 +91,7 @@ private fun LineInfo.startsSqlDelightStatementOrLabel(kind: SourceFileKind): Boo
     return token.lowercase() in statementStartKeywordsForBlankLines
 }
 
-private val sqlDelightStatementLabelRegex = Regex("""\s*[A-Za-z_][A-Za-z0-9_]*\s*(?::|\{)\s*""")
+private val sqlDelightStatementLabelRegex = Regex("""\s*[A-Za-z_][A-Za-z0-9_]*\s*[:{]\s*""")
 
 private val statementStartKeywordsForBlankLines =
     setOf(

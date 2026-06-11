@@ -64,4 +64,4 @@ public class NoBlankLineAfterQueryLabelRule : Rule {
 
 private fun LineInfo.isSqlDelightQueryLabel(): Boolean = sqlDelightQueryLabelRegex.matches(text)
 
-private val sqlDelightQueryLabelRegex = Regex("""\s*[A-Za-z_][A-Za-z0-9_]*\s*(?::|\{)\s*""")
+private val sqlDelightQueryLabelRegex = Regex("""\s*[A-Za-z_][A-Za-z0-9_]*\s*[:{]\s*""")

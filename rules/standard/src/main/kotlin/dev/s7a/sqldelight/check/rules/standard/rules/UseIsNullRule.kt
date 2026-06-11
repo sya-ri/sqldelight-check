@@ -44,7 +44,7 @@ public class UseIsNullRule : Rule {
                 reporter.report(
                     RuleDiagnostic(
                         severity = defaultSeverity,
-                        message = "Use ${replacement} NULL instead of $operatorText NULL.",
+                        message = "Use $replacement NULL instead of $operatorText NULL.",
                         file = context.file,
                         range = range,
                         database = context.database,

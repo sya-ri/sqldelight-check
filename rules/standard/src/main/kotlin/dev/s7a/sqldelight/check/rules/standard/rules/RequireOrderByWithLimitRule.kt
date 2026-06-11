@@ -25,15 +25,14 @@ public class RequireOrderByWithLimitRule : Rule {
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isKeyword("select")) return@forEachIndexed
-            val selectDepth = content.sqlParenthesisDepthAt(token.startOffset)
-            if (selectDepth != 0) return@forEachIndexed
+            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
 
             val statementEnd = content.statementEndAfter(token.startOffset)
             val statementTokens =
                 tokens
                     .drop(index + 1)
                     .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                    .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth }
+                    .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == 0 }
             val limitOrOffset =
                 statementTokens.firstOrNull { candidate -> candidate.isKeyword("limit") || candidate.isKeyword("offset") }
                     ?: return@forEachIndexed

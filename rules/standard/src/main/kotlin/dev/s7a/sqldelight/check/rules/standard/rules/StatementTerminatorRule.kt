@@ -67,12 +67,13 @@ private data class StatementStart(
 private fun String.statementStarts(): List<StatementStart> {
     val tokens = sqlTokens().toList()
     val depths = topLevelDepthsByOffset()
-    return tokens
+    return tokens.asSequence()
         .filter { token -> token.normalizedText in statementStartKeywords }
         .filter { token -> depths[token.startOffset] == 0 }
         .filter { token -> isFirstSqlTokenOnLine(token.startOffset) }
         .filterNot { token -> token.normalizedText == "create" && isCreateTrigger(tokens, token) }
         .map { token -> StatementStart(keyword = token.normalizedText, offset = token.startOffset) }
+        .toList()
 }
 
 private fun String.topLevelDepthsByOffset(): Map<Int, Int> {
@@ -139,8 +140,7 @@ private fun String.lastSqlCharacterBefore(
 ): SqlCharacter? =
     sqlCharacters()
         .takeWhile { character -> character.offset < endOffset }
-        .filter { character -> character.offset >= startOffset && !character.value.isWhitespace() }
-        .lastOrNull()
+        .lastOrNull { character -> character.offset >= startOffset && !character.value.isWhitespace() }
 
 private fun String.sqlDelightLabelOffsets(): List<Int> =
     linesWithRanges()

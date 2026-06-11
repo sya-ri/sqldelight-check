@@ -50,7 +50,7 @@ private fun Iterable<RuleExtension>.toRuleConfigs(): Map<QualifiedRuleId, RuleCo
 
 private fun String.toQualifiedRuleId(): QualifiedRuleId {
     val delimiter = indexOf(':')
-    require(delimiter > 0 && delimiter < lastIndex) {
+    require(delimiter in 1..<lastIndex) {
         "Rule ID must use rule-set:rule-name form: $this"
     }
     return QualifiedRuleId(

@@ -48,6 +48,6 @@ public class PreferBetweenForInclusiveRangeRule : Rule {
 }
 
 private val inclusiveRangePattern =
-    Regex("""\b([A-Za-z_][A-Za-z0-9_.]*)\s*>=\s*(:[A-Za-z_][A-Za-z0-9_]*|\?|[-]?\d+(?:\.\d+)?)\s+AND\s+([A-Za-z_][A-Za-z0-9_.]*)\s*<=""", RegexOption.IGNORE_CASE)
+    Regex("""\b([A-Za-z_][A-Za-z0-9_.]*)\s*>=\s*(:[A-Za-z_][A-Za-z0-9_]*|\?|-?\d+(?:\.\d+)?)\s+AND\s+([A-Za-z_][A-Za-z0-9_.]*)\s*<=""", RegexOption.IGNORE_CASE)
 
 private val betweenBoundaryKeywords = setOf("except", "group", "having", "intersect", "limit", "offset", "order", "union", "window")

@@ -34,8 +34,7 @@ public class NoUnnecessaryStatementParenthesesRule : Rule {
 
                 val select =
                     tokens.firstOrNull { token ->
-                        token.startOffset > openOffset &&
-                            token.startOffset < closeOffset &&
+                            token.startOffset in (openOffset + 1)..<closeOffset &&
                             token.isKeyword("select")
                     } ?: return@forEach
                 if (content.sqlParenthesisDepthAt(select.startOffset) != 1) return@forEach

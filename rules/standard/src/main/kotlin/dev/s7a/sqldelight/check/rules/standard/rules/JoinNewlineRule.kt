@@ -74,8 +74,7 @@ private fun List<SqlToken>.statementStartOffsetBefore(
     asSequence()
         .take(tokenIndex + 1)
         .filter { token -> token.normalizedText in topLevelStatementStartKeywords }
-        .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == 0 }
-        .lastOrNull()
+        .lastOrNull { token -> content.sqlParenthesisDepthAt(token.startOffset) == 0 }
         ?.startOffset
 
 private fun String.onlyInlineWhitespaceBetween(

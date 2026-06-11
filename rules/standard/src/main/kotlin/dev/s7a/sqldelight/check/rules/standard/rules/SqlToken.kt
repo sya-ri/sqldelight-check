@@ -80,5 +80,4 @@ internal fun List<SqlToken>.lastKeywordBefore(
     asSequence()
         .takeWhile { token -> token.startOffset < offset }
         .map { token -> token.normalizedText }
-        .filter { token -> token in keywords }
-        .lastOrNull()
+        .lastOrNull { token -> token in keywords }

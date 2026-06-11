@@ -26,8 +26,7 @@ public class ClauseKeywordNewlineRule : Rule {
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isKeyword("select")) return@forEachIndexed
-            val selectDepth = content.sqlParenthesisDepthAt(token.startOffset)
-            if (selectDepth != 0) return@forEachIndexed
+            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
 
             val statementEnd = content.statementEndAfter(token.startOffset)
             if (!content.substring(token.startOffset, statementEnd).contains('\n')) return@forEachIndexed
@@ -35,7 +34,7 @@ public class ClauseKeywordNewlineRule : Rule {
             tokens
                 .drop(index + 1)
                 .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth }
+                .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == 0 }
                 .majorClauseKeywords()
                 .forEach { clause ->
                     val line = lines.lineContaining(clause.startOffset) ?: return@forEach
