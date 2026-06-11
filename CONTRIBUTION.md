@@ -50,9 +50,7 @@ When public API changes are intentional, update Kotlin ABI baselines after revie
 
 `v0.1.0` publishing is not automated yet. Before a release, verify:
 
-- `./gradlew --no-daemon check`
-- `./gradlew --no-daemon dokkaGeneratePublicationHtml dokkaGeneratePublicationJavadoc`
-- `./gradlew --no-daemon publishToMavenLocal`
+- `./gradlew --no-daemon releaseCheck`
 - The CI Qodana job is green for the release commit, or run the local Qodana Docker command above with the repository
   `qodana.yaml` configuration when verifying outside CI.
 - Gradle plugin metadata.

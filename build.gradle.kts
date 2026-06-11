@@ -77,6 +77,17 @@ tasks.register("printVersion") {
     }
 }
 
+tasks.register("releaseCheck") {
+    group = "verification"
+    description = "Runs local release-blocking checks before publishing sqldelight-check."
+    dependsOn("check")
+    dependsOn(publishedArtifacts.keys.map { projectPath -> "$projectPath:check" })
+    dependsOn(":gradle-plugin:check")
+    dependsOn("dokkaGeneratePublicationHtml")
+    dependsOn(publishedArtifacts.keys.map { projectPath -> "$projectPath:dokkaGeneratePublicationJavadoc" })
+    dependsOn(publishedArtifacts.keys.map { projectPath -> "$projectPath:publishToMavenLocal" })
+}
+
 subprojects {
     group = rootProject.group
     version = rootProject.version
