@@ -28,6 +28,7 @@ internal fun String.reportNoSpaceBeforeToken(
         .forEach { character ->
             val whitespaceStart = horizontalWhitespaceStartBefore(character.offset)
             if (whitespaceStart == character.offset) return@forEach
+            if (whitespaceStart > 0 && this[whitespaceStart - 1] in setOf('\n', '\r')) return@forEach
 
             val range = rangeAtOffsets(whitespaceStart, character.offset)
             reporter.report(
