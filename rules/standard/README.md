@@ -124,6 +124,7 @@ The standard rule set uses two safety levels:
 | `standard:no-select-distinct-with-group-by` | Warning / Auto | No | None | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
 | `standard:no-select-star` | Warning / Auto | No | None | Disallow `SELECT *` result columns. |
 | `standard:no-select-trailing-comma` | Warning / Auto | Yes | Unsafe | Disallow trailing commas at the end of `SELECT` clauses. |
+| `standard:no-self-column-alias` | Warning / Auto | No | None | Disallow SELECT result aliases that repeat the source column name. |
 | `standard:no-self-alias` | Warning / Auto | No | None | Disallow table aliases that repeat the table name they alias. |
 | `standard:no-special-character-identifiers` | Warning / Auto | No | None | Disallow quoted identifiers that need non-portable special characters. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
@@ -188,7 +189,8 @@ Useful sqlfluff concepts reflected here:
   `standard:unique-table-aliases`.
 - Parse-light alias and identifier checks from SQLFluff AL01, AL02, AL08, and RF05:
   `standard:require-table-alias-as`, `standard:require-column-alias-as`,
-  `standard:unique-column-aliases`, and `standard:no-special-character-identifiers`.
+  `standard:unique-column-aliases`, `standard:no-self-column-alias`, and
+  `standard:no-special-character-identifiers`.
 - Parse-light reference checks from SQLFluff ST03 and ST11: `standard:no-unused-cte` and
   `standard:no-unused-join`.
 
@@ -244,6 +246,40 @@ FROM player AS p;
 Fix behavior:
 
 - No fix is provided.
+
+## `standard:no-self-column-alias`
+
+Reports SELECT result aliases that repeat the source column name.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT name AS name
+FROM player;
+```
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT player.name AS name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT name AS playerName
+FROM player;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- Computed expressions are ignored because their alias can intentionally match an output concept.
+- Quoted identifiers are ignored because quoting semantics are dialect-specific.
 
 ## `standard:no-special-character-identifiers`
 

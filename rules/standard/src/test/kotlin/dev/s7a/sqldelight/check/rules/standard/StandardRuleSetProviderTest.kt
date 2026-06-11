@@ -59,6 +59,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:no-select-distinct-with-group-by"),
                 RuleId("standard:no-select-star"),
                 RuleId("standard:no-select-trailing-comma"),
+                RuleId("standard:no-self-column-alias"),
                 RuleId("standard:no-self-alias"),
                 RuleId("standard:no-special-character-identifiers"),
                 RuleId("standard:no-tab-indentation"),

@@ -42,6 +42,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoRightJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectDistinctWithGroupByRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectTrailingCommaRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoSelfColumnAliasRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelfAliasRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpecialCharacterIdentifiersRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
@@ -129,6 +130,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoSelectDistinctWithGroupByRule),
             RuleProvider(::NoSelectStarRule),
             RuleProvider(::NoSelectTrailingCommaRule),
+            RuleProvider(::NoSelfColumnAliasRule),
             RuleProvider(::NoSelfAliasRule),
             RuleProvider(::NoSpecialCharacterIdentifiersRule),
             RuleProvider(::NoTabIndentationRule),
