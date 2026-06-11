@@ -63,6 +63,7 @@ Configure rule sets, rules, reports, write safety, and database-specific overrid
 
 ```kotlin
 import dev.s7a.sqldelight.check.api.Enablement
+import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.Severity
 
 sqldelightCheck {
@@ -129,6 +130,8 @@ sqldelightCheck {
     write {
         unsafe.set(false)
     }
+
+    logLevel.set(LogLevel.Verbose)
 }
 ```
 
@@ -140,6 +143,12 @@ Enablement values:
 
 Rule-level explicit enablement overrides a rule set default. Severity values are `Info`, `Warning`, and `Error`; error
 diagnostics fail check tasks after reports are written.
+
+Log levels control task output detail:
+
+- `Info`: task summary only.
+- `Verbose`: summary plus resolved file inventory.
+- `Debug`: summary, resolved file inventory, and per-file rule traces.
 
 ## Disable Diagnostics
 

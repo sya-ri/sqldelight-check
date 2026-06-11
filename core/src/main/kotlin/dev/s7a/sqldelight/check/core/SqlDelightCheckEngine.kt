@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.core
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.core.sqldelight.SqlDelight2Analyzer
@@ -28,10 +29,12 @@ public class SqlDelightCheckEngine {
         inputs: List<AnalysisInput> = emptyList(),
         ruleSetProviders: List<RuleSetProvider> = emptyList(),
         config: CheckConfig = CheckConfig(),
+        trace: AnalysisTrace = AnalysisTrace.None,
     ): List<Diagnostic> =
         inputs.flatMap { input ->
             val analysisResult = SqlDelight2Analyzer.analyze(input)
-            analysisResult.diagnostics + runRules(input.database, analysisResult.files, ruleSetProviders, config)
+            trace.databaseFiles(input.database, analysisResult.files)
+            analysisResult.diagnostics + runRules(input.database, analysisResult.files, ruleSetProviders, config, trace)
         }
 
     private fun runRules(
@@ -39,6 +42,7 @@ public class SqlDelightCheckEngine {
         files: List<SourceFile>,
         ruleSetProviders: List<RuleSetProvider>,
         config: CheckConfig,
+        trace: AnalysisTrace,
     ): List<Diagnostic> {
         val resolver = ConfigurationResolver(config)
         val rules =
@@ -47,7 +51,7 @@ public class SqlDelightCheckEngine {
                     RuleCandidate(provider.id, ruleProvider.create())
                 }
             }
-        return files.flatMap { file -> runRulesForFile(database, file, rules, resolver) }
+        return files.flatMap { file -> runRulesForFile(database, file, rules, resolver, trace) }
     }
 
     private fun runRulesForFile(
@@ -55,37 +59,43 @@ public class SqlDelightCheckEngine {
         file: SourceFile,
         rules: List<RuleCandidate>,
         resolver: ConfigurationResolver,
+        trace: AnalysisTrace,
     ): List<Diagnostic> {
         val facts = SourceSqlFactsExtractor.extract(file)
         val disableDirectives = DisableDirectives.parse(file)
-        return rules.flatMap { candidate ->
-            val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
-            val ruleConfig =
-                resolver.resolveRule(
-                    ruleId = candidate.rule.id,
-                    databaseName = database.name,
-                    defaultEnablement = candidate.rule.defaultEnablement,
-                    defaultSeverity = candidate.rule.defaultSeverity,
-                )
-            val context =
-                object : RuleContext {
-                    override val database: DatabaseContext = database
-                    override val file: SourceFile = file
-                    override val options: Map<String, String> = ruleConfig.options
-                    override val facts: SqlFacts = facts
-                }
-            val enablement = EnablementResolver.resolveRuleEnablement(ruleSetConfig.enablement, ruleConfig.enablement)
-            if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
+        val executedRuleIds = mutableListOf<RuleId>()
+        val diagnostics =
+            rules.flatMap { candidate ->
+                val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
+                val ruleConfig =
+                    resolver.resolveRule(
+                        ruleId = candidate.rule.id,
+                        databaseName = database.name,
+                        defaultEnablement = candidate.rule.defaultEnablement,
+                        defaultSeverity = candidate.rule.defaultSeverity,
+                    )
+                val context =
+                    object : RuleContext {
+                        override val database: DatabaseContext = database
+                        override val file: SourceFile = file
+                        override val options: Map<String, String> = ruleConfig.options
+                        override val facts: SqlFacts = facts
+                    }
+                val enablement = EnablementResolver.resolveRuleEnablement(ruleSetConfig.enablement, ruleConfig.enablement)
+                if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
 
-            val diagnostics = mutableListOf<Diagnostic>()
-            candidate.rule.run(
-                context,
-                DiagnosticReporter { diagnostic ->
-                    diagnostics += diagnostic.copy(severity = ruleConfig.severity)
-                },
-            )
-            diagnostics
-        }.filterNot(disableDirectives::suppresses)
+                executedRuleIds += candidate.rule.id
+                val diagnostics = mutableListOf<Diagnostic>()
+                candidate.rule.run(
+                    context,
+                    DiagnosticReporter { diagnostic ->
+                        diagnostics += diagnostic.copy(severity = ruleConfig.severity)
+                    },
+                )
+                diagnostics
+            }.filterNot(disableDirectives::suppresses)
+        trace.fileRules(database, file, executedRuleIds)
+        return diagnostics
     }
 
     private fun Rule.shouldRun(

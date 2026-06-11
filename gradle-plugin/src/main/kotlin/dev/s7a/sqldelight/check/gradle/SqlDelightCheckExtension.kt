@@ -1,8 +1,10 @@
 package dev.s7a.sqldelight.check.gradle
 
+import dev.s7a.sqldelight.check.api.LogLevel
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import javax.inject.Inject
 
 /**
@@ -60,6 +62,15 @@ public open class SqlDelightCheckExtension
          * The same safety options apply to check, lint, and format write aliases.
          */
         public val write: WriteExtension = objects.newInstance(WriteExtension::class.java)
+
+        /**
+         * Controls how much execution detail the task emits.
+         *
+         * `Info` keeps the output to summaries, `Verbose` adds resolved files,
+         * and `Debug` adds per-file rule traces.
+         */
+        public val logLevel: Property<LogLevel> =
+            objects.property(LogLevel::class.java).convention(LogLevel.Info)
 
         private val ruleSetsDsl: RuleSetContainerExtension = RuleSetContainerExtension(ruleSets)
         private val rulesDsl: RuleContainerExtension = RuleContainerExtension(rules)

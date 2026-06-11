@@ -23,8 +23,9 @@ internal fun SqlDelightCheckExtension.toCheckConfig(): CheckConfig =
                         rules = database.rules.toRuleConfigs(),
                     )
                 database.name to config
-            },
+        },
         allowUnsafeWrites = write.unsafe.get(),
+        logLevel = logLevel.get(),
     )
 
 private fun Iterable<RuleSetExtension>.toRuleSetConfigs(): Map<RuleSetId, RuleSetConfig> =

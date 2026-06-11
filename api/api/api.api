@@ -97,6 +97,17 @@ public final class dev/s7a/sqldelight/check/api/FixSafety : java/lang/Enum {
 	public static fun values ()[Ldev/s7a/sqldelight/check/api/FixSafety;
 }
 
+public final class dev/s7a/sqldelight/check/api/LogLevel : java/lang/Enum {
+	public static final field Debug Ldev/s7a/sqldelight/check/api/LogLevel;
+	public static final field Info Ldev/s7a/sqldelight/check/api/LogLevel;
+	public static final field Verbose Ldev/s7a/sqldelight/check/api/LogLevel;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getLogsFiles ()Z
+	public final fun getLogsRules ()Z
+	public static fun valueOf (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/LogLevel;
+	public static fun values ()[Ldev/s7a/sqldelight/check/api/LogLevel;
+}
+
 public final class dev/s7a/sqldelight/check/api/RuleId {
 	public static final synthetic fun box-impl (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/RuleId;
 	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;

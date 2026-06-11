@@ -217,6 +217,96 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `check task logs resolved files at verbose level`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.LogLevel
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            logLevel.set(LogLevel.Verbose)
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertContentEquals(
+            listOf(
+                "sqldelight-check [Database] files (1):",
+                "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
+                "sqldelight-check analyzed 1 SQLDelight database(s).",
+            ),
+            result.sqldelightCheckOutputLines(),
+        )
+    }
+
+    @Test
+    fun `check task logs per file rules at debug level`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Enablement
+                        import dev.s7a.sqldelight.check.api.LogLevel
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            logLevel.set(LogLevel.Debug)
+                            ruleSets {
+                                standard {
+                                    enabled.set(Enablement.Disabled)
+                                }
+                            }
+                            rules {
+                                rule("standard:final-newline") {
+                                    enabled.set(Enablement.Enabled)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertContentEquals(
+            listOf(
+                "sqldelight-check [Database] files (1):",
+                "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
+                "sqldelight-check [Database] src/main/sqldelight/com/example/Player.sq rules: standard:final-newline",
+                "sqldelight-check analyzed 1 SQLDelight database(s).",
+            ),
+            result.sqldelightCheckOutputLines(),
+        )
+    }
+
+    @Test
     fun `check task resolves multiple sqldelight databases`() {
         val project =
             testProject(
@@ -729,9 +819,12 @@ class SqlDelightCheckGradlePluginTest {
     private fun sqlDelightBuildScript(
         sqlDelightVersion: String = "2.3.2",
         extraRepositories: String = "",
+        extraImports: String = "",
         extraConfiguration: String = "",
     ): String =
         """
+        $extraImports
+
         plugins {
             kotlin("jvm") version "2.4.0"
             id("app.cash.sqldelight") version "$sqlDelightVersion"

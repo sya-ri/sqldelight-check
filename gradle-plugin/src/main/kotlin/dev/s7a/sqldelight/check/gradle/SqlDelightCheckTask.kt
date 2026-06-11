@@ -1,7 +1,12 @@
 package dev.s7a.sqldelight.check.gradle
 
 import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.DatabaseContext
+import dev.s7a.sqldelight.check.api.LogLevel
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.FixApplier
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
@@ -30,12 +35,13 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public fun run() {
         val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
         val config = extension.toCheckConfig()
-        var result = analyze(config)
+        val trace = tracing(extension.logLevel.get())
+        var result = analyze(config, trace)
         if (applyFixes.get()) {
             val changedFiles = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeWrites)
             if (changedFiles > 0) {
                 logger.lifecycle("Applied sqldelight-check fixes to {} file(s).", changedFiles)
-                result = analyze(config)
+                result = analyze(config, trace)
             }
         }
 
@@ -48,16 +54,44 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         }
     }
 
-    private fun analyze(config: CheckConfig): AnalysisRunResult {
+    private fun analyze(
+        config: CheckConfig,
+        trace: AnalysisTrace,
+    ): AnalysisRunResult {
         val inputs = SqlDelightProjectResolver(project).resolve()
         val diagnostics =
             SqlDelightCheckEngine().run(
                 inputs = inputs.map { input -> input.analysisInput },
                 ruleSetProviders = project.sqldelightCheckRuleRegistry().providers(),
                 config = config,
+                trace = trace,
             )
         return AnalysisRunResult(databaseCount = inputs.size, diagnostics = diagnostics)
     }
+
+    private fun tracing(logLevel: LogLevel): AnalysisTrace =
+        object : AnalysisTrace {
+            override fun databaseFiles(
+                database: DatabaseContext,
+                files: List<SourceFile>,
+            ) {
+                if (!logLevel.logsFiles) return
+                logger.lifecycle("sqldelight-check [{}] files ({}):", database.name, files.size)
+                files.forEach { file ->
+                    logger.lifecycle("sqldelight-check [{}]   - {}", database.name, file.path)
+                }
+            }
+
+            override fun fileRules(
+                database: DatabaseContext,
+                file: SourceFile,
+                ruleIds: List<RuleId>,
+            ) {
+                if (!logLevel.logsRules) return
+                val renderedRules = if (ruleIds.isEmpty()) "(none)" else ruleIds.joinToString(", ") { ruleId -> ruleId.value }
+                logger.lifecycle("sqldelight-check [{}] {} rules: {}", database.name, file.path, renderedRules)
+            }
+        }
 
     private fun applyDiagnosticFixes(
         diagnostics: List<Diagnostic>,
