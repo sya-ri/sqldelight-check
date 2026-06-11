@@ -33,6 +33,19 @@ class NoDeleteWithoutWhereRuleTest {
     }
 
     @Test
+    fun `accepts on delete cascade foreign key action`() {
+        NoDeleteWithoutWhereRule().assertDiagnosticCount(
+            """
+            CREATE TABLE child (
+              id INTEGER NOT NULL PRIMARY KEY,
+              parent_id INTEGER NOT NULL REFERENCES parent(id) ON DELETE CASCADE
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
     fun `does not use nested where clause for delete statement`() {
         NoDeleteWithoutWhereRule().assertDiagnosticCount(
             """
