@@ -179,7 +179,13 @@ Built-in rule set artifacts:
 - `sqldelight-check-rules-sqlite`: SQLite-specific rules gated by `DialectCapabilities.SQLite`.
 - `sqldelight-check-rules-hsql`: HSQL-specific rule-set slot gated by `DialectCapabilities.Hsql`.
 
-See [the standard rule set README](rules/standard/README.md) for rule behavior, options, fix safety, and examples.
+See the rule-set README files for rule behavior, options, and examples:
+
+- [Standard rules](rules/standard/README.md)
+- [PostgreSQL rules](rules/postgres/README.md)
+- [MySQL rules](rules/mysql/README.md)
+- [SQLite rules](rules/sqlite/README.md)
+- [HSQL rules](rules/hsql/README.md)
 
 Rules run after SQLDelight accepts the project input. SQLDelight parser and dialect behavior are not reimplemented by
 sqldelight-check.
