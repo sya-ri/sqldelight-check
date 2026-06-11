@@ -1,5 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+
 internal data class TableReference(
     val statementStartOffset: Int,
     val depth: Int,
@@ -17,7 +19,9 @@ internal enum class TableReferenceIntroducer {
     Join,
 }
 
-internal fun String.tableReferences(): List<TableReference> {
+internal fun String.tableReferences(
+    sourceKeywords: SqlDialectSourceKeywords = SqlDialectSourceKeywords.Default,
+): List<TableReference> {
     val tokens = sqlTokens().toList()
     val references = mutableListOf<TableReference>()
     tokens.forEachIndexed { index, token ->
@@ -26,7 +30,7 @@ internal fun String.tableReferences(): List<TableReference> {
         val depth = sqlParenthesisDepthAt(token.startOffset)
         val statementStart = statementStartBefore(token.startOffset)
         val statementEnd = statementEndAfter(token.startOffset)
-        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth)
+        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth, sourceKeywords)
         references +=
             tableReferencesAfterKeyword(
                 tokens = tokens,
@@ -165,14 +169,15 @@ private fun String.firstReferenceBoundaryAfter(
     startIndex: Int,
     statementEnd: Int,
     depth: Int,
+    sourceKeywords: SqlDialectSourceKeywords,
 ): Int =
     tokens
         .asSequence()
         .drop(startIndex)
         .firstOrNull { token ->
-            token.startOffset < statementEnd &&
+                token.startOffset < statementEnd &&
                 sqlParenthesisDepthAt(token.startOffset) == depth &&
-                token.normalizedText in tableReferenceBoundaryKeywords
+                token.normalizedText in sourceKeywords.tableReferenceBoundaryKeywords
         }?.startOffset
         ?: statementEnd
 
@@ -182,24 +187,3 @@ private fun String.statementStartBefore(offset: Int): Int =
         .lastOrNull { character -> character.value == ';' }
         ?.let { character -> character.offset + 1 }
         ?: 0
-
-private val tableReferenceBoundaryKeywords =
-    setOf(
-        "cross",
-        "except",
-        "full",
-        "group",
-        "having",
-        "inner",
-        "intersect",
-        "join",
-        "left",
-        "limit",
-        "offset",
-        "on",
-        "order",
-        "right",
-        "union",
-        "using",
-        "where",
-    )

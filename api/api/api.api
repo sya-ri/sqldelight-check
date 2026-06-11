@@ -76,6 +76,9 @@ public final class dev/s7a/sqldelight/check/api/FixSafety : java/lang/Enum {
 	public static fun values ()[Ldev/s7a/sqldelight/check/api/FixSafety;
 }
 
+public abstract interface annotation class dev/s7a/sqldelight/check/api/InternalSqldelightCheckApi : java/lang/annotation/Annotation {
+}
+
 public final class dev/s7a/sqldelight/check/api/LogLevel : java/lang/Enum {
 	public static final field Debug Ldev/s7a/sqldelight/check/api/LogLevel;
 	public static final field Info Ldev/s7a/sqldelight/check/api/LogLevel;
@@ -190,17 +193,35 @@ public final class dev/s7a/sqldelight/check/api/SourceRange {
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialect {
-	public fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;)V
-	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;)V
+	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getArtifact ()Ljava/lang/String;
 	public final fun getCapabilities ()Ljava/util/Set;
 	public final fun getDisplayName ()Ljava/lang/String;
 	public final fun getFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
 	public final fun getImplementationClass ()Ljava/lang/String;
+	public final fun getSourceKeywords ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
 	public final fun getVersion ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceKeywords {
+	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAliasBoundaryKeywords ()Ljava/util/Set;
+	public final fun getJoinModifierKeywords ()Ljava/util/Set;
+	public final fun getTableReferenceBoundaryKeywords ()Ljava/util/Set;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceKeywords$Companion {
+	public final fun getDefault ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceKeywords;
 }
 
 public final class dev/s7a/sqldelight/check/api/TextEdit {

@@ -1,9 +1,15 @@
 package dev.s7a.sqldelight.check.api
 
 /**
- * Diagnostic emitted by a rule, core analyzer, formatter, or configuration validation.
+ * Diagnostic resolved by the engine and passed to reporters.
+ *
+ * Rules should emit [RuleDiagnostic]. The constructor is public only so core,
+ * reporter tests, and other sqldelight-check modules can share the resolved
+ * representation across Gradle module boundaries.
  */
-public class Diagnostic(
+public class Diagnostic
+    @InternalSqldelightCheckApi
+    public constructor(
     /**
      * Rule ID responsible for the diagnostic when available.
      */

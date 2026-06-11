@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -39,7 +40,7 @@ public class RequireResultColumnAliasRule : Rule {
 
             content.selectTargets(token.endOffset, fromToken.startOffset, selectDepth).forEach { target ->
                 if (!target.requiresAlias(content)) return@forEach
-                if (target.hasAlias(content)) return@forEach
+                if (target.hasAlias(content, context.database.dialect.sourceKeywords)) return@forEach
 
                 reporter.report(
                     RuleDiagnostic(
@@ -96,18 +97,18 @@ private fun SelectTarget.requiresAlias(content: String): Boolean {
     return text.any { character -> character in "()+-*/|<>= " } || tokens.any { token -> token.isKeyword("case") }
 }
 
-private fun SelectTarget.hasAlias(content: String): Boolean {
+private fun SelectTarget.hasAlias(
+    content: String,
+    sourceKeywords: SqlDialectSourceKeywords,
+): Boolean {
     val text = content.substring(startOffset, endOffset)
     val tokens = text.sqlTokens().toList()
     if (tokens.any { token -> token.isKeyword("as") }) return true
     if (tokens.size < 2) return false
     val last = tokens.last()
     val previous = tokens[tokens.lastIndex - 1]
-    return last.normalizedText !in aliasBoundaryKeywords && previous.endOffset < last.startOffset
+    return last.normalizedText !in sourceKeywords.aliasBoundaryKeywords && previous.endOffset < last.startOffset
 }
 
 private fun String.isSimpleColumnReference(): Boolean =
     all { character -> character.isLetterOrDigit() || character == '_' || character == '.' || character == '"' || character == '`' }
-
-private val aliasBoundaryKeywords =
-    setOf("case", "cast", "coalesce", "count", "else", "end", "false", "from", "null", "then", "true", "when")

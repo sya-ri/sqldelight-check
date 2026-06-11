@@ -1,3 +1,5 @@
+@file:OptIn(dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi::class)
+
 package dev.s7a.sqldelight.check.reporter.githubannotations
 
 import dev.s7a.sqldelight.check.api.QualifiedRuleId

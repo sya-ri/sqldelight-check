@@ -906,10 +906,9 @@ class SqlDelightCheckGradlePluginTest {
     private companion object {
         private const val SQLDELIGHT_SNAPSHOT_REPOSITORY_URL = "https://central.sonatype.com/repository/maven-snapshots/"
         private const val EMPTY_JSON_REPORT =
-            """{"formatVersion":"0.1.0","summary":{"diagnostics":0,"errors":0,"warnings":0,"infos":0},"diagnostics":[]}"""
+            """{"summary":{"diagnostics":0,"errors":0,"warnings":0,"infos":0},"diagnostics":[]}"""
         private const val EMPTY_PRETTY_JSON_REPORT =
             "{\n" +
-                "    \"formatVersion\": \"0.1.0\",\n" +
                 "    \"summary\": {\n" +
                 "        \"diagnostics\": 0,\n" +
                 "        \"errors\": 0,\n" +
@@ -926,10 +925,10 @@ class SqlDelightCheckGradlePluginTest {
         val verifySnapshots = System.getProperty("sqldelightCheck.verifySnapshots").toBoolean()
 
         fun finalNewlineErrorJsonReport(): String =
-            """{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}"""
+            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}"""
 
         fun unsafeComparisonSpacingJsonReport(): String =
-            """{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
+            """{"summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
 
         fun sqliteDatabaseJson(version: String = "2.3.2"): String =
             """{"name":"Database","dialect":{"family":"SQLite","displayName":"sqlite 3 38","artifact":"app.cash.sqldelight:sqlite-3-38-dialect","version":"$version","implementationClass":null,"capabilities":["sqlite"]}}"""

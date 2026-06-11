@@ -2,6 +2,8 @@ package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
+import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import dev.s7a.sqldelight.check.rule.api.SqlJoinFacts
 import dev.s7a.sqldelight.check.rule.api.SqlQualifiedReferenceFacts
@@ -20,14 +22,17 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
  * this output while preserving the public rule-api model.
  */
 internal object SourceSqlFactsExtractor {
-    fun extract(file: SourceFile): SqlFacts {
+    fun extract(
+        file: SourceFile,
+        dialect: SqlDialect,
+    ): SqlFacts {
         val content = file.content
         val tokens = content.sqlTokens().toList()
         if (tokens.isEmpty()) return SqlFacts()
 
         val statements =
             content.statementRanges()
-                .mapNotNull { range -> content.statementFacts(range, tokens) }
+                .mapNotNull { range -> content.statementFacts(range, tokens, dialect.sourceKeywords) }
                 .toList()
         return SqlFacts(statements = statements)
     }
@@ -35,13 +40,14 @@ internal object SourceSqlFactsExtractor {
     private fun String.statementFacts(
         range: OffsetRange,
         tokens: List<SqlToken>,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): SqlStatementFacts? {
         val statementTokens = tokens.filter { token -> token.startOffset in range.startOffset..<range.endOffset }
         val leading = statementTokens.leadingSqlToken(this) ?: return null
         val kind = leading.statementKind(statementTokens)
-        val select = if (kind == SqlStatementKind.Select) selectFacts(leading, range, statementTokens) else null
-        val tables = tableReferences(range, statementTokens)
-        val joins = joinFacts(range, statementTokens, tables)
+        val select = if (kind == SqlStatementKind.Select) selectFacts(leading, range, statementTokens, sourceKeywords) else null
+        val tables = tableReferences(range, statementTokens, sourceKeywords)
+        val joins = joinFacts(range, statementTokens, tables, sourceKeywords)
         val qualifiedReferences = qualifiedReferences(range, statementTokens)
         return SqlStatementFacts(
             kind = kind,
@@ -80,6 +86,7 @@ internal object SourceSqlFactsExtractor {
         leading: SqlToken,
         range: OffsetRange,
         statementTokens: List<SqlToken>,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): SqlSelectFacts? {
         val selectToken =
             if (leading.isKeyword("select")) {
@@ -97,7 +104,7 @@ internal object SourceSqlFactsExtractor {
                     sqlParenthesisDepthAt(token.startOffset) == selectDepth
             } ?: return null
 
-        val columns = resultColumns(selectToken.endOffset, fromToken.startOffset, selectDepth)
+        val columns = resultColumns(selectToken.endOffset, fromToken.startOffset, selectDepth, sourceKeywords)
         return SqlSelectFacts(
             selectListRange = rangeAtOffsets(selectToken.startOffset, fromToken.startOffset),
             resultColumns = columns,
@@ -108,6 +115,7 @@ internal object SourceSqlFactsExtractor {
         startOffset: Int,
         endOffset: Int,
         depth: Int,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): List<SqlResultColumnFacts> =
         splitTopLevelSegments(startOffset, endOffset, depth)
             .map { segment ->
@@ -115,29 +123,30 @@ internal object SourceSqlFactsExtractor {
                 val tokens = text.sqlTokens().toList()
                 SqlResultColumnFacts(
                     range = rangeAtOffsets(segment.startOffset, segment.endOffset),
-                    alias = tokens.aliasText(),
+                    alias = tokens.aliasText(sourceKeywords),
                     wildcard = text.trim() == "*" || text.trim().endsWith(".*"),
                 )
             }
 
-    private fun List<SqlToken>.aliasText(): String? {
+    private fun List<SqlToken>.aliasText(sourceKeywords: SqlDialectSourceKeywords): String? {
         if (size < 2) return null
         val last = last()
         val previous = this[lastIndex - 1]
         if (previous.isKeyword("as")) return last.text
-        return if (previous.endOffset < last.startOffset && last.normalizedText !in aliasBoundaryKeywords) last.text else null
+        return if (previous.endOffset < last.startOffset && last.normalizedText !in sourceKeywords.aliasBoundaryKeywords) last.text else null
     }
 
     private fun String.tableReferences(
         range: OffsetRange,
         statementTokens: List<SqlToken>,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): List<SqlTableReferenceFacts> {
         val references = mutableListOf<SqlTableReferenceFacts>()
         statementTokens.forEachIndexed { index, token ->
             if (!token.isKeyword("from") && !token.isKeyword("join")) return@forEachIndexed
             if (sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
-            val boundary = firstReferenceBoundaryAfter(statementTokens, index + 1, range.endOffset)
-            references += tableReferencesAfterKeyword(token.endOffset, boundary)
+            val boundary = firstReferenceBoundaryAfter(statementTokens, index + 1, range.endOffset, sourceKeywords)
+            references += tableReferencesAfterKeyword(token.endOffset, boundary, sourceKeywords)
         }
         return references
     }
@@ -145,15 +154,19 @@ internal object SourceSqlFactsExtractor {
     private fun String.tableReferencesAfterKeyword(
         startOffset: Int,
         endOffset: Int,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): List<SqlTableReferenceFacts> =
         splitTopLevelSegments(startOffset, endOffset, depth = 0)
-            .mapNotNull { segment -> tableReferenceInSegment(segment) }
+            .mapNotNull { segment -> tableReferenceInSegment(segment, sourceKeywords) }
 
-    private fun String.tableReferenceInSegment(segment: OffsetRange): SqlTableReferenceFacts? {
+    private fun String.tableReferenceInSegment(
+        segment: OffsetRange,
+        sourceKeywords: SqlDialectSourceKeywords,
+    ): SqlTableReferenceFacts? {
         val open = nextSqlCharacterAfter(segment.startOffset)
         if (open?.value == '(' && open.offset < segment.endOffset) {
             val close = matchingClosingParenthesisOffset(open.offset) ?: return null
-            val alias = substring(close + 1, segment.endOffset).sqlTokens().toList().aliasText()
+            val alias = substring(close + 1, segment.endOffset).sqlTokens().toList().aliasText(sourceKeywords)
             return SqlTableReferenceFacts(
                 range = rangeAtOffsets(open.offset, segment.endOffset),
                 alias = alias,
@@ -169,7 +182,7 @@ internal object SourceSqlFactsExtractor {
         return SqlTableReferenceFacts(
             range = rangeAtOffsets(segment.startOffset, segment.endOffset),
             name = source.text,
-            alias = tokens.drop(1).aliasText(),
+            alias = tokens.drop(1).aliasText(sourceKeywords),
             subquery = false,
         )
     }
@@ -178,6 +191,7 @@ internal object SourceSqlFactsExtractor {
         range: OffsetRange,
         statementTokens: List<SqlToken>,
         references: List<SqlTableReferenceFacts>,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): List<SqlJoinFacts> =
         statementTokens
             .filter { token -> token.isKeyword("join") && sqlParenthesisDepthAt(token.startOffset) == 0 }
@@ -185,7 +199,7 @@ internal object SourceSqlFactsExtractor {
                 val table = references.firstOrNull { reference -> reference.range.start.toOffsetIn(this) >= join.endOffset } ?: return@mapNotNull null
                 SqlJoinFacts(
                     range = rangeAtOffsets(join.startOffset, table.range.end.toOffsetIn(this)),
-                    kind = joinKindBefore(join, range.startOffset, statementTokens),
+                    kind = joinKindBefore(join, range.startOffset, statementTokens, sourceKeywords),
                     table = table,
                 )
             }
@@ -194,11 +208,12 @@ internal object SourceSqlFactsExtractor {
         join: SqlToken,
         statementStart: Int,
         statementTokens: List<SqlToken>,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): String {
         val modifiers =
             statementTokens
                 .filter { token -> token.startOffset in statementStart..<join.startOffset }
-                .takeLastWhile { token -> token.normalizedText in joinModifierKeywords }
+                .takeLastWhile { token -> token.normalizedText in sourceKeywords.joinModifierKeywords }
         return (modifiers.map { token -> token.text } + join.text).joinToString(" ")
     }
 
@@ -267,6 +282,7 @@ internal object SourceSqlFactsExtractor {
         tokens: List<SqlToken>,
         startIndex: Int,
         statementEnd: Int,
+        sourceKeywords: SqlDialectSourceKeywords,
     ): Int =
         tokens
             .asSequence()
@@ -274,7 +290,7 @@ internal object SourceSqlFactsExtractor {
             .firstOrNull { token ->
                 token.startOffset < statementEnd &&
                     sqlParenthesisDepthAt(token.startOffset) == 0 &&
-                    token.normalizedText in tableReferenceBoundaryKeywords
+                    token.normalizedText in sourceKeywords.tableReferenceBoundaryKeywords
             }?.startOffset
             ?: statementEnd
 }
@@ -447,29 +463,3 @@ private fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, igno
 private fun Char.isIdentifierStart(): Boolean = this == '_' || isLetter()
 
 private fun Char.isIdentifierPart(): Boolean = this == '_' || isLetterOrDigit()
-
-private val aliasBoundaryKeywords =
-    setOf("case", "cast", "coalesce", "count", "else", "end", "false", "from", "null", "then", "true", "when")
-
-private val tableReferenceBoundaryKeywords =
-    setOf(
-        "cross",
-        "except",
-        "full",
-        "group",
-        "having",
-        "inner",
-        "intersect",
-        "join",
-        "left",
-        "limit",
-        "offset",
-        "on",
-        "order",
-        "right",
-        "union",
-        "using",
-        "where",
-    )
-
-private val joinModifierKeywords = setOf("cross", "full", "inner", "join", "left", "outer", "right")

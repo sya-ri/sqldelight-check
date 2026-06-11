@@ -1,3 +1,5 @@
+@file:OptIn(dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi::class)
+
 package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.api.DatabaseContext

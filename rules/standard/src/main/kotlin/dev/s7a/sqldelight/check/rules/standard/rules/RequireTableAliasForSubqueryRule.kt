@@ -24,7 +24,7 @@ public class RequireTableAliasForSubqueryRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        context.file.content.tableReferences().forEach { reference ->
+        context.file.content.tableReferences(context.database.dialect.sourceKeywords).forEach { reference ->
             if (reference.depth != 0 || !reference.isSubquery || reference.alias != null) return@forEach
 
             reporter.report(

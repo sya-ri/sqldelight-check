@@ -1,8 +1,11 @@
+@file:OptIn(InternalSqldelightCheckApi::class)
+
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
+import dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleSetId
@@ -63,7 +66,7 @@ public class SqlDelightCheckEngine {
         resolver: ConfigurationResolver,
         trace: AnalysisTrace,
     ): List<Diagnostic> {
-        val facts = SourceSqlFactsExtractor.extract(file)
+        val facts = SourceSqlFactsExtractor.extract(file, database.dialect)
         val disableDirectives = DisableDirectives.parse(file)
         val executedRuleIds = mutableListOf<QualifiedRuleId>()
         val diagnostics =

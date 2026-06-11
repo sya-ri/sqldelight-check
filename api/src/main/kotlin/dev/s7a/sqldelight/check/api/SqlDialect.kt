@@ -28,6 +28,10 @@ public class SqlDialect(
      * Capabilities discovered or inferred for this dialect.
      */
     public val capabilities: Set<DialectCapability> = emptySet(),
+    /**
+     * Keyword groups used by source-level SQL fact extraction.
+     */
+    public val sourceKeywords: SqlDialectSourceKeywords = SqlDialectSourceKeywords.Default,
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||
@@ -37,7 +41,8 @@ public class SqlDialect(
             artifact == other.artifact &&
             version == other.version &&
             implementationClass == other.implementationClass &&
-            capabilities == other.capabilities
+            capabilities == other.capabilities &&
+            sourceKeywords == other.sourceKeywords
 
     override fun hashCode(): Int {
         var result = family.hashCode()
@@ -46,9 +51,10 @@ public class SqlDialect(
         result = 31 * result + (version?.hashCode() ?: 0)
         result = 31 * result + (implementationClass?.hashCode() ?: 0)
         result = 31 * result + capabilities.hashCode()
+        result = 31 * result + sourceKeywords.hashCode()
         return result
     }
 
     override fun toString(): String =
-        "SqlDialect(family=$family, displayName=$displayName, artifact=$artifact, version=$version, implementationClass=$implementationClass, capabilities=$capabilities)"
+        "SqlDialect(family=$family, displayName=$displayName, artifact=$artifact, version=$version, implementationClass=$implementationClass, capabilities=$capabilities, sourceKeywords=$sourceKeywords)"
 }

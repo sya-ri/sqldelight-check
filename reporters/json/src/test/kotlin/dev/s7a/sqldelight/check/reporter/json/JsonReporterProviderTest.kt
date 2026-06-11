@@ -1,8 +1,8 @@
+@file:OptIn(dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi::class)
+
 package dev.s7a.sqldelight.check.reporter.json
 
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
-
-
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
@@ -26,7 +26,7 @@ class JsonReporterProviderTest {
         val json = JsonReporterProvider().render(Report(diagnostics = emptyList()))
 
         assertEquals(
-            """{"formatVersion":"0.1.0","summary":{"diagnostics":0,"errors":0,"warnings":0,"infos":0},"diagnostics":[]}""",
+            """{"summary":{"diagnostics":0,"errors":0,"warnings":0,"infos":0},"diagnostics":[]}""",
             json,
         )
     }
@@ -36,7 +36,7 @@ class JsonReporterProviderTest {
         val json = JsonReporterProvider().render(Report(diagnostics = listOf(diagnostic())))
 
         assertEquals(
-            """{"formatVersion":"0.1.0","summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:use-is-null","severity":"warning","message":"Use `IS NULL` instead of = NULL & keep <safe>.","file":"src/commonMain/sqldelight/Player.sq","range":{"start":{"line":2,"column":8},"end":{"line":2,"column":16}},"database":null,"fixes":[{"title":"Use IS NULL","safety":"safe","edits":[{"range":{"start":{"line":2,"column":46},"end":{"line":2,"column":52}},"replacement":"IS NULL"}]}]}]}""",
+            """{"summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:use-is-null","severity":"warning","message":"Use `IS NULL` instead of = NULL & keep <safe>.","file":"src/commonMain/sqldelight/Player.sq","range":{"start":{"line":2,"column":8},"end":{"line":2,"column":16}},"database":null,"fixes":[{"title":"Use IS NULL","safety":"safe","edits":[{"range":{"start":{"line":2,"column":46},"end":{"line":2,"column":52}},"replacement":"IS NULL"}]}]}]}""",
             json,
         )
     }
@@ -51,7 +51,6 @@ class JsonReporterProviderTest {
         assertEquals(
             """
             {
-                "formatVersion": "0.1.0",
                 "summary": {
                     "diagnostics": 0,
                     "errors": 0,

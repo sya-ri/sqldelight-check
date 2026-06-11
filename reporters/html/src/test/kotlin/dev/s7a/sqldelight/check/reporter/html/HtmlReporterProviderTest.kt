@@ -1,3 +1,5 @@
+@file:OptIn(dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi::class)
+
 package dev.s7a.sqldelight.check.reporter.html
 
 import dev.s7a.sqldelight.check.api.Diagnostic

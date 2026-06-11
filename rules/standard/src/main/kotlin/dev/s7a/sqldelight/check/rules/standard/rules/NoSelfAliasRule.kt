@@ -24,7 +24,7 @@ public class NoSelfAliasRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        context.file.content.tableReferences().forEach { reference ->
+        context.file.content.tableReferences(context.database.dialect.sourceKeywords).forEach { reference ->
             val tableName = reference.tableName ?: return@forEach
             val alias = reference.alias ?: return@forEach
             if (!tableName.equals(alias.text, ignoreCase = true)) return@forEach

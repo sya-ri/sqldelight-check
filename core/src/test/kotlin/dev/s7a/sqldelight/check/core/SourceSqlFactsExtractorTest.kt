@@ -3,6 +3,9 @@ package dev.s7a.sqldelight.check.core
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
+import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -137,8 +140,35 @@ class SourceSqlFactsExtractorTest {
         assertFalse(statement.select?.resultColumns.orEmpty().any { column -> column.wildcard })
     }
 
-    private fun extract(content: String) =
-        SourceSqlFactsExtractor.extract(SourceFile(path = "src/main/sqldelight/com/example/Test.sq", content = content))
+    @Test
+    fun `uses dialect source keywords for table reference boundaries`() {
+        val content =
+            """
+            SELECT player.id
+            FROM player SAMPLE bucket
+            WHERE player.id = ?;
+            """.trimIndent()
+        val dialect =
+            SqlDialect(
+                family = DialectFamily.Custom,
+                displayName = "Custom",
+                sourceKeywords =
+                    SqlDialectSourceKeywords(
+                        tableReferenceBoundaryKeywords =
+                            SqlDialectSourceKeywords.Default.tableReferenceBoundaryKeywords + "sample",
+                    ),
+            )
+
+        val statement = extract(content, dialect).statements.single()
+
+        assertEquals(listOf("player"), statement.tableReferences.map { reference -> reference.name })
+        assertEquals(listOf(null), statement.tableReferences.map { reference -> reference.alias })
+    }
+
+    private fun extract(
+        content: String,
+        dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite, displayName = "SQLite"),
+    ) = SourceSqlFactsExtractor.extract(SourceFile(path = "src/main/sqldelight/com/example/Test.sq", content = content), dialect)
 
     private fun String.textIn(range: SourceRange): String = substring(range.start.toOffsetIn(this), range.end.toOffsetIn(this))
 
