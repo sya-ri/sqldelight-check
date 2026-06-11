@@ -2,12 +2,18 @@
 
 ## Branches
 
-sqldelight-check uses `main` while the project is being prepared for its first release. Release branches may be added
-after `v0.1.0` is published.
+sqldelight-check uses a stable `main` branch and release-line development branches.
 
-Do not include agent-specific names in branch names.
+- `main` points at the latest published release.
+- `release/0.x` is the development branch for the current pre-1.0 release line.
+- Feature, fix, and dependency update pull requests should target `release/0.x`.
+- Release preparation is merged into `release/0.x` first, then `main` is advanced to the published release commit after artifacts are published.
+- A publish pull request from `release/0.x` to `main` is created automatically when `release/0.x` is updated.
+- Do not include agent-specific names in branch names.
 
 ## Pull Requests
+
+Open pull requests against `release/0.x` unless a maintainer explicitly asks for another base branch.
 
 Use short, descriptive titles without agent-specific prefixes. Keep each pull request focused on one behavior, fix, or
 release task.
@@ -48,7 +54,16 @@ When public API changes are intentional, update Kotlin ABI baselines after revie
 
 ## Publishing
 
-`v0.1.0` publishing is not automated yet. Before a release, verify:
+Publish pull requests target `main` from `release/0.x`. Merge the publish pull request with a merge commit only when the
+release branch is ready to become the latest published state.
+
+Do not squash or rebase publish pull requests. A merge commit preserves the release branch commits and keeps the next
+publish pull request based on the previous published merge point.
+
+After the publish pull request is merged, publish artifacts from `main`, verify that they are available, then create the
+GitHub Release.
+
+`v0.1.0` publishing is not automated yet. Before merging a publish pull request, verify:
 
 - `./gradlew --no-daemon releaseCheck`
 - The CI Qodana job is green for the release commit, or run the local Qodana Docker command above with the repository
@@ -58,3 +73,15 @@ When public API changes are intentional, update Kotlin ABI baselines after revie
 - SQLDelight `2.3.2` core analyzer behavior.
 - Built-in rule and reporter discovery.
 - External provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.
+
+## Protected Branches
+
+The protected branch set is:
+
+- `main`
+- `release/*`
+
+Do not force-push or delete protected branches. Changes should go through pull requests.
+Rulesets should allow only merge commits into `main` and only squash merges into `release/*`.
+The repository ruleset requires one approving review, except for maintainers listed as pull-request bypass actors.
+Required status checks cannot be bypassed.
