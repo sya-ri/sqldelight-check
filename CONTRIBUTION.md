@@ -26,6 +26,9 @@ Run Qodana locally with the repository `qodana.yaml` configuration:
 docker run -it -v "$PWD":/data/project jetbrains/qodana-jvm-community:2026.1
 ```
 
+The CI workflow also runs Qodana on pull requests and pushes to `main` with `JetBrains/qodana-action` and the
+repository `qodana.yaml` configuration. Keep the local Docker image version aligned with `qodana.yaml`.
+
 Before committing Kotlin or Gradle changes, scan for fully qualified type references in implementation and build files
 and convert them to imports when practical. Package names, import declarations, plugin IDs, Maven coordinates,
 reflection class-name strings, and `ServiceLoader` provider names are intentionally allowed.
@@ -50,7 +53,8 @@ When public API changes are intentional, update Kotlin ABI baselines after revie
 - `./gradlew --no-daemon check`
 - `./gradlew --no-daemon dokkaGeneratePublicationHtml dokkaGeneratePublicationJavadoc`
 - `./gradlew --no-daemon publishToMavenLocal`
-- Qodana with the repository `qodana.yaml` configuration.
+- The CI Qodana job is green for the release commit, or run the local Qodana Docker command above with the repository
+  `qodana.yaml` configuration when verifying outside CI.
 - Gradle plugin metadata.
 - Generated reports.
 - SQLDelight `2.3.2` core analyzer behavior.
