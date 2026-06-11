@@ -138,3 +138,8 @@ sqldelightCheck {
 Reporter output files are managed by sqldelight-check. Single-file reporters should write to `output.file()`.
 Reporters that need assets or shards can write relative paths with `output.file("assets/report.css")`. A reporter
 should avoid reading project files directly unless its format explicitly requires it.
+
+## Example Project
+
+See `examples/custom-extensions/custom-reporter` for a runnable custom reporter loaded by
+`examples/custom-extensions`.
