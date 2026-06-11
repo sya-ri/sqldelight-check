@@ -6,4 +6,3 @@ profile:
   name: qodana.recommended
 exclude:
   - name: RedundantVisibilityModifier
-

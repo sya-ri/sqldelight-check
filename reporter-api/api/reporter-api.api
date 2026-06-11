@@ -22,4 +22,3 @@ public abstract interface class dev/s7a/sqldelight/check/reporter/api/ReporterPr
 public final class dev/s7a/sqldelight/check/reporter/api/ReporterProvider$DefaultImpls {
 	public static synthetic fun create$default (Ldev/s7a/sqldelight/check/reporter/api/ReporterProvider;Ljava/util/Map;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/reporter/api/Reporter;
 }
-

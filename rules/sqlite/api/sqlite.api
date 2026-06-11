@@ -55,4 +55,3 @@ public abstract class dev/s7a/sqldelight/check/rules/sqlite/rules/RegexSQLiteRul
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
-

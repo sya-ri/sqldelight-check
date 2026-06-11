@@ -22,4 +22,3 @@ private object TextReporter : Reporter {
         output.write("sqldelight-check diagnostics: ${report.diagnostics.size}\n".toByteArray())
     }
 }
-

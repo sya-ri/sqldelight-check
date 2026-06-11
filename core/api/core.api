@@ -192,4 +192,3 @@ public final class dev/s7a/sqldelight/check/core/SqlDelightCheckEngine {
 	public final fun run (Ljava/util/List;Ljava/util/List;Ldev/s7a/sqldelight/check/core/CheckConfig;)Ljava/util/List;
 	public static synthetic fun run$default (Ldev/s7a/sqldelight/check/core/SqlDelightCheckEngine;Ljava/util/List;Ljava/util/List;Ldev/s7a/sqldelight/check/core/CheckConfig;ILjava/lang/Object;)Ljava/util/List;
 }
-
