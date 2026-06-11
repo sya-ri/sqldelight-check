@@ -1,9 +1,31 @@
-package dev.s7a.sqldelight.check.rules.postgres.rules
+package dev.s7a.sqldelight.check.rule.api
 
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
 
-internal fun String.rangeAtOffsets(
+/**
+ * SQL-like source token outside comments and quoted text.
+ */
+public data class SqlToken(
+    public val text: String,
+    public val startOffset: Int,
+    public val endOffset: Int,
+) {
+    /**
+     * Lowercase token text for case-insensitive matching.
+     */
+    public val normalizedText: String = text.lowercase()
+}
+
+/**
+ * Returns true when this token matches [value] ignoring case.
+ */
+public fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
+
+/**
+ * Converts source offsets into a 1-based line/column range.
+ */
+public fun String.rangeAtOffsets(
     startOffset: Int,
     endOffset: Int,
 ): SourceRange =
@@ -12,7 +34,10 @@ internal fun String.rangeAtOffsets(
         end = positionAt(endOffset),
     )
 
-internal fun String.positionAt(offset: Int): SourcePosition {
+/**
+ * Converts a source offset into a 1-based line/column position.
+ */
+public fun String.positionAt(offset: Int): SourcePosition {
     val boundedOffset = offset.coerceIn(0, length)
     var line = 1
     var lineStart = 0
@@ -27,13 +52,17 @@ internal fun String.positionAt(offset: Int): SourcePosition {
     return SourcePosition(line = line, column = boundedOffset - lineStart + 1)
 }
 
-internal fun String.maskSqlCommentsAndQuotedText(): String {
+/**
+ * Replaces comments and quoted text with spaces while preserving offsets.
+ */
+public fun String.maskSqlCommentsAndQuotedText(hashLineComments: Boolean = false): String {
     val chars = toCharArray()
     var index = 0
     while (index < chars.size) {
         index =
             when {
-                startsWith("--", index) -> maskUntilLineEnd(chars, index)
+                startsWith("--", index) -> maskLineComment(chars, index)
+                hashLineComments && chars[index] == '#' -> maskLineComment(chars, index)
                 startsWith("/*", index) -> maskBlockComment(chars, index)
                 chars[index] == '\'' -> maskQuoted(chars, index, '\'')
                 chars[index] == '"' -> maskQuoted(chars, index, '"')
@@ -45,23 +74,17 @@ internal fun String.maskSqlCommentsAndQuotedText(): String {
     return String(chars)
 }
 
-internal data class SqlToken(
-    val text: String,
-    val startOffset: Int,
-    val endOffset: Int,
-) {
-    val normalizedText: String = text.lowercase()
-}
-
-internal fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
-
-internal fun String.sqlTokens(): Sequence<SqlToken> =
+/**
+ * Tokenizes SQL-like identifiers and semicolons outside comments and quoted text.
+ */
+public fun String.sqlTokens(hashLineComments: Boolean = false): Sequence<SqlToken> =
     sequence {
         var index = 0
         while (index < length) {
             index =
                 when {
                     startsWith("--", index) -> skipLineComment(index)
+                    hashLineComments && this@sqlTokens[index] == '#' -> skipLineComment(index)
                     startsWith("/*", index) -> skipBlockComment(index)
                     this@sqlTokens[index] == '\'' -> skipQuoted(index, '\'')
                     this@sqlTokens[index] == '"' -> skipQuoted(index, '"')
@@ -85,7 +108,10 @@ internal fun String.sqlTokens(): Sequence<SqlToken> =
         }
     }
 
-internal fun List<SqlToken>.sqlStatements(): List<List<SqlToken>> {
+/**
+ * Splits a token stream into statements at semicolon tokens.
+ */
+public fun List<SqlToken>.sqlStatements(): List<List<SqlToken>> {
     val statements = mutableListOf<List<SqlToken>>()
     val current = mutableListOf<SqlToken>()
     for (token in this) {
@@ -99,7 +125,7 @@ internal fun List<SqlToken>.sqlStatements(): List<List<SqlToken>> {
     return statements
 }
 
-private fun String.maskUntilLineEnd(
+private fun String.maskLineComment(
     chars: CharArray,
     start: Int,
 ): Int {
@@ -107,39 +133,6 @@ private fun String.maskUntilLineEnd(
     for (index in start until end) chars[index] = ' '
     return end
 }
-
-private fun String.skipLineComment(start: Int): Int =
-    indexOf('\n', startIndex = start).let { if (it == -1) length else it }
-
-private fun String.skipBlockComment(start: Int): Int =
-    indexOf("*/", startIndex = start + 2).let { if (it == -1) length else it + 2 }
-
-private fun String.skipQuoted(
-    start: Int,
-    quote: Char,
-): Int {
-    var index = start + 1
-    while (index < length) {
-        if (this[index] == quote) {
-            val next = index + 1
-            if (next < length && this[next] == quote) {
-                index += 2
-            } else {
-                return next
-            }
-        } else {
-            index++
-        }
-    }
-    return length
-}
-
-private fun String.skipBracketQuoted(start: Int): Int =
-    indexOf(']', startIndex = start + 1).let { if (it == -1) length else it + 1 }
-
-private fun Char.isIdentifierStart(): Boolean = isLetter() || this == '_'
-
-private fun Char.isIdentifierPart(): Boolean = isLetterOrDigit() || this == '_' || this == '$'
 
 private fun String.maskBlockComment(
     chars: CharArray,
@@ -179,7 +172,41 @@ private fun String.maskBracketQuoted(
     chars: CharArray,
     start: Int,
 ): Int {
+    chars[start] = ' '
     val end = indexOf(']', startIndex = start + 1).let { if (it == -1) length else it + 1 }
-    for (index in start until end) chars[index] = ' '
+    for (index in start + 1 until end) chars[index] = ' '
     return end
 }
+
+private fun String.skipLineComment(start: Int): Int =
+    indexOf('\n', startIndex = start).let { if (it == -1) length else it }
+
+private fun String.skipBlockComment(start: Int): Int =
+    indexOf("*/", startIndex = start + 2).let { if (it == -1) length else it + 2 }
+
+private fun String.skipQuoted(
+    start: Int,
+    quote: Char,
+): Int {
+    var index = start + 1
+    while (index < length) {
+        if (this[index] == quote) {
+            val next = index + 1
+            if (next < length && this[next] == quote) {
+                index += 2
+            } else {
+                return next
+            }
+        } else {
+            index++
+        }
+    }
+    return length
+}
+
+private fun String.skipBracketQuoted(start: Int): Int =
+    indexOf(']', startIndex = start + 1).let { if (it == -1) length else it + 1 }
+
+private fun Char.isIdentifierStart(): Boolean = isLetter() || this == '_'
+
+private fun Char.isIdentifierPart(): Boolean = isLetterOrDigit() || this == '_' || this == '$'

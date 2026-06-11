@@ -63,16 +63,15 @@ package com.example.sqldelight.rules
 
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.DialectFamily
-import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 class ExampleRule : Rule {
-    override val id = RuleId("example:example-rule")
+    override val id = "example-rule"
     override val defaultSeverity = Severity.Warning
-    override val defaultEnablement = Enablement.Auto
+    override val defaultEnable = true
 
     override fun isApplicable(context: RuleContext): Boolean =
         context.database.dialect.family == DialectFamily.PostgreSql
@@ -81,7 +80,7 @@ class ExampleRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        // Inspect context.file.source, context.facts, context.database, and context.options.
+        // Inspect context.file.content, context.file.kind, context.facts, context.database, and context.options.
     }
 }
 ```
@@ -97,15 +96,25 @@ checked project, so exposing them from `rule-api` would make third-party rule
 sets version-sensitive.
 
 Use `RuleContext.facts` for parser-backed structure that sqldelight-check
-intends to keep stable. Use `RuleContext.file.source` only for conservative
-source-text checks such as comments, line endings, or token-level policies.
+intends to keep stable. Use `RuleContext.file.content` and
+`RuleContext.file.kind` only for conservative source-text checks such as
+comments, line endings, file-kind gates, or token-level policies.
 
 When a rule needs structure that `SqlFacts` does not expose yet, prefer adding a
 stable fact type to `rule-api` over reaching into SQLDelight internals.
 
+`rule-api` also provides small source-text helpers for rules that only need
+offset-stable text checks:
+
+- `String.rangeAtOffsets(startOffset, endOffset)` converts offsets to a `SourceRange`.
+- `String.sqlTokens()` scans SQL-like identifiers outside comments and quoted text.
+- `String.maskSqlCommentsAndQuotedText()` masks comments and quoted text while preserving offsets.
+- `Map<String, String>.booleanOption(...)`, `positiveIntOption(...)`, and `commaSeparatedOption(...)` parse common rule options.
+
 ## IDs And Configuration
 
-Use `rule-set:rule-name` IDs. The rule set part should match the provider ID:
+Rules expose only their local ID. sqldelight-check combines the provider ID and
+rule ID into the configured `rule-set:rule-name` ID:
 
 ```kotlin
 sqldelightCheck {
@@ -123,8 +132,10 @@ sqldelightCheck {
 }
 ```
 
-Custom rules can override `Rule.isApplicable(context)` to opt into dialect-, database-, or file-specific automatic
-enablement. The method is consulted only when the resolved rule enablement is `Auto`; explicit `Enabled` and `Disabled`
+Custom rules can set `defaultEnable = false` to stay disabled unless users
+explicitly enable them. When `defaultEnable = true`, rules use automatic
+applicability: `Rule.targetCapability` and `Rule.isApplicable(context)` decide
+whether the rule runs for a database/file. Explicit `Enabled` and `Disabled`
 settings remain user overrides.
 
 ## Fixes
@@ -139,3 +150,8 @@ sqldelightCheck {
     }
 }
 ```
+
+## Example Project
+
+See `examples/custom-extensions/custom-ruleset` for a runnable custom rule set loaded by
+`examples/custom-extensions`.

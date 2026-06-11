@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -12,15 +13,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports SQLDelight model-bound INSERT statements.
  */
 public class AvoidModelBoundInsertForPublicApiRule : Rule {
-    override val id: RuleId = RuleId("standard:avoid-model-bound-insert-for-public-api")
+    override val id: String = "avoid-model-bound-insert-for-public-api"
     override val defaultSeverity: Severity = Severity.Info
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        if (!context.file.path.endsWith(".sq")) return
+        if (context.file.kind != SourceFileKind.Query) return
 
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
@@ -34,7 +35,7 @@ public class AvoidModelBoundInsertForPublicApiRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Prefer an explicit INSERT column list and named values over model-bound VALUES ?.",
                     file = context.file,

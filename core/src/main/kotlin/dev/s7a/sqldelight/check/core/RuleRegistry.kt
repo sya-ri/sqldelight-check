@@ -45,13 +45,25 @@ private fun validateRuleSetProviders(providers: List<RuleSetProvider>) {
         "Duplicate sqldelight-check rule set provider ID(s): ${duplicateRuleSetIds.joinToString()}"
     }
 
-    val duplicateRuleIds =
-        providers
-            .flatMap { provider ->
-                provider.ruleProviders().map { ruleProvider ->
-                    provider.id.value to ruleProvider.create().id.value
-                }
+    val ruleIds =
+        providers.flatMap { provider ->
+            provider.ruleProviders().map { ruleProvider ->
+                provider.id.value to ruleProvider.create().id
             }
+        }
+
+    val invalidRuleIds =
+        ruleIds
+            .filter { (_, ruleId) -> ':' in ruleId }
+            .map { (ruleSetId, ruleId) -> "$ruleSetId:$ruleId" }
+            .sorted()
+    require(invalidRuleIds.isEmpty()) {
+        "Rule IDs must be local and must not contain ':': ${invalidRuleIds.joinToString()}"
+    }
+
+    val duplicateRuleIds =
+        ruleIds
+            .map { (ruleSetId, ruleId) -> ruleSetId to "$ruleSetId:$ruleId" }
             .groupBy { (_, ruleId) -> ruleId }
             .filterValues { matches -> matches.size > 1 }
             .mapValues { (_, matches) ->

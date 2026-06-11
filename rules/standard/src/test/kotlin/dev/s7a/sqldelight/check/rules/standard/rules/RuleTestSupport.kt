@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
@@ -73,9 +74,26 @@ internal fun Rule.diagnostics(
                 override val options: Map<String, String> = options
                 override val facts: SqlFacts = facts
             },
-        reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic },
+        reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic.withRuleSetPrefix("standard") },
     )
     return diagnostics
+}
+
+private fun Diagnostic.withRuleSetPrefix(prefix: String): Diagnostic {
+    val currentRuleId = ruleId ?: return this
+    return if (':' in currentRuleId.value) {
+        this
+    } else {
+        Diagnostic(
+            ruleId = RuleId("$prefix:${currentRuleId.value}"),
+            severity = severity,
+            message = message,
+            file = file,
+            range = range,
+            database = database,
+            fixes = fixes,
+        )
+    }
 }
 
 internal fun Rule.assertDiagnosticCount(

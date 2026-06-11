@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `CASE` expressions that map a predicate directly to boolean literals.
  */
 public class PreferSimpleBooleanCaseRule : Rule {
-    override val id: RuleId = RuleId("standard:prefer-simple-boolean-case")
+    override val id: String = "prefer-simple-boolean-case"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -28,7 +28,7 @@ public class PreferSimpleBooleanCaseRule : Rule {
             val match = tokens.simpleBooleanCaseMatch(index) ?: return@forEachIndexed
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Prefer a direct boolean predicate instead of CASE returning TRUE or FALSE.",
                     file = context.file,

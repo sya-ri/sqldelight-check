@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports join clauses that omit `ON` or `USING` instead of declaring `CROSS JOIN`.
  */
 public class ExplicitCrossJoinRule : Rule {
-    override val id: RuleId = RuleId("standard:explicit-cross-join")
+    override val id: String = "explicit-cross-join"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -40,7 +40,7 @@ public class ExplicitCrossJoinRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Use CROSS JOIN for joins without ON or USING.",
                     file = context.file,

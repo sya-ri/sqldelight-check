@@ -17,7 +17,7 @@ class SQLiteRuleSetProviderTest {
     fun `sqlite rule set provides sqlite rules`() {
         val provider = SQLiteRuleSetProvider()
         val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
-        val ruleIds = rules.map { rule -> rule.id }.toSet()
+        val ruleIds = rules.map { rule -> RuleId("${provider.id.value}:${rule.id}") }.toSet()
 
         assertEquals(RuleSetId("sqlite"), provider.id)
         assertEquals(setOf(DialectCapabilities.SQLite), rules.map { rule -> rule.targetCapability }.toSet())

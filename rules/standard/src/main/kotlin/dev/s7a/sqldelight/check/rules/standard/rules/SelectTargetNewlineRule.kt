@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline SELECT lists that do not put every target on its own line.
  */
 public class SelectTargetNewlineRule : Rule {
-    override val id: RuleId = RuleId("standard:select-target-newline")
+    override val id: String = "select-target-newline"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -31,7 +31,7 @@ public class SelectTargetNewlineRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Multiline SELECT lists should put each result expression on its own line.",
                     file = context.file,

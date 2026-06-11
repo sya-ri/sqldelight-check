@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports common function-wrapped WHERE predicates that are hard to use with indexes.
  */
 public class RequireWhereIndexFriendlyPredicateRule : Rule {
-    override val id: RuleId = RuleId("standard:require-where-index-friendly-predicate")
+    override val id: String = "require-where-index-friendly-predicate"
     override val defaultSeverity: Severity = Severity.Info
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class RequireWhereIndexFriendlyPredicateRule : Rule {
                 .forEach { function ->
                     reporter.report(
                         Diagnostic(
-                            ruleId = id,
+                            ruleId = RuleId(id),
                             severity = defaultSeverity,
                             message = "Avoid wrapping WHERE columns in functions when an index-friendly predicate can be used.",
                             file = context.file,

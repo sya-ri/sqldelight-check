@@ -1,5 +1,9 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.rule.api.booleanOption
+import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
@@ -14,9 +18,9 @@ private const val DEFAULT_MAX_CASE_DEPTH = 2
  * Reports CASE expressions nested deeper than the configured limit.
  */
 public class MaxCaseDepthRule : Rule {
-    override val id: RuleId = RuleId("standard:max-case-depth")
+    override val id: String = "max-case-depth"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -32,7 +36,7 @@ public class MaxCaseDepthRule : Rule {
                     if (depth > maxDepth) {
                         reporter.report(
                             Diagnostic(
-                                ruleId = id,
+                                ruleId = RuleId(id),
                                 severity = defaultSeverity,
                                 message = "CASE nesting depth is greater than $maxDepth.",
                                 file = context.file,

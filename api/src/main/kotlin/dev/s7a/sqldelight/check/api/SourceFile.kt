@@ -13,6 +13,16 @@ public class SourceFile(
      */
     public val content: String,
 ) {
+    /**
+     * SQLDelight source kind inferred from [path].
+     */
+    public val kind: SourceFileKind =
+        when {
+            path.endsWith(".sq") -> SourceFileKind.Query
+            path.endsWith(".sqm") -> SourceFileKind.Migration
+            else -> SourceFileKind.Other
+        }
+
     override fun equals(other: Any?): Boolean =
         this === other ||
             other is SourceFile &&

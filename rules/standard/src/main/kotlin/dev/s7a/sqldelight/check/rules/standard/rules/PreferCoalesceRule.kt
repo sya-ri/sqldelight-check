@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `IFNULL` and `NVL` calls that can be written as `COALESCE`.
  */
 public class PreferCoalesceRule : Rule {
-    override val id: RuleId = RuleId("standard:prefer-coalesce")
+    override val id: String = "prefer-coalesce"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class PreferCoalesceRule : Rule {
                 val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Use COALESCE instead of ${token.text.uppercase()}.",
                         file = context.file,

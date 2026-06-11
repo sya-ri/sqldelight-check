@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports ORDER BY items with explicit direction but no explicit NULL ordering.
  */
 public class RequireExplicitNullOrderingRule : Rule {
-    override val id: RuleId = RuleId("standard:require-explicit-null-ordering")
+    override val id: String = "require-explicit-null-ordering"
     override val defaultSeverity: Severity = Severity.Info
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -35,7 +35,7 @@ public class RequireExplicitNullOrderingRule : Rule {
                 .forEach { direction ->
                     reporter.report(
                         Diagnostic(
-                            ruleId = id,
+                            ruleId = RuleId(id),
                             severity = defaultSeverity,
                             message = "Specify NULLS FIRST or NULLS LAST with explicit ORDER BY direction.",
                             file = context.file,

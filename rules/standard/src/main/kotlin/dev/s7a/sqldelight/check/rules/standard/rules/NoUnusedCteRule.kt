@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * ambiguous CTE layouts alone until SQLDelight-derived facts are richer.
  */
 public class NoUnusedCteRule : Rule {
-    override val id: RuleId = RuleId("standard:no-unused-cte")
+    override val id: String = "no-unused-cte"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -29,7 +29,7 @@ public class NoUnusedCteRule : Rule {
                 if (content.hasTokenAfter(cte.name, block.mainQueryStartOffset)) return@forEach
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "CTE '${cte.name}' is not referenced by the main query.",
                         file = context.file,

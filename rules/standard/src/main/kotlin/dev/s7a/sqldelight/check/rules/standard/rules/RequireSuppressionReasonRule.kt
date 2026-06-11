@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports sqldelight-check disable directives that do not include an explanatory reason.
  */
 public class RequireSuppressionReasonRule : Rule {
-    override val id: RuleId = RuleId("standard:require-suppression-reason")
+    override val id: String = "require-suppression-reason"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -26,7 +26,7 @@ public class RequireSuppressionReasonRule : Rule {
             .forEach { directive ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "sqldelight-check disable directives should include a reason after '--'.",
                         file = context.file,

@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `UNION` operators that do not explicitly specify `ALL` or `DISTINCT`.
  */
 public class ExplicitUnionOperatorRule : Rule {
-    override val id: RuleId = RuleId("standard:explicit-union-operator")
+    override val id: String = "explicit-union-operator"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -29,7 +29,7 @@ public class ExplicitUnionOperatorRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "UNION should explicitly specify ALL or DISTINCT.",
                     file = context.file,

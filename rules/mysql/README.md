@@ -32,14 +32,14 @@ and `Severity.Info` are supported through user configuration.
 
 | Rule ID | Enable | Severity | Fix | Purpose |
 | --- | --- | --- | --- | --- |
-| `mysql:no-utf8-charset` | 🔘 | ⚠️ |  | Prefer `utf8mb4` instead of MySQL `utf8` or `utf8mb3`. |
-| `mysql:no-copy-algorithm` | 🔘 | ⚠️ |  | Disallow `ALTER TABLE ... ALGORITHM=COPY` for online migrations. |
-| `mysql:no-exclusive-lock` | 🔘 | ⚠️ |  | Disallow `ALTER TABLE ... LOCK=EXCLUSIVE` for online migrations. |
-| `mysql:no-replace-into` | 🔘 | ⚠️ |  | Disallow `REPLACE INTO`, which can delete and reinsert rows. |
-| `mysql:no-zero-date-default` | 🔘 | ⚠️ |  | Disallow zero date defaults that fail under stricter SQL modes. |
-| `mysql:no-display-width-integer` | 🔘 | ⚠️ |  | Disallow deprecated integer display widths. |
-| `mysql:require-index-prefix-length` | 🔘 | ⚠️ |  | Require prefix lengths for indexes on `TEXT` and `BLOB` columns. |
-| `mysql:risky-alter-table` | 🔘 | ⚠️ |  | Flag `ALTER TABLE` operations that can rebuild or strongly lock a table. |
+| [`mysql:no-utf8-charset`](#mysqlno-utf8-charset) | 🔘 | ⚠️ |  | Prefer `utf8mb4` instead of MySQL `utf8` or `utf8mb3`. |
+| [`mysql:no-copy-algorithm`](#mysqlno-copy-algorithm) | 🔘 | ⚠️ |  | Disallow `ALTER TABLE ... ALGORITHM=COPY` for online migrations. |
+| [`mysql:no-exclusive-lock`](#mysqlno-exclusive-lock) | 🔘 | ⚠️ |  | Disallow `ALTER TABLE ... LOCK=EXCLUSIVE` for online migrations. |
+| [`mysql:no-replace-into`](#mysqlno-replace-into) | 🔘 | ⚠️ |  | Disallow `REPLACE INTO`, which can delete and reinsert rows. |
+| [`mysql:no-zero-date-default`](#mysqlno-zero-date-default) | 🔘 | ⚠️ |  | Disallow zero date defaults that fail under stricter SQL modes. |
+| [`mysql:no-display-width-integer`](#mysqlno-display-width-integer) | 🔘 | ⚠️ |  | Disallow deprecated integer display widths. |
+| [`mysql:require-index-prefix-length`](#mysqlrequire-index-prefix-length) | 🔘 | ⚠️ |  | Require prefix lengths for indexes on `TEXT` and `BLOB` columns. |
+| [`mysql:risky-alter-table`](#mysqlrisky-alter-table) | 🔘 | ⚠️ |  | Flag `ALTER TABLE` operations that can rebuild or strongly lock a table. |
 
 ## Notes
 

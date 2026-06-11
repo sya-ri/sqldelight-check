@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports missing or repeated spaces after comma tokens on the same line.
  */
 public class SpaceAfterCommaRule : Rule {
-    override val id: RuleId = RuleId("standard:space-after-comma")
+    override val id: String = "space-after-comma"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -39,7 +39,7 @@ public class SpaceAfterCommaRule : Rule {
                 val range = content.rangeAtOffsets(comma.offset + 1, whitespaceEnd)
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Comma should be followed by one space.",
                         file = context.file,

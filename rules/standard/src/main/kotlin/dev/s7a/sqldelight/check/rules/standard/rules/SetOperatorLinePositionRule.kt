@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports set operators that are not placed at the start of their own line.
  */
 public class SetOperatorLinePositionRule : Rule {
-    override val id: RuleId = RuleId("standard:set-operator-line-position")
+    override val id: String = "set-operator-line-position"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class SetOperatorLinePositionRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "${token.text.uppercase()} should be at the start of its own line.",
                         file = context.file,

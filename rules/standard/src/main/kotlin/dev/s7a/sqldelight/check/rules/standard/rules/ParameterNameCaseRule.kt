@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -12,15 +13,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports named SQLDelight parameters that are not lower camel case.
  */
 public class ParameterNameCaseRule : Rule {
-    override val id: RuleId = RuleId("standard:parameter-name-case")
+    override val id: String = "parameter-name-case"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        if (!context.file.path.endsWith(".sq")) return
+        if (context.file.kind != SourceFileKind.Query) return
 
         val content = context.file.content
         content.namedSqlDelightParameters().forEach { parameter ->
@@ -28,7 +29,7 @@ public class ParameterNameCaseRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "SQLDelight parameter ':${parameter.name}' should be lower camel case.",
                     file = context.file,

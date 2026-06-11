@@ -1,5 +1,12 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
+import dev.s7a.sqldelight.check.rule.api.isKeyword
+import dev.s7a.sqldelight.check.rule.api.maskSqlCommentsAndQuotedText
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.rule.api.sqlStatements
+import dev.s7a.sqldelight.check.rule.api.sqlTokens
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
@@ -17,9 +24,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * online.
  */
 public class ReindexConcurrentlyRule : Rule {
-    override val id: RuleId = RuleId("postgres:reindex-concurrently")
+    override val id: String = "reindex-concurrently"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
 
     override fun run(
@@ -39,7 +46,7 @@ public class ReindexConcurrentlyRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Use REINDEX CONCURRENTLY for PostgreSQL reindex operations on live objects.",
                     file = context.file,

@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports spaces or tabs after dot tokens in qualified names.
  */
 public class NoSpaceAfterDotRule : Rule {
-    override val id: RuleId = RuleId("standard:no-space-after-dot")
+    override val id: String = "no-space-after-dot"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class NoSpaceAfterDotRule : Rule {
                 val range = content.rangeAtOffsets(dot.offset + 1, whitespaceEnd)
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Dot should not be followed by whitespace.",
                         file = context.file,

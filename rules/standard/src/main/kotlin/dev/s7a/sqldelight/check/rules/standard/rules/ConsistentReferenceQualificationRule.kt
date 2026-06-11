@@ -20,9 +20,9 @@ import dev.s7a.sqldelight.check.rule.api.SqlStatementFacts
  * a style diagnostic can be issued without noisy false positives.
  */
 public class ConsistentReferenceQualificationRule : Rule {
-    override val id: RuleId = RuleId("standard:consistent-reference-qualification")
+    override val id: String = "consistent-reference-qualification"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -39,7 +39,7 @@ public class ConsistentReferenceQualificationRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Single-table SELECT result columns should use qualification consistently.",
                     file = context.file,

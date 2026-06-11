@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -12,15 +13,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports explicit transaction statements in SQLDelight migration files.
  */
 public class NoTransactionInMigrationRule : Rule {
-    override val id: RuleId = RuleId("standard:no-transaction-in-migration")
+    override val id: String = "no-transaction-in-migration"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        if (!context.file.path.endsWith(".sqm")) return
+        if (context.file.kind != SourceFileKind.Migration) return
 
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
@@ -34,7 +35,7 @@ public class NoTransactionInMigrationRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Do not wrap SQLDelight migration files in explicit transaction statements.",
                     file = context.file,

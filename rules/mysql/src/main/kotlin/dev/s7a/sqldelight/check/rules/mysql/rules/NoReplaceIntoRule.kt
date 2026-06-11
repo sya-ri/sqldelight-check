@@ -1,5 +1,12 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
+import dev.s7a.sqldelight.check.rule.api.isKeyword
+import dev.s7a.sqldelight.check.rule.api.maskSqlCommentsAndQuotedText
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.rule.api.sqlStatements
+import dev.s7a.sqldelight.check.rule.api.sqlTokens
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
@@ -17,9 +24,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * cascading side effects that are easy to miss in application code.
  */
 public class NoReplaceIntoRule : Rule {
-    override val id: RuleId = RuleId("mysql:no-replace-into")
+    override val id: String = "no-replace-into"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.MySql
 
     override fun run(
@@ -29,7 +36,7 @@ public class NoReplaceIntoRule : Rule {
         if (!isApplicable(context)) return
 
         val content = context.file.content
-        val tokens = content.sqlTokens().toList()
+        val tokens = content.sqlTokens(hashLineComments = true).toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isKeyword("replace")) return@forEachIndexed
 
@@ -38,7 +45,7 @@ public class NoReplaceIntoRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message =
                         "Avoid MySQL REPLACE INTO because it can delete and insert rows instead of updating them.",

@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports major clause keywords that do not start their own line.
  */
 public class ClauseKeywordNewlineRule : Rule {
-    override val id: RuleId = RuleId("standard:clause-keyword-newline")
+    override val id: String = "clause-keyword-newline"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -42,7 +42,7 @@ public class ClauseKeywordNewlineRule : Rule {
 
                     reporter.report(
                         Diagnostic(
-                            ruleId = id,
+                            ruleId = RuleId(id),
                             severity = defaultSeverity,
                             message = "${clause.name} should start its own line.",
                             file = context.file,

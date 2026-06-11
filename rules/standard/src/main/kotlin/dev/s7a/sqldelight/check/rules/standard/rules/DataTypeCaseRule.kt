@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports common SQL data type names that are not uppercase.
  */
 public class DataTypeCaseRule : Rule {
-    override val id: RuleId = RuleId("standard:data-type-case")
+    override val id: String = "data-type-case"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class DataTypeCaseRule : Rule {
                 val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "SQL data type '${token.text}' should be uppercase.",
                         file = context.file,

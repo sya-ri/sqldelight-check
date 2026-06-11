@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports top-level `FROM` and `JOIN` subqueries that should be written as CTEs.
  */
 public class NoFromSubqueryRule : Rule {
-    override val id: RuleId = RuleId("standard:no-from-subquery")
+    override val id: String = "no-from-subquery"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -42,7 +42,7 @@ public class NoFromSubqueryRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Use a CTE instead of a top-level FROM or JOIN subquery.",
                     file = context.file,

@@ -1,8 +1,6 @@
 package dev.s7a.sqldelight.check.rule.api
 
 import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.api.Enablement
-import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 
 /**
@@ -13,12 +11,13 @@ import dev.s7a.sqldelight.check.api.Severity
  */
 public interface Rule {
     /**
-     * Globally unique rule ID using `rule-set:rule-name` form.
+     * Rule-local ID, such as `no-select-star`.
      *
-     * The ID is the stable key used by Gradle configuration, reporters, and
-     * source-level disable directives.
+     * sqldelight-check combines the containing [RuleSetProvider.id] and this
+     * value into the user-facing `rule-set:rule-name` ID used by Gradle
+     * configuration, reporters, and source-level disable directives.
      */
-    public val id: RuleId
+    public val id: String
 
     /**
      * Default severity used when user configuration does not override it.
@@ -29,11 +28,15 @@ public interface Rule {
     public val defaultSeverity: Severity
 
     /**
-     * Default enablement before user configuration and auto applicability are resolved.
+     * Whether this rule can run by default before user configuration and auto
+     * applicability are resolved.
      *
-     * `Auto` lets the rule decide applicability from the current [RuleContext].
+     * `true` means the rule uses automatic applicability, so dialect capability
+     * and [isApplicable] still decide whether it runs for a file. `false` means
+     * the rule is disabled unless user configuration explicitly enables it.
      */
-    public val defaultEnablement: Enablement
+    public val defaultEnable: Boolean
+        get() = true
 
     /**
      * Dialect capability required when this rule is resolved with `Auto`.

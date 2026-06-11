@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -12,15 +13,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports repeated predicates on the same column that use different named parameters.
  */
 public class ConsistentParameterNamesRule : Rule {
-    override val id: RuleId = RuleId("standard:consistent-parameter-names")
+    override val id: String = "consistent-parameter-names"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        if (!context.file.path.endsWith(".sq")) return
+        if (context.file.kind != SourceFileKind.Query) return
 
         val content = context.file.content
         val seen = mutableMapOf<Triple<Int, String, String>, NamedParameterPredicate>()
@@ -32,7 +33,7 @@ public class ConsistentParameterNamesRule : Rule {
             } else if (previous.parameter != predicate.parameter) {
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Use the same named parameter for repeated ${predicate.column} predicates.",
                         file = context.file,

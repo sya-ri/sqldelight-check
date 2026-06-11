@@ -60,6 +60,21 @@ class SqlDelightCheckEngineTest {
     }
 
     @Test
+    fun `rule override replaces severity emitted by rule`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput()),
+                ruleSetProviders = listOf(testRuleSet(testRule(severity = Severity.Info))),
+                config =
+                    CheckConfig(
+                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Auto, Severity.Error)),
+                    ),
+            )
+
+        assertEquals(Severity.Error, diagnostics.single().severity)
+    }
+
+    @Test
     fun `auto rule is skipped when dialect applicability rejects the database`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
@@ -356,7 +371,7 @@ class SqlDelightCheckEngineTest {
                             testRule(
                                 message = { "suppression reason" },
                                 rangeLine = 1,
-                                id = RuleId("standard:require-suppression-reason"),
+                                id = "require-suppression-reason",
                             ),
                         ),
                     ),
@@ -394,16 +409,17 @@ class SqlDelightCheckEngineTest {
         }
 
     private fun testRule(
-        id: RuleId = ruleId,
+        id: String = "test",
+        severity: Severity = Severity.Warning,
         targetCapability: DialectCapability? = null,
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
         rangeLine: Int? = null,
     ): Rule =
         object : Rule {
-            override val id: RuleId = id
-            override val defaultSeverity: Severity = Severity.Warning
-            override val defaultEnablement: Enablement = Enablement.Auto
+            override val id: String = id
+            override val defaultSeverity: Severity = severity
+            override val defaultEnable: Boolean = true
             override val targetCapability: DialectCapability? = targetCapability
 
             override fun isApplicable(context: RuleContext): Boolean = isApplicable.invoke(context)
@@ -414,7 +430,7 @@ class SqlDelightCheckEngineTest {
             ) {
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = message(context),
                         file = context.file,

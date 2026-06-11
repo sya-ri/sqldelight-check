@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline INSERT column and VALUES lists that do not use one item per line.
  */
 public class InsertValuesNewlineRule : Rule {
-    override val id: RuleId = RuleId("standard:insert-values-newline")
+    override val id: String = "insert-values-newline"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -61,7 +61,7 @@ public class InsertValuesNewlineRule : Rule {
         if (lines.itemStartsAreOnOwnLines(items)) return
         reporter.report(
             Diagnostic(
-                ruleId = id,
+                ruleId = RuleId(id),
                 severity = defaultSeverity,
                 message = "Multiline INSERT column and VALUES lists should put each item on its own line.",
                 file = context.file,

@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports whitespace before the first SQLDelight declaration or statement.
  */
 public class NoLeadingWhitespaceRule : Rule {
-    override val id: RuleId = RuleId("standard:no-leading-whitespace")
+    override val id: String = "no-leading-whitespace"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -31,7 +31,7 @@ public class NoLeadingWhitespaceRule : Rule {
         val range = content.rangeAtOffsets(0, endOffset)
         reporter.report(
             Diagnostic(
-                ruleId = id,
+                ruleId = RuleId(id),
                 severity = defaultSeverity,
                 message = "File should not start with whitespace.",
                 file = context.file,

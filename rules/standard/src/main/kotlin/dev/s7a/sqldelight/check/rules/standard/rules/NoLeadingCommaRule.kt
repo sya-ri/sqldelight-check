@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports comma tokens that lead a line in multiline SQL.
  */
 public class NoLeadingCommaRule : Rule {
-    override val id: RuleId = RuleId("standard:no-leading-comma")
+    override val id: String = "no-leading-comma"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -33,7 +33,7 @@ public class NoLeadingCommaRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Commas should trail the previous line.",
                         file = context.file,

@@ -3,15 +3,16 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticRepo
 }
 
 public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
-	public abstract fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultEnable ()Z
 	public abstract fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public abstract fun getId-cwxIa2A ()Ljava/lang/String;
+	public abstract fun getId ()Ljava/lang/String;
 	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public abstract fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/Rule$DefaultImpls {
+	public static fun getDefaultEnable (Ldev/s7a/sqldelight/check/rule/api/Rule;)Z
 	public static fun getTargetCapability (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public static fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 }
@@ -23,6 +24,16 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleContext {
 	public abstract fun getOptions ()Ljava/util/Map;
 }
 
+public final class dev/s7a/sqldelight/check/rule/api/RuleDefaultsKt {
+	public static final fun getDefaultEnablement (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/Enablement;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleOptionsKt {
+	public static final fun booleanOption (Ljava/util/Map;Ljava/lang/String;Z)Z
+	public static final fun commaSeparatedOption (Ljava/util/Map;Ljava/lang/String;)Ljava/util/List;
+	public static final fun positiveIntOption (Ljava/util/Map;Ljava/lang/String;I)I
+}
+
 public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleProvider {
 	public abstract fun create ()Ldev/s7a/sqldelight/check/rule/api/Rule;
 }
@@ -30,6 +41,17 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleProvider {
 public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
 	public abstract fun getId-wigqPlY ()Ljava/lang/String;
 	public abstract fun ruleProviders ()Ljava/util/Set;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/SourceTextKt {
+	public static final fun isKeyword (Ldev/s7a/sqldelight/check/rule/api/SqlToken;Ljava/lang/String;)Z
+	public static final fun maskSqlCommentsAndQuotedText (Ljava/lang/String;Z)Ljava/lang/String;
+	public static synthetic fun maskSqlCommentsAndQuotedText$default (Ljava/lang/String;ZILjava/lang/Object;)Ljava/lang/String;
+	public static final fun positionAt (Ljava/lang/String;I)Ldev/s7a/sqldelight/check/api/SourcePosition;
+	public static final fun rangeAtOffsets (Ljava/lang/String;II)Ldev/s7a/sqldelight/check/api/SourceRange;
+	public static final fun sqlStatements (Ljava/util/List;)Ljava/util/List;
+	public static final fun sqlTokens (Ljava/lang/String;Z)Lkotlin/sequences/Sequence;
+	public static synthetic fun sqlTokens$default (Ljava/lang/String;ZILjava/lang/Object;)Lkotlin/sequences/Sequence;
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/SqlFacts {
@@ -118,6 +140,22 @@ public final class dev/s7a/sqldelight/check/rule/api/SqlTableReferenceFacts {
 	public final fun getName ()Ljava/lang/String;
 	public final fun getRange ()Ldev/s7a/sqldelight/check/api/SourceRange;
 	public final fun getSubquery ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/SqlToken {
+	public fun <init> (Ljava/lang/String;II)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/String;II)Ldev/s7a/sqldelight/check/rule/api/SqlToken;
+	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/rule/api/SqlToken;Ljava/lang/String;IIILjava/lang/Object;)Ldev/s7a/sqldelight/check/rule/api/SqlToken;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndOffset ()I
+	public final fun getNormalizedText ()Ljava/lang/String;
+	public final fun getStartOffset ()I
+	public final fun getText ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

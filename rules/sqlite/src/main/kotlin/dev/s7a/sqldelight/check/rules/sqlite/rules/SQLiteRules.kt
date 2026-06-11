@@ -1,5 +1,11 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
+import dev.s7a.sqldelight.check.rule.api.isKeyword
+import dev.s7a.sqldelight.check.rule.api.maskSqlCommentsAndQuotedText
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.rule.api.sqlTokens
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
@@ -55,9 +61,9 @@ public class NoAlterTableComplexChangeRule : RegexSQLiteRule(
  * SQLite tables.
  */
 public class PreferWithoutRowidForCompositePkRule : Rule {
-    override val id: RuleId = RuleId("sqlite:prefer-without-rowid-for-composite-pk")
+    override val id: String = "prefer-without-rowid-for-composite-pk"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.SQLite
 
     override fun run(
@@ -73,7 +79,7 @@ public class PreferWithoutRowidForCompositePkRule : Rule {
             .forEach { match ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Consider WITHOUT ROWID for SQLite tables with composite primary keys.",
                         file = context.file,
@@ -96,9 +102,9 @@ public abstract class RegexSQLiteRule(
     pattern: String,
     private val message: String,
 ) : Rule {
-    override val id: RuleId = RuleId("sqlite:$ruleName")
+    override val id: String = "$ruleName"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.SQLite
     private val regex = Regex(pattern, regexOptions)
 
@@ -112,7 +118,7 @@ public abstract class RegexSQLiteRule(
         regex.findAll(masked).forEach { match ->
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = message,
                     file = context.file,

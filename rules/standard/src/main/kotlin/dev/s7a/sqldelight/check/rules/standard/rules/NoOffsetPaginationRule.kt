@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `OFFSET` pagination, which should usually be replaced with keyset pagination.
  */
 public class NoOffsetPaginationRule : Rule {
-    override val id: RuleId = RuleId("standard:no-offset-pagination")
+    override val id: String = "no-offset-pagination"
     override val defaultSeverity: Severity = Severity.Info
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -30,7 +30,7 @@ public class NoOffsetPaginationRule : Rule {
             .forEach { token ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Prefer keyset pagination over OFFSET pagination for stable and scalable paging.",
                         file = context.file,

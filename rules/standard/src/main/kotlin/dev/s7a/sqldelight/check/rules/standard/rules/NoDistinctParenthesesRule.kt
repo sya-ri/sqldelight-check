@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `SELECT DISTINCT(...)` syntax.
  */
 public class NoDistinctParenthesesRule : Rule {
-    override val id: RuleId = RuleId("standard:no-distinct-parentheses")
+    override val id: String = "no-distinct-parentheses"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -36,7 +36,7 @@ public class NoDistinctParenthesesRule : Rule {
             val range = content.rangeAtOffsets(distinct.startOffset, closeOffset + 1)
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Do not wrap SELECT DISTINCT arguments in parentheses.",
                     file = context.file,

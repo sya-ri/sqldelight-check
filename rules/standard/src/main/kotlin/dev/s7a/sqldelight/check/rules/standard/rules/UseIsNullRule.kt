@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports equality comparisons to `NULL` that should use `IS NULL` or `IS NOT NULL`.
  */
 public class UseIsNullRule : Rule {
-    override val id: RuleId = RuleId("standard:use-is-null")
+    override val id: String = "use-is-null"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -42,7 +42,7 @@ public class UseIsNullRule : Rule {
                 val range = content.rangeAtOffsets(operator.startOffset, operator.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Use ${replacement} NULL instead of $operatorText NULL.",
                         file = context.file,

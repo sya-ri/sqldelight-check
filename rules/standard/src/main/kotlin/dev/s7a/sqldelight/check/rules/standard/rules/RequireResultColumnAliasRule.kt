@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports computed SELECT targets that do not have a result column alias.
  */
 public class RequireResultColumnAliasRule : Rule {
-    override val id: RuleId = RuleId("standard:require-result-column-alias")
+    override val id: String = "require-result-column-alias"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -41,7 +41,7 @@ public class RequireResultColumnAliasRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Computed SELECT result columns should have an alias.",
                         file = context.file,

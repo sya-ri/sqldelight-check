@@ -128,9 +128,19 @@ public final class dev/s7a/sqldelight/check/api/SourceFile {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getContent ()Ljava/lang/String;
+	public final fun getKind ()Ldev/s7a/sqldelight/check/api/SourceFileKind;
 	public final fun getPath ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SourceFileKind : java/lang/Enum {
+	public static final field Migration Ldev/s7a/sqldelight/check/api/SourceFileKind;
+	public static final field Other Ldev/s7a/sqldelight/check/api/SourceFileKind;
+	public static final field Query Ldev/s7a/sqldelight/check/api/SourceFileKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SourceFileKind;
+	public static fun values ()[Ldev/s7a/sqldelight/check/api/SourceFileKind;
 }
 
 public final class dev/s7a/sqldelight/check/api/SourcePosition {

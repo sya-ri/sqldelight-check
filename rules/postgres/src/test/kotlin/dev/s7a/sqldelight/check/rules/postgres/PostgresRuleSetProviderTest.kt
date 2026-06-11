@@ -17,7 +17,7 @@ class PostgresRuleSetProviderTest {
     fun `postgres rule set provides postgres rules`() {
         val provider = PostgresRuleSetProvider()
         val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
-        val ruleIds = rules.map { rule -> rule.id }.toSet()
+        val ruleIds = rules.map { rule -> RuleId("${provider.id.value}:${rule.id}") }.toSet()
 
         assertEquals(RuleSetId("postgres"), provider.id)
         assertEquals(setOf(DialectCapabilities.PostgreSql), rules.map { rule -> rule.targetCapability }.toSet())

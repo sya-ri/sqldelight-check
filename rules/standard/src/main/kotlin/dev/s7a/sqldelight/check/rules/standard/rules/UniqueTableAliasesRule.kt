@@ -14,9 +14,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Duplicate aliases make qualified column references ambiguous.
  */
 public class UniqueTableAliasesRule : Rule {
-    override val id: RuleId = RuleId("standard:unique-table-aliases")
+    override val id: String = "unique-table-aliases"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class UniqueTableAliasesRule : Rule {
                     if (seen.add(normalized)) return@forEach
                     reporter.report(
                         Diagnostic(
-                            ruleId = id,
+                            ruleId = RuleId(id),
                             severity = defaultSeverity,
                             message = "Table aliases should be unique within a statement.",
                             file = context.file,

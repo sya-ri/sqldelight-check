@@ -1,5 +1,12 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
+import dev.s7a.sqldelight.check.rule.api.isKeyword
+import dev.s7a.sqldelight.check.rule.api.maskSqlCommentsAndQuotedText
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.rule.api.sqlStatements
+import dev.s7a.sqldelight.check.rule.api.sqlTokens
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
@@ -42,9 +49,9 @@ public class NoConcurrentIndexInTransactionRule : RegexPostgresRule(
  * with reduced migration risk.
  */
 public class RequireNotValidConstraintRule : Rule {
-    override val id: RuleId = RuleId("postgres:require-not-valid-constraint")
+    override val id: String = "require-not-valid-constraint"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
     private val addConstraintRegex = Regex("""\bALTER\s+TABLE\b(?:(?!;).)*\bADD\s+CONSTRAINT\b(?:(?!;).)*;?""", regexOptions)
     private val notValidRegex = Regex("""\bNOT\s+VALID\b""", RegexOption.IGNORE_CASE)
@@ -61,7 +68,7 @@ public class RequireNotValidConstraintRule : Rule {
             .forEach { match ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Add PostgreSQL constraints as NOT VALID and validate them in a later migration.",
                         file = context.file,
@@ -156,9 +163,9 @@ public abstract class RegexPostgresRule(
     pattern: String,
     private val message: String,
 ) : Rule {
-    override val id: RuleId = RuleId("postgres:$ruleName")
+    override val id: String = "$ruleName"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
     private val regex = Regex(pattern, regexOptions)
 
@@ -172,7 +179,7 @@ public abstract class RegexPostgresRule(
         regex.findAll(masked).forEach { match ->
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = message,
                     file = context.file,

@@ -1,7 +1,10 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.rule.api.booleanOption
+import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
+
 import dev.s7a.sqldelight.check.api.Diagnostic
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -14,9 +17,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Configure blocked words with the comma-separated `words` option.
  */
 public class BlockedWordsRule : Rule {
-    override val id: RuleId = RuleId("standard:blocked-words")
+    override val id: String = "blocked-words"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -38,23 +41,16 @@ public class BlockedWordsRule : Rule {
         content.sqlTokens().forEach { token ->
             val lookup = if (matchCase) token.text else token.text.lowercase()
             if (lookup !in blockedWords) return@forEach
-            reporter.reportBlockedWord(context, id, defaultSeverity, token.text, token.startOffset, token.endOffset)
+            reporter.reportBlockedWord(context, RuleId(id), defaultSeverity, token.text, token.startOffset, token.endOffset)
         }
 
         if (!ignoreComments) {
             content.commentRanges().forEach { range ->
-                content.reportBlockedWordsInRange(context, reporter, id, defaultSeverity, range, blockedWords, matchCase)
+                content.reportBlockedWordsInRange(context, reporter, RuleId(id), defaultSeverity, range, blockedWords, matchCase)
             }
         }
     }
 }
-
-private fun Map<String, String>.commaSeparatedOption(name: String): List<String> =
-    get(name)
-        ?.split(',')
-        ?.map { value -> value.trim() }
-        ?.filter { value -> value.isNotEmpty() }
-        ?: emptyList()
 
 private data class OffsetRange(
     val startOffset: Int,

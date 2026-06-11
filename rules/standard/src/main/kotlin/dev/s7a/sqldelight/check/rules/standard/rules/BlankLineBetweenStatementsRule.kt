@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -15,9 +16,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports adjacent top-level statements that are not separated by a blank line.
  */
 public class BlankLineBetweenStatementsRule : Rule {
-    override val id: RuleId = RuleId("standard:blank-line-between-statements")
+    override val id: String = "blank-line-between-statements"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -40,12 +41,12 @@ public class BlankLineBetweenStatementsRule : Rule {
             if (hasBlankLineBetween) return@forEach
 
             val nextLine = lines[nextContentLineIndex]
-            if (!nextLine.startsSqlDelightStatementOrLabel(context.file.path)) return@forEach
+            if (!nextLine.startsSqlDelightStatementOrLabel(context.file.kind)) return@forEach
 
             val range = content.rangeAtOffsets(nextLine.startOffset, nextLine.startOffset)
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Statements should be separated by one blank line.",
                     file = context.file,
@@ -82,10 +83,10 @@ private fun List<LineInfo>.indexOfLineContaining(offset: Int): Int? =
     indexOfLast { line -> line.startOffset <= offset }
         .takeIf { index -> index >= 0 }
 
-private fun LineInfo.startsSqlDelightStatementOrLabel(path: String): Boolean {
+private fun LineInfo.startsSqlDelightStatementOrLabel(kind: SourceFileKind): Boolean {
     val trimmed = text.trimStart()
     if (trimmed.isEmpty()) return false
-    if (path.endsWith(".sq") && sqlDelightStatementLabelRegex.matches(text)) return true
+    if (kind == SourceFileKind.Query && sqlDelightStatementLabelRegex.matches(text)) return true
     val token = trimmed.takeWhile { character -> character == '_' || character.isLetterOrDigit() }
     return token.lowercase() in statementStartKeywordsForBlankLines
 }

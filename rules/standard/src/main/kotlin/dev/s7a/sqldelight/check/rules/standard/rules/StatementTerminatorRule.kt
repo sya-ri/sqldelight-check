@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -12,9 +13,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports SQL statements that are not terminated by a semicolon.
  */
 public class StatementTerminatorRule : Rule {
-    override val id: RuleId = RuleId("standard:statement-terminator")
+    override val id: String = "statement-terminator"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -22,13 +23,13 @@ public class StatementTerminatorRule : Rule {
     ) {
         val content = context.file.content
         val starts =
-            if (context.file.path.endsWith(".sqm")) {
+            if (context.file.kind == SourceFileKind.Migration) {
                 content.statementStarts()
             } else {
                 content.statementStarts().filter { start -> start.keyword in sqlDelightStatementStartKeywords }
             }
         val labelOffsets =
-            if (context.file.path.endsWith(".sq")) {
+            if (context.file.kind == SourceFileKind.Query) {
                 content.sqlDelightLabelOffsets()
             } else {
                 emptyList()
@@ -45,7 +46,7 @@ public class StatementTerminatorRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Statement should be terminated by a semicolon.",
                     file = context.file,

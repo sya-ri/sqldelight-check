@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rules.hsql
 
 import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rules.hsql.rules.NoDatabaseFileSettingsRule
@@ -24,11 +25,11 @@ class HsqlRuleSetProviderTest {
         assertEquals(setOf(DialectCapabilities.Hsql), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
-                "hsql:no-database-file-settings",
-                "hsql:no-system-operations",
-                "hsql:no-text-table-source",
+                RuleId("hsql:no-database-file-settings"),
+                RuleId("hsql:no-system-operations"),
+                RuleId("hsql:no-text-table-source"),
             ),
-            rules.map { rule -> rule.id.value }.toSet(),
+            rules.map { rule -> RuleId("${provider.id.value}:${rule.id}") }.toSet(),
         )
         assertTrue(provider.ruleProviders().any { ruleProvider -> ruleProvider.create() is NoDatabaseFileSettingsRule })
         assertTrue(provider.ruleProviders().any { ruleProvider -> ruleProvider.create() is NoSystemOperationsRule })

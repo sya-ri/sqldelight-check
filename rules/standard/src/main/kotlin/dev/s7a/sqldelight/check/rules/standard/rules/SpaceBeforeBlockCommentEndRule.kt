@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports block comments whose closing marker is not preceded by a space.
  */
 public class SpaceBeforeBlockCommentEndRule : Rule {
-    override val id: RuleId = RuleId("standard:space-before-block-comment-end")
+    override val id: String = "space-before-block-comment-end"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -37,7 +37,7 @@ public class SpaceBeforeBlockCommentEndRule : Rule {
             val range = content.rangeAtOffsets(markerStart, markerStart)
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Block comment end marker should be preceded by one space.",
                     file = context.file,

@@ -32,12 +32,12 @@ and `Severity.Info` are supported through user configuration.
 
 | Rule ID | Enable | Severity | Fix | Purpose |
 | --- | --- | --- | --- | --- |
-| `sqlite:consistent-conflict-resolution` | 🔘 | ⚠️ |  | Require conflict resolution syntax to stay consistent within a file. |
-| `sqlite:foreign-keys-restored` | 🔘 | ⚠️ |  | Require foreign key enforcement to be restored after temporary disablement. |
-| `sqlite:prefer-integer-primary-key` | 🔘 | ⚠️ |  | Prefer exact `INTEGER PRIMARY KEY` for rowid alias behavior. |
-| `sqlite:no-autoincrement-without-need` | 🔘 | ⚠️ |  | Disallow `AUTOINCREMENT` when the stricter rowid behavior is not needed. |
-| `sqlite:no-alter-table-complex-change` | 🔘 | ⚠️ |  | Disallow complex `ALTER TABLE` changes that SQLite cannot apply in place. |
-| `sqlite:prefer-without-rowid-for-composite-pk` | 🔘 | ⚠️ |  | Prefer `WITHOUT ROWID` for tables with composite primary keys. |
+| [`sqlite:consistent-conflict-resolution`](#sqliteconsistent-conflict-resolution) | 🔘 | ⚠️ |  | Require conflict resolution syntax to stay consistent within a file. |
+| [`sqlite:foreign-keys-restored`](#sqliteforeign-keys-restored) | 🔘 | ⚠️ |  | Require foreign key enforcement to be restored after temporary disablement. |
+| [`sqlite:prefer-integer-primary-key`](#sqliteprefer-integer-primary-key) | 🔘 | ⚠️ |  | Prefer exact `INTEGER PRIMARY KEY` for rowid alias behavior. |
+| [`sqlite:no-autoincrement-without-need`](#sqliteno-autoincrement-without-need) | 🔘 | ⚠️ |  | Disallow `AUTOINCREMENT` when the stricter rowid behavior is not needed. |
+| [`sqlite:no-alter-table-complex-change`](#sqliteno-alter-table-complex-change) | 🔘 | ⚠️ |  | Disallow complex `ALTER TABLE` changes that SQLite cannot apply in place. |
+| [`sqlite:prefer-without-rowid-for-composite-pk`](#sqliteprefer-without-rowid-for-composite-pk) | 🔘 | ⚠️ |  | Prefer `WITHOUT ROWID` for tables with composite primary keys. |
 
 ## Notes
 

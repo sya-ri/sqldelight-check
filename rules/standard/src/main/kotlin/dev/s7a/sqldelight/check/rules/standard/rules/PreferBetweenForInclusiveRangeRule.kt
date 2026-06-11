@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports simple inclusive range predicates that can be written with BETWEEN.
  */
 public class PreferBetweenForInclusiveRangeRule : Rule {
-    override val id: RuleId = RuleId("standard:prefer-between-for-inclusive-range")
+    override val id: String = "prefer-between-for-inclusive-range"
     override val defaultSeverity: Severity = Severity.Info
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class PreferBetweenForInclusiveRangeRule : Rule {
                 val startOffset = token.endOffset + match.range.first
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Prefer BETWEEN for simple inclusive ranges on the same expression.",
                         file = context.file,

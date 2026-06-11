@@ -32,9 +32,9 @@ and `Severity.Info` are supported through user configuration.
 
 | Rule ID | Enable | Severity | Fix | Purpose |
 | --- | --- | --- | --- | --- |
-| `hsql:no-database-file-settings` | 🔘 | ⚠️ |  | Disallow database or file settings in schema and migration sources. |
-| `hsql:no-system-operations` | 🔘 | ⚠️ |  | Disallow HSQL system operations in schema and migration sources. |
-| `hsql:no-text-table-source` | 🔘 | ⚠️ |  | Disallow HSQL text-table sources in versioned SQLDelight files. |
+| [`hsql:no-database-file-settings`](#hsqlno-database-file-settings) | 🔘 | ⚠️ |  | Disallow database or file settings in schema and migration sources. |
+| [`hsql:no-system-operations`](#hsqlno-system-operations) | 🔘 | ⚠️ |  | Disallow HSQL system operations in schema and migration sources. |
+| [`hsql:no-text-table-source`](#hsqlno-text-table-source) | 🔘 | ⚠️ |  | Disallow HSQL text-table sources in versioned SQLDelight files. |
 
 ## Notes
 

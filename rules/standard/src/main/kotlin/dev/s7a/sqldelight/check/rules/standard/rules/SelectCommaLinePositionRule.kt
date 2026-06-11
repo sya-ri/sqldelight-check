@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline SELECT list commas that are not trailing the previous target.
  */
 public class SelectCommaLinePositionRule : Rule {
-    override val id: RuleId = RuleId("standard:select-comma-line-position")
+    override val id: String = "select-comma-line-position"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class SelectCommaLinePositionRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Multiline SELECT list commas should trail the previous result expression.",
                         file = context.file,

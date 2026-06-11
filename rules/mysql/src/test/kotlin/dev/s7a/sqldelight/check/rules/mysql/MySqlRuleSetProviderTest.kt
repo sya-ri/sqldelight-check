@@ -17,7 +17,7 @@ class MySqlRuleSetProviderTest {
     fun `mysql rule set provides mysql rules`() {
         val provider = MySqlRuleSetProvider()
         val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
-        val ruleIds = rules.map { rule -> rule.id }.toSet()
+        val ruleIds = rules.map { rule -> RuleId("${provider.id.value}:${rule.id}") }.toSet()
 
         assertEquals(RuleSetId("mysql"), provider.id)
         assertEquals(setOf(DialectCapabilities.MySql), rules.map { rule -> rule.targetCapability }.toSet())

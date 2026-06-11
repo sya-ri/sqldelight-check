@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports blank lines after the last SQLDelight declaration or statement.
  */
 public class NoTrailingBlankLinesRule : Rule {
-    override val id: RuleId = RuleId("standard:no-trailing-blank-lines")
+    override val id: String = "no-trailing-blank-lines"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -30,7 +30,7 @@ public class NoTrailingBlankLinesRule : Rule {
         val range = content.rangeAtOffsets(lastContentLine.newlineEndOffset, content.length)
         reporter.report(
             Diagnostic(
-                ruleId = id,
+                ruleId = RuleId(id),
                 severity = defaultSeverity,
                 message = "File should not end with blank lines.",
                 file = context.file,

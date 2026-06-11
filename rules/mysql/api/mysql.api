@@ -18,9 +18,9 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoExclusiveLockRul
 
 public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoReplaceIntoRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
-	public fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getId ()Ljava/lang/String;
 	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -32,9 +32,9 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoUtf8CharsetRule 
 
 public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoZeroDateDefaultRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
-	public fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getId ()Ljava/lang/String;
 	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -42,9 +42,9 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoZeroDateDefaultR
 
 public abstract class dev/s7a/sqldelight/check/rules/mysql/rules/RegexMySqlRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getId ()Ljava/lang/String;
 	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -52,9 +52,9 @@ public abstract class dev/s7a/sqldelight/check/rules/mysql/rules/RegexMySqlRule 
 
 public final class dev/s7a/sqldelight/check/rules/mysql/rules/RequireIndexPrefixLengthRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
-	public fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getId ()Ljava/lang/String;
 	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -62,9 +62,9 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/RequireIndexPrefix
 
 public final class dev/s7a/sqldelight/check/rules/mysql/rules/RiskyAlterTableRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
-	public fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getId ()Ljava/lang/String;
 	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V

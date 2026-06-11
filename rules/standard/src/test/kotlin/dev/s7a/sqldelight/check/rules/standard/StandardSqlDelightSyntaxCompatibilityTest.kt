@@ -20,7 +20,7 @@ class StandardSqlDelightSyntaxCompatibilityTest {
             assertEquals(
                 emptyList(),
                 rule.diagnostics(cleanPlayerSq, path = PLAYER_SQ_PATH),
-                "${rule.id.value} should accept SQLDelight imports, column adapters, and named queries.",
+                "${rule.id} should accept SQLDelight imports, column adapters, and named queries.",
             )
         }
     }
@@ -33,7 +33,7 @@ class StandardSqlDelightSyntaxCompatibilityTest {
             assertEquals(
                 emptyList(),
                 rule.diagnostics(cleanMigrationSqm, path = MIGRATION_SQM_PATH),
-                "${rule.id.value} should accept SQLDelight migration files.",
+                "${rule.id} should accept SQLDelight migration files.",
             )
         }
     }

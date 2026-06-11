@@ -1,11 +1,18 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
+import dev.s7a.sqldelight.check.rule.api.isKeyword
+import dev.s7a.sqldelight.check.rule.api.maskSqlCommentsAndQuotedText
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.rule.api.sqlTokens
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -17,12 +24,12 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * matching restore to `ON`.
  */
 public class ForeignKeysRestoredRule : Rule {
-    override val id: RuleId = RuleId("sqlite:foreign-keys-restored")
+    override val id: String = "foreign-keys-restored"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.SQLite
 
-    override fun isApplicable(context: RuleContext): Boolean = context.file.path.endsWith(".sqm")
+    override fun isApplicable(context: RuleContext): Boolean = context.file.kind == SourceFileKind.Migration
 
     override fun run(
         context: RuleContext,
@@ -41,7 +48,7 @@ public class ForeignKeysRestoredRule : Rule {
 
         reporter.report(
             Diagnostic(
-                ruleId = id,
+                ruleId = RuleId(id),
                 severity = defaultSeverity,
                 message =
                     "Restore SQLite foreign key enforcement with PRAGMA foreign_keys = ON later in the migration.",

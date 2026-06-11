@@ -1,5 +1,12 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
+import dev.s7a.sqldelight.check.rule.api.isKeyword
+import dev.s7a.sqldelight.check.rule.api.maskSqlCommentsAndQuotedText
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.rule.api.sqlStatements
+import dev.s7a.sqldelight.check.rule.api.sqlTokens
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
@@ -17,9 +24,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * live MySQL databases.
  */
 public class RiskyAlterTableRule : Rule {
-    override val id: RuleId = RuleId("mysql:risky-alter-table")
+    override val id: String = "risky-alter-table"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.MySql
 
     override fun run(
@@ -29,7 +36,7 @@ public class RiskyAlterTableRule : Rule {
         if (!isApplicable(context)) return
 
         val content = context.file.content
-        content.sqlTokens()
+        content.sqlTokens(hashLineComments = true)
             .toList()
             .sqlStatements()
             .forEach { statement ->
@@ -38,7 +45,7 @@ public class RiskyAlterTableRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message =
                             "Review this MySQL ALTER TABLE operation because it can rebuild or strongly lock " +

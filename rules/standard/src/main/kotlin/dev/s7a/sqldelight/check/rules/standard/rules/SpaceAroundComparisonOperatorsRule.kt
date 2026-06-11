@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports comparison operators without exactly one space on both sides.
  */
 public class SpaceAroundComparisonOperatorsRule : Rule {
-    override val id: RuleId = RuleId("standard:space-around-comparison-operators")
+    override val id: String = "space-around-comparison-operators"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -43,7 +43,7 @@ public class SpaceAroundComparisonOperatorsRule : Rule {
                 val range = content.rangeAtOffsets(leftStart, rightEnd)
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Comparison operator '$operatorText' should have one space on both sides.",
                         file = context.file,

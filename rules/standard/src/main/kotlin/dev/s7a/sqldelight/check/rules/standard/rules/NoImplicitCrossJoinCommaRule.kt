@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports comma-separated FROM sources that should be written as explicit joins.
  */
 public class NoImplicitCrossJoinCommaRule : Rule {
-    override val id: RuleId = RuleId("standard:no-implicit-cross-join-comma")
+    override val id: String = "no-implicit-cross-join-comma"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -36,7 +36,7 @@ public class NoImplicitCrossJoinCommaRule : Rule {
                 .forEach { comma ->
                     reporter.report(
                         Diagnostic(
-                            ruleId = id,
+                            ruleId = RuleId(id),
                             severity = defaultSeverity,
                             message = "Use explicit JOIN syntax instead of comma-separated FROM sources.",
                             file = context.file,

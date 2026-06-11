@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports trailing commas at the end of `SELECT` clauses.
  */
 public class NoSelectTrailingCommaRule : Rule {
-    override val id: RuleId = RuleId("standard:no-select-trailing-comma")
+    override val id: String = "no-select-trailing-comma"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class NoSelectTrailingCommaRule : Rule {
             val range = content.rangeAtOffsets(commaOffset, commaOffset + 1)
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "SELECT clause should not end with a trailing comma.",
                     file = context.file,

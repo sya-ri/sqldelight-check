@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline CASE expressions whose branch keywords do not start their own line.
  */
 public class CaseBranchNewlineRule : Rule {
-    override val id: RuleId = RuleId("standard:case-branch-newline")
+    override val id: String = "case-branch-newline"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -40,7 +40,7 @@ public class CaseBranchNewlineRule : Rule {
                     if (line.firstNonWhitespaceOffset == branch.startOffset) return@forEach
                     reporter.report(
                         Diagnostic(
-                            ruleId = id,
+                            ruleId = RuleId(id),
                             severity = defaultSeverity,
                             message = "Multiline CASE branch keywords should start their own line.",
                             file = context.file,

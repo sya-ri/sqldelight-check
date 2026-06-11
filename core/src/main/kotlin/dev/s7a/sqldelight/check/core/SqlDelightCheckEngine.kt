@@ -13,6 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
+import dev.s7a.sqldelight.check.rule.api.defaultEnablement
 
 /**
  * Runs SQLDelight analysis and sqldelight-check rules for resolved database inputs.
@@ -49,7 +50,8 @@ public class SqlDelightCheckEngine {
         val rules =
             ruleSetProviders.flatMap { provider ->
                 provider.ruleProviders().map { ruleProvider ->
-                    RuleCandidate(provider.id, ruleProvider.create())
+                    val rule = ruleProvider.create()
+                    RuleCandidate(provider.id, rule.id.toFullRuleId(provider.id), rule)
                 }
             }
         return files.flatMap { file -> runRulesForFile(database, file, rules, resolver, trace) }
@@ -70,7 +72,7 @@ public class SqlDelightCheckEngine {
                 val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
                 val ruleConfig =
                     resolver.resolveRule(
-                        ruleId = candidate.rule.id,
+                        ruleId = candidate.ruleId,
                         databaseName = database.name,
                         defaultEnablement = candidate.rule.defaultEnablement,
                         defaultSeverity = candidate.rule.defaultSeverity,
@@ -85,12 +87,12 @@ public class SqlDelightCheckEngine {
                 val enablement = EnablementResolver.resolveRuleEnablement(ruleSetConfig.enablement, ruleConfig.enablement)
                 if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
 
-                executedRuleIds += candidate.rule.id
+                executedRuleIds += candidate.ruleId
                 val diagnostics = mutableListOf<Diagnostic>()
                 candidate.rule.run(
                     context,
                     DiagnosticReporter { diagnostic ->
-                        diagnostics += diagnostic.withSeverity(ruleConfig.severity)
+                        diagnostics += diagnostic.withRuleIdentity(candidate.ruleId, ruleConfig.severity)
                     },
                 )
                 diagnostics
@@ -113,7 +115,10 @@ public class SqlDelightCheckEngine {
         targetCapability?.let { capability -> capability in context.database.dialect.capabilities } ?: true
 }
 
-private fun Diagnostic.withSeverity(severity: Severity): Diagnostic =
+private fun Diagnostic.withRuleIdentity(
+    ruleId: RuleId,
+    severity: Severity,
+): Diagnostic =
     Diagnostic(
         ruleId = ruleId,
         severity = severity,
@@ -126,5 +131,13 @@ private fun Diagnostic.withSeverity(severity: Severity): Diagnostic =
 
 private data class RuleCandidate(
     val ruleSetId: RuleSetId,
+    val ruleId: RuleId,
     val rule: Rule,
 )
+
+private fun String.toFullRuleId(ruleSetId: RuleSetId): RuleId {
+    require(':' !in this) {
+        "Rule ID must be local and must not contain ':': ${ruleSetId.value}:$this"
+    }
+    return RuleId("${ruleSetId.value}:$this")
+}

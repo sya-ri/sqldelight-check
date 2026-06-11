@@ -24,8 +24,9 @@ option that makes the trade-off explicit.
 
 ## Severity Policy
 
-Built-in rules default to `Severity.Warning` for `v0.1.0`. That keeps the first
-release conservative while still surfacing diagnostics by default.
+Built-in rules use `Severity.Warning` for high-confidence findings and
+`Severity.Info` for advisory findings that are useful but more context
+dependent.
 
 Users can promote or demote rules with `Severity.Error` and `Severity.Info` in
 `build.gradle.kts`. SQLDelight parser and compiler diagnostics remain errors

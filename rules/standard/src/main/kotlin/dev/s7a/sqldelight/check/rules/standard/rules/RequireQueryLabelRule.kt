@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -12,15 +13,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports executable SQLDelight statements in `.sq` files that are not introduced by a query label.
  */
 public class RequireQueryLabelRule : Rule {
-    override val id: RuleId = RuleId("standard:require-query-label")
+    override val id: String = "require-query-label"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        if (!context.file.path.endsWith(".sq")) return
+        if (context.file.kind != SourceFileKind.Query) return
 
         val content = context.file.content
         val lines = content.linesWithRanges()
@@ -35,7 +36,7 @@ public class RequireQueryLabelRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Executable statements in .sq files should be introduced by a SQLDelight query label.",
                     file = context.file,

@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports DELETE statements without a top-level WHERE clause.
  */
 public class NoDeleteWithoutWhereRule : Rule {
-    override val id: RuleId = RuleId("standard:no-delete-without-where")
+    override val id: String = "no-delete-without-where"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -35,7 +35,7 @@ public class NoDeleteWithoutWhereRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "DELETE statements should include a WHERE clause.",
                     file = context.file,

@@ -1,5 +1,9 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.rule.api.booleanOption
+import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
@@ -14,9 +18,9 @@ private const val DEFAULT_MAX_LINE_LENGTH = 120
  * Reports non-blank lines that exceed the maximum line length.
  */
 public class MaxLineLengthRule : Rule {
-    override val id: RuleId = RuleId("standard:max-line-length")
+    override val id: String = "max-line-length"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -35,7 +39,7 @@ public class MaxLineLengthRule : Rule {
             .forEach { line ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = id,
+                        ruleId = RuleId(id),
                         severity = defaultSeverity,
                         message = "Line is longer than $maxLineLength characters.",
                         file = context.file,

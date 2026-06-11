@@ -15,9 +15,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports line comments whose `--` marker is not followed by a space.
  */
 public class SpaceAfterLineCommentMarkerRule : Rule {
-    override val id: RuleId = RuleId("standard:space-after-line-comment-marker")
+    override val id: String = "space-after-line-comment-marker"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -33,7 +33,7 @@ public class SpaceAfterLineCommentMarkerRule : Rule {
             val range = content.rangeAtOffsets(markerEnd, markerEnd)
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "Line comment marker should be followed by one space.",
                     file = context.file,

@@ -12,9 +12,9 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `ORDER BY` clauses that mix explicit and implicit sort directions.
  */
 public class ConsistentOrderByDirectionRule : Rule {
-    override val id: RuleId = RuleId("standard:consistent-order-by-direction")
+    override val id: String = "consistent-order-by-direction"
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnablement: Enablement = Enablement.Auto
+    override val defaultEnable: Boolean = true
 
     override fun run(
         context: RuleContext,
@@ -34,7 +34,7 @@ public class ConsistentOrderByDirectionRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = id,
+                    ruleId = RuleId(id),
                     severity = defaultSeverity,
                     message = "ORDER BY should specify ASC/DESC for all columns or for none of them.",
                     file = context.file,

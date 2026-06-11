@@ -13,7 +13,7 @@ class StandardRuleSetProviderTest {
         val ruleIds =
             StandardRuleSetProvider()
                 .ruleProviders()
-                .map { provider -> provider.create().id }
+                .map { provider -> RuleId("standard:${provider.create().id}") }
                 .toSet()
 
         assertEquals(

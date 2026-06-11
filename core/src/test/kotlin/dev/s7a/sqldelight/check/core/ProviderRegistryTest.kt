@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
@@ -57,13 +56,36 @@ class ProviderRegistryTest {
             assertFailsWith<IllegalArgumentException> {
                 RuleRegistry.create(
                     listOf(
-                        ruleSetProvider("first", "custom:duplicate"),
-                        ruleSetProvider("second", "custom:duplicate"),
+                        ruleSetProvider("custom", "duplicate", "duplicate"),
                     ),
                 )
             }
 
-        assertEquals("Duplicate sqldelight-check rule ID(s): custom:duplicate in first, second", error.message)
+        assertEquals("Duplicate sqldelight-check rule ID(s): custom:duplicate in custom", error.message)
+    }
+
+    @Test
+    fun `rule registry allows matching local rule IDs across different rule sets`() {
+        RuleRegistry.create(
+            listOf(
+                ruleSetProvider("first", "duplicate"),
+                ruleSetProvider("second", "duplicate"),
+            ),
+        )
+    }
+
+    @Test
+    fun `rule registry rejects full rule IDs from rules`() {
+        val error =
+            assertFailsWith<IllegalArgumentException> {
+                RuleRegistry.create(
+                    listOf(
+                        ruleSetProvider("custom", "custom:duplicate"),
+                    ),
+                )
+            }
+
+        assertEquals("Rule IDs must be local and must not contain ':': custom:custom:duplicate", error.message)
     }
 
     private fun reporterProvider(id: String): ReporterProvider =
@@ -81,24 +103,25 @@ class ProviderRegistryTest {
 
     private fun ruleSetProvider(
         ruleSetId: String,
-        ruleId: String,
+        vararg ruleIds: String,
     ): RuleSetProvider =
         object : RuleSetProvider {
             override val id: RuleSetId = RuleSetId(ruleSetId)
 
             override fun ruleProviders(): Set<RuleProvider> =
-                setOf(
-                    RuleProvider {
-                        testRule(ruleId)
-                    },
-                )
+                ruleIds
+                    .map { ruleId ->
+                        RuleProvider {
+                            testRule(ruleId)
+                        }
+                    }.toSet()
         }
 
     private fun testRule(ruleId: String): Rule =
         object : Rule {
-            override val id: RuleId = RuleId(ruleId)
+            override val id: String = ruleId
             override val defaultSeverity: Severity = Severity.Warning
-            override val defaultEnablement: Enablement = Enablement.Enabled
+            override val defaultEnable: Boolean = true
 
             override fun run(
                 context: RuleContext,
