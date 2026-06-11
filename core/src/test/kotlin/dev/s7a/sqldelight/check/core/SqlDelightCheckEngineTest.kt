@@ -15,6 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -142,6 +143,44 @@ class SqlDelightCheckEngineTest {
         assertEquals("12:global", diagnostics.single().message)
     }
 
+    @Test
+    fun `source sql facts are exposed to rule context`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            content =
+                                """
+                                selectPlayers:
+                                SELECT player.id AS player_id, team.name AS team_name
+                                FROM player
+                                JOIN team ON team.id = player.team_id;
+                                """.trimIndent(),
+                        ),
+                    ),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(
+                            testRule(
+                                message = { context ->
+                                    val statement = context.facts.statements.single()
+                                    listOf(
+                                        statement.kind.name,
+                                        statement.select?.resultColumns?.size,
+                                        statement.tableReferences.size,
+                                        statement.joins.size,
+                                    ).joinToString(":")
+                                },
+                            ),
+                        ),
+                    ),
+            )
+
+        assertEquals("Select:2:2:1", diagnostics.single().message)
+        assertEquals(SqlStatementKind.Select, SqlStatementKind.valueOf(diagnostics.single().message.substringBefore(":")))
+    }
+
     private fun testRuleSet(rule: Rule = testRule()): RuleSetProvider =
         object : RuleSetProvider {
             override val id: RuleSetId = ruleSetId
@@ -177,14 +216,17 @@ class SqlDelightCheckEngineTest {
             }
         }
 
-    private fun testInput(family: DialectFamily = DialectFamily.SQLite): AnalysisInput =
+    private fun testInput(
+        family: DialectFamily = DialectFamily.SQLite,
+        content: String = "SELECT 1;",
+    ): AnalysisInput =
         AnalysisInput(
             database =
                 DatabaseContext(
                     name = "Database",
                     dialect = SqlDialect(family = family, displayName = family.name),
                 ),
-            files = listOf(SourceFile(path = "src/main/sqldelight/Test.sq", content = "SELECT 1;")),
+            files = listOf(SourceFile(path = "src/main/sqldelight/Test.sq", content = content)),
             sourceFolders = emptyList(),
             dependencyFolders = emptyList(),
             dialectClasspath = emptyList(),

@@ -24,4 +24,9 @@ public interface RuleContext {
      * Resolved string options for the rule currently being executed.
      */
     public val options: Map<String, String>
+
+    /**
+     * Stable SQL structure facts for the file being analyzed.
+     */
+    public val facts: SqlFacts
 }

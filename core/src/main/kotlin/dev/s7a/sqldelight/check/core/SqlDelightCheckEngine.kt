@@ -10,6 +10,7 @@ import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+import dev.s7a.sqldelight.check.rule.api.SqlFacts
 
 /**
  * Entry point for sqldelight-check analysis.
@@ -50,6 +51,7 @@ public class SqlDelightCheckEngine {
         rules: List<RuleCandidate>,
         resolver: ConfigurationResolver,
     ): List<Diagnostic> {
+        val facts = SourceSqlFactsExtractor.extract(file)
         return rules.flatMap { candidate ->
             val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
             val ruleConfig =
@@ -64,6 +66,7 @@ public class SqlDelightCheckEngine {
                     override val database: DatabaseContext = database
                     override val file: SourceFile = file
                     override val options: Map<String, String> = ruleConfig.options
+                    override val facts: SqlFacts = facts
                 }
             val enablement = EnablementResolver.resolveRuleEnablement(ruleSetConfig.enablement, ruleConfig.enablement)
             if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
