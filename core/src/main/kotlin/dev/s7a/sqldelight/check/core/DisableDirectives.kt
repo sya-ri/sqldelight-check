@@ -51,6 +51,25 @@ internal class DisableDirectives private constructor(
                 )
             }
 
+    fun suppressionReasonDiagnostics(
+        file: SourceFile,
+        ruleId: QualifiedRuleId,
+        severity: Severity,
+        database: DatabaseContext,
+    ): List<Diagnostic> =
+        disableDirectives
+            .filter { directive -> directive.requiresReason && !directive.hasReason }
+            .map { directive ->
+                Diagnostic(
+                    ruleId = ruleId,
+                    severity = severity,
+                    message = "sqldelight-check disable directives should include a reason after '--'.",
+                    file = file,
+                    range = directive.range,
+                    database = database,
+                )
+            }
+
     internal companion object {
         fun parse(file: SourceFile): DisableDirectives {
             val state = ParserState()
@@ -63,11 +82,11 @@ internal class DisableDirectives private constructor(
                     }
                     return@forEachIndexed
                 }
-
                 when (directive.command) {
                     DirectiveCommand.DisableFile -> {
-                        state.fileDirective = directive.disableDirective()
-                        state.disableDirectives += state.fileDirective!!
+                        val disableDirective = directive.disableDirective()
+                        state.fileDirective = disableDirective
+                        state.disableDirectives += disableDirective
                     }
                     DirectiveCommand.DisableNextLine ->
                         state.nextLineRules.getOrPut(lineNumber + 1) {
@@ -103,9 +122,11 @@ internal class DisableDirectives private constructor(
             val withoutPrefix = body.removePrefix("sqldelight-check-")
             val commandText = withoutPrefix.takeWhile { character -> !character.isWhitespace() }
             val command = DirectiveCommand.fromToken(commandText) ?: return null
-            val ruleIds = withoutPrefix.drop(command.token.length).withoutReason().trim().ruleIds()
+            val payload = withoutPrefix.drop(command.token.length)
+            val ruleIds = payload.withoutReason().trim().ruleIds()
             return Directive(
                 command = command,
+                hasReason = payload.hasReason(),
                 matcher = RuleMatcher(ruleIds = ruleIds),
                 range =
                     SourceRange(
@@ -118,6 +139,11 @@ internal class DisableDirectives private constructor(
         private fun String.withoutReason(): String {
             val delimiter = indexOf(" --")
             return if (delimiter == -1) this else substring(0, delimiter)
+        }
+
+        private fun String.hasReason(): Boolean {
+            val delimiter = indexOf(" --")
+            return delimiter != -1 && drop(delimiter + 3).isNotBlank()
         }
 
         private fun String.ruleIds(): Set<String>? {
@@ -153,11 +179,12 @@ internal class DisableDirectives private constructor(
  */
 private enum class DirectiveCommand(
     val token: String,
+    val requiresReason: Boolean,
 ) {
-    Disable("disable"),
-    Enable("enable"),
-    DisableNextLine("disable-next-line"),
-    DisableFile("disable-file"),
+    Disable("disable", requiresReason = true),
+    Enable("enable", requiresReason = false),
+    DisableNextLine("disable-next-line", requiresReason = true),
+    DisableFile("disable-file", requiresReason = true),
     ;
 
     companion object {
@@ -206,6 +233,8 @@ private data class RuleMatcher(
  */
 private data class DisableDirective(
     val matcher: RuleMatcher,
+    val requiresReason: Boolean,
+    val hasReason: Boolean,
     val range: SourceRange,
 ) {
     var used: Boolean = false
@@ -222,8 +251,15 @@ private data class DisableDirective(
  */
 private data class Directive(
     val command: DirectiveCommand,
+    val hasReason: Boolean,
     val matcher: RuleMatcher,
     val range: SourceRange,
 ) {
-    fun disableDirective(): DisableDirective = DisableDirective(matcher = matcher, range = range)
+    fun disableDirective(): DisableDirective =
+        DisableDirective(
+            matcher = matcher,
+            requiresReason = command.requiresReason,
+            hasReason = hasReason,
+            range = range,
+        )
 }

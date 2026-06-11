@@ -104,7 +104,8 @@ public class SqlDelightCheckEngine {
         trace.fileRules(database, file, executedRuleIds)
         return diagnostics +
             coreRuleSeverity(resolver, database.name, coreRequireSuppressionReasonRuleId).orEmptyDiagnostics { severity ->
-                file.suppressionReasonDiagnostics(
+                disableDirectives.suppressionReasonDiagnostics(
+                    file = file,
                     ruleId = coreRequireSuppressionReasonRuleId,
                     severity = severity,
                     database = database,
