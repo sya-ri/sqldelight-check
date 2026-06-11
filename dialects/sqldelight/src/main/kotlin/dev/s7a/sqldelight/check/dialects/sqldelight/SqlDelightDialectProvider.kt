@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.dialects.sqldelight
 
-import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
@@ -33,27 +33,27 @@ public class SqlDelightDialectProvider : SqlDialectProvider {
 private val SQLiteDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.SQLite,
-        capabilities = setOf(DialectCapabilities.SQLite),
+        capabilities = setOf(DialectCapability.SQLite),
         sourceKeywords = SqlDialectSourceKeywords.SQLite,
     )
 
 private val MySqlDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.MySql,
-        capabilities = setOf(DialectCapabilities.MySql),
+        capabilities = setOf(DialectCapability.MySql),
         sourceKeywords = SqlDialectSourceKeywords.MySql,
     )
 
 private val PostgreSqlDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.PostgreSql,
-        capabilities = setOf(DialectCapabilities.PostgreSql),
+        capabilities = setOf(DialectCapability.PostgreSql),
         sourceKeywords = SqlDialectSourceKeywords.PostgreSql,
     )
 
 private val HsqlDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.Hsql,
-        capabilities = setOf(DialectCapabilities.Hsql),
+        capabilities = setOf(DialectCapability.Hsql),
         sourceKeywords = SqlDialectSourceKeywords.Hsql,
     )

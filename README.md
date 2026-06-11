@@ -188,10 +188,10 @@ Omitting rule IDs suppresses all rule diagnostics covered by that directive.
 Built-in rule set artifacts:
 
 - `sqldelight-check-rules-standard`: dialect-independent rules for `.sq` and `.sqm` files.
-- `sqldelight-check-rules-postgres`: PostgreSQL-specific rules gated by `DialectCapabilities.PostgreSql`.
-- `sqldelight-check-rules-mysql`: MySQL-specific rules gated by `DialectCapabilities.MySql`.
-- `sqldelight-check-rules-sqlite`: SQLite-specific rules gated by `DialectCapabilities.SQLite`.
-- `sqldelight-check-rules-hsql`: HSQL-specific rule-set slot gated by `DialectCapabilities.Hsql`.
+- `sqldelight-check-rules-postgres`: PostgreSQL-specific rules gated by `DialectCapability.PostgreSql`.
+- `sqldelight-check-rules-mysql`: MySQL-specific rules gated by `DialectCapability.MySql`.
+- `sqldelight-check-rules-sqlite`: SQLite-specific rules gated by `DialectCapability.SQLite`.
+- `sqldelight-check-rules-hsql`: HSQL-specific rule-set slot gated by `DialectCapability.Hsql`.
 
 See the rule-set README files for rule behavior, options, and examples:
 

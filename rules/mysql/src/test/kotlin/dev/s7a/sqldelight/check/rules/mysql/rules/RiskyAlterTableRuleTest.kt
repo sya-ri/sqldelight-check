@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.rules.mysql.rules
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
-import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -73,7 +73,7 @@ class RiskyAlterTableRuleTest {
                     """
                     ALTER TABLE player DROP COLUMN legacy_name;
                     """,
-                capabilities = setOf(DialectCapabilities.SQLite),
+                capabilities = setOf(DialectCapability.SQLite),
             )
 
         assertEquals(emptyList(), diagnostics)

@@ -7,7 +7,6 @@ import dev.s7a.sqldelight.check.rule.api.SqlToken
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
@@ -27,7 +26,7 @@ public class ForeignKeysRestoredRule : Rule {
     override val id: RuleId = RuleId("foreign-keys-restored")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapabilities.SQLite
+    override val targetCapability: DialectCapability = DialectCapability.SQLite
 
     override fun isApplicable(context: RuleContext): Boolean = context.file.kind == SourceFileKind.Migration
 

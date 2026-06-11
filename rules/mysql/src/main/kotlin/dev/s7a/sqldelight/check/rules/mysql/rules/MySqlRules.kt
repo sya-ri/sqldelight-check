@@ -8,7 +8,6 @@ import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
@@ -64,7 +63,7 @@ public class NoZeroDateDefaultRule : Rule {
     override val id: RuleId = RuleId("no-zero-date-default")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapabilities.MySql
+    override val targetCapability: DialectCapability = DialectCapability.MySql
     private val regex = Regex("""\bDEFAULT\s+['"]0000-00-00(?:\s+\d\d:\d\d:\d\d)?['"]""", regexOptions)
 
     override fun run(
@@ -109,7 +108,7 @@ public class RequireIndexPrefixLengthRule : Rule {
     override val id: RuleId = RuleId("require-index-prefix-length")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapabilities.MySql
+    override val targetCapability: DialectCapability = DialectCapability.MySql
 
     override fun run(
         context: RuleContext,
@@ -163,7 +162,7 @@ public abstract class RegexMySqlRule(
     override val id: RuleId = RuleId("$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapabilities.MySql
+    override val targetCapability: DialectCapability = DialectCapability.MySql
     private val regex = Regex(pattern, regexOptions)
 
     override fun run(

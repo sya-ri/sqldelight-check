@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.rules.sqlite.rules
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
-import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -93,7 +93,7 @@ class ConsistentConflictResolutionRuleTest {
                     INSERT OR REPLACE INTO player(id, name) VALUES (1, 'Ada');
                     REPLACE INTO team(id, name) VALUES (1, 'Core');
                     """,
-                capabilities = setOf(DialectCapabilities.PostgreSql),
+                capabilities = setOf(DialectCapability.PostgreSql),
                 path = "src/main/sqldelight/com/example/Player.sq",
             )
 

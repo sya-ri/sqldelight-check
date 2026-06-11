@@ -22,20 +22,20 @@ public final class dev/s7a/sqldelight/check/api/Diagnostic {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class dev/s7a/sqldelight/check/api/DialectCapabilities {
-	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/DialectCapabilities;
-	public final fun getHsql ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public final fun getMySql ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public final fun getPostgreSql ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public final fun getSQLite ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-}
-
 public final class dev/s7a/sqldelight/check/api/DialectCapability {
+	public static final field Companion Ldev/s7a/sqldelight/check/api/DialectCapability$Companion;
 	public fun <init> (Ljava/lang/String;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getId ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/DialectCapability$Companion {
+	public final fun getHsql ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public final fun getMySql ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public final fun getPostgreSql ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public final fun getSQLite ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 }
 
 public final class dev/s7a/sqldelight/check/api/DialectFamily : java/lang/Enum {

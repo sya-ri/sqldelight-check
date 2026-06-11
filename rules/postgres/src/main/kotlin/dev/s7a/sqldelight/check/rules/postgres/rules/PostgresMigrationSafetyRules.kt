@@ -8,7 +8,6 @@ import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
@@ -52,7 +51,7 @@ public class RequireNotValidConstraintRule : Rule {
     override val id: RuleId = RuleId("require-not-valid-constraint")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
+    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
     private val addConstraintRegex = Regex("""\bALTER\s+TABLE\b(?:(?!;).)*\bADD\s+CONSTRAINT\b(?:(?!;).)*;?""", regexOptions)
     private val notValidRegex = Regex("""\bNOT\s+VALID\b""", RegexOption.IGNORE_CASE)
 
@@ -165,7 +164,7 @@ public abstract class RegexPostgresRule(
     override val id: RuleId = RuleId("$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
+    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
     private val regex = Regex(pattern, regexOptions)
 
     override fun run(

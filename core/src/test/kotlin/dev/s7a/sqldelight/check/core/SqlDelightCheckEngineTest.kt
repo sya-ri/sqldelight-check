@@ -1,7 +1,6 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.Diagnostic
@@ -101,13 +100,13 @@ class SqlDelightCheckEngineTest {
                     listOf(
                         testInput(
                             DialectFamily.MySql,
-                            capabilities = setOf(DialectCapabilities.MySql),
+                            capabilities = setOf(DialectCapability.MySql),
                         ),
                     ),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
-                            testRule(targetCapability = DialectCapabilities.SQLite),
+                            testRule(targetCapability = DialectCapability.SQLite),
                         ),
                     ),
             )
@@ -145,13 +144,13 @@ class SqlDelightCheckEngineTest {
                     listOf(
                         testInput(
                             DialectFamily.MySql,
-                            capabilities = setOf(DialectCapabilities.MySql),
+                            capabilities = setOf(DialectCapability.MySql),
                         ),
                     ),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
-                            testRule(targetCapability = DialectCapabilities.SQLite),
+                            testRule(targetCapability = DialectCapability.SQLite),
                         ),
                     ),
                 config =
@@ -443,7 +442,7 @@ class SqlDelightCheckEngineTest {
 
     private fun testInput(
         family: DialectFamily = DialectFamily.SQLite,
-        capabilities: Set<DialectCapability> = setOf(DialectCapabilities.SQLite),
+        capabilities: Set<DialectCapability> = setOf(DialectCapability.SQLite),
         content: String = "SELECT 1;",
     ): AnalysisInput =
         AnalysisInput(

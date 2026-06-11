@@ -8,7 +8,6 @@ import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
@@ -27,7 +26,7 @@ public class RiskyAlterTableRule : Rule {
     override val id: RuleId = RuleId("risky-alter-table")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapabilities.MySql
+    override val targetCapability: DialectCapability = DialectCapability.MySql
 
     override fun run(
         context: RuleContext,

@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.dialects.sqldelight
 
-import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
@@ -21,7 +21,7 @@ class SqlDelightDialectProviderTest {
         assertEquals(
             SqlDialect(
                 family = DialectFamily.SQLite,
-                capabilities = setOf(DialectCapabilities.SQLite),
+                capabilities = setOf(DialectCapability.SQLite),
                 sourceKeywords = SqlDialectSourceKeywords.SQLite,
             ),
             SqlDelightDialectProvider().resolve(
@@ -35,7 +35,7 @@ class SqlDelightDialectProviderTest {
         assertEquals(
             SqlDialect(
                 family = DialectFamily.MySql,
-                capabilities = setOf(DialectCapabilities.MySql),
+                capabilities = setOf(DialectCapability.MySql),
                 sourceKeywords = SqlDialectSourceKeywords.MySql,
             ),
             SqlDelightDialectProvider().resolve(
@@ -49,7 +49,7 @@ class SqlDelightDialectProviderTest {
         assertEquals(
             SqlDialect(
                 family = DialectFamily.PostgreSql,
-                capabilities = setOf(DialectCapabilities.PostgreSql),
+                capabilities = setOf(DialectCapability.PostgreSql),
                 sourceKeywords = SqlDialectSourceKeywords.PostgreSql,
             ),
             SqlDelightDialectProvider().resolve(
@@ -63,7 +63,7 @@ class SqlDelightDialectProviderTest {
         assertEquals(
             SqlDialect(
                 family = DialectFamily.Hsql,
-                capabilities = setOf(DialectCapabilities.Hsql),
+                capabilities = setOf(DialectCapability.Hsql),
                 sourceKeywords = SqlDialectSourceKeywords.Hsql,
             ),
             SqlDelightDialectProvider().resolve(
