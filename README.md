@@ -227,6 +227,8 @@ Default report outputs are written under `build/reports/sqldelight-check/`. JSON
 default. HTML and Markdown are available but disabled by default. GitHub annotations are enabled automatically on GitHub
 Actions when `GITHUB_ACTIONS=true`, unless explicitly disabled.
 
+![HTML report preview](docs/assets/html-report.png)
+
 See [Report Outputs](docs/reports.md) for GitHub Actions snippets and examples. The HTML report is intended to be the
 primary visual artifact for CI uploads.
 
