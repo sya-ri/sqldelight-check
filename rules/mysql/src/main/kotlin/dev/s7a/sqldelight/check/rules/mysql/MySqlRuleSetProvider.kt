@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rules.mysql.rules.NoReplaceIntoRule
+import dev.s7a.sqldelight.check.rules.mysql.rules.RiskyAlterTableRule
 
 /**
  * Provides rules for MySQL dialect projects.
@@ -23,5 +24,6 @@ public class MySqlRuleSetProvider : RuleSetProvider {
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
             RuleProvider(::NoReplaceIntoRule),
+            RuleProvider(::RiskyAlterTableRule),
         )
 }

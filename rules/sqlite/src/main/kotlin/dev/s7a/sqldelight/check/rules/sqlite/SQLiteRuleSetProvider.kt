@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+import dev.s7a.sqldelight.check.rules.sqlite.rules.ConsistentConflictResolutionRule
 import dev.s7a.sqldelight.check.rules.sqlite.rules.ForeignKeysRestoredRule
 
 /**
@@ -22,6 +23,7 @@ public class SQLiteRuleSetProvider : RuleSetProvider {
 
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
+            RuleProvider(::ConsistentConflictResolutionRule),
             RuleProvider(::ForeignKeysRestoredRule),
         )
 }

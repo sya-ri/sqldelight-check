@@ -24,6 +24,7 @@ class PostgresRuleSetProviderTest {
             setOf(
                 RuleId("postgres:excessive-locks"),
                 RuleId("postgres:reindex-concurrently"),
+                RuleId("postgres:risky-alter-table"),
             ),
             ruleIds,
         )

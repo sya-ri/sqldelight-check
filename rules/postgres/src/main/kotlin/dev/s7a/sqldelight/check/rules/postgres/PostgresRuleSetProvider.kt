@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rules.postgres.rules.ExcessiveLocksRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.ReindexConcurrentlyRule
+import dev.s7a.sqldelight.check.rules.postgres.rules.RiskyAlterTableRule
 
 /**
  * Provides rules for PostgreSQL dialect projects.
@@ -25,5 +26,6 @@ public class PostgresRuleSetProvider : RuleSetProvider {
         setOf(
             RuleProvider(::ExcessiveLocksRule),
             RuleProvider(::ReindexConcurrentlyRule),
+            RuleProvider(::RiskyAlterTableRule),
         )
 }

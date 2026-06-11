@@ -20,7 +20,13 @@ class MySqlRuleSetProviderTest {
 
         assertEquals(RuleSetId("mysql"), provider.id)
         assertEquals(DialectCapabilities.MySql, provider.targetCapability)
-        assertEquals(setOf(RuleId("mysql:no-replace-into")), ruleIds)
+        assertEquals(
+            setOf(
+                RuleId("mysql:no-replace-into"),
+                RuleId("mysql:risky-alter-table"),
+            ),
+            ruleIds,
+        )
     }
 
     @Test

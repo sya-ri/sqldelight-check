@@ -50,6 +50,30 @@ internal fun String.rangeAtOffsets(
         end = positionAt(endOffset),
     )
 
+internal fun List<SqlToken>.sqlStatements(): List<List<SqlToken>> {
+    val statements = mutableListOf<List<SqlToken>>()
+    var startIndex = 0
+    forEachIndexed { index, token ->
+        if (token.text == ";") {
+            addStatement(statements, startIndex, index)
+            startIndex = index + 1
+        }
+    }
+    addStatement(statements, startIndex, size)
+    return statements
+}
+
+private fun List<SqlToken>.addStatement(
+    statements: MutableList<List<SqlToken>>,
+    startIndex: Int,
+    endIndex: Int,
+) {
+    val statement = subList(startIndex, endIndex)
+    if (statement.isNotEmpty()) {
+        statements += statement
+    }
+}
+
 private fun String.positionAt(offset: Int): SourcePosition {
     val boundedOffset = offset.coerceIn(0, length)
     var line = 1

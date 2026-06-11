@@ -20,7 +20,13 @@ class SQLiteRuleSetProviderTest {
 
         assertEquals(RuleSetId("sqlite"), provider.id)
         assertEquals(DialectCapabilities.SQLite, provider.targetCapability)
-        assertEquals(setOf(RuleId("sqlite:foreign-keys-restored")), ruleIds)
+        assertEquals(
+            setOf(
+                RuleId("sqlite:consistent-conflict-resolution"),
+                RuleId("sqlite:foreign-keys-restored"),
+            ),
+            ruleIds,
+        )
     }
 
     @Test
