@@ -1,7 +1,6 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.rule.api.isKeyword
-import dev.s7a.sqldelight.check.rule.api.maskSqlCommentsAndQuotedText
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.rule.api.SqlToken
 import dev.s7a.sqldelight.check.rule.api.sqlStatements
@@ -9,7 +8,6 @@ import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter

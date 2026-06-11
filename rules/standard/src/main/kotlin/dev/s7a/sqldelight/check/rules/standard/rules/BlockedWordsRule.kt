@@ -4,7 +4,6 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
 import dev.s7a.sqldelight.check.rule.api.booleanOption
 import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
-import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId

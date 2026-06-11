@@ -3,7 +3,6 @@ package dev.s7a.sqldelight.check.reporter.sarif
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import dev.s7a.sqldelight.check.reporter.api.Reporter
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /**
