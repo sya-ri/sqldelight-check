@@ -14,6 +14,7 @@ import java.io.File
 import java.net.URLClassLoader
 import java.nio.file.Files
 import java.util.ServiceLoader
+import java.util.ServiceConfigurationError
 
 /**
  * SQLDelight analyzer backed by SQLDelight 2.x runtime classes.
@@ -47,7 +48,7 @@ internal object SqlDelight2Analyzer {
                 )
             }.getOrElse { failure ->
                 val rootCause = failure.rootCause()
-                listOf(input.errorDiagnostic("SQLDelight 2.x analysis failed: ${rootCause.message ?: rootCause::class.java.name}"))
+                listOf(input.errorDiagnostic(sqlDelightAnalysisFailureMessage(input, rootCause)))
             }
         return AnalysisResult(files = input.files, diagnostics = diagnostics)
     }
@@ -160,6 +161,28 @@ internal object SqlDelight2Analyzer {
             range = parsed.range,
             database = database,
         )
+    }
+
+}
+
+internal fun sqlDelightAnalysisFailureMessage(
+    input: AnalysisInput,
+    failure: Throwable,
+): String {
+    val detail = failure.message ?: failure::class.java.name
+    return when (failure) {
+        is ServiceConfigurationError ->
+            "SQLDelight dialect service loading failed for ${input.database.name}: $detail"
+        is ClassNotFoundException ->
+            "SQLDelight 2.x analysis failed because a required class was not found for ${input.database.name}: $detail"
+        is NoClassDefFoundError ->
+            "SQLDelight 2.x analysis failed because a required class was not found for ${input.database.name}: $detail"
+        is LinkageError ->
+            "SQLDelight 2.x analysis failed because loaded SQLDelight classes are incompatible for ${input.database.name}: $detail"
+        is IllegalArgumentException ->
+            "SQLDelight 2.x analysis failed because sqldelight-check built an invalid analysis model for ${input.database.name}: $detail"
+        else ->
+            "Unexpected SQLDelight 2.x analysis failure for ${input.database.name}: $detail"
     }
 }
 
