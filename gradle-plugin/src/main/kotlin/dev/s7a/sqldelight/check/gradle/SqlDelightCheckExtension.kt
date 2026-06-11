@@ -6,7 +6,10 @@ import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
 
 /**
- * Gradle DSL for configuring sqldelight-check.
+ * Top-level Gradle DSL for configuring sqldelight-check.
+ *
+ * The extension owns global defaults, database-specific overrides, reporter
+ * output settings, and write-task safety options.
  */
 public open class SqlDelightCheckExtension
     @Inject
@@ -14,7 +17,8 @@ public open class SqlDelightCheckExtension
         objects: ObjectFactory,
     ) {
         /**
-         * Rule set defaults applied to every SQLDelight database unless overridden.
+         * Rule set defaults applied to every SQLDelight database unless
+         * database-specific overrides replace them.
          */
         public val ruleSets: NamedDomainObjectContainer<RuleSetExtension> =
             objects.domainObjectContainer(RuleSetExtension::class.java) { name ->
@@ -22,7 +26,8 @@ public open class SqlDelightCheckExtension
             }
 
         /**
-         * Rule overrides applied to every SQLDelight database unless overridden.
+         * Rule overrides applied to every SQLDelight database unless
+         * database-specific overrides replace them.
          */
         public val rules: NamedDomainObjectContainer<RuleExtension> =
             objects.domainObjectContainer(RuleExtension::class.java) { name ->
@@ -30,7 +35,9 @@ public open class SqlDelightCheckExtension
             }
 
         /**
-         * Reporters and output options.
+         * Reporters and output options keyed by reporter ID.
+         *
+         * Built-in reporters are registered by the plugin before task execution.
          */
         public val reports: NamedDomainObjectContainer<ReporterExtension> =
             objects.domainObjectContainer(ReporterExtension::class.java) { name ->
@@ -39,6 +46,8 @@ public open class SqlDelightCheckExtension
 
         /**
          * Database-specific overrides keyed by SQLDelight database name.
+         *
+         * These values are merged after top-level rule and rule set defaults.
          */
         public val databases: NamedDomainObjectContainer<DatabaseExtension> =
             objects.domainObjectContainer(DatabaseExtension::class.java) { name ->
@@ -47,39 +56,55 @@ public open class SqlDelightCheckExtension
 
         /**
          * Write behavior shared by `*Write` tasks.
+         *
+         * The same safety options apply to check, lint, and format write aliases.
          */
         public val write: WriteExtension = objects.newInstance(WriteExtension::class.java)
 
+        private val ruleSetsDsl: RuleSetContainerExtension = RuleSetContainerExtension(ruleSets)
+        private val rulesDsl: RuleContainerExtension = RuleContainerExtension(rules)
+        private val reportsDsl: ReporterContainerExtension = ReporterContainerExtension(reports)
+        private val databasesDsl: DatabaseContainerExtension = DatabaseContainerExtension(databases)
+
         /**
-         * Configures a rule set default.
+         * Configures rule set defaults using the nested DSL.
+         *
+         * The container also exposes `maybeCreate` for compatibility.
          */
-        public fun ruleSets(configure: Action<in NamedDomainObjectContainer<RuleSetExtension>>) {
-            configure.execute(ruleSets)
+        public fun ruleSets(configure: Action<in RuleSetContainerExtension>) {
+            configure.execute(ruleSetsDsl)
         }
 
         /**
-         * Configures rule overrides.
+         * Configures rule overrides using the nested DSL.
+         *
+         * Use `rule("rule-set:rule-id")` for built-in and external rules.
          */
-        public fun rules(configure: Action<in NamedDomainObjectContainer<RuleExtension>>) {
-            configure.execute(rules)
+        public fun rules(configure: Action<in RuleContainerExtension>) {
+            configure.execute(rulesDsl)
         }
 
         /**
-         * Configures reporters.
+         * Configures reporters using the nested DSL.
+         *
+         * Built-in reporters have named helpers and external reporters use `report`.
          */
-        public fun reports(configure: Action<in NamedDomainObjectContainer<ReporterExtension>>) {
-            configure.execute(reports)
+        public fun reports(configure: Action<in ReporterContainerExtension>) {
+            configure.execute(reportsDsl)
         }
 
         /**
-         * Configures database-specific overrides.
+         * Configures database-specific overrides using the nested DSL.
+         *
+         * Use `database("Name")` with the SQLDelight database name.
          */
-        public fun databases(configure: Action<in NamedDomainObjectContainer<DatabaseExtension>>) {
-            configure.execute(databases)
+        public fun databases(configure: Action<in DatabaseContainerExtension>) {
+            configure.execute(databasesDsl)
         }
 
         /**
-         * Configures write behavior.
+         * Configures write behavior shared by check write, lint write, and
+         * format write tasks.
          */
         public fun write(configure: Action<in WriteExtension>) {
             configure.execute(write)

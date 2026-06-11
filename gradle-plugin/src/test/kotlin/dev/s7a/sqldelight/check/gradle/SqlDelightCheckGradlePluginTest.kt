@@ -120,7 +120,9 @@ class SqlDelightCheckGradlePluginTest {
 
                 sqldelightCheck {
                     reports {
-                        maybeCreate("github-annotations").required.set(false)
+                        githubAnnotations {
+                            required.set(false)
+                        }
                     }
                 }
                 """.trimIndent(),
@@ -130,6 +132,65 @@ class SqlDelightCheckGradlePluginTest {
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertEquals(false, project.file("build/reports/sqldelight-check/report.github-annotations").exists())
+    }
+
+    @Test
+    fun `extension supports nested configuration DSL`() {
+        val project =
+            testProject(
+                """
+                import dev.s7a.sqldelight.check.api.Enablement
+                import dev.s7a.sqldelight.check.api.Severity
+
+                plugins {
+                    id("dev.s7a.sqldelight.check")
+                }
+
+                sqldelightCheck {
+                    ruleSets {
+                        standard {
+                            enabled.set(Enablement.Auto)
+                        }
+                        postgres {
+                            enabled.set(Enablement.Disabled)
+                        }
+                    }
+
+                    rules {
+                        rule("standard:final-newline") {
+                            enabled.set(Enablement.Enabled)
+                            severity.set(Severity.Error)
+                        }
+                    }
+
+                    databases {
+                        database("Database") {
+                            ruleSets {
+                                standard {
+                                    enabled.set(Enablement.Disabled)
+                                }
+                            }
+                            rules {
+                                rule("standard:final-newline") {
+                                    severity.set(Severity.Warning)
+                                }
+                            }
+                        }
+                    }
+
+                    reports {
+                        html {
+                            required.set(true)
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(true, project.file("build/reports/sqldelight-check/report.html").exists())
     }
 
     @Test
@@ -251,10 +312,12 @@ class SqlDelightCheckGradlePluginTest {
 
             sqldelightCheck {
                 ruleSets {
-                    maybeCreate("standard").enabled.set(Enablement.Disabled)
+                    standard {
+                        enabled.set(Enablement.Disabled)
+                    }
                 }
                 rules {
-                    maybeCreate("standard:final-newline").apply {
+                    rule("standard:final-newline") {
                         enabled.set(Enablement.Enabled)
                         severity.set(Severity.Error)
                     }
@@ -316,10 +379,12 @@ class SqlDelightCheckGradlePluginTest {
 
             sqldelightCheck {
                 ruleSets {
-                    maybeCreate("standard").enabled.set(Enablement.Disabled)
+                    standard {
+                        enabled.set(Enablement.Disabled)
+                    }
                 }
                 rules {
-                    maybeCreate("standard:final-newline").apply {
+                    rule("standard:final-newline") {
                         enabled.set(Enablement.Enabled)
                         severity.set(Severity.Warning)
                     }
@@ -478,10 +543,12 @@ class SqlDelightCheckGradlePluginTest {
 
                 sqldelightCheck {
                     ruleSets {
-                        maybeCreate("standard").enabled.set(Enablement.Disabled)
+                        standard {
+                            enabled.set(Enablement.Disabled)
+                        }
                     }
                     rules {
-                        maybeCreate("standard:final-newline").apply {
+                        rule("standard:final-newline") {
                             enabled.set(Enablement.Enabled)
                             severity.set(Severity.Error)
                         }
@@ -639,7 +706,7 @@ class SqlDelightCheckGradlePluginTest {
 
                 sqldelightCheck {
                     reports {
-                        maybeCreate("external").apply {
+                        report("external") {
                             required.set(true)
                             options.put("mode", "ci")
                             outputFile.set(layout.buildDirectory.file("reports/sqldelight-check/external.txt"))

@@ -64,37 +64,63 @@ import dev.s7a.sqldelight.check.api.Severity
 
 sqldelightCheck {
     ruleSets {
-        maybeCreate("standard").enabled.set(Enablement.Auto)
-        maybeCreate("postgres").enabled.set(Enablement.Auto)
+        standard {
+            enabled.set(Enablement.Auto)
+        }
+        postgres {
+            enabled.set(Enablement.Auto)
+        }
     }
 
     rules {
-        maybeCreate("standard:final-newline").apply {
+        rule("standard:final-newline") {
             enabled.set(Enablement.Enabled)
             severity.set(Severity.Warning)
         }
-        maybeCreate("standard:no-trailing-whitespace").severity.set(Severity.Error)
-        maybeCreate("standard:max-line-length").options.put("max", "120")
-        maybeCreate("standard:max-joins").options.put("max", "8")
-        maybeCreate("standard:max-subquery-depth").options.put("maxDepth", "3")
-        maybeCreate("standard:max-case-depth").options.put("maxDepth", "2")
+        rule("standard:no-trailing-whitespace") {
+            severity.set(Severity.Error)
+        }
+        rule("standard:max-line-length") {
+            options.put("max", "120")
+        }
+        rule("standard:max-joins") {
+            options.put("max", "8")
+        }
+        rule("standard:max-subquery-depth") {
+            options.put("maxDepth", "3")
+        }
+        rule("standard:max-case-depth") {
+            options.put("maxDepth", "2")
+        }
     }
 
     databases {
-        maybeCreate("Database").rules {
-            maybeCreate("standard:no-trailing-whitespace").severity.set(Severity.Warning)
+        database("Database") {
+            rules {
+                rule("standard:no-trailing-whitespace") {
+                    severity.set(Severity.Warning)
+                }
+            }
         }
     }
 
     reports {
-        maybeCreate("json").apply {
+        json {
             required.set(true)
             options.put("prettyPrint", "true")
         }
-        maybeCreate("sarif").required.set(true)
-        maybeCreate("text").required.set(true)
-        maybeCreate("html").required.set(false)
-        maybeCreate("markdown").required.set(false)
+        sarif {
+            required.set(true)
+        }
+        text {
+            required.set(true)
+        }
+        html {
+            required.set(false)
+        }
+        markdown {
+            required.set(false)
+        }
     }
 
     write {
@@ -175,14 +201,25 @@ Enable or disable reporters in `build.gradle.kts`:
 ```kotlin
 sqldelightCheck {
     reports {
-        maybeCreate("json").required.set(true)
-        maybeCreate("sarif").required.set(true)
-        maybeCreate("text").required.set(false)
-        maybeCreate("html").required.set(true)
-        maybeCreate("markdown").required.set(true)
-        maybeCreate("github-annotations").required.set(false)
-
-        maybeCreate("json").options.put("prettyPrint", "true")
+        json {
+            required.set(true)
+            options.put("prettyPrint", "true")
+        }
+        sarif {
+            required.set(true)
+        }
+        text {
+            required.set(false)
+        }
+        html {
+            required.set(true)
+        }
+        markdown {
+            required.set(true)
+        }
+        githubAnnotations {
+            required.set(false)
+        }
     }
 }
 ```
