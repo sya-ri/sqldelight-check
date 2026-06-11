@@ -6,7 +6,7 @@ import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
-import java.io.OutputStream
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -32,9 +32,11 @@ private class SarifReporter(
 ) : Reporter {
     override fun write(
         report: Report,
-        output: OutputStream,
+        output: ReportOutput,
     ) {
-        output.write(json.encodeToString(report.toSarifReport()).toByteArray())
+        output.file().use { file ->
+            file.write(json.encodeToString(report.toSarifReport()).toByteArray())
+        }
     }
 }
 

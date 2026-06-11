@@ -7,7 +7,9 @@ import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -68,7 +70,7 @@ private fun SarifReporterProvider.render(
     options: Map<String, String> = emptyMap(),
 ): String {
     val output = ByteArrayOutputStream()
-    create(options).write(report, output)
+    create(options).write(report, ByteArrayReportOutput(output))
     return output.toString()
 }
 
@@ -87,3 +89,11 @@ private fun diagnostic(): Diagnostic =
         ),
         database = null,
     )
+
+private class ByteArrayReportOutput(
+    private val output: ByteArrayOutputStream,
+) : ReportOutput {
+    override fun file(): OutputStream = output
+
+    override fun file(path: String): OutputStream = output
+}

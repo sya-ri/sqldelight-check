@@ -6,7 +6,7 @@ import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
-import java.io.OutputStream
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 
 /**
  * Provider for GitHub Actions workflow command annotations.
@@ -20,9 +20,11 @@ public class GitHubAnnotationsReporterProvider : ReporterProvider {
 private object GitHubAnnotationsReporter : Reporter {
     override fun write(
         report: Report,
-        output: OutputStream,
+        output: ReportOutput,
     ) {
-        output.write(report.toGitHubAnnotations().toByteArray())
+        output.file().use { file ->
+            file.write(report.toGitHubAnnotations().toByteArray())
+        }
     }
 }
 

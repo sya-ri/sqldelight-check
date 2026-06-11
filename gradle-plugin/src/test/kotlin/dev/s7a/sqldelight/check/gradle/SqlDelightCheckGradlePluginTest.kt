@@ -742,7 +742,25 @@ class SqlDelightCheckGradlePluginTest {
 
     @Test
     fun `fix task does not apply unsafe fixes by default`() {
-        val project = testProject(sqlDelightBuildScript())
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Enablement
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            rules {
+                                rule("standard:prefer-named-parameters") {
+                                    enabled.set(Enablement.Disabled)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
         val path = "src/main/sqldelight/com/example/Player.sq"
         val content =
             """
@@ -769,9 +787,18 @@ class SqlDelightCheckGradlePluginTest {
         val project =
             testProject(
                 sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Enablement
+                        """.trimIndent(),
                     extraConfiguration =
                         """
                     sqldelightCheck {
+                        rules {
+                            rule("standard:prefer-named-parameters") {
+                                enabled.set(Enablement.Disabled)
+                            }
+                        }
                         fix {
                             unsafe.set(true)
                         }
@@ -831,7 +858,9 @@ class SqlDelightCheckGradlePluginTest {
                         report("external") {
                             required.set(true)
                             options.put("mode", "ci")
+                            options.put("asset", "details.txt")
                             outputFile.set(layout.buildDirectory.file("reports/sqldelight-check/external.txt"))
+                            outputDirectory.set(layout.buildDirectory.dir("reports/sqldelight-check/external"))
                         }
                     }
                 }
@@ -843,6 +872,7 @@ class SqlDelightCheckGradlePluginTest {
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertEquals("external diagnostics=0 mode=ci", project.file("build/reports/sqldelight-check/external.txt").readText())
+        assertEquals("external asset=details.txt", project.file("build/reports/sqldelight-check/external/details.txt").readText())
     }
 
     /**
@@ -975,6 +1005,7 @@ class SqlDelightCheckGradlePluginTest {
                 package com.example;
 
                 import dev.s7a.sqldelight.check.reporter.api.Report;
+                import dev.s7a.sqldelight.check.reporter.api.ReportOutput;
                 import dev.s7a.sqldelight.check.reporter.api.Reporter;
                 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider;
                 import java.io.IOException;
@@ -1001,10 +1032,18 @@ class SqlDelightCheckGradlePluginTest {
                         }
 
                         @Override
-                        public void write(Report report, OutputStream output) {
+                        public void write(Report report, ReportOutput output) {
                             try {
                                 String text = "external diagnostics=" + report.getDiagnostics().size() + " mode=" + options.get("mode");
-                                output.write(text.getBytes(StandardCharsets.UTF_8));
+                                try (OutputStream file = output.file()) {
+                                    file.write(text.getBytes(StandardCharsets.UTF_8));
+                                }
+                                String asset = options.get("asset");
+                                if (asset != null) {
+                                    try (OutputStream file = output.file(asset)) {
+                                        file.write(("external asset=" + asset).getBytes(StandardCharsets.UTF_8));
+                                    }
+                                }
                             } catch (IOException exception) {
                                 throw new RuntimeException(exception);
                             }

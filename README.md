@@ -110,6 +110,7 @@ sqldelightCheck {
     reports {
         json {
             required.set(true)
+            outputFile.set(layout.buildDirectory.file("reports/sqldelight-check/report.json"))
             options.put("prettyPrint", "true")
         }
         sarif {
@@ -120,6 +121,7 @@ sqldelightCheck {
         }
         html {
             required.set(false)
+            outputDirectory.set(layout.buildDirectory.dir("reports/sqldelight-check/html"))
         }
         markdown {
             required.set(false)

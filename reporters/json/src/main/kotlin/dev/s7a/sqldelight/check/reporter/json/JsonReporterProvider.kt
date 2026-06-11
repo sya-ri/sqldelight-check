@@ -11,7 +11,7 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
-import java.io.OutputStream
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -36,9 +36,11 @@ private class JsonReporter(
 ) : Reporter {
     override fun write(
         report: Report,
-        output: OutputStream,
+        output: ReportOutput,
     ) {
-        output.write(json.encodeToString(report.toJsonReport()).toByteArray())
+        output.file().use { file ->
+            file.write(json.encodeToString(report.toJsonReport()).toByteArray())
+        }
     }
 }
 

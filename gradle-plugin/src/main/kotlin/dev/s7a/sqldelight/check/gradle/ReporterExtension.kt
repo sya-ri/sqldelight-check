@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.gradle
 
 import org.gradle.api.Named
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -26,6 +27,11 @@ public open class ReporterExtension
          * Report output file.
          */
         public val outputFile: RegularFileProperty = objects.fileProperty()
+
+        /**
+         * Directory used when a reporter writes multiple files.
+         */
+        public val outputDirectory: DirectoryProperty = objects.directoryProperty()
 
         /**
          * Reporter-specific string options passed to the selected reporter provider.

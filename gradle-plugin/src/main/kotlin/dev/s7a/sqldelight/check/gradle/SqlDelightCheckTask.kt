@@ -12,7 +12,11 @@ import dev.s7a.sqldelight.check.core.FixApplier
 import dev.s7a.sqldelight.check.core.FixSkipReason
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
+import java.io.File
+import java.io.OutputStream
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
@@ -182,12 +186,45 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                     registry.find(reporter.name)
                         ?: throw GradleException("sqldelight-check reporter '${reporter.name}' was not found on the runtime classpath.")
                 val outputFile = reporter.outputFile.get().asFile
-                outputFile.parentFile.mkdirs()
-                outputFile.outputStream().use { output ->
-                    provider.create(reporter.options.get()).write(report, output)
-                }
+                val outputDirectory = reporter.outputDirectory.get().asFile
+                provider
+                    .create(reporter.options.get())
+                    .write(
+                        report,
+                        GradleReportOutput(
+                            primaryFile = outputFile,
+                            outputDirectory = outputDirectory,
+                        ),
+                    )
                 logger.lifecycle("Wrote sqldelight-check {} report to {}", reporter.name, outputFile)
             }
+    }
+}
+
+private class GradleReportOutput(
+    private val primaryFile: File,
+    private val outputDirectory: File,
+) : ReportOutput {
+    override fun file(): OutputStream {
+        primaryFile.parentFile.mkdirs()
+        return primaryFile.outputStream()
+    }
+
+    override fun file(path: String): OutputStream {
+        val relativePath = Path.of(path).normalize()
+        require(!relativePath.isAbsolute && !relativePath.startsWith("..")) {
+            "Report output path must be relative and stay inside the reporter output directory: $path"
+        }
+
+        val root = outputDirectory.toPath().toAbsolutePath().normalize()
+        val file = root.resolve(relativePath).normalize()
+        require(file.startsWith(root)) {
+            "Report output path must stay inside the reporter output directory: $path"
+        }
+
+        val outputFile = file.toFile()
+        outputFile.parentFile.mkdirs()
+        return outputFile.outputStream()
     }
 }
 

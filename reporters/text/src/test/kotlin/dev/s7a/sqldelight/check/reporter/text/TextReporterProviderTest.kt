@@ -10,7 +10,9 @@ import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -175,7 +177,7 @@ class TextReporterProviderTest {
 
 private fun TextReporterProvider.render(report: Report): String {
     val output = ByteArrayOutputStream()
-    create().write(report, output)
+    create().write(report, ByteArrayReportOutput(output))
     return output.toString()
 }
 
@@ -225,3 +227,11 @@ private fun diagnostic(
         database = null,
         fixes = fixes,
     )
+
+private class ByteArrayReportOutput(
+    private val output: ByteArrayOutputStream,
+) : ReportOutput {
+    override fun file(): OutputStream = output
+
+    override fun file(path: String): OutputStream = output
+}

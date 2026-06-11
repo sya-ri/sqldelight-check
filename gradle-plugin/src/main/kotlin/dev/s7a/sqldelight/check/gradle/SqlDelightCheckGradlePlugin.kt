@@ -105,6 +105,7 @@ private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension)
         extension.reports.maybeCreate(name).apply {
             this.required.convention(required)
             outputFile.convention(layout.buildDirectory.file("reports/sqldelight-check/report.$name"))
+            outputDirectory.convention(layout.buildDirectory.dir("reports/sqldelight-check/$name"))
         }
     }
     extension.reports.maybeCreate("github-annotations").required.convention(isGitHubActions)

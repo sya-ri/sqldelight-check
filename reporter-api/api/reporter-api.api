@@ -9,8 +9,13 @@ public final class dev/s7a/sqldelight/check/reporter/api/Report {
 	public fun toString ()Ljava/lang/String;
 }
 
+public abstract interface class dev/s7a/sqldelight/check/reporter/api/ReportOutput {
+	public abstract fun file ()Ljava/io/OutputStream;
+	public abstract fun file (Ljava/lang/String;)Ljava/io/OutputStream;
+}
+
 public abstract interface class dev/s7a/sqldelight/check/reporter/api/Reporter {
-	public abstract fun write (Ldev/s7a/sqldelight/check/reporter/api/Report;Ljava/io/OutputStream;)V
+	public abstract fun write (Ldev/s7a/sqldelight/check/reporter/api/Report;Ldev/s7a/sqldelight/check/reporter/api/ReportOutput;)V
 }
 
 public abstract interface class dev/s7a/sqldelight/check/reporter/api/ReporterProvider {

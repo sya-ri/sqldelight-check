@@ -8,7 +8,7 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
-import java.io.OutputStream
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 
 /**
  * Provider for the built-in plain text reporter.
@@ -22,9 +22,11 @@ public class TextReporterProvider : ReporterProvider {
 private object TextReporter : Reporter {
     override fun write(
         report: Report,
-        output: OutputStream,
+        output: ReportOutput,
     ) {
-        output.write(report.render().toByteArray())
+        output.file().use { file ->
+            file.write(report.render().toByteArray())
+        }
     }
 }
 

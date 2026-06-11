@@ -6,7 +6,7 @@ import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
-import java.io.OutputStream
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 
 /**
  * Provider for the built-in Markdown reporter.
@@ -20,9 +20,11 @@ public class MarkdownReporterProvider : ReporterProvider {
 private object MarkdownReporter : Reporter {
     override fun write(
         report: Report,
-        output: OutputStream,
+        output: ReportOutput,
     ) {
-        output.write(report.toMarkdown().toByteArray())
+        output.file().use { file ->
+            file.write(report.toMarkdown().toByteArray())
+        }
     }
 }
 

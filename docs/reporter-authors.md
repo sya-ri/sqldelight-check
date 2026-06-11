@@ -53,23 +53,23 @@ com.example.sqldelight.reporter.ExampleReporterProvider
 
 ## Reporter
 
-Reporters receive a stable `Report` model and write bytes to the supplied output stream.
+Reporters receive a stable `Report` model and write files through `ReportOutput`.
 
 ```kotlin
 package com.example.sqldelight.reporter
 
 import dev.s7a.sqldelight.check.reporter.api.Report
+import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import dev.s7a.sqldelight.check.reporter.api.Reporter
-import java.io.OutputStream
 
 class ExampleReporter(
     private val options: Map<String, String>,
 ) : Reporter {
     override fun write(
         report: Report,
-        output: OutputStream,
+        output: ReportOutput,
     ) {
-        output.writer().use { writer ->
+        output.file().writer().use { writer ->
             writer.appendLine("sqldelight-check diagnostics: ${report.summary.diagnostics}")
         }
     }
@@ -84,10 +84,13 @@ sqldelightCheck {
         report("example") {
             required.set(true)
             options.put("format", "compact")
+            outputFile.set(layout.buildDirectory.file("reports/sqldelight-check/example.txt"))
+            outputDirectory.set(layout.buildDirectory.dir("reports/sqldelight-check/example"))
         }
     }
 }
 ```
 
-Reporter output files are managed by sqldelight-check. A reporter should write one complete report to the stream and
-avoid reading project files directly unless its format explicitly requires it.
+Reporter output files are managed by sqldelight-check. Single-file reporters should write to `output.file()`.
+Reporters that need assets or shards can write relative paths with `output.file("assets/report.css")`. A reporter
+should avoid reading project files directly unless its format explicitly requires it.
