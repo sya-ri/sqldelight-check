@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rules.standard.rules.ClauseKeywordNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentColumnReferencesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentOrderByDirectionRule
@@ -19,6 +20,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoConsecutiveSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDistinctParenthesesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoElseNullRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingBlankLinesRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingWhitespaceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoRedundantSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceAfterDotRule
@@ -34,9 +36,11 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectTrailingCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
+import dev.s7a.sqldelight.check.rules.standard.rules.OperatorLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCoalesceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireOrderByWithLimitRule
+import dev.s7a.sqldelight.check.rules.standard.rules.SelectModifierLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SetOperatorLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterBlockCommentStartRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAfterCommaRule
@@ -61,6 +65,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
      */
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
+            RuleProvider(::ClauseKeywordNewlineRule),
             RuleProvider(::ConsistentColumnReferencesRule),
             RuleProvider(::ConsistentNotEqualOperatorRule),
             RuleProvider(::ConsistentOrderByDirectionRule),
@@ -79,6 +84,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoDistinctParenthesesRule),
             RuleProvider(::NoElseNullRule),
             RuleProvider(::NoLeadingBlankLinesRule),
+            RuleProvider(::NoLeadingCommaRule),
             RuleProvider(::NoLeadingWhitespaceRule),
             RuleProvider(::NoRedundantSemicolonsRule),
             RuleProvider(::NoSpaceAfterDotRule),
@@ -94,9 +100,11 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
+            RuleProvider(::OperatorLinePositionRule),
             RuleProvider(::PreferCoalesceRule),
             RuleProvider(::PreferCountStarRule),
             RuleProvider(::RequireOrderByWithLimitRule),
+            RuleProvider(::SelectModifierLinePositionRule),
             RuleProvider(::SetOperatorLinePositionRule),
             RuleProvider(::SpaceAfterBlockCommentStartRule),
             RuleProvider(::SpaceAfterCommaRule),

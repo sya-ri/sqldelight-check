@@ -83,6 +83,7 @@ The standard rule set uses two safety levels:
 
 | Rule ID | Default | Fix | Safety | Purpose |
 | --- | --- | --- | --- | --- |
+| `standard:clause-keyword-newline` | Warning / Auto | No | None | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
 | `standard:consistent-column-references` | Warning / Auto | No | None | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
 | `standard:consistent-order-by-direction` | Warning / Auto | No | None | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
@@ -101,6 +102,7 @@ The standard rule set uses two safety levels:
 | `standard:no-distinct-parentheses` | Warning / Auto | Yes | Safe | Disallow parentheses immediately after `SELECT DISTINCT`. |
 | `standard:no-else-null` | Warning / Auto | No | None | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
 | `standard:no-leading-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines before the first content line. |
+| `standard:no-leading-comma` | Warning / Auto | No | None | Disallow comma tokens as the first non-whitespace character on a line. |
 | `standard:no-leading-whitespace` | Warning / Auto | Yes | Safe | Disallow any whitespace before the first file content. |
 | `standard:no-redundant-semicolons` | Warning / Auto | Yes | Safe | Disallow repeated semicolons separated only by whitespace. |
 | `standard:no-space-after-dot` | Warning / Auto | Yes | Safe | Disallow inline whitespace immediately after `.`. |
@@ -116,9 +118,11 @@ The standard rule set uses two safety levels:
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:operator-line-position` | Warning / Auto | No | None | Require multiline comparison and binary operators to trail the previous line. |
 | `standard:prefer-coalesce` | Warning / Auto | Yes | Unsafe | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
 | `standard:require-order-by-with-limit` | Warning / Auto | No | None | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
+| `standard:select-modifier-line-position` | Warning / Auto | No | None | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
 | `standard:set-operator-line-position` | Warning / Auto | No | None | Require multiline set operators to begin their own line after indentation. |
 | `standard:space-after-block-comment-start` | Warning / Auto | Yes | Safe | Require one space after a block comment opening marker. |
 | `standard:space-after-comma` | Warning / Auto | Yes | Safe | Require one inline space after `,` when another token follows. |
@@ -147,11 +151,13 @@ Useful sqlfluff concepts reflected here:
   `standard:use-is-null`, and `standard:no-right-join`.
 - Convention and ambiguity checks for operator, `CASE`, and set-operation clarity:
   `standard:consistent-not-equal-operator`, `standard:prefer-coalesce`, `standard:no-else-null`,
-  `standard:explicit-union-operator`, and `standard:set-operator-line-position`.
+  `standard:explicit-union-operator`, `standard:operator-line-position`, and
+  `standard:set-operator-line-position`.
 - Ambiguity checks for `SELECT` and `ORDER BY`: `standard:no-select-distinct-with-group-by`,
   `standard:consistent-order-by-direction`, `standard:consistent-column-references`,
   `standard:require-order-by-with-limit`, `standard:explicit-cross-join`, `standard:explicit-inner-join`,
-  `standard:no-distinct-parentheses`, and `standard:no-select-trailing-comma`.
+  `standard:no-distinct-parentheses`, `standard:no-select-trailing-comma`,
+  `standard:select-modifier-line-position`, and `standard:clause-keyword-newline`.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,
@@ -402,6 +408,37 @@ Fix behavior:
 - Removes inline spaces and tabs immediately before `,`.
 - Skips comments, string literals, and quoted identifiers.
 - Safe to apply in write tasks.
+
+## `standard:no-leading-comma`
+
+Reports comma tokens in multiline SQL when the comma is the first non-whitespace character on a line.
+
+This rule is inspired by sqlfluff's leading-comma layout checks. The standard style keeps commas trailing, matching the
+other comma spacing rules in this rule set.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id
+  , name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id,
+  name
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line SQL is accepted.
+- Skips comments, string literals, and quoted identifiers.
 
 ## `standard:space-after-comma`
 
@@ -736,6 +773,40 @@ Why unsafe:
 - SQL dialects have operator families beyond the common comparison set.
 - Some dialect-specific operators are visually similar to comparison operators.
 - The current rule uses source text rather than SQLDelight PSI, so users must opt in before write tasks apply fixes.
+
+## `standard:operator-line-position`
+
+Reports comparison and binary operators in multiline SQL when the operator is the first non-whitespace character on a
+line.
+
+This rule is inspired by sqlfluff's operator line-position rule. The standard style uses trailing operators because the
+existing operator spacing rules keep operators between operands.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE score
+  >= 10;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE score >=
+  10;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line SQL is accepted.
+- Skips comments, string literals, and quoted identifiers.
 
 ## `standard:space-after-line-comment-marker`
 
@@ -1287,6 +1358,74 @@ Why unsafe:
 - Dialects differ on whether trailing select-list commas are accepted.
 - The first implementation uses source text rather than SQLDelight select-clause facts.
 - Users must opt in before write tasks apply fixes.
+
+## `standard:select-modifier-line-position`
+
+Reports `SELECT DISTINCT` and `SELECT ALL` modifiers when the modifier is not on the same line as `SELECT`.
+
+This rule is inspired by sqlfluff's `SELECT` modifier layout rule. Keeping the modifier next to `SELECT` makes the row
+deduplication or all-row intent visible at the statement start.
+
+Invalid:
+
+```sql
+selectNames:
+SELECT
+  DISTINCT name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectNames:
+SELECT DISTINCT name
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:clause-keyword-newline`
+
+Reports major top-level `SELECT` clause keywords in multiline statements when the keyword does not start its own line
+after indentation.
+
+This is a conservative source-text subset inspired by sqlfluff's clause newline rule. It checks top-level `SELECT`
+statements and skips clauses inside parentheses.
+
+Checked clauses:
+
+```text
+FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT, OFFSET
+```
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id FROM player WHERE score > 0
+ORDER BY id LIMIT 10;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id
+FROM player
+WHERE score > 0
+ORDER BY id
+LIMIT 10;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Single-line SQL is accepted.
+- Skips comments, string literals, quoted identifiers, and nested parenthesized clauses.
 
 ## `standard:no-right-join`
 

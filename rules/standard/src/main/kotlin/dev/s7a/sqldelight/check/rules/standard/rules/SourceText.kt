@@ -9,7 +9,13 @@ internal data class LineInfo(
     val endOffset: Int,
     val newlineEndOffset: Int,
     val text: String,
-)
+) {
+    val firstNonWhitespaceOffset: Int?
+        get() {
+            val index = text.indexOfFirst { character -> character != ' ' && character != '\t' }
+            return if (index == -1) null else startOffset + index
+        }
+}
 
 internal data class SqlToken(
     val text: String,
@@ -90,6 +96,9 @@ internal fun String.linesWithRanges(): List<LineInfo> {
     }
     return lines
 }
+
+internal fun List<LineInfo>.lineContaining(offset: Int): LineInfo? =
+    lastOrNull { line -> line.startOffset <= offset }
 
 internal fun String.sqlTokens(): Sequence<SqlToken> =
     sequence {
