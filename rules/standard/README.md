@@ -3338,6 +3338,18 @@ Valid:
 SELECT * FROM legacy_export;
 ```
 
+The reason must be in the same SQL line comment after a second `--`. For file
+or block suppressions, put the reason on the `disable-file` or `disable`
+directive line:
+
+```sql
+-- sqldelight-check-disable-file -- generated fixture
+
+-- sqldelight-check-disable standard:no-select-star -- legacy export shape
+SELECT * FROM legacy_export;
+-- sqldelight-check-enable standard:no-select-star
+```
+
 Fix behavior:
 
 - No automatic fix is provided.
