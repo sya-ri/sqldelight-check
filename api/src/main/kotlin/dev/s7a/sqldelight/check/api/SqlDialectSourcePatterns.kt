@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CoalesceAlternativeFunction
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnConstraintStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CommonFunctionName
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DataTypeName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ExpressionContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.GroupByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinConditionBoundary
@@ -20,6 +21,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IndexUnfriendlyF
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SelectListStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SetOperator
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightMappableStorageTypeName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
@@ -403,6 +405,47 @@ public class SqlDialectSourcePatterns(
                             "TRIM",
                             "UPPER",
                             roles = arrayOf(IndexUnfriendlyFunction),
+                        ) +
+                        sourcePatterns(
+                            "BIGINT",
+                            "BLOB",
+                            "BOOL",
+                            "BOOLEAN",
+                            "CHAR",
+                            "CLOB",
+                            "DECIMAL",
+                            "DOUBLE",
+                            "FLOAT",
+                            "INT",
+                            "INTEGER",
+                            "NUMERIC",
+                            "REAL",
+                            "SMALLINT",
+                            "TEXT",
+                            "TIMESTAMP",
+                            "VARCHAR",
+                            roles = arrayOf(DataTypeName),
+                        ) +
+                        sourcePatterns(
+                            "ANY",
+                            "BLOB",
+                            "BOOLEAN",
+                            "CHAR",
+                            "CLOB",
+                            "DATE",
+                            "DATETIME",
+                            "DECIMAL",
+                            "DOUBLE",
+                            "FLOAT",
+                            "INT",
+                            "INTEGER",
+                            "NUMERIC",
+                            "REAL",
+                            "TEXT",
+                            "TIME",
+                            "TIMESTAMP",
+                            "VARCHAR",
+                            roles = arrayOf(SqlDelightMappableStorageTypeName),
                         ) +
                         sourcePatterns(
                             "SELECT",

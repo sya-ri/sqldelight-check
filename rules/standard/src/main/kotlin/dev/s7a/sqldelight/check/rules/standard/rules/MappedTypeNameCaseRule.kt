@@ -46,30 +46,8 @@ private fun String.mappedTypeTokens(sourcePatterns: SqlDialectSourcePatterns): S
             if (!token.isTerm(SqlDialectSourceTerm.As)) return@forEachIndexed
             val previous = tokens.getOrNull(index - 1) ?: return@forEachIndexed
             val next = tokens.getOrNull(index + 1) ?: return@forEachIndexed
-            if (previous.normalizedText !in sqlStorageTypeNames) return@forEachIndexed
+            if (!previous.matches(sourcePatterns, SqlDialectSourcePatternRole.SqlDelightMappableStorageTypeName)) return@forEachIndexed
             if (next.matches(sourcePatterns, SqlDialectSourcePatternRole.ColumnConstraintStart)) return@forEachIndexed
             yield(next)
         }
     }
-
-private val sqlStorageTypeNames =
-    setOf(
-        "any",
-        "blob",
-        "boolean",
-        "char",
-        "clob",
-        "date",
-        "datetime",
-        "decimal",
-        "double",
-        "float",
-        "int",
-        "integer",
-        "numeric",
-        "real",
-        "text",
-        "time",
-        "timestamp",
-        "varchar",
-    )

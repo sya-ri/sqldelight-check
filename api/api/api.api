@@ -316,6 +316,13 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$Comm
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$DataTypeName : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$DataTypeName;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$ExpressionContinuation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
 	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$ExpressionContinuation;
 	public fun equals (Ljava/lang/Object;)Z
@@ -409,6 +416,13 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$SetO
 
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$SqlDelightExecutableStatementStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
 	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$SqlDelightExecutableStatementStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$SqlDelightMappableStorageTypeName : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$SqlDelightMappableStorageTypeName;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

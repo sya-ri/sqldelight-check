@@ -127,7 +127,7 @@ private fun String.withoutOrderByOrdinalSuffix(): String {
     val words = text.split(' ')
     if (
         words.size >= 3 &&
-        words[words.lastIndex - 1].equals("nulls", ignoreCase = true) &&
+        words[words.lastIndex - 1].equals(SqlDialectSourceTerm.Nulls.normalizedText, ignoreCase = true) &&
         words.last().isOrdinalNullsPlacement()
     ) {
         text = words.dropLast(2).joinToString(" ")
@@ -139,9 +139,13 @@ private fun String.withoutOrderByOrdinalSuffix(): String {
     return text.trim()
 }
 
-private fun String.isOrdinalOrderDirection(): Boolean = equals("asc", ignoreCase = true) || equals("desc", ignoreCase = true)
+private fun String.isOrdinalOrderDirection(): Boolean =
+    equals(SqlDialectSourceTerm.Asc.normalizedText, ignoreCase = true) ||
+        equals(SqlDialectSourceTerm.Desc.normalizedText, ignoreCase = true)
 
-private fun String.isOrdinalNullsPlacement(): Boolean = equals("first", ignoreCase = true) || equals("last", ignoreCase = true)
+private fun String.isOrdinalNullsPlacement(): Boolean =
+    equals(SqlDialectSourceTerm.First.normalizedText, ignoreCase = true) ||
+        equals(SqlDialectSourceTerm.Last.normalizedText, ignoreCase = true)
 
 private val ordinalReferenceRegex = Regex("[0-9]+")
 

@@ -503,6 +503,10 @@ public sealed interface SqlDialectSourcePatternRole {
 
     public data object IndexUnfriendlyFunction : SqlDialectSourcePatternRole
 
+    public data object DataTypeName : SqlDialectSourcePatternRole
+
+    public data object SqlDelightMappableStorageTypeName : SqlDialectSourcePatternRole
+
     public data object ExpressionContinuation : SqlDialectSourcePatternRole
 
     public data object ParenthesizedExpressionContinuation : SqlDialectSourcePatternRole
