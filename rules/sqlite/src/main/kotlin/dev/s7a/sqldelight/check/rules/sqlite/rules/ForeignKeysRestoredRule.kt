@@ -2,6 +2,7 @@ package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -11,15 +12,17 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 /**
  * Reports SQLite migration files that disable foreign keys without restoring them.
+ *
+ * The rule checks migration text for `PRAGMA foreign_keys = OFF` without a
+ * matching restore to `ON`.
  */
 public class ForeignKeysRestoredRule : Rule {
     override val id: RuleId = RuleId("sqlite:foreign-keys-restored")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
+    override val targetCapability: DialectCapability = DialectCapabilities.SQLite
 
-    override fun isApplicable(context: RuleContext): Boolean =
-        DialectCapabilities.SQLite in context.database.dialect.capabilities &&
-            context.file.path.endsWith(".sqm")
+    override fun isApplicable(context: RuleContext): Boolean = context.file.path.endsWith(".sqm")
 
     override fun run(
         context: RuleContext,

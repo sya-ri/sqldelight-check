@@ -1,6 +1,8 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -12,6 +14,9 @@ private val regexOptions = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE,
 
 /**
  * Reports PostgreSQL index creation statements that omit CONCURRENTLY.
+ *
+ * Concurrent index builds reduce write blocking for indexes created on live
+ * tables.
  */
 public class RequireConcurrentIndexRule : RegexPostgresRule(
     ruleName = "require-concurrent-index",
@@ -21,6 +26,8 @@ public class RequireConcurrentIndexRule : RegexPostgresRule(
 
 /**
  * Reports CREATE INDEX CONCURRENTLY inside transaction blocks.
+ *
+ * PostgreSQL rejects concurrent index creation inside an explicit transaction.
  */
 public class NoConcurrentIndexInTransactionRule : RegexPostgresRule(
     ruleName = "no-concurrent-index-in-transaction",
@@ -30,15 +37,17 @@ public class NoConcurrentIndexInTransactionRule : RegexPostgresRule(
 
 /**
  * Reports PostgreSQL ADD CONSTRAINT statements that omit NOT VALID.
+ *
+ * Adding constraints as `NOT VALID` lets validation happen in a separate step
+ * with reduced migration risk.
  */
 public class RequireNotValidConstraintRule : Rule {
     override val id: RuleId = RuleId("postgres:require-not-valid-constraint")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
+    override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
     private val addConstraintRegex = Regex("""\bALTER\s+TABLE\b(?:(?!;).)*\bADD\s+CONSTRAINT\b(?:(?!;).)*;?""", regexOptions)
     private val notValidRegex = Regex("""\bNOT\s+VALID\b""", RegexOption.IGNORE_CASE)
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isPostgreSql()
 
     override fun run(
         context: RuleContext,
@@ -66,6 +75,9 @@ public class RequireNotValidConstraintRule : Rule {
 
 /**
  * Reports PostgreSQL ALTER COLUMN SET NOT NULL migrations on existing columns.
+ *
+ * Existing-column nullability changes should use a separate validation strategy
+ * before enforcing the constraint.
  */
 public class NoSetNotNullOnExistingColumnRule : RegexPostgresRule(
     ruleName = "no-set-not-null-on-existing-column",
@@ -75,6 +87,9 @@ public class NoSetNotNullOnExistingColumnRule : RegexPostgresRule(
 
 /**
  * Reports PostgreSQL ADD COLUMN statements that use volatile defaults.
+ *
+ * Volatile defaults can rewrite or evaluate many existing rows during the
+ * migration.
  */
 public class NoAddColumnWithVolatileDefaultRule : RegexPostgresRule(
     ruleName = "no-add-column-with-volatile-default",
@@ -84,6 +99,9 @@ public class NoAddColumnWithVolatileDefaultRule : RegexPostgresRule(
 
 /**
  * Reports PostgreSQL serial pseudo-types when identity columns are preferred.
+ *
+ * Identity columns are the modern PostgreSQL mechanism for generated numeric
+ * keys.
  */
 public class PreferIdentityOverSerialRule : RegexPostgresRule(
     ruleName = "prefer-identity-over-serial",
@@ -93,6 +111,9 @@ public class PreferIdentityOverSerialRule : RegexPostgresRule(
 
 /**
  * Reports PostgreSQL DROP COLUMN migrations.
+ *
+ * Dropping columns can break live application versions that still read or write
+ * the old schema.
  */
 public class NoDropColumnRule : RegexPostgresRule(
     ruleName = "no-drop-column",
@@ -102,6 +123,9 @@ public class NoDropColumnRule : RegexPostgresRule(
 
 /**
  * Reports PostgreSQL RENAME COLUMN migrations.
+ *
+ * Renaming columns can break live application versions that still reference the
+ * old name.
  */
 public class NoRenameColumnRule : RegexPostgresRule(
     ruleName = "no-rename-column",
@@ -111,6 +135,9 @@ public class NoRenameColumnRule : RegexPostgresRule(
 
 /**
  * Reports PostgreSQL RENAME TABLE migrations.
+ *
+ * Renaming tables can break live application versions that still reference the
+ * old name.
  */
 public class NoRenameTableRule : RegexPostgresRule(
     ruleName = "no-rename-table",
@@ -120,6 +147,9 @@ public class NoRenameTableRule : RegexPostgresRule(
 
 /**
  * Base implementation for PostgreSQL rules that can be evaluated from masked source text.
+ *
+ * The base class centralizes capability gating and diagnostic range mapping for
+ * regex-backed rules.
  */
 public abstract class RegexPostgresRule(
     ruleName: String,
@@ -129,9 +159,8 @@ public abstract class RegexPostgresRule(
     override val id: RuleId = RuleId("postgres:$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
+    override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
     private val regex = Regex(pattern, regexOptions)
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isPostgreSql()
 
     override fun run(
         context: RuleContext,

@@ -2,6 +2,7 @@ package dev.s7a.sqldelight.check.rules.mysql.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -11,14 +12,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 /**
  * Reports MySQL ALTER TABLE statements with operations that commonly rebuild or lock a table.
+ *
+ * The rule focuses on migration patterns that can cause long blocking work on
+ * live MySQL databases.
  */
 public class RiskyAlterTableRule : Rule {
     override val id: RuleId = RuleId("mysql:risky-alter-table")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
-
-    override fun isApplicable(context: RuleContext): Boolean =
-        DialectCapabilities.MySql in context.database.dialect.capabilities
+    override val targetCapability: DialectCapability = DialectCapabilities.MySql
 
     override fun run(
         context: RuleContext,

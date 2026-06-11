@@ -1,7 +1,8 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.api.DatabaseContext
+import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
@@ -12,6 +13,7 @@ import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -76,6 +78,28 @@ class SqlDelightCheckEngineTest {
     }
 
     @Test
+    fun `auto rule is skipped when target capability rejects the database`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            DialectFamily.MySql,
+                            capabilities = setOf(DialectCapabilities.MySql),
+                        ),
+                    ),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(
+                            testRule(targetCapability = DialectCapabilities.SQLite),
+                        ),
+                    ),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
     fun `explicit rule enablement overrides dialect auto applicability`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
@@ -86,6 +110,32 @@ class SqlDelightCheckEngineTest {
                             testRule(
                                 isApplicable = { context -> context.database.dialect.family == DialectFamily.SQLite },
                             ),
+                        ),
+                    ),
+                config =
+                    CheckConfig(
+                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                    ),
+            )
+
+        assertEquals(1, diagnostics.size)
+    }
+
+    @Test
+    fun `explicit rule enablement overrides target capability auto applicability`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs =
+                    listOf(
+                        testInput(
+                            DialectFamily.MySql,
+                            capabilities = setOf(DialectCapabilities.MySql),
+                        ),
+                    ),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(
+                            testRule(targetCapability = DialectCapabilities.SQLite),
                         ),
                     ),
                 config =
@@ -295,6 +345,7 @@ class SqlDelightCheckEngineTest {
         }
 
     private fun testRule(
+        targetCapability: DialectCapability? = null,
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
         rangeLine: Int? = null,
@@ -303,6 +354,7 @@ class SqlDelightCheckEngineTest {
             override val id: RuleId = ruleId
             override val defaultSeverity: Severity = Severity.Warning
             override val defaultEnablement: Enablement = Enablement.Auto
+            override val targetCapability: DialectCapability? = targetCapability
 
             override fun isApplicable(context: RuleContext): Boolean = isApplicable.invoke(context)
 
@@ -325,13 +377,14 @@ class SqlDelightCheckEngineTest {
 
     private fun testInput(
         family: DialectFamily = DialectFamily.SQLite,
+        capabilities: Set<DialectCapability> = setOf(DialectCapabilities.SQLite),
         content: String = "SELECT 1;",
     ): AnalysisInput =
         AnalysisInput(
             database =
                 DatabaseContext(
                     name = "Database",
-                    dialect = SqlDialect(family = family, displayName = family.name),
+                    dialect = SqlDialect(family = family, displayName = family.name, capabilities = capabilities),
                 ),
             files = listOf(SourceFile(path = "src/main/sqldelight/Test.sq", content = content)),
             sourceFolders = emptyList(),

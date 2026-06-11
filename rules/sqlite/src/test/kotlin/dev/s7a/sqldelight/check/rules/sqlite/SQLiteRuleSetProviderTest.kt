@@ -16,10 +16,11 @@ class SQLiteRuleSetProviderTest {
     @Test
     fun `sqlite rule set provides sqlite rules`() {
         val provider = SQLiteRuleSetProvider()
-        val ruleIds = provider.ruleProviders().map { ruleProvider -> ruleProvider.create().id }.toSet()
+        val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
+        val ruleIds = rules.map { rule -> rule.id }.toSet()
 
         assertEquals(RuleSetId("sqlite"), provider.id)
-        assertEquals(DialectCapabilities.SQLite, provider.targetCapability)
+        assertEquals(setOf(DialectCapabilities.SQLite), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
                 RuleId("sqlite:consistent-conflict-resolution"),

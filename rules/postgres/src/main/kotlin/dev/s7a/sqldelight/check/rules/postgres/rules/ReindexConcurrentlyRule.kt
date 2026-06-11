@@ -2,6 +2,7 @@ package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -11,14 +12,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 /**
  * Reports PostgreSQL REINDEX statements that omit CONCURRENTLY.
+ *
+ * Concurrent reindexing avoids blocking writes for indexes that can be rebuilt
+ * online.
  */
 public class ReindexConcurrentlyRule : Rule {
     override val id: RuleId = RuleId("postgres:reindex-concurrently")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
-
-    override fun isApplicable(context: RuleContext): Boolean =
-        DialectCapabilities.PostgreSql in context.database.dialect.capabilities
+    override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
 
     override fun run(
         context: RuleContext,

@@ -16,10 +16,11 @@ class MySqlRuleSetProviderTest {
     @Test
     fun `mysql rule set provides mysql rules`() {
         val provider = MySqlRuleSetProvider()
-        val ruleIds = provider.ruleProviders().map { ruleProvider -> ruleProvider.create().id }.toSet()
+        val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
+        val ruleIds = rules.map { rule -> rule.id }.toSet()
 
         assertEquals(RuleSetId("mysql"), provider.id)
-        assertEquals(DialectCapabilities.MySql, provider.targetCapability)
+        assertEquals(setOf(DialectCapabilities.MySql), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
                 RuleId("mysql:no-utf8-charset"),

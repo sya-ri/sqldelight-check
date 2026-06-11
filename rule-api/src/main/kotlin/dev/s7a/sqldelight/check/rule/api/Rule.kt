@@ -1,35 +1,60 @@
 package dev.s7a.sqldelight.check.rule.api
 
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 
 /**
  * Lint or formatting rule contributed by a rule set.
+ *
+ * Rule implementations are loaded through a [RuleSetProvider] and run after
+ * SQLDelight accepts the source file.
  */
 public interface Rule {
     /**
      * Globally unique rule ID using `rule-set:rule-name` form.
+     *
+     * The ID is the stable key used by Gradle configuration, reporters, and
+     * source-level disable directives.
      */
     public val id: RuleId
 
     /**
      * Default severity used when user configuration does not override it.
+     *
+     * The engine replaces diagnostic severities with the resolved configured
+     * severity before reports are written.
      */
     public val defaultSeverity: Severity
 
     /**
      * Default enablement before user configuration and auto applicability are resolved.
+     *
+     * `Auto` lets the rule decide applicability from the current [RuleContext].
      */
     public val defaultEnablement: Enablement
 
     /**
+     * Dialect capability required when this rule is resolved with `Auto`.
+     *
+     * Rules without a dialect-specific requirement should keep this value null.
+     */
+    public val targetCapability: DialectCapability?
+        get() = null
+
+    /**
      * Returns whether this rule applies to the current context when enablement is `Auto`.
+     *
+     * Explicit `Enabled` and `Disabled` configuration bypass this method.
      */
     public fun isApplicable(context: RuleContext): Boolean = true
 
     /**
      * Runs this rule against the current context.
+     *
+     * Implementations report diagnostics through [reporter] and should not
+     * mutate the source file directly.
      */
     public fun run(
         context: RuleContext,

@@ -1,6 +1,8 @@
 package dev.s7a.sqldelight.check.rules.hsql.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -60,9 +62,8 @@ public abstract class RegexHsqlRule(
     override val id: RuleId = RuleId("hsql:$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
+    override val targetCapability: DialectCapability = DialectCapabilities.Hsql
     private val regex = Regex(pattern, regexOptions)
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isHsql()
 
     override fun run(
         context: RuleContext,

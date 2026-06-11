@@ -1,6 +1,8 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -12,6 +14,9 @@ private val regexOptions = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE,
 
 /**
  * Reports MySQL character set declarations that use utf8 instead of utf8mb4.
+ *
+ * MySQL `utf8` is an alias for `utf8mb3`, so this rule points schemas toward
+ * the full Unicode `utf8mb4` character set.
  */
 public class NoUtf8CharsetRule : RegexMySqlRule(
     ruleName = "no-utf8-charset",
@@ -21,6 +26,8 @@ public class NoUtf8CharsetRule : RegexMySqlRule(
 
 /**
  * Reports MySQL ALTER TABLE statements that force the COPY algorithm.
+ *
+ * COPY can rebuild the table and is usually unsafe for online schema changes.
  */
 public class NoCopyAlgorithmRule : RegexMySqlRule(
     ruleName = "no-copy-algorithm",
@@ -30,6 +37,9 @@ public class NoCopyAlgorithmRule : RegexMySqlRule(
 
 /**
  * Reports MySQL ALTER TABLE statements that request an exclusive lock.
+ *
+ * Exclusive locks block concurrent access and are risky for migrations that run
+ * against live databases.
  */
 public class NoExclusiveLockRule : RegexMySqlRule(
     ruleName = "no-exclusive-lock",
@@ -39,14 +49,16 @@ public class NoExclusiveLockRule : RegexMySqlRule(
 
 /**
  * Reports MySQL zero date defaults that are rejected by stricter SQL modes.
+ *
+ * The rule helps avoid schema defaults that fail under `NO_ZERO_DATE` or related
+ * production SQL modes.
  */
 public class NoZeroDateDefaultRule : Rule {
     override val id: RuleId = RuleId("mysql:no-zero-date-default")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
+    override val targetCapability: DialectCapability = DialectCapabilities.MySql
     private val regex = Regex("""\bDEFAULT\s+['"]0000-00-00(?:\s+\d\d:\d\d:\d\d)?['"]""", regexOptions)
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isMySql()
 
     override fun run(
         context: RuleContext,
@@ -71,6 +83,9 @@ public class NoZeroDateDefaultRule : Rule {
 
 /**
  * Reports deprecated MySQL integer display width declarations.
+ *
+ * Display widths no longer affect integer storage and create unnecessary schema
+ * noise in modern MySQL versions.
  */
 public class NoDisplayWidthIntegerRule : RegexMySqlRule(
     ruleName = "no-display-width-integer",
@@ -80,13 +95,15 @@ public class NoDisplayWidthIntegerRule : RegexMySqlRule(
 
 /**
  * Reports indexes on MySQL TEXT and BLOB columns that omit a prefix length.
+ *
+ * Prefix lengths are required for many MySQL index definitions over large text
+ * and binary column types.
  */
 public class RequireIndexPrefixLengthRule : Rule {
     override val id: RuleId = RuleId("mysql:require-index-prefix-length")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isMySql()
+    override val targetCapability: DialectCapability = DialectCapabilities.MySql
 
     override fun run(
         context: RuleContext,
@@ -129,6 +146,9 @@ public class RequireIndexPrefixLengthRule : Rule {
 
 /**
  * Base implementation for MySQL rules that can be evaluated from masked source text.
+ *
+ * The base class centralizes capability gating and diagnostic range mapping for
+ * regex-backed rules.
  */
 public abstract class RegexMySqlRule(
     ruleName: String,
@@ -138,9 +158,8 @@ public abstract class RegexMySqlRule(
     override val id: RuleId = RuleId("mysql:$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
+    override val targetCapability: DialectCapability = DialectCapabilities.MySql
     private val regex = Regex(pattern, regexOptions)
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isMySql()
 
     override fun run(
         context: RuleContext,

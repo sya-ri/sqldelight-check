@@ -2,6 +2,7 @@ package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -11,14 +12,15 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 /**
  * Reports SQLite files that mix multiple conflict-resolution upsert styles.
+ *
+ * Mixing `OR REPLACE` and `ON CONFLICT` styles makes migration intent harder to
+ * audit.
  */
 public class ConsistentConflictResolutionRule : Rule {
     override val id: RuleId = RuleId("sqlite:consistent-conflict-resolution")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
-
-    override fun isApplicable(context: RuleContext): Boolean =
-        DialectCapabilities.SQLite in context.database.dialect.capabilities
+    override val targetCapability: DialectCapability = DialectCapabilities.SQLite
 
     override fun run(
         context: RuleContext,

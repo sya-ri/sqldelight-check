@@ -19,6 +19,9 @@ internal fun Rule.diagnostics(
     path: String = "src/main/sqldelight/com/example/1.sqm",
     options: Map<String, String> = emptyMap(),
 ): List<Diagnostic> {
+    val targetCapability = this.targetCapability
+    if (targetCapability != null && targetCapability !in capabilities) return emptyList()
+
     val diagnostics = mutableListOf<Diagnostic>()
     run(
         context =

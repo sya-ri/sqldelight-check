@@ -95,8 +95,11 @@ public class SqlDelightCheckEngine {
         when (enablement) {
             Enablement.Enabled -> true
             Enablement.Disabled -> false
-            Enablement.Auto -> isApplicable(context)
+            Enablement.Auto -> hasTargetCapability(context) && isApplicable(context)
         }
+
+    private fun Rule.hasTargetCapability(context: RuleContext): Boolean =
+        targetCapability?.let { capability -> capability in context.database.dialect.capabilities } ?: true
 }
 
 private data class RuleCandidate(

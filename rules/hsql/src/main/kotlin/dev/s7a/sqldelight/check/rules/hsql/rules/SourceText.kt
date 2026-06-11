@@ -1,11 +1,7 @@
 package dev.s7a.sqldelight.check.rules.hsql.rules
 
-import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
-import dev.s7a.sqldelight.check.rule.api.RuleContext
-
-internal fun RuleContext.isHsql(): Boolean = DialectCapabilities.Hsql in database.dialect.capabilities
 
 internal fun String.rangeAtOffsets(
     startOffset: Int,

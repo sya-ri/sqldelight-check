@@ -16,10 +16,11 @@ class PostgresRuleSetProviderTest {
     @Test
     fun `postgres rule set provides postgres rules`() {
         val provider = PostgresRuleSetProvider()
-        val ruleIds = provider.ruleProviders().map { ruleProvider -> ruleProvider.create().id }.toSet()
+        val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
+        val ruleIds = rules.map { rule -> rule.id }.toSet()
 
         assertEquals(RuleSetId("postgres"), provider.id)
-        assertEquals(DialectCapabilities.PostgreSql, provider.targetCapability)
+        assertEquals(setOf(DialectCapabilities.PostgreSql), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
                 RuleId("postgres:excessive-locks"),

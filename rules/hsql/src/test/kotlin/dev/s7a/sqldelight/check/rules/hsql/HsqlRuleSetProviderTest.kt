@@ -18,16 +18,17 @@ class HsqlRuleSetProviderTest {
     @Test
     fun `hsql rule set provides hsql rules`() {
         val provider = HsqlRuleSetProvider()
+        val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
 
         assertEquals(RuleSetId("hsql"), provider.id)
-        assertEquals(DialectCapabilities.Hsql, provider.targetCapability)
+        assertEquals(setOf(DialectCapabilities.Hsql), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
                 "hsql:no-database-file-settings",
                 "hsql:no-system-operations",
                 "hsql:no-text-table-source",
             ),
-            provider.ruleProviders().map { ruleProvider -> ruleProvider.create().id.value }.toSet(),
+            rules.map { rule -> rule.id.value }.toSet(),
         )
         assertTrue(provider.ruleProviders().any { ruleProvider -> ruleProvider.create() is NoDatabaseFileSettingsRule })
         assertTrue(provider.ruleProviders().any { ruleProvider -> ruleProvider.create() is NoSystemOperationsRule })

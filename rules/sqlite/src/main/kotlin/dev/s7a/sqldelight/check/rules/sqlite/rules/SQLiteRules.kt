@@ -1,6 +1,8 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.DialectCapabilities
+import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -12,6 +14,9 @@ private val regexOptions = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE,
 
 /**
  * Reports SQLite rowid primary keys that do not use the exact INTEGER PRIMARY KEY spelling.
+ *
+ * SQLite only gives rowid alias behavior to the exact `INTEGER PRIMARY KEY`
+ * declaration.
  */
 public class PreferIntegerPrimaryKeyRule : RegexSQLiteRule(
     ruleName = "prefer-integer-primary-key",
@@ -21,6 +26,9 @@ public class PreferIntegerPrimaryKeyRule : RegexSQLiteRule(
 
 /**
  * Reports SQLite AUTOINCREMENT usage for schemas that do not need its stricter behavior.
+ *
+ * AUTOINCREMENT changes rowid reuse semantics and can add overhead compared with
+ * the normal SQLite rowid allocator.
  */
 public class NoAutoincrementWithoutNeedRule : RegexSQLiteRule(
     ruleName = "no-autoincrement-without-need",
@@ -30,6 +38,9 @@ public class NoAutoincrementWithoutNeedRule : RegexSQLiteRule(
 
 /**
  * Reports SQLite ALTER TABLE operations that require an explicit table rebuild strategy.
+ *
+ * The rule flags migration forms that SQLite cannot apply as simple in-place
+ * table alterations.
  */
 public class NoAlterTableComplexChangeRule : RegexSQLiteRule(
     ruleName = "no-alter-table-complex-change",
@@ -39,13 +50,15 @@ public class NoAlterTableComplexChangeRule : RegexSQLiteRule(
 
 /**
  * Reports SQLite composite primary key tables that can consider WITHOUT ROWID.
+ *
+ * WITHOUT ROWID can reduce duplicate primary-key storage for some composite-key
+ * SQLite tables.
  */
 public class PreferWithoutRowidForCompositePkRule : Rule {
     override val id: RuleId = RuleId("sqlite:prefer-without-rowid-for-composite-pk")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isSQLite()
+    override val targetCapability: DialectCapability = DialectCapabilities.SQLite
 
     override fun run(
         context: RuleContext,
@@ -74,6 +87,9 @@ public class PreferWithoutRowidForCompositePkRule : Rule {
 
 /**
  * Base implementation for SQLite rules that can be evaluated from masked source text.
+ *
+ * The base class centralizes capability gating and diagnostic range mapping for
+ * regex-backed rules.
  */
 public abstract class RegexSQLiteRule(
     ruleName: String,
@@ -83,9 +99,8 @@ public abstract class RegexSQLiteRule(
     override val id: RuleId = RuleId("sqlite:$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnablement: Enablement = Enablement.Auto
+    override val targetCapability: DialectCapability = DialectCapabilities.SQLite
     private val regex = Regex(pattern, regexOptions)
-
-    override fun isApplicable(context: RuleContext): Boolean = context.isSQLite()
 
     override fun run(
         context: RuleContext,
