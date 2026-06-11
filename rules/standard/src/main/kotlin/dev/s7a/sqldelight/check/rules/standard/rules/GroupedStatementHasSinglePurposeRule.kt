@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports SQLDelight grouped statements that mix read and write statements.
  */
 public class GroupedStatementHasSinglePurposeRule : Rule {
-    override val id: String = "grouped-statement-has-single-purpose"
+    override val id: RuleId = RuleId("grouped-statement-has-single-purpose")
     override val defaultSeverity: Severity = Severity.Info
     override val defaultEnable: Boolean = true
 
@@ -37,7 +37,7 @@ public class GroupedStatementHasSinglePurposeRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Grouped SQLDelight statements should not mix read and write statements.",
                     file = context.file,

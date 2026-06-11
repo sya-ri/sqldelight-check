@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import dev.s7a.sqldelight.check.reporter.api.Reporter
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -85,12 +86,12 @@ class ProviderRegistryTest {
                 )
             }
 
-        assertEquals("Rule IDs must be local and must not contain ':': custom:custom:duplicate", error.message)
+        assertEquals("Rule ID must use lowercase kebab-case with letters and digits: custom:duplicate", error.message)
     }
 
     private fun reporterProvider(id: String): ReporterProvider =
         object : ReporterProvider {
-            override val id: String = id
+            override val id: ReporterId = ReporterId(id)
 
             override fun create(options: Map<String, String>): Reporter =
                 object : Reporter {
@@ -119,7 +120,7 @@ class ProviderRegistryTest {
 
     private fun testRule(ruleId: String): Rule =
         object : Rule {
-            override val id: String = ruleId
+            override val id: RuleId = RuleId(ruleId)
             override val defaultSeverity: Severity = Severity.Warning
             override val defaultEnable: Boolean = true
 

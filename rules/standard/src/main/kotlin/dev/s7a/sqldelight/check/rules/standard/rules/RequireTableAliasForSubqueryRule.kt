@@ -14,7 +14,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Aliasing derived tables keeps outer column references explicit.
  */
 public class RequireTableAliasForSubqueryRule : Rule {
-    override val id: String = "require-table-alias-for-subquery"
+    override val id: RuleId = RuleId("require-table-alias-for-subquery")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -27,7 +27,7 @@ public class RequireTableAliasForSubqueryRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "FROM and JOIN subqueries should have a table alias.",
                     file = context.file,

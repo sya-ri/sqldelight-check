@@ -14,7 +14,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Self-aliases add noise without making later column references clearer.
  */
 public class NoSelfAliasRule : Rule {
-    override val id: String = "no-self-alias"
+    override val id: RuleId = RuleId("no-self-alias")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -29,7 +29,7 @@ public class NoSelfAliasRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Table aliases should not repeat the table name.",
                     file = context.file,

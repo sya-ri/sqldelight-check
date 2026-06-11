@@ -8,6 +8,7 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import kotlinx.html.FlowContent
 import kotlinx.html.a
@@ -36,7 +37,7 @@ import kotlinx.html.unsafe
  * Provider for the built-in HTML reporter.
  */
 public class HtmlReporterProvider : ReporterProvider {
-    override val id: String = "html"
+    override val id: ReporterId = ReporterId("html")
 
     override fun create(options: Map<String, String>): Reporter = HtmlReporter
 }
@@ -184,7 +185,7 @@ private fun FlowContent.diagnosticCard(
         h3 {
             a(href = "#diagnostic-$index") { +"#$index" }
             +" "
-            code { +(diagnostic.ruleId?.value ?: "-") }
+            code { +(diagnostic.qualifiedRuleId?.value ?: diagnostic.ruleId?.value ?: "-") }
         }
         div("meta") {
             span("severity-${diagnostic.severity.name.lowercase()}") { +diagnostic.severity.name }

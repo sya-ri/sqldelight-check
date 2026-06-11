@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports anonymous SQLDelight parameters that should use named parameters.
  */
 public class PreferNamedParametersRule : Rule {
-    override val id: String = "prefer-named-parameters"
+    override val id: RuleId = RuleId("prefer-named-parameters")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -31,7 +31,7 @@ public class PreferNamedParametersRule : Rule {
             .forEach { character ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Use a named SQLDelight parameter instead of anonymous ?.",
                         file = context.file,

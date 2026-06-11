@@ -63,13 +63,14 @@ package com.example.sqldelight.rules
 
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 
 class ExampleRule : Rule {
-    override val id = "example-rule"
+    override val id = RuleId("example")
     override val defaultSeverity = Severity.Warning
     override val defaultEnable = true
 
@@ -124,7 +125,7 @@ sqldelightCheck {
         }
     }
     rules {
-        rule("example:example-rule") {
+        rule("example:example") {
             severity.set(Severity.Error)
             options.put("optionName", "value")
         }

@@ -8,13 +8,14 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 
 /**
  * Provider for the built-in plain text reporter.
  */
 public class TextReporterProvider : ReporterProvider {
-    override val id: String = "text"
+    override val id: ReporterId = ReporterId("text")
 
     override fun create(options: Map<String, String>): Reporter = TextReporter
 }
@@ -60,7 +61,7 @@ private fun List<Diagnostic>.sorted(): List<Diagnostic> =
                 { it.value.range?.end?.line ?: 0 },
                 { it.value.range?.end?.column ?: 0 },
                 { it.value.severity.sortOrder },
-                { it.value.ruleId?.value ?: "" },
+                { it.value.qualifiedRuleId?.value ?: it.value.ruleId?.value ?: "" },
                 { it.value.message },
                 { it.index },
             ),
@@ -84,7 +85,7 @@ private fun StringBuilder.appendFix(
 }
 
 private val Diagnostic.ruleLabel: String
-    get() = ruleId?.value ?: "sqldelight-check"
+    get() = qualifiedRuleId?.value ?: ruleId?.value ?: "sqldelight-check"
 
 private val Diagnostic.locationLabel: String
     get() = locationLabel(file?.path, range)

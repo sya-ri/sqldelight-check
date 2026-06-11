@@ -16,7 +16,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports adjacent top-level statements that are not separated by a blank line.
  */
 public class BlankLineBetweenStatementsRule : Rule {
-    override val id: String = "blank-line-between-statements"
+    override val id: RuleId = RuleId("blank-line-between-statements")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -46,7 +46,7 @@ public class BlankLineBetweenStatementsRule : Rule {
             val range = content.rangeAtOffsets(nextLine.startOffset, nextLine.startOffset)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Statements should be separated by one blank line.",
                     file = context.file,

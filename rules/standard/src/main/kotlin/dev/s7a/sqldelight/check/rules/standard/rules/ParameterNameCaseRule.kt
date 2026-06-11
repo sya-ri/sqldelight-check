@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports named SQLDelight parameters that are not lower camel case.
  */
 public class ParameterNameCaseRule : Rule {
-    override val id: String = "parameter-name-case"
+    override val id: RuleId = RuleId("parameter-name-case")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -29,7 +29,7 @@ public class ParameterNameCaseRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "SQLDelight parameter ':${parameter.name}' should be lower camel case.",
                     file = context.file,

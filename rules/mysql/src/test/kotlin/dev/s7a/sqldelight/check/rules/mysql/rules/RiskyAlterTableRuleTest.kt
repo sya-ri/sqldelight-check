@@ -1,7 +1,11 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -23,8 +27,8 @@ class RiskyAlterTableRuleTest {
 
         assertEquals(3, diagnostics.size)
         assertEquals(
-            setOf(RuleId("mysql:risky-alter-table")),
-            diagnostics.map { diagnostic -> diagnostic.ruleId }.toSet(),
+            setOf(qualifiedRuleId("mysql:risky-alter-table")),
+            diagnostics.map { diagnostic -> diagnostic.qualifiedRuleId }.toSet(),
         )
         assertEquals(1, diagnostics.first().range?.start?.line)
         assertEquals(1, diagnostics.first().range?.start?.column)
@@ -74,4 +78,13 @@ class RiskyAlterTableRuleTest {
 
         assertEquals(emptyList(), diagnostics)
     }
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

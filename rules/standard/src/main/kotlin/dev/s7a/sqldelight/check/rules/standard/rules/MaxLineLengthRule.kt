@@ -18,7 +18,7 @@ private const val DEFAULT_MAX_LINE_LENGTH = 120
  * Reports non-blank lines that exceed the maximum line length.
  */
 public class MaxLineLengthRule : Rule {
-    override val id: String = "max-line-length"
+    override val id: RuleId = RuleId("max-line-length")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -39,7 +39,7 @@ public class MaxLineLengthRule : Rule {
             .forEach { line ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Line is longer than $maxLineLength characters.",
                         file = context.file,

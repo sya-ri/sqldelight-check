@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports UPDATE statements without a top-level WHERE clause.
  */
 public class NoUpdateWithoutWhereRule : Rule {
-    override val id: String = "no-update-without-where"
+    override val id: RuleId = RuleId("no-update-without-where")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class NoUpdateWithoutWhereRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "UPDATE statements should include a WHERE clause.",
                     file = context.file,

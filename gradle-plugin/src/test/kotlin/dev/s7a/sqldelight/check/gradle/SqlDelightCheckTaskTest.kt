@@ -3,7 +3,9 @@ package dev.s7a.sqldelight.check.gradle
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
@@ -19,8 +21,14 @@ class SqlDelightCheckTaskTest {
         val hits =
             diagnosticRuleHitsByFile(
                 listOf(
-                    diagnostic(databaseName = "PrimaryDatabase", ruleId = "standard:final-newline"),
-                    diagnostic(databaseName = "ReportingDatabase", ruleId = "standard:no-select-star"),
+                    diagnostic(
+                        databaseName = "PrimaryDatabase",
+                        ruleId = qualifiedRuleId("standard:final-newline"),
+                    ),
+                    diagnostic(
+                        databaseName = "ReportingDatabase",
+                        ruleId = qualifiedRuleId("standard:no-select-star"),
+                    ),
                 ),
             )
 
@@ -36,10 +44,10 @@ class SqlDelightCheckTaskTest {
 
     private fun diagnostic(
         databaseName: String,
-        ruleId: String,
+        ruleId: QualifiedRuleId,
     ): Diagnostic =
         Diagnostic(
-            ruleId = RuleId(ruleId),
+            ruleId = ruleId.ruleId,
             severity = Severity.Warning,
             message = "test",
             file = SourceFile(path = "src/main/sqldelight/com/example/Query.sq", content = "SELECT * FROM player;\n"),
@@ -53,5 +61,15 @@ class SqlDelightCheckTaskTest {
                             displayName = "sqlite 3 38",
                         ),
                 ),
+            qualifiedRuleId = ruleId,
         )
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

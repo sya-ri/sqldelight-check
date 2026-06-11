@@ -11,7 +11,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports spaces or tabs before closing parenthesis tokens.
  */
 public class NoSpaceBeforeClosingParenthesisRule : Rule {
-    override val id: String = "no-space-before-closing-parenthesis"
+    override val id: RuleId = RuleId("no-space-before-closing-parenthesis")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 

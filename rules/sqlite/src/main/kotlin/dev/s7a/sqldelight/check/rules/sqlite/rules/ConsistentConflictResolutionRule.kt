@@ -24,7 +24,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * audit.
  */
 public class ConsistentConflictResolutionRule : Rule {
-    override val id: String = "consistent-conflict-resolution"
+    override val id: RuleId = RuleId("consistent-conflict-resolution")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.SQLite
@@ -46,7 +46,7 @@ public class ConsistentConflictResolutionRule : Rule {
         conflictStyles.forEach { conflictStyle ->
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message =
                         "Use one SQLite conflict-resolution style consistently within the same file.",

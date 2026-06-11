@@ -6,13 +6,14 @@ import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 
 /**
  * Provider for the built-in Markdown reporter.
  */
 public class MarkdownReporterProvider : ReporterProvider {
-    override val id: String = "markdown"
+    override val id: ReporterId = ReporterId("markdown")
 
     override fun create(options: Map<String, String>): Reporter = MarkdownReporter
 }
@@ -61,7 +62,7 @@ private fun StringBuilder.appendDiagnosticRow(diagnostic: Diagnostic) {
     append("| ")
     append(diagnostic.severity.name.escapeMarkdownTableCell())
     append(" | `")
-    append((diagnostic.ruleId?.value ?: "-").escapeMarkdownCode())
+    append((diagnostic.qualifiedRuleId?.value ?: diagnostic.ruleId?.value ?: "-").escapeMarkdownCode())
     append("` | ")
     append(diagnostic.locationLabel().escapeMarkdownTableCell())
     append(" | ")

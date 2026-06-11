@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * generated SQLDelight result column names visible.
  */
 public class RequireColumnAliasAsRule : Rule {
-    override val id: String = "require-column-alias-as"
+    override val id: RuleId = RuleId("require-column-alias-as")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -29,7 +29,7 @@ public class RequireColumnAliasAsRule : Rule {
             .forEach { alias ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Column aliases should use AS.",
                         file = context.file,

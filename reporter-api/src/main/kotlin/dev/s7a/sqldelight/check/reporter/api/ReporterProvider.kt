@@ -7,7 +7,7 @@ public interface ReporterProvider {
     /**
      * Reporter ID used in the Gradle DSL.
      */
-    public val id: String
+    public val id: ReporterId
 
     /**
      * Creates a reporter instance.

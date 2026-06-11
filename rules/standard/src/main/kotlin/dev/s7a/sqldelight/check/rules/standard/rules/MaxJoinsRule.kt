@@ -18,7 +18,7 @@ private const val DEFAULT_MAX_JOINS = 8
  * Reports statements with too many JOIN clauses.
  */
 public class MaxJoinsRule : Rule {
-    override val id: String = "max-joins"
+    override val id: RuleId = RuleId("max-joins")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -43,7 +43,7 @@ public class MaxJoinsRule : Rule {
             val firstExcessJoin = joins[max]
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Statement has more than $max JOIN clauses.",
                     file = context.file,

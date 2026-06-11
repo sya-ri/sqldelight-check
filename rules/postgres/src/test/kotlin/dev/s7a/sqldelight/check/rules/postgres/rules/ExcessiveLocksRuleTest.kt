@@ -1,7 +1,11 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -20,7 +24,7 @@ class ExcessiveLocksRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
-        assertEquals(RuleId("postgres:excessive-locks"), diagnostics.single().ruleId)
+        assertEquals(qualifiedRuleId("postgres:excessive-locks"), diagnostics.single().qualifiedRuleId)
         assertEquals(1, diagnostics.single().range?.start?.line)
         assertEquals(1, diagnostics.single().range?.start?.column)
         assertTrue(diagnostics.single().fixes.isEmpty())
@@ -76,4 +80,13 @@ class ExcessiveLocksRuleTest {
 
         assertEquals(emptyList(), diagnostics)
     }
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

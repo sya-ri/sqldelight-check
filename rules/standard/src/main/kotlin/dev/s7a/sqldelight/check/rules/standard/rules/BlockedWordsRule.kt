@@ -17,7 +17,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Configure blocked words with the comma-separated `words` option.
  */
 public class BlockedWordsRule : Rule {
-    override val id: String = "blocked-words"
+    override val id: RuleId = RuleId("blocked-words")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -41,12 +41,12 @@ public class BlockedWordsRule : Rule {
         content.sqlTokens().forEach { token ->
             val lookup = if (matchCase) token.text else token.text.lowercase()
             if (lookup !in blockedWords) return@forEach
-            reporter.reportBlockedWord(context, RuleId(id), defaultSeverity, token.text, token.startOffset, token.endOffset)
+            reporter.reportBlockedWord(context, id, defaultSeverity, token.text, token.startOffset, token.endOffset)
         }
 
         if (!ignoreComments) {
             content.commentRanges().forEach { range ->
-                content.reportBlockedWordsInRange(context, reporter, RuleId(id), defaultSeverity, range, blockedWords, matchCase)
+                content.reportBlockedWordsInRange(context, reporter, id, defaultSeverity, range, blockedWords, matchCase)
             }
         }
     }

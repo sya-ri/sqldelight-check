@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 
 /**
@@ -18,7 +18,7 @@ public class DatabaseConfig(
     /**
      * Rule overrides for this database.
      */
-    public val rules: Map<RuleId, RuleConfig> = emptyMap(),
+    public val rules: Map<QualifiedRuleId, RuleConfig> = emptyMap(),
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||

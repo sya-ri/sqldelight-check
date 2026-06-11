@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports runs with more than one consecutive blank line.
  */
 public class MaxBlankLinesRule : Rule {
-    override val id: String = "max-blank-lines"
+    override val id: RuleId = RuleId("max-blank-lines")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -44,7 +44,7 @@ public class MaxBlankLinesRule : Rule {
             val range = content.rangeAtOffsets(firstExtraLine.startOffset, lastExtraLine.newlineEndOffset)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "File should not contain more than one consecutive blank line.",
                     file = context.file,

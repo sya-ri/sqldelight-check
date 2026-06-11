@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports ordinal references in `GROUP BY` and `ORDER BY` clauses.
  */
 public class NoOrderByOrdinalRule : Rule {
-    override val id: String = "no-order-by-ordinal"
+    override val id: RuleId = RuleId("no-order-by-ordinal")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -36,7 +36,7 @@ public class NoOrderByOrdinalRule : Rule {
                 .forEach { ordinal ->
                     reporter.report(
                         Diagnostic(
-                            ruleId = RuleId(id),
+                            ruleId = id,
                             severity = defaultSeverity,
                             message = "${token.text.uppercase()} BY should reference columns by name instead of ordinal.",
                             file = context.file,

@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports row-counting calls that use `COUNT(1)` or `COUNT(0)` instead of `COUNT(*)`.
  */
 public class PreferCountStarRule : Rule {
-    override val id: String = "prefer-count-star"
+    override val id: RuleId = RuleId("prefer-count-star")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class PreferCountStarRule : Rule {
                 val range = content.rangeAtOffsets(argument.startOffset, argument.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Use COUNT(*) for row counts instead of COUNT(${argument.text}).",
                         file = context.file,

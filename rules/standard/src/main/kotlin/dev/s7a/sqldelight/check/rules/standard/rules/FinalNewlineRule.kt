@@ -17,7 +17,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports files that do not end with a newline.
  */
 public class FinalNewlineRule : Rule {
-    override val id: String = "final-newline"
+    override val id: RuleId = RuleId("final-newline")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -32,7 +32,7 @@ public class FinalNewlineRule : Rule {
         val range = SourceRange(start = position, end = position)
         reporter.report(
             Diagnostic(
-                ruleId = RuleId(id),
+                ruleId = id,
                 severity = defaultSeverity,
                 message = "File should end with a newline.",
                 file = context.file,

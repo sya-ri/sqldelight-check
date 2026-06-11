@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline ORDER BY clauses that do not put every ordering expression on its own line.
  */
 public class OrderByTargetNewlineRule : Rule {
-    override val id: String = "order-by-target-newline"
+    override val id: RuleId = RuleId("order-by-target-newline")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -42,7 +42,7 @@ public class OrderByTargetNewlineRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Multiline ORDER BY clauses should put each ordering expression on its own line.",
                     file = context.file,

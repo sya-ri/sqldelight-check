@@ -11,6 +11,7 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -20,7 +21,7 @@ import kotlinx.serialization.json.Json
  * Provider for the built-in JSON reporter.
  */
 public class JsonReporterProvider : ReporterProvider {
-    override val id: String = "json"
+    override val id: ReporterId = ReporterId("json")
 
     override fun create(options: Map<String, String>): Reporter =
         JsonReporter(
@@ -128,7 +129,7 @@ private fun Report.toJsonReport(): JsonReport =
 
 private fun Diagnostic.toJsonDiagnostic(): JsonDiagnostic =
     JsonDiagnostic(
-        ruleId = ruleId?.value,
+        ruleId = qualifiedRuleId?.value ?: ruleId?.value,
         severity = severity.name.lowercase(),
         message = message,
         file = file?.path,

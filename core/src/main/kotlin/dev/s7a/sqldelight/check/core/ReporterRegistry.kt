@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import java.util.ServiceLoader
 
 /**
@@ -16,7 +17,12 @@ public class ReporterRegistry(
     /**
      * Finds a reporter provider by DSL ID.
      */
-    public fun find(id: String): ReporterProvider? = providers.firstOrNull { provider -> provider.id == id }
+    public fun find(id: String): ReporterProvider? = find(ReporterId(id))
+
+    /**
+     * Finds a reporter provider by DSL ID.
+     */
+    public fun find(id: ReporterId): ReporterProvider? = providers.firstOrNull { provider -> provider.id == id }
 
     /**
      * Returns all discovered reporter providers.
@@ -32,7 +38,7 @@ public class ReporterRegistry(
                 ServiceLoader
                     .load(ReporterProvider::class.java, classLoader)
                     .toList()
-                    .sortedBy { provider -> provider.id },
+                    .sortedBy { provider -> provider.id.value },
             )
     }
 }
@@ -40,7 +46,7 @@ public class ReporterRegistry(
 private fun validateReporterProviders(providers: List<ReporterProvider>) {
     val duplicates =
         providers
-            .groupBy { provider -> provider.id }
+            .groupBy { provider -> provider.id.value }
             .filterValues { matches -> matches.size > 1 }
             .keys
             .sorted()

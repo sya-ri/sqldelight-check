@@ -24,7 +24,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * live MySQL databases.
  */
 public class RiskyAlterTableRule : Rule {
-    override val id: String = "risky-alter-table"
+    override val id: RuleId = RuleId("risky-alter-table")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.MySql
@@ -45,7 +45,7 @@ public class RiskyAlterTableRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message =
                             "Review this MySQL ALTER TABLE operation because it can rebuild or strongly lock " +

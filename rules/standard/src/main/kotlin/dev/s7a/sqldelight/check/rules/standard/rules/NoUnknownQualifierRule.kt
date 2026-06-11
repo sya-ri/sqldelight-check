@@ -19,7 +19,7 @@ import dev.s7a.sqldelight.check.rule.api.SqlStatementFacts
  * to a table name or table alias visible in the same statement.
  */
 public class NoUnknownQualifierRule : Rule {
-    override val id: String = "no-unknown-qualifier"
+    override val id: RuleId = RuleId("no-unknown-qualifier")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -37,7 +37,7 @@ public class NoUnknownQualifierRule : Rule {
                 .forEach { reference ->
                     reporter.report(
                         Diagnostic(
-                            ruleId = RuleId(id),
+                            ruleId = id,
                             severity = defaultSeverity,
                             message = "Qualifier '${reference.qualifier}' is not declared by a table reference in this statement.",
                             file = context.file,

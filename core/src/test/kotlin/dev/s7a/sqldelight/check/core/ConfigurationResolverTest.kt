@@ -1,5 +1,8 @@
 package dev.s7a.sqldelight.check.core
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
@@ -13,7 +16,7 @@ import kotlin.test.assertEquals
 class ConfigurationResolverTest {
     @Test
     fun `database rule overrides global rule`() {
-        val ruleId = RuleId("standard:keyword-case")
+        val ruleId = qualifiedRuleId("standard:keyword-case")
         val resolver =
             ConfigurationResolver(
                 CheckConfig(
@@ -43,7 +46,7 @@ class ConfigurationResolverTest {
 
     @Test
     fun `database rule options override and extend global rule options`() {
-        val ruleId = RuleId("standard:max-joins")
+        val ruleId = qualifiedRuleId("standard:max-joins")
         val resolver =
             ConfigurationResolver(
                 CheckConfig(
@@ -132,4 +135,13 @@ class ConfigurationResolverTest {
 
         assertEquals(Enablement.Enabled, resolved.enablement)
     }
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

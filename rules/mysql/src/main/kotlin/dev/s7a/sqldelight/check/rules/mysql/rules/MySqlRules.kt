@@ -61,7 +61,7 @@ public class NoExclusiveLockRule : RegexMySqlRule(
  * production SQL modes.
  */
 public class NoZeroDateDefaultRule : Rule {
-    override val id: String = "no-zero-date-default"
+    override val id: RuleId = RuleId("no-zero-date-default")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.MySql
@@ -76,7 +76,7 @@ public class NoZeroDateDefaultRule : Rule {
         regex.findAll(content).forEach { match ->
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Avoid zero date defaults in MySQL schemas.",
                     file = context.file,
@@ -107,7 +107,7 @@ public class NoDisplayWidthIntegerRule : RegexMySqlRule(
  * and binary column types.
  */
 public class RequireIndexPrefixLengthRule : Rule {
-    override val id: String = "require-index-prefix-length"
+    override val id: RuleId = RuleId("require-index-prefix-length")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.MySql
@@ -139,7 +139,7 @@ public class RequireIndexPrefixLengthRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Indexes on MySQL TEXT or BLOB columns should specify a prefix length.",
                         file = context.file,
@@ -162,7 +162,7 @@ public abstract class RegexMySqlRule(
     pattern: String,
     private val message: String,
 ) : Rule {
-    override val id: String = "$ruleName"
+    override val id: RuleId = RuleId("$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.MySql
@@ -178,7 +178,7 @@ public abstract class RegexMySqlRule(
         regex.findAll(masked).forEach { match ->
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = message,
                     file = context.file,

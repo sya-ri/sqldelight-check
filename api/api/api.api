@@ -8,13 +8,14 @@ public final class dev/s7a/sqldelight/check/api/DatabaseContext {
 }
 
 public final class dev/s7a/sqldelight/check/api/Diagnostic {
-	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/SourceRange;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
 	public final fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
 	public final fun getFixes ()Ljava/util/List;
 	public final fun getMessage ()Ljava/lang/String;
+	public final fun getQualifiedRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
 	public final fun getRange ()Ldev/s7a/sqldelight/check/api/SourceRange;
 	public final fun getRuleId-226TpoM ()Ljava/lang/String;
 	public final fun getSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -85,6 +86,20 @@ public final class dev/s7a/sqldelight/check/api/LogLevel : java/lang/Enum {
 	public final fun getLogsRules ()Z
 	public static fun valueOf (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/LogLevel;
 	public static fun values ()[Ldev/s7a/sqldelight/check/api/LogLevel;
+}
+
+public final class dev/s7a/sqldelight/check/api/QualifiedRuleId {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-wigqPlY ()Ljava/lang/String;
+	public final fun component2-cwxIa2A ()Ljava/lang/String;
+	public final fun copy-zIWqXKc (Ljava/lang/String;Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public static synthetic fun copy-zIWqXKc$default (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRuleId-cwxIa2A ()Ljava/lang/String;
+	public final fun getRuleSetId-wigqPlY ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/s7a/sqldelight/check/api/RuleId {

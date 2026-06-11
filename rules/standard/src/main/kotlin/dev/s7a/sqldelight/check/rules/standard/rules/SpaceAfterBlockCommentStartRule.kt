@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports block comments whose opening marker is not followed by a space.
  */
 public class SpaceAfterBlockCommentStartRule : Rule {
-    override val id: String = "space-after-block-comment-start"
+    override val id: RuleId = RuleId("space-after-block-comment-start")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -33,7 +33,7 @@ public class SpaceAfterBlockCommentStartRule : Rule {
             val range = content.rangeAtOffsets(markerEnd, markerEnd)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Block comment start marker should be followed by one space.",
                     file = context.file,

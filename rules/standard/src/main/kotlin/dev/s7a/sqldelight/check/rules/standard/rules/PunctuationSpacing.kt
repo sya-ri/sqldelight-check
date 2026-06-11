@@ -36,7 +36,7 @@ internal fun String.reportNoSpaceBeforeToken(
             val range = rangeAtOffsets(whitespaceStart, character.offset)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(rule.id),
+                    ruleId = rule.id,
                     severity = rule.defaultSeverity,
                     message = message,
                     file = context.file,

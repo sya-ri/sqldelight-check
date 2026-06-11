@@ -1,7 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.Enablement
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 
 /**
@@ -11,7 +11,7 @@ public class ResolvedRuleConfig(
     /**
      * Rule ID being configured.
      */
-    public val ruleId: RuleId,
+    public val ruleId: QualifiedRuleId,
     /**
      * Final enablement before `Auto` applicability is evaluated.
      */

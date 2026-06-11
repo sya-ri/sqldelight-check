@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports bare conditioned joins that should be written as `INNER JOIN`.
  */
 public class ExplicitInnerJoinRule : Rule {
-    override val id: String = "explicit-inner-join"
+    override val id: RuleId = RuleId("explicit-inner-join")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -29,7 +29,7 @@ public class ExplicitInnerJoinRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Use INNER JOIN instead of bare JOIN when ON or USING is present.",
                     file = context.file,

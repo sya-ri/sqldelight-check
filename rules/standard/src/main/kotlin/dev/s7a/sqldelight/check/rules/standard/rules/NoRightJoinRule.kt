@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `RIGHT JOIN` clauses so queries can be written as `LEFT JOIN`.
  */
 public class NoRightJoinRule : Rule {
-    override val id: String = "no-right-join"
+    override val id: RuleId = RuleId("no-right-join")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -28,7 +28,7 @@ public class NoRightJoinRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Use LEFT JOIN instead of ${content.substring(token.startOffset, joinToken.endOffset)}.",
                     file = context.file,

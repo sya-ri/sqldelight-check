@@ -49,7 +49,7 @@ public class NoConcurrentIndexInTransactionRule : RegexPostgresRule(
  * with reduced migration risk.
  */
 public class RequireNotValidConstraintRule : Rule {
-    override val id: String = "require-not-valid-constraint"
+    override val id: RuleId = RuleId("require-not-valid-constraint")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
@@ -68,7 +68,7 @@ public class RequireNotValidConstraintRule : Rule {
             .forEach { match ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Add PostgreSQL constraints as NOT VALID and validate them in a later migration.",
                         file = context.file,
@@ -163,7 +163,7 @@ public abstract class RegexPostgresRule(
     pattern: String,
     private val message: String,
 ) : Rule {
-    override val id: String = "$ruleName"
+    override val id: RuleId = RuleId("$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
@@ -179,7 +179,7 @@ public abstract class RegexPostgresRule(
         regex.findAll(masked).forEach { match ->
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = message,
                     file = context.file,

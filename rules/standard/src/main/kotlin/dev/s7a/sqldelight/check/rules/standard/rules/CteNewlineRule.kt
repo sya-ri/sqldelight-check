@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline WITH clauses whose CTE definitions do not start their own line.
  */
 public class CteNewlineRule : Rule {
-    override val id: String = "cte-newline"
+    override val id: RuleId = RuleId("cte-newline")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -42,7 +42,7 @@ public class CteNewlineRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Multiline WITH clauses should put each CTE definition on its own line.",
                     file = context.file,

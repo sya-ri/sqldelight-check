@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports INSERT statements that rely on table column order.
  */
 public class PreferExplicitColumnListInInsertRule : Rule {
-    override val id: String = "prefer-explicit-column-list-in-insert"
+    override val id: RuleId = RuleId("prefer-explicit-column-list-in-insert")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -41,7 +41,7 @@ public class PreferExplicitColumnListInInsertRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "INSERT statements should include an explicit column list.",
                     file = context.file,

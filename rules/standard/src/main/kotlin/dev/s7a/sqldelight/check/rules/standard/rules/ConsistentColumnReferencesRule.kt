@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `GROUP BY` and `ORDER BY` clauses that mix ordinal and named references.
  */
 public class ConsistentColumnReferencesRule : Rule {
-    override val id: String = "consistent-column-references"
+    override val id: RuleId = RuleId("consistent-column-references")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -44,7 +44,7 @@ public class ConsistentColumnReferencesRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message =
                         "$clauseName should not mix ordinal column references " +

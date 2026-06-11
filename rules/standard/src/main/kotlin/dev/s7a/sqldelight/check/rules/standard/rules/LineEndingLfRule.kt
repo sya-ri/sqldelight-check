@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports CRLF and CR line endings.
  */
 public class LineEndingLfRule : Rule {
-    override val id: String = "line-ending-lf"
+    override val id: RuleId = RuleId("line-ending-lf")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class LineEndingLfRule : Rule {
             val range = content.rangeAtOffsets(index, endOffset)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Line ending should be LF.",
                     file = context.file,

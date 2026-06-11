@@ -29,10 +29,11 @@ Implement `ReporterProvider`. Its `id` is the name users configure in `sqldeligh
 package com.example.sqldelight.reporter
 
 import dev.s7a.sqldelight.check.reporter.api.Reporter
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
 
 class ExampleReporterProvider : ReporterProvider {
-    override val id = "example"
+    override val id = ReporterId("example")
 
     override fun create(options: Map<String, String>): Reporter =
         ExampleReporter(options)

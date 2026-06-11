@@ -1,5 +1,6 @@
 package dev.s7a.sqldelight.check.core
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import java.util.ServiceLoader
 
@@ -48,22 +49,13 @@ private fun validateRuleSetProviders(providers: List<RuleSetProvider>) {
     val ruleIds =
         providers.flatMap { provider ->
             provider.ruleProviders().map { ruleProvider ->
-                provider.id.value to ruleProvider.create().id
+                provider.id to ruleProvider.create().id
             }
         }
 
-    val invalidRuleIds =
-        ruleIds
-            .filter { (_, ruleId) -> ':' in ruleId }
-            .map { (ruleSetId, ruleId) -> "$ruleSetId:$ruleId" }
-            .sorted()
-    require(invalidRuleIds.isEmpty()) {
-        "Rule IDs must be local and must not contain ':': ${invalidRuleIds.joinToString()}"
-    }
-
     val duplicateRuleIds =
         ruleIds
-            .map { (ruleSetId, ruleId) -> ruleSetId to "$ruleSetId:$ruleId" }
+            .map { (ruleSetId, ruleId) -> ruleSetId.value to QualifiedRuleId(ruleSetId, ruleId).value }
             .groupBy { (_, ruleId) -> ruleId }
             .filterValues { matches -> matches.size > 1 }
             .mapValues { (_, matches) ->

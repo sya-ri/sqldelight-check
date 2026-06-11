@@ -10,7 +10,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
 public class NoSelectStarRule : Rule {
-    override val id: String = "no-select-star"
+    override val id: RuleId = RuleId("no-select-star")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -28,7 +28,7 @@ public class NoSelectStarRule : Rule {
                 val starOffset = match.value.lastIndexOf('*').let { offset -> match.range.first + offset }
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = context.options["message"] ?: "Avoid SELECT * in public SQLDelight queries.",
                         file = context.file,

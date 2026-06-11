@@ -1,9 +1,11 @@
 package dev.s7a.sqldelight.check.reporter.text
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
@@ -55,7 +57,7 @@ class TextReporterProviderTest {
                     diagnostics =
                         listOf(
                             diagnostic(
-                                ruleId = RuleId("standard:info"),
+                                qualifiedRuleId = qualifiedRuleId("standard:info"),
                                 severity = Severity.Info,
                                 message = "Informational note",
                                 file = SourceFile("src/b.sq", "SELECT 1;"),
@@ -65,14 +67,14 @@ class TextReporterProviderTest {
                                 ),
                             ),
                             diagnostic(
-                                ruleId = null,
+                                qualifiedRuleId = null,
                                 severity = Severity.Error,
                                 message = "Project configuration is invalid.",
                                 file = null,
                                 range = null,
                             ),
                             diagnostic(
-                                ruleId = RuleId("standard:warning"),
+                                qualifiedRuleId = qualifiedRuleId("standard:warning"),
                                 severity = Severity.Warning,
                                 message = "Warning note",
                                 file = SourceFile("src/a.sq", "SELECT * FROM player;"),
@@ -105,7 +107,7 @@ class TextReporterProviderTest {
                     diagnostics =
                         listOf(
                             diagnostic(
-                                ruleId = RuleId("standard:late"),
+                                qualifiedRuleId = qualifiedRuleId("standard:late"),
                                 severity = Severity.Warning,
                                 message = "Later file",
                                 file = SourceFile("src/z.sq", "SELECT 1;"),
@@ -115,7 +117,7 @@ class TextReporterProviderTest {
                                 ),
                             ),
                             diagnostic(
-                                ruleId = RuleId("standard:tie"),
+                                qualifiedRuleId = qualifiedRuleId("standard:tie"),
                                 severity = Severity.Warning,
                                 message = "Matching diagnostic",
                                 fixes =
@@ -128,7 +130,7 @@ class TextReporterProviderTest {
                                     ),
                             ),
                             diagnostic(
-                                ruleId = RuleId("standard:early"),
+                                qualifiedRuleId = qualifiedRuleId("standard:early"),
                                 severity = Severity.Error,
                                 message = "Earlier column",
                                 range = SourceRange(
@@ -137,7 +139,7 @@ class TextReporterProviderTest {
                                 ),
                             ),
                             diagnostic(
-                                ruleId = RuleId("standard:tie"),
+                                qualifiedRuleId = qualifiedRuleId("standard:tie"),
                                 severity = Severity.Warning,
                                 message = "Matching diagnostic",
                                 fixes =
@@ -203,7 +205,7 @@ private fun diagnosticWithFix(): Diagnostic =
     )
 
 private fun diagnostic(
-    ruleId: RuleId? = RuleId("standard:use-is-null"),
+    qualifiedRuleId: QualifiedRuleId? = qualifiedRuleId("standard:use-is-null"),
     severity: Severity = Severity.Warning,
     message: String = "Use `IS NULL` instead of = NULL.",
     file: SourceFile? =
@@ -219,12 +221,13 @@ private fun diagnostic(
     fixes: List<Fix> = emptyList(),
 ): Diagnostic =
     Diagnostic(
-        ruleId = ruleId,
+        ruleId = qualifiedRuleId?.ruleId,
         severity = severity,
         message = message,
         file = file,
         range = range,
         database = null,
+        qualifiedRuleId = qualifiedRuleId,
         fixes = fixes,
     )
 
@@ -234,4 +237,13 @@ private class ByteArrayReportOutput(
     override fun file(): OutputStream = output
 
     override fun file(path: String): OutputStream = output
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

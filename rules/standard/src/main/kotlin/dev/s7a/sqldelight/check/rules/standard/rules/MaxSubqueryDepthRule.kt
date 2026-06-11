@@ -18,7 +18,7 @@ private const val DEFAULT_MAX_SUBQUERY_DEPTH = 3
  * Reports SELECT statements nested deeper than the configured parenthesis depth.
  */
 public class MaxSubqueryDepthRule : Rule {
-    override val id: String = "max-subquery-depth"
+    override val id: RuleId = RuleId("max-subquery-depth")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class MaxSubqueryDepthRule : Rule {
                 if (depth <= maxDepth) return@forEach
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Subquery nesting depth is greater than $maxDepth.",
                         file = context.file,

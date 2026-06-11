@@ -16,7 +16,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * expressions to explicit aliasing rules.
  */
 public class NoSelfColumnAliasRule : Rule {
-    override val id: String = "no-self-column-alias"
+    override val id: RuleId = RuleId("no-self-column-alias")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -30,7 +30,7 @@ public class NoSelfColumnAliasRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Column aliases should not repeat the source column name.",
                     file = context.file,

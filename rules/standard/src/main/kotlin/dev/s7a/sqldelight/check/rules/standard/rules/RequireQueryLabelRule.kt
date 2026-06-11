@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports executable SQLDelight statements in `.sq` files that are not introduced by a query label.
  */
 public class RequireQueryLabelRule : Rule {
-    override val id: String = "require-query-label"
+    override val id: RuleId = RuleId("require-query-label")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -36,7 +36,7 @@ public class RequireQueryLabelRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Executable statements in .sq files should be introduced by a SQLDelight query label.",
                     file = context.file,

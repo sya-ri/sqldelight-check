@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports comparison and binary operators that lead a line in multiline SQL.
  */
 public class OperatorLinePositionRule : Rule {
-    override val id: String = "operator-line-position"
+    override val id: RuleId = RuleId("operator-line-position")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -37,7 +37,7 @@ public class OperatorLinePositionRule : Rule {
                 val operatorText = content.substring(operator.startOffset, operator.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Operator '$operatorText' should trail the previous line.",
                         file = context.file,

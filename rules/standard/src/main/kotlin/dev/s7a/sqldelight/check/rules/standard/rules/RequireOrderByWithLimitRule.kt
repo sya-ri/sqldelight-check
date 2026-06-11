@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports top-level `SELECT` statements that use `LIMIT` or `OFFSET` without `ORDER BY`.
  */
 public class RequireOrderByWithLimitRule : Rule {
-    override val id: String = "require-order-by-with-limit"
+    override val id: RuleId = RuleId("require-order-by-with-limit")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -40,7 +40,7 @@ public class RequireOrderByWithLimitRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "SELECT statements with LIMIT or OFFSET should also specify ORDER BY.",
                     file = context.file,

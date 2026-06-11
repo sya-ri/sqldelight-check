@@ -20,7 +20,7 @@ public abstract class dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule : 
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId ()Ljava/lang/String;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V

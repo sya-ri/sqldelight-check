@@ -1,5 +1,9 @@
 package dev.s7a.sqldelight.check.rules.postgres
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
+
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
@@ -17,24 +21,24 @@ class PostgresRuleSetProviderTest {
     fun `postgres rule set provides postgres rules`() {
         val provider = PostgresRuleSetProvider()
         val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
-        val ruleIds = rules.map { rule -> RuleId("${provider.id.value}:${rule.id}") }.toSet()
+        val ruleIds = rules.map { rule -> QualifiedRuleId(provider.id, rule.id) }.toSet()
 
         assertEquals(RuleSetId("postgres"), provider.id)
         assertEquals(setOf(DialectCapabilities.PostgreSql), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
-                RuleId("postgres:excessive-locks"),
-                RuleId("postgres:require-concurrent-index"),
-                RuleId("postgres:no-concurrent-index-in-transaction"),
-                RuleId("postgres:require-not-valid-constraint"),
-                RuleId("postgres:no-set-not-null-on-existing-column"),
-                RuleId("postgres:no-add-column-with-volatile-default"),
-                RuleId("postgres:prefer-identity-over-serial"),
-                RuleId("postgres:no-drop-column"),
-                RuleId("postgres:no-rename-column"),
-                RuleId("postgres:no-rename-table"),
-                RuleId("postgres:reindex-concurrently"),
-                RuleId("postgres:risky-alter-table"),
+                qualifiedRuleId("postgres:excessive-locks"),
+                qualifiedRuleId("postgres:require-concurrent-index"),
+                qualifiedRuleId("postgres:no-concurrent-index-in-transaction"),
+                qualifiedRuleId("postgres:require-not-valid-constraint"),
+                qualifiedRuleId("postgres:no-set-not-null-on-existing-column"),
+                qualifiedRuleId("postgres:no-add-column-with-volatile-default"),
+                qualifiedRuleId("postgres:prefer-identity-over-serial"),
+                qualifiedRuleId("postgres:no-drop-column"),
+                qualifiedRuleId("postgres:no-rename-column"),
+                qualifiedRuleId("postgres:no-rename-table"),
+                qualifiedRuleId("postgres:reindex-concurrently"),
+                qualifiedRuleId("postgres:risky-alter-table"),
             ),
             ruleIds,
         )
@@ -46,4 +50,13 @@ class PostgresRuleSetProviderTest {
 
         assertTrue(RuleSetId("postgres") in providers)
     }
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

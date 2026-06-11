@@ -11,7 +11,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports spaces or tabs before comma tokens.
  */
 public class NoSpaceBeforeCommaRule : Rule {
-    override val id: String = "no-space-before-comma"
+    override val id: RuleId = RuleId("no-space-before-comma")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 

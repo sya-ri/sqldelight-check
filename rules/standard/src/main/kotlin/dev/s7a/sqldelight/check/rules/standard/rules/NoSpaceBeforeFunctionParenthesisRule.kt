@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports spaces or tabs between common SQL function names and their opening parenthesis.
  */
 public class NoSpaceBeforeFunctionParenthesisRule : Rule {
-    override val id: String = "no-space-before-function-parenthesis"
+    override val id: RuleId = RuleId("no-space-before-function-parenthesis")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -34,7 +34,7 @@ public class NoSpaceBeforeFunctionParenthesisRule : Rule {
                 val range = content.rangeAtOffsets(token.endOffset, parenthesisOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Function name should not be separated from opening parenthesis.",
                         file = context.file,

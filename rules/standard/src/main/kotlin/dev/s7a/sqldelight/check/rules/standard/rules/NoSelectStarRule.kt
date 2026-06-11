@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports result-column wildcards in SELECT lists.
  */
 public class NoSelectStarRule : Rule {
-    override val id: String = "no-select-star"
+    override val id: RuleId = RuleId("no-select-star")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -41,7 +41,7 @@ public class NoSelectStarRule : Rule {
                 .forEach { character ->
                     reporter.report(
                         Diagnostic(
-                            ruleId = RuleId(id),
+                            ruleId = id,
                             severity = defaultSeverity,
                             message = "Avoid SELECT * and list result columns explicitly.",
                             file = context.file,

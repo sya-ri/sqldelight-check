@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports repeated predicates on the same column that use different named parameters.
  */
 public class ConsistentParameterNamesRule : Rule {
-    override val id: String = "consistent-parameter-names"
+    override val id: RuleId = RuleId("consistent-parameter-names")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -33,7 +33,7 @@ public class ConsistentParameterNamesRule : Rule {
             } else if (previous.parameter != predicate.parameter) {
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Use the same named parameter for repeated ${predicate.column} predicates.",
                         file = context.file,

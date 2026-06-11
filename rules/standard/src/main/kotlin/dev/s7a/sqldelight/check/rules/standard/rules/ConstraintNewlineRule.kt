@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline CREATE TABLE constraints that do not start their own line.
  */
 public class ConstraintNewlineRule : Rule {
-    override val id: String = "constraint-newline"
+    override val id: RuleId = RuleId("constraint-newline")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -45,7 +45,7 @@ public class ConstraintNewlineRule : Rule {
                     if (line.firstNonWhitespaceOffset == constraint.startOffset) return@forEach
                     reporter.report(
                         Diagnostic(
-                            ruleId = RuleId(id),
+                            ruleId = id,
                             severity = defaultSeverity,
                             message = "Multiline CREATE TABLE constraints should start their own line.",
                             file = context.file,

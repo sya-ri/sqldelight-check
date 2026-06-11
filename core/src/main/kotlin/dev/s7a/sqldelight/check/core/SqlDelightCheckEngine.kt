@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.core
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
@@ -51,7 +51,7 @@ public class SqlDelightCheckEngine {
             ruleSetProviders.flatMap { provider ->
                 provider.ruleProviders().map { ruleProvider ->
                     val rule = ruleProvider.create()
-                    RuleCandidate(provider.id, rule.id.toFullRuleId(provider.id), rule)
+                    RuleCandidate(provider.id, QualifiedRuleId(provider.id, rule.id), rule)
                 }
             }
         return files.flatMap { file -> runRulesForFile(database, file, rules, resolver, trace) }
@@ -66,7 +66,7 @@ public class SqlDelightCheckEngine {
     ): List<Diagnostic> {
         val facts = SourceSqlFactsExtractor.extract(file)
         val disableDirectives = DisableDirectives.parse(file)
-        val executedRuleIds = mutableListOf<RuleId>()
+        val executedRuleIds = mutableListOf<QualifiedRuleId>()
         val diagnostics =
             rules.flatMap { candidate ->
                 val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
@@ -116,28 +116,22 @@ public class SqlDelightCheckEngine {
 }
 
 private fun Diagnostic.withRuleIdentity(
-    ruleId: RuleId,
+    ruleId: QualifiedRuleId,
     severity: Severity,
 ): Diagnostic =
     Diagnostic(
-        ruleId = ruleId,
+        ruleId = ruleId.ruleId,
         severity = severity,
         message = message,
         file = file,
         range = range,
         database = database,
+        qualifiedRuleId = ruleId,
         fixes = fixes,
     )
 
 private data class RuleCandidate(
     val ruleSetId: RuleSetId,
-    val ruleId: RuleId,
+    val ruleId: QualifiedRuleId,
     val rule: Rule,
 )
-
-private fun String.toFullRuleId(ruleSetId: RuleSetId): RuleId {
-    require(':' !in this) {
-        "Rule ID must be local and must not contain ':': ${ruleSetId.value}:$this"
-    }
-    return RuleId("${ruleSetId.value}:$this")
-}

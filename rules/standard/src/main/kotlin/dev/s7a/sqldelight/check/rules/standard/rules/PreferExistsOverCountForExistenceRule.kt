@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports COUNT comparisons that are only checking for existence.
  */
 public class PreferExistsOverCountForExistenceRule : Rule {
-    override val id: String = "prefer-exists-over-count-for-existence"
+    override val id: RuleId = RuleId("prefer-exists-over-count-for-existence")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -29,7 +29,7 @@ public class PreferExistsOverCountForExistenceRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Use EXISTS instead of COUNT(*) > 0 when only existence is needed.",
                         file = context.file,

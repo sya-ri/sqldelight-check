@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports repeated semicolon tokens with only whitespace between them.
  */
 public class NoRedundantSemicolonsRule : Rule {
-    override val id: String = "no-redundant-semicolons"
+    override val id: RuleId = RuleId("no-redundant-semicolons")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -48,7 +48,7 @@ public class NoRedundantSemicolonsRule : Rule {
             val range = content.rangeAtOffsets(first.offset + 1, fixEnd)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Statement should not contain redundant semicolons.",
                     file = context.file,

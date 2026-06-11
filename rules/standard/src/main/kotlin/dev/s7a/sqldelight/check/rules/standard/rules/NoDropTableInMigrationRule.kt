@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports destructive `DROP TABLE` statements in SQLDelight migration files.
  */
 public class NoDropTableInMigrationRule : Rule {
-    override val id: String = "no-drop-table-in-migration"
+    override val id: RuleId = RuleId("no-drop-table-in-migration")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -34,7 +34,7 @@ public class NoDropTableInMigrationRule : Rule {
             .forEach { (drop, table) ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Avoid DROP TABLE in SQLDelight migrations unless the destructive change is intentional.",
                         file = context.file,

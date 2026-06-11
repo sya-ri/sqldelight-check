@@ -16,7 +16,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports blank lines between a SQLDelight query label and its statement body.
  */
 public class NoBlankLineAfterQueryLabelRule : Rule {
-    override val id: String = "no-blank-line-after-query-label"
+    override val id: RuleId = RuleId("no-blank-line-after-query-label")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -42,7 +42,7 @@ public class NoBlankLineAfterQueryLabelRule : Rule {
             val range = content.rangeAtOffsets(firstBlankLine.startOffset, lastBlankLine.newlineEndOffset)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Query label should not be separated from its statement by blank lines.",
                     file = context.file,

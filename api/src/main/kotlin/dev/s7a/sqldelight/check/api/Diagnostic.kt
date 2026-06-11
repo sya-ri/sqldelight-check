@@ -29,6 +29,10 @@ public class Diagnostic(
      */
     public val database: DatabaseContext?,
     /**
+     * Rule ID after the engine combines [ruleId] with the contributing rule set.
+     */
+    public val qualifiedRuleId: QualifiedRuleId? = null,
+    /**
      * Optional fixes for the diagnostic.
      */
     public val fixes: List<Fix> = emptyList(),
@@ -42,6 +46,7 @@ public class Diagnostic(
             file == other.file &&
             range == other.range &&
             database == other.database &&
+            qualifiedRuleId == other.qualifiedRuleId &&
             fixes == other.fixes
 
     override fun hashCode(): Int {
@@ -51,10 +56,11 @@ public class Diagnostic(
         result = 31 * result + (file?.hashCode() ?: 0)
         result = 31 * result + (range?.hashCode() ?: 0)
         result = 31 * result + (database?.hashCode() ?: 0)
+        result = 31 * result + (qualifiedRuleId?.hashCode() ?: 0)
         result = 31 * result + fixes.hashCode()
         return result
     }
 
     override fun toString(): String =
-        "Diagnostic(ruleId=$ruleId, severity=$severity, message=$message, file=$file, range=$range, database=$database, fixes=$fixes)"
+        "Diagnostic(ruleId=$ruleId, severity=$severity, message=$message, file=$file, range=$range, database=$database, qualifiedRuleId=$qualifiedRuleId, fixes=$fixes)"
 }

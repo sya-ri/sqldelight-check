@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rule.api
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 
 /**
@@ -17,7 +18,7 @@ public interface Rule {
      * value into the user-facing `rule-set:rule-name` ID used by Gradle
      * configuration, reporters, and source-level disable directives.
      */
-    public val id: String
+    public val id: RuleId
 
     /**
      * Default severity used when user configuration does not override it.

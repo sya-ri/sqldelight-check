@@ -1,6 +1,6 @@
 public final class dev/s7a/sqldelight/check/reporter/html/HtmlReporterProvider : dev/s7a/sqldelight/check/reporter/api/ReporterProvider {
 	public fun <init> ()V
 	public fun create (Ljava/util/Map;)Ldev/s7a/sqldelight/check/reporter/api/Reporter;
-	public fun getId ()Ljava/lang/String;
+	public fun getId ()Ldev/s7a/sqldelight/check/reporter/api/ReporterId;
 }
 

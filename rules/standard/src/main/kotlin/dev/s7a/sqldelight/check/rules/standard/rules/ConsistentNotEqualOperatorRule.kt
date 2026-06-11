@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports mixed `!=` and `<>` not-equal operators in the same file.
  */
 public class ConsistentNotEqualOperatorRule : Rule {
-    override val id: String = "consistent-not-equal-operator"
+    override val id: RuleId = RuleId("consistent-not-equal-operator")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -43,7 +43,7 @@ public class ConsistentNotEqualOperatorRule : Rule {
                 val range = content.rangeAtOffsets(operator.startOffset, operator.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Use a consistent not-equal operator; expected '$preferred'.",
                         file = context.file,

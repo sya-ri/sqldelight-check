@@ -1,7 +1,11 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -22,7 +26,7 @@ class ForeignKeysRestoredRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
-        assertEquals(RuleId("sqlite:foreign-keys-restored"), diagnostics.single().ruleId)
+        assertEquals(qualifiedRuleId("sqlite:foreign-keys-restored"), diagnostics.single().qualifiedRuleId)
         assertEquals(1, diagnostics.single().range?.start?.line)
         assertEquals(1, diagnostics.single().range?.start?.column)
         assertTrue(diagnostics.single().fixes.isEmpty())
@@ -87,4 +91,13 @@ class ForeignKeysRestoredRuleTest {
 
         assertEquals(emptyList(), diagnostics)
     }
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

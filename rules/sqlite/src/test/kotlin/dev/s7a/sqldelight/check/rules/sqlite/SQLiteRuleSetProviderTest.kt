@@ -1,5 +1,9 @@
 package dev.s7a.sqldelight.check.rules.sqlite
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
+
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
@@ -17,18 +21,18 @@ class SQLiteRuleSetProviderTest {
     fun `sqlite rule set provides sqlite rules`() {
         val provider = SQLiteRuleSetProvider()
         val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
-        val ruleIds = rules.map { rule -> RuleId("${provider.id.value}:${rule.id}") }.toSet()
+        val ruleIds = rules.map { rule -> QualifiedRuleId(provider.id, rule.id) }.toSet()
 
         assertEquals(RuleSetId("sqlite"), provider.id)
         assertEquals(setOf(DialectCapabilities.SQLite), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
-                RuleId("sqlite:consistent-conflict-resolution"),
-                RuleId("sqlite:foreign-keys-restored"),
-                RuleId("sqlite:prefer-integer-primary-key"),
-                RuleId("sqlite:no-autoincrement-without-need"),
-                RuleId("sqlite:no-alter-table-complex-change"),
-                RuleId("sqlite:prefer-without-rowid-for-composite-pk"),
+                qualifiedRuleId("sqlite:consistent-conflict-resolution"),
+                qualifiedRuleId("sqlite:foreign-keys-restored"),
+                qualifiedRuleId("sqlite:prefer-integer-primary-key"),
+                qualifiedRuleId("sqlite:no-autoincrement-without-need"),
+                qualifiedRuleId("sqlite:no-alter-table-complex-change"),
+                qualifiedRuleId("sqlite:prefer-without-rowid-for-composite-pk"),
             ),
             ruleIds,
         )
@@ -40,4 +44,13 @@ class SQLiteRuleSetProviderTest {
 
         assertTrue(RuleSetId("sqlite") in providers)
     }
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

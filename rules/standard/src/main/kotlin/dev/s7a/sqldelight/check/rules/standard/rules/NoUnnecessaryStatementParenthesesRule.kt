@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports redundant statement-level parentheses around top-level `SELECT` statements.
  */
 public class NoUnnecessaryStatementParenthesesRule : Rule {
-    override val id: String = "no-unnecessary-statement-parentheses"
+    override val id: RuleId = RuleId("no-unnecessary-statement-parentheses")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -42,7 +42,7 @@ public class NoUnnecessaryStatementParenthesesRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Remove redundant parentheses around the SELECT statement.",
                         file = context.file,

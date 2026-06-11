@@ -18,7 +18,7 @@ private const val DEFAULT_MAX_CASE_DEPTH = 2
  * Reports CASE expressions nested deeper than the configured limit.
  */
 public class MaxCaseDepthRule : Rule {
-    override val id: String = "max-case-depth"
+    override val id: RuleId = RuleId("max-case-depth")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -36,7 +36,7 @@ public class MaxCaseDepthRule : Rule {
                     if (depth > maxDepth) {
                         reporter.report(
                             Diagnostic(
-                                ruleId = RuleId(id),
+                                ruleId = id,
                                 severity = defaultSeverity,
                                 message = "CASE nesting depth is greater than $maxDepth.",
                                 file = context.file,

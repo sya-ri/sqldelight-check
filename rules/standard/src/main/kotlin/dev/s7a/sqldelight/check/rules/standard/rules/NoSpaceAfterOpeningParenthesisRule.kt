@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports spaces or tabs after opening parenthesis tokens.
  */
 public class NoSpaceAfterOpeningParenthesisRule : Rule {
-    override val id: String = "no-space-after-opening-parenthesis"
+    override val id: RuleId = RuleId("no-space-after-opening-parenthesis")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -34,7 +34,7 @@ public class NoSpaceAfterOpeningParenthesisRule : Rule {
                 val range = content.rangeAtOffsets(parenthesis.offset + 1, whitespaceEnd)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Opening parenthesis should not be followed by whitespace.",
                         file = context.file,

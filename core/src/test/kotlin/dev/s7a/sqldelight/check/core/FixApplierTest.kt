@@ -1,9 +1,13 @@
 package dev.s7a.sqldelight.check.core
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
@@ -64,7 +68,7 @@ class FixApplierTest {
         assertEquals(
             listOf(
                 SkippedFix(
-                    ruleId = RuleId("standard:test"),
+                    ruleId = qualifiedRuleId("standard:test"),
                     file = sourceFile,
                     title = "replace star",
                     reason = FixSkipReason.Unsafe,
@@ -282,30 +286,36 @@ class FixApplierTest {
         safety: FixSafety,
         range: SourceRange,
         replacement: String,
-    ): Diagnostic =
-        Diagnostic(
-            ruleId = RuleId("standard:test"),
+    ): Diagnostic {
+        val qualifiedRuleId = qualifiedRuleId("standard:test")
+        return Diagnostic(
+            ruleId = qualifiedRuleId.ruleId,
             severity = Severity.Warning,
             message = "test",
             file = file,
             range = range,
             database = null,
+            qualifiedRuleId = qualifiedRuleId,
             fixes =
                 listOf(
                     fix(title = title, safety = safety, range = range, replacement = replacement),
                 ),
         )
+    }
 
-    private fun diagnostic(fixes: List<Fix>): Diagnostic =
-        Diagnostic(
-            ruleId = RuleId("standard:test"),
+    private fun diagnostic(fixes: List<Fix>): Diagnostic {
+        val qualifiedRuleId = qualifiedRuleId("standard:test")
+        return Diagnostic(
+            ruleId = qualifiedRuleId.ruleId,
             severity = Severity.Warning,
             message = "test",
             file = null,
             range = null,
             database = null,
+            qualifiedRuleId = qualifiedRuleId,
             fixes = fixes,
         )
+    }
 
     private fun fix(
         title: String,
@@ -328,4 +338,13 @@ class FixApplierTest {
             start = SourcePosition(line = line, column = startColumn),
             end = SourcePosition(line = line, column = endColumn),
         )
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

@@ -1,7 +1,9 @@
 package dev.s7a.sqldelight.check.reporter.githubannotations
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
@@ -33,7 +35,7 @@ class GitHubAnnotationsReporterProviderTest {
                                 message = "Use IS NULL, not = NULL\nSee 100% rule coverage.",
                             ),
                             diagnostic(
-                                ruleId = null,
+                                qualifiedRuleId = null,
                                 severity = Severity.Info,
                                 file = null,
                                 range = null,
@@ -60,7 +62,7 @@ private fun GitHubAnnotationsReporterProvider.render(report: Report): String {
 }
 
 private fun diagnostic(
-    ruleId: RuleId? = RuleId("standard:use-is-null"),
+    qualifiedRuleId: QualifiedRuleId? = qualifiedRuleId("standard:use-is-null"),
     severity: Severity,
     file: SourceFile? =
         SourceFile(
@@ -75,12 +77,13 @@ private fun diagnostic(
     message: String,
 ): Diagnostic =
     Diagnostic(
-        ruleId = ruleId,
+        ruleId = qualifiedRuleId?.ruleId,
         severity = severity,
         message = message,
         file = file,
         range = range,
         database = null,
+        qualifiedRuleId = qualifiedRuleId,
         fixes = emptyList(),
     )
 
@@ -90,4 +93,13 @@ private class ByteArrayReportOutput(
     override fun file(): OutputStream = output
 
     override fun file(path: String): OutputStream = output
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

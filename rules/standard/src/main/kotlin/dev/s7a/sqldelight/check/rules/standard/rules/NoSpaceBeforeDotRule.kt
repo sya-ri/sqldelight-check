@@ -11,7 +11,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports spaces or tabs before dot tokens in qualified names.
  */
 public class NoSpaceBeforeDotRule : Rule {
-    override val id: String = "no-space-before-dot"
+    override val id: RuleId = RuleId("no-space-before-dot")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 

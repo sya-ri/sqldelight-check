@@ -118,7 +118,7 @@ private fun Fix.toSkippedFix(
     reason: FixSkipReason,
 ): SkippedFix =
     SkippedFix(
-        ruleId = diagnostic.ruleId,
+        ruleId = diagnostic.qualifiedRuleId,
         file = diagnostic.file,
         title = title,
         reason = reason,

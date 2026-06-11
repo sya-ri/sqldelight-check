@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports common SQL keywords that are not uppercase.
  */
 public class KeywordCaseRule : Rule {
-    override val id: String = "keyword-case"
+    override val id: RuleId = RuleId("keyword-case")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -33,7 +33,7 @@ public class KeywordCaseRule : Rule {
                 val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "SQL keyword '${token.text}' should be uppercase.",
                         file = context.file,

@@ -1,5 +1,9 @@
 package dev.s7a.sqldelight.check.rules.hsql
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
+
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
@@ -25,11 +29,11 @@ class HsqlRuleSetProviderTest {
         assertEquals(setOf(DialectCapabilities.Hsql), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
-                RuleId("hsql:no-database-file-settings"),
-                RuleId("hsql:no-system-operations"),
-                RuleId("hsql:no-text-table-source"),
+                qualifiedRuleId("hsql:no-database-file-settings"),
+                qualifiedRuleId("hsql:no-system-operations"),
+                qualifiedRuleId("hsql:no-text-table-source"),
             ),
-            rules.map { rule -> RuleId("${provider.id.value}:${rule.id}") }.toSet(),
+            rules.map { rule -> QualifiedRuleId(provider.id, rule.id) }.toSet(),
         )
         assertTrue(provider.ruleProviders().any { ruleProvider -> ruleProvider.create() is NoDatabaseFileSettingsRule })
         assertTrue(provider.ruleProviders().any { ruleProvider -> ruleProvider.create() is NoSystemOperationsRule })
@@ -42,4 +46,13 @@ class HsqlRuleSetProviderTest {
 
         assertTrue(RuleSetId("hsql") in providers)
     }
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

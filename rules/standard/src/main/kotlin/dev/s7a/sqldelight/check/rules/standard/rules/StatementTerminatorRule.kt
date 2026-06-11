@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports SQL statements that are not terminated by a semicolon.
  */
 public class StatementTerminatorRule : Rule {
-    override val id: String = "statement-terminator"
+    override val id: RuleId = RuleId("statement-terminator")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -46,7 +46,7 @@ public class StatementTerminatorRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Statement should be terminated by a semicolon.",
                     file = context.file,

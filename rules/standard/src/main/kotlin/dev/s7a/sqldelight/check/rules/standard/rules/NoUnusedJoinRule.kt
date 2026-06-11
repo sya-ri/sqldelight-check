@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * that never appears as a qualifier after the JOIN source.
  */
 public class NoUnusedJoinRule : Rule {
-    override val id: String = "no-unused-join"
+    override val id: RuleId = RuleId("no-unused-join")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -32,7 +32,7 @@ public class NoUnusedJoinRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "JOIN source '$qualifier' is not referenced by later qualified column reads.",
                         file = context.file,

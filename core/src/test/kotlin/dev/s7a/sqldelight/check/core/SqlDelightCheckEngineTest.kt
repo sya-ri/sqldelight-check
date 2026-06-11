@@ -1,5 +1,8 @@
 package dev.s7a.sqldelight.check.core
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectCapabilities
 import dev.s7a.sqldelight.check.api.DialectCapability
@@ -417,7 +420,7 @@ class SqlDelightCheckEngineTest {
         rangeLine: Int? = null,
     ): Rule =
         object : Rule {
-            override val id: String = id
+            override val id: RuleId = RuleId(id)
             override val defaultSeverity: Severity = severity
             override val defaultEnable: Boolean = true
             override val targetCapability: DialectCapability? = targetCapability
@@ -430,7 +433,7 @@ class SqlDelightCheckEngineTest {
             ) {
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = this.id,
                         severity = defaultSeverity,
                         message = message(context),
                         file = context.file,
@@ -461,7 +464,7 @@ class SqlDelightCheckEngineTest {
 
     private companion object {
         val ruleSetId = RuleSetId("standard")
-        val ruleId = RuleId("standard:test")
+        val ruleId = qualifiedRuleId("standard:test")
     }
 }
 
@@ -470,3 +473,12 @@ private fun singleCharacterRange(line: Int): SourceRange =
         start = SourcePosition(line = line, column = 1),
         end = SourcePosition(line = line, column = 2),
     )
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
+}

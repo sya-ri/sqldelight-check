@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -16,7 +17,7 @@ import kotlinx.serialization.json.Json
  * Provider for the built-in SARIF reporter.
  */
 public class SarifReporterProvider : ReporterProvider {
-    override val id: String = "sarif"
+    override val id: ReporterId = ReporterId("sarif")
 
     override fun create(options: Map<String, String>): Reporter =
         SarifReporter(
@@ -143,7 +144,7 @@ private fun Diagnostic.toSarifResult(): SarifResult =
         locations = sarifLocations(),
     )
 
-private fun Diagnostic.sarifRuleId(): String = ruleId?.value ?: "sqldelight-check:diagnostic"
+private fun Diagnostic.sarifRuleId(): String = qualifiedRuleId?.value ?: ruleId?.value ?: "sqldelight-check:diagnostic"
 
 private fun Diagnostic.sarifLocations(): List<SarifLocation>? {
     val sourceFile = file ?: return null

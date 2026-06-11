@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports LIKE patterns that start with a wildcard.
  */
 public class NoLeadingWildcardLikeRule : Rule {
-    override val id: String = "no-leading-wildcard-like"
+    override val id: RuleId = RuleId("no-leading-wildcard-like")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -31,7 +31,7 @@ public class NoLeadingWildcardLikeRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Avoid LIKE patterns that start with a wildcard.",
                         file = context.file,

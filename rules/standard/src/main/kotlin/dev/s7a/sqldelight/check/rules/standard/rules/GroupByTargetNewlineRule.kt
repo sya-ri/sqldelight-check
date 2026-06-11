@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports multiline GROUP BY clauses that do not put every grouping expression on its own line.
  */
 public class GroupByTargetNewlineRule : Rule {
-    override val id: String = "group-by-target-newline"
+    override val id: RuleId = RuleId("group-by-target-newline")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -42,7 +42,7 @@ public class GroupByTargetNewlineRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Multiline GROUP BY clauses should put each grouping expression on its own line.",
                     file = context.file,

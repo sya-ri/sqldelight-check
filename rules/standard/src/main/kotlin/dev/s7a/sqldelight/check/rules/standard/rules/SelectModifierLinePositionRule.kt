@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports `SELECT` modifiers that are split onto another line.
  */
 public class SelectModifierLinePositionRule : Rule {
-    override val id: String = "select-modifier-line-position"
+    override val id: RuleId = RuleId("select-modifier-line-position")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class SelectModifierLinePositionRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "${modifier.text.uppercase()} should be on the same line as SELECT.",
                     file = context.file,

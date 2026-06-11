@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports NOT IN subqueries that do not exclude NULL values.
  */
 public class NoNotInNullableSubqueryRule : Rule {
-    override val id: String = "no-not-in-nullable-subquery"
+    override val id: RuleId = RuleId("no-not-in-nullable-subquery")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class NoNotInNullableSubqueryRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Prefer NOT EXISTS or exclude NULL values when using NOT IN with a subquery.",
                     file = context.file,

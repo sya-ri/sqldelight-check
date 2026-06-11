@@ -3,7 +3,9 @@ package dev.s7a.sqldelight.check.reporter.html
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
@@ -32,7 +34,7 @@ class HtmlReporterProviderTest {
                     diagnostics =
                         listOf(
                             diagnostic(
-                                ruleId = "standard:no-select-trailing-comma",
+                                qualifiedRuleId = qualifiedRuleId("standard:no-select-trailing-comma"),
                                 severity = Severity.Error,
                                 message = "Remove the trailing comma from the SELECT list.",
                                 path = "src/commonMain/sqldelight/Team.sq",
@@ -51,13 +53,13 @@ class HtmlReporterProviderTest {
                                 replacement = "",
                             ),
                             diagnostic(
-                                ruleId = "standard:use-is-null",
+                                qualifiedRuleId = qualifiedRuleId("standard:use-is-null"),
                                 severity = Severity.Warning,
                                 message = "Use `IS NULL` instead of = NULL & keep <safe>.",
                                 replacement = "IS NULL",
                             ),
                             diagnostic(
-                                ruleId = "standard:keyword-case",
+                                qualifiedRuleId = qualifiedRuleId("standard:keyword-case"),
                                 severity = Severity.Info,
                                 message = "Use uppercase SQL keywords.",
                                 path = "src/commonMain/sqldelight/Search.sq",
@@ -93,7 +95,7 @@ private fun expectedHtml(name: String): String =
     }.readText()
 
 private fun diagnostic(
-    ruleId: String = "standard:use-is-null",
+    qualifiedRuleId: QualifiedRuleId = qualifiedRuleId("standard:use-is-null"),
     severity: Severity = Severity.Warning,
     message: String,
     path: String = "src/commonMain/sqldelight/Player.sq",
@@ -106,7 +108,7 @@ private fun diagnostic(
     replacement: String = "IS NULL",
 ): Diagnostic =
     Diagnostic(
-        ruleId = RuleId(ruleId),
+        ruleId = qualifiedRuleId.ruleId,
         severity = severity,
         message = message,
         file = SourceFile(
@@ -115,6 +117,7 @@ private fun diagnostic(
         ),
         range = range,
         database = null,
+        qualifiedRuleId = qualifiedRuleId,
         fixes =
             listOf(
                 Fix(
@@ -137,4 +140,13 @@ private class ByteArrayReportOutput(
     override fun file(): OutputStream = output
 
     override fun file(path: String): OutputStream = output
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

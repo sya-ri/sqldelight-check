@@ -17,7 +17,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports trailing spaces and tabs.
  */
 public class NoTrailingWhitespaceRule : Rule {
-    override val id: String = "no-trailing-whitespace"
+    override val id: RuleId = RuleId("no-trailing-whitespace")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -37,7 +37,7 @@ public class NoTrailingWhitespaceRule : Rule {
                     )
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Line contains trailing whitespace.",
                         file = context.file,

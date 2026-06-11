@@ -24,7 +24,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * online.
  */
 public class ReindexConcurrentlyRule : Rule {
-    override val id: String = "reindex-concurrently"
+    override val id: RuleId = RuleId("reindex-concurrently")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
@@ -46,7 +46,7 @@ public class ReindexConcurrentlyRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Use REINDEX CONCURRENTLY for PostgreSQL reindex operations on live objects.",
                     file = context.file,

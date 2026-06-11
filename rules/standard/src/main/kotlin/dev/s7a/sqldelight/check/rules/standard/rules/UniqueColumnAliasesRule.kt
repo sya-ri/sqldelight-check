@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * can hide which expression a downstream reference reads.
  */
 public class UniqueColumnAliasesRule : Rule {
-    override val id: String = "unique-column-aliases"
+    override val id: RuleId = RuleId("unique-column-aliases")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -33,7 +33,7 @@ public class UniqueColumnAliasesRule : Rule {
                     if (seen.add(alias.token.text.lowercase())) return@forEach
                     reporter.report(
                         Diagnostic(
-                            ruleId = RuleId(id),
+                            ruleId = id,
                             severity = defaultSeverity,
                             message = "Column aliases should be unique within a SELECT list.",
                             file = context.file,

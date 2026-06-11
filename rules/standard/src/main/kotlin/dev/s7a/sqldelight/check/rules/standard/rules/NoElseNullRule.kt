@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports redundant `ELSE NULL` branches in `CASE` expressions.
  */
 public class NoElseNullRule : Rule {
-    override val id: String = "no-else-null"
+    override val id: RuleId = RuleId("no-else-null")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -33,7 +33,7 @@ public class NoElseNullRule : Rule {
 
                     reporter.report(
                         Diagnostic(
-                            ruleId = RuleId(id),
+                            ruleId = id,
                             severity = defaultSeverity,
                             message = "Omit ELSE NULL from CASE expressions.",
                             file = context.file,

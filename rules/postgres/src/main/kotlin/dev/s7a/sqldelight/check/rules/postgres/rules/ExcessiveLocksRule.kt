@@ -24,7 +24,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * migration strategy.
  */
 public class ExcessiveLocksRule : Rule {
-    override val id: String = "excessive-locks"
+    override val id: RuleId = RuleId("excessive-locks")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.PostgreSql
@@ -46,7 +46,7 @@ public class ExcessiveLocksRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Use CREATE INDEX CONCURRENTLY for PostgreSQL indexes that may be built on live tables.",
                     file = context.file,

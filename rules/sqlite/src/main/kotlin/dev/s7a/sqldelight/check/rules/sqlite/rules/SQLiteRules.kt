@@ -61,7 +61,7 @@ public class NoAlterTableComplexChangeRule : RegexSQLiteRule(
  * SQLite tables.
  */
 public class PreferWithoutRowidForCompositePkRule : Rule {
-    override val id: String = "prefer-without-rowid-for-composite-pk"
+    override val id: RuleId = RuleId("prefer-without-rowid-for-composite-pk")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.SQLite
@@ -79,7 +79,7 @@ public class PreferWithoutRowidForCompositePkRule : Rule {
             .forEach { match ->
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Consider WITHOUT ROWID for SQLite tables with composite primary keys.",
                         file = context.file,
@@ -102,7 +102,7 @@ public abstract class RegexSQLiteRule(
     pattern: String,
     private val message: String,
 ) : Rule {
-    override val id: String = "$ruleName"
+    override val id: RuleId = RuleId("$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.SQLite
@@ -118,7 +118,7 @@ public abstract class RegexSQLiteRule(
         regex.findAll(masked).forEach { match ->
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = message,
                     file = context.file,

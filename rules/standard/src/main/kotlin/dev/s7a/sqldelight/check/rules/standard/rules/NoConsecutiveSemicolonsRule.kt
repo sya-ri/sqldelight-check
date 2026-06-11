@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports adjacent repeated semicolon tokens.
  */
 public class NoConsecutiveSemicolonsRule : Rule {
-    override val id: String = "no-consecutive-semicolons"
+    override val id: RuleId = RuleId("no-consecutive-semicolons")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -41,7 +41,7 @@ public class NoConsecutiveSemicolonsRule : Rule {
                 val range = content.rangeAtOffsets(semicolon.offset + 1, runEnd)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Statement should not contain consecutive semicolons.",
                         file = context.file,

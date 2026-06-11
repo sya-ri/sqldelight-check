@@ -1,7 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.Diagnostic
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.SourceFile
 
 /**
@@ -17,7 +17,7 @@ internal class DisableDirectives private constructor(
     private val disabledLines: List<DisabledLine>,
 ) {
     fun suppresses(diagnostic: Diagnostic): Boolean {
-        val ruleId = diagnostic.ruleId ?: return false
+        val ruleId = diagnostic.qualifiedRuleId ?: return false
         if (ruleId.value in unsuppressibleRuleIds) return false
         val line = diagnostic.range?.start?.line ?: return false
         if (fileRules?.matches(ruleId) == true) return true
@@ -109,14 +109,14 @@ private data class DisabledLine(
 ) {
     fun matches(
         diagnosticLine: Int,
-        ruleId: RuleId,
+        ruleId: QualifiedRuleId,
     ): Boolean = diagnosticLine == line && rules.any { matcher -> matcher.matches(ruleId) }
 }
 
 private data class RuleMatcher(
     val ruleIds: Set<String>?,
 ) {
-    fun matches(ruleId: RuleId): Boolean = ruleIds == null || ruleId.value in ruleIds
+    fun matches(ruleId: QualifiedRuleId): Boolean = ruleIds == null || ruleId.value in ruleIds
 }
 
 private data class Directive(

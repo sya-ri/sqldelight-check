@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.gradle
 
 import dev.s7a.sqldelight.check.api.LogLevel
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.core.CheckConfig
@@ -35,9 +36,9 @@ private fun Iterable<RuleSetExtension>.toRuleSetConfigs(): Map<RuleSetId, RuleSe
         id to RuleSetConfig(id = id, enablement = ruleSet.enabled.get())
     }
 
-private fun Iterable<RuleExtension>.toRuleConfigs(): Map<RuleId, RuleConfig> =
+private fun Iterable<RuleExtension>.toRuleConfigs(): Map<QualifiedRuleId, RuleConfig> =
     associate { rule ->
-        val id = RuleId(rule.name)
+        val id = rule.name.toQualifiedRuleId()
         id to
             RuleConfig(
                 id = id,
@@ -46,3 +47,14 @@ private fun Iterable<RuleExtension>.toRuleConfigs(): Map<RuleId, RuleConfig> =
                 options = rule.options.get(),
             )
     }
+
+private fun String.toQualifiedRuleId(): QualifiedRuleId {
+    val delimiter = indexOf(':')
+    require(delimiter > 0 && delimiter < lastIndex) {
+        "Rule ID must use rule-set:rule-name form: $this"
+    }
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(substring(0, delimiter)),
+        ruleId = RuleId(substring(delimiter + 1)),
+    )
+}

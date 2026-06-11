@@ -16,7 +16,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * `standard:no-select-star` because they do not expose a reliable column count.
  */
 public class ConsistentSetOperationColumnCountRule : Rule {
-    override val id: String = "consistent-set-operation-column-count"
+    override val id: RuleId = RuleId("consistent-set-operation-column-count")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -36,7 +36,7 @@ public class ConsistentSetOperationColumnCountRule : Rule {
 
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "Set operation SELECT lists should return the same number of columns.",
                         file = context.file,

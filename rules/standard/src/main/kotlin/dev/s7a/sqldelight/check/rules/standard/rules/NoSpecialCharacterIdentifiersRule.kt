@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * literals out of scope.
  */
 public class NoSpecialCharacterIdentifiersRule : Rule {
-    override val id: String = "no-special-character-identifiers"
+    override val id: RuleId = RuleId("no-special-character-identifiers")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -28,7 +28,7 @@ public class NoSpecialCharacterIdentifiersRule : Rule {
             if (identifier.name.all { character -> character == '_' || character.isLetterOrDigit() }) return@forEach
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Identifiers should avoid special characters.",
                     file = context.file,

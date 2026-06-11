@@ -1,9 +1,13 @@
 package dev.s7a.sqldelight.check.reporter.json
 
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+
+
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
@@ -71,9 +75,10 @@ private fun JsonReporterProvider.render(
     return output.toString()
 }
 
-private fun diagnostic(): Diagnostic =
-    Diagnostic(
-        ruleId = RuleId("standard:use-is-null"),
+private fun diagnostic(): Diagnostic {
+    val qualifiedRuleId = qualifiedRuleId("standard:use-is-null")
+    return Diagnostic(
+        ruleId = qualifiedRuleId.ruleId,
         severity = Severity.Warning,
         message = "Use `IS NULL` instead of = NULL & keep <safe>.",
         file = SourceFile(
@@ -85,6 +90,7 @@ private fun diagnostic(): Diagnostic =
             end = SourcePosition(line = 2, column = 16),
         ),
         database = null,
+        qualifiedRuleId = qualifiedRuleId,
         fixes =
             listOf(
                 Fix(
@@ -103,6 +109,7 @@ private fun diagnostic(): Diagnostic =
                 ),
             ),
     )
+}
 
 private class ByteArrayReportOutput(
     private val output: ByteArrayOutputStream,
@@ -110,4 +117,13 @@ private class ByteArrayReportOutput(
     override fun file(): OutputStream = output
 
     override fun file(path: String): OutputStream = output
+}
+
+private fun qualifiedRuleId(value: String): QualifiedRuleId {
+    val delimiter = value.indexOf(':')
+    require(delimiter > 0 && delimiter < value.lastIndex)
+    return QualifiedRuleId(
+        ruleSetId = RuleSetId(value.substring(0, delimiter)),
+        ruleId = RuleId(value.substring(delimiter + 1)),
+    )
 }

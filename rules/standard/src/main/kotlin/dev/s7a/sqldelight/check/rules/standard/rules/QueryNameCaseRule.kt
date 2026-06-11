@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports SQLDelight query labels that are not lower camel case.
  */
 public class QueryNameCaseRule : Rule {
-    override val id: String = "query-name-case"
+    override val id: RuleId = RuleId("query-name-case")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -29,7 +29,7 @@ public class QueryNameCaseRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "SQLDelight query label '${label.name}' should be lower camel case.",
                     file = context.file,

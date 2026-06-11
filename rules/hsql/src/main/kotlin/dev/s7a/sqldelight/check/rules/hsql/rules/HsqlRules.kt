@@ -66,7 +66,7 @@ public abstract class RegexHsqlRule(
     pattern: String,
     private val message: String,
 ) : Rule {
-    override val id: String = "$ruleName"
+    override val id: RuleId = RuleId("$ruleName")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.Hsql
@@ -82,7 +82,7 @@ public abstract class RegexHsqlRule(
         regex.findAll(masked).forEach { match ->
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = message,
                     file = context.file,

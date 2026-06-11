@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports SQL literal tokens that are not uppercase.
  */
 public class LiteralCaseRule : Rule {
-    override val id: String = "literal-case"
+    override val id: RuleId = RuleId("literal-case")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -32,7 +32,7 @@ public class LiteralCaseRule : Rule {
                 val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
                 reporter.report(
                     Diagnostic(
-                        ruleId = RuleId(id),
+                        ruleId = id,
                         severity = defaultSeverity,
                         message = "SQL literal '${token.text}' should be uppercase.",
                         file = context.file,

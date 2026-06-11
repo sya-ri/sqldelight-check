@@ -1019,6 +1019,7 @@ class SqlDelightCheckGradlePluginTest {
 
                 import dev.s7a.sqldelight.check.reporter.api.Report;
                 import dev.s7a.sqldelight.check.reporter.api.ReportOutput;
+                import dev.s7a.sqldelight.check.reporter.api.ReporterId;
                 import dev.s7a.sqldelight.check.reporter.api.Reporter;
                 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider;
                 import java.io.IOException;
@@ -1028,8 +1029,8 @@ class SqlDelightCheckGradlePluginTest {
 
                 public final class ExternalReporterProvider implements ReporterProvider {
                     @Override
-                    public String getId() {
-                        return "external";
+                    public ReporterId getId() {
+                        return new ReporterId("external");
                     }
 
                     @Override

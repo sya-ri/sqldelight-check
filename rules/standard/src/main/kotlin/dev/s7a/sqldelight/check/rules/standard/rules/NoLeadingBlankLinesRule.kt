@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports blank lines before the first SQLDelight declaration or statement.
  */
 public class NoLeadingBlankLinesRule : Rule {
-    override val id: String = "no-leading-blank-lines"
+    override val id: RuleId = RuleId("no-leading-blank-lines")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -30,7 +30,7 @@ public class NoLeadingBlankLinesRule : Rule {
         val range = content.rangeAtOffsets(0, firstContentLine.startOffset)
         reporter.report(
             Diagnostic(
-                ruleId = RuleId(id),
+                ruleId = id,
                 severity = defaultSeverity,
                 message = "File should not start with blank lines.",
                 file = context.file,

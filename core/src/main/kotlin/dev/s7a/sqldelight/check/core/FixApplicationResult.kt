@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.SourceFile
 
 /**
@@ -62,7 +62,7 @@ public class SkippedFix(
     /**
      * Rule ID that produced the fix when available.
      */
-    public val ruleId: RuleId?,
+    public val ruleId: QualifiedRuleId?,
     /**
      * File that contained the skipped fix when available.
      */

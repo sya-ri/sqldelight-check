@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports SQLDelight model-bound INSERT statements.
  */
 public class AvoidModelBoundInsertForPublicApiRule : Rule {
-    override val id: String = "avoid-model-bound-insert-for-public-api"
+    override val id: RuleId = RuleId("avoid-model-bound-insert-for-public-api")
     override val defaultSeverity: Severity = Severity.Info
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class AvoidModelBoundInsertForPublicApiRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Prefer an explicit INSERT column list and named values over model-bound VALUES ?.",
                     file = context.file,

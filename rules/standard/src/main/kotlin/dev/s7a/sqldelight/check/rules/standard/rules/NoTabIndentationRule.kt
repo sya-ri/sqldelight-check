@@ -15,7 +15,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports tab characters in leading indentation.
  */
 public class NoTabIndentationRule : Rule {
-    override val id: String = "no-tab-indentation"
+    override val id: RuleId = RuleId("no-tab-indentation")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -32,7 +32,7 @@ public class NoTabIndentationRule : Rule {
             val range = content.rangeAtOffsets(line.startOffset, line.startOffset + indentation.length)
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Indentation should use spaces instead of tabs.",
                     file = context.file,

@@ -24,7 +24,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * cascading side effects that are easy to miss in application code.
  */
 public class NoReplaceIntoRule : Rule {
-    override val id: String = "no-replace-into"
+    override val id: RuleId = RuleId("no-replace-into")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.MySql
@@ -45,7 +45,7 @@ public class NoReplaceIntoRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message =
                         "Avoid MySQL REPLACE INTO because it can delete and insert rows instead of updating them.",

@@ -6,13 +6,14 @@ import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.Reporter
 import dev.s7a.sqldelight.check.reporter.api.ReporterProvider
+import dev.s7a.sqldelight.check.reporter.api.ReporterId
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 
 /**
  * Provider for GitHub Actions workflow command annotations.
  */
 public class GitHubAnnotationsReporterProvider : ReporterProvider {
-    override val id: String = "github-annotations"
+    override val id: ReporterId = ReporterId("github-annotations")
 
     override fun create(options: Map<String, String>): Reporter = GitHubAnnotationsReporter
 }
@@ -37,7 +38,7 @@ private fun Report.toGitHubAnnotations(): String =
 
 private fun Diagnostic.toWorkflowCommand(): String {
     val properties = buildList {
-        add("title=${(ruleId?.value ?: "sqldelight-check").escapeWorkflowCommandProperty()}")
+        add("title=${(qualifiedRuleId?.value ?: ruleId?.value ?: "sqldelight-check").escapeWorkflowCommandProperty()}")
         file?.path?.let { path ->
             add("file=${path.escapeWorkflowCommandProperty()}")
         }

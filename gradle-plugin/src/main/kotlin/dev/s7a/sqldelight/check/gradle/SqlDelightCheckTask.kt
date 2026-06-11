@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.gradle
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.LogLevel
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.core.AnalysisTrace
@@ -109,7 +109,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
             override fun fileRules(
                 database: DatabaseContext,
                 file: SourceFile,
-                ruleIds: List<RuleId>,
+                ruleIds: List<QualifiedRuleId>,
             ) {
                 if (!logLevel.logsRules) return
                 traceCollector.record(database.name, file.path, ruleIds)
@@ -255,7 +255,7 @@ private data class RuleTraceCollector(
     public fun record(
         databaseName: String,
         filePath: String,
-        ruleIds: List<RuleId>,
+        ruleIds: List<QualifiedRuleId>,
     ) {
         traces += FileRuleTrace(databaseName = databaseName, filePath = filePath, ruleIds = ruleIds)
     }
@@ -264,12 +264,12 @@ private data class RuleTraceCollector(
 private data class FileRuleTrace(
     val databaseName: String,
     val filePath: String,
-    val ruleIds: List<RuleId>,
+    val ruleIds: List<QualifiedRuleId>,
 )
 
 internal fun diagnosticRuleHitsByFile(diagnostics: List<Diagnostic>): Map<FileRuleKey, Set<String>> =
     diagnostics
-        .filter { diagnostic -> diagnostic.file != null && diagnostic.ruleId != null && diagnostic.database != null }
+        .filter { diagnostic -> diagnostic.file != null && diagnostic.qualifiedRuleId != null && diagnostic.database != null }
         .groupBy { diagnostic ->
             FileRuleKey(
                 databaseName = diagnostic.database!!.name,
@@ -277,7 +277,7 @@ internal fun diagnosticRuleHitsByFile(diagnostics: List<Diagnostic>): Map<FileRu
             )
         }
         .mapValues { (_, fileDiagnostics) ->
-            fileDiagnostics.mapTo(linkedSetOf()) { diagnostic -> diagnostic.ruleId!!.value }
+            fileDiagnostics.mapTo(linkedSetOf()) { diagnostic -> diagnostic.qualifiedRuleId!!.value }
         }
 
 internal data class FileRuleKey(

@@ -24,7 +24,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * matching restore to `ON`.
  */
 public class ForeignKeysRestoredRule : Rule {
-    override val id: String = "foreign-keys-restored"
+    override val id: RuleId = RuleId("foreign-keys-restored")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
     override val targetCapability: DialectCapability = DialectCapabilities.SQLite
@@ -48,7 +48,7 @@ public class ForeignKeysRestoredRule : Rule {
 
         reporter.report(
             Diagnostic(
-                ruleId = RuleId(id),
+                ruleId = id,
                 severity = defaultSeverity,
                 message =
                     "Restore SQLite foreign key enforcement with PRAGMA foreign_keys = ON later in the migration.",

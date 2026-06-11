@@ -1,7 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.SourceFile
 
 /**
@@ -25,7 +25,7 @@ public interface AnalysisTrace {
     public fun fileRules(
         database: DatabaseContext,
         file: SourceFile,
-        ruleIds: List<RuleId>,
+        ruleIds: List<QualifiedRuleId>,
     ): Unit
 
     /**
@@ -40,7 +40,7 @@ public interface AnalysisTrace {
         override fun fileRules(
             database: DatabaseContext,
             file: SourceFile,
-            ruleIds: List<RuleId>,
+            ruleIds: List<QualifiedRuleId>,
         ): Unit = Unit
     }
 }

@@ -13,7 +13,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports explicit transaction statements in SQLDelight migration files.
  */
 public class NoTransactionInMigrationRule : Rule {
-    override val id: String = "no-transaction-in-migration"
+    override val id: RuleId = RuleId("no-transaction-in-migration")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -35,7 +35,7 @@ public class NoTransactionInMigrationRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Do not wrap SQLDelight migration files in explicit transaction statements.",
                     file = context.file,

@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports predicates that mix same-level AND and OR without explicit grouping.
  */
 public class RequireParenthesesForMixedBooleanOperatorsRule : Rule {
-    override val id: String = "require-parentheses-for-mixed-boolean-operators"
+    override val id: RuleId = RuleId("require-parentheses-for-mixed-boolean-operators")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
 
@@ -38,7 +38,7 @@ public class RequireParenthesesForMixedBooleanOperatorsRule : Rule {
                 .forEach { mixed ->
                     reporter.report(
                         Diagnostic(
-                            ruleId = RuleId(id),
+                            ruleId = id,
                             severity = defaultSeverity,
                             message = "Use parentheses when mixing AND and OR in the same predicate.",
                             file = context.file,

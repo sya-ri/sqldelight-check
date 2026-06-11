@@ -1,7 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.Enablement
-import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 
@@ -31,7 +31,7 @@ public class ConfigurationResolver(
      * Resolves a rule for a database.
      */
     public fun resolveRule(
-        ruleId: RuleId,
+        ruleId: QualifiedRuleId,
         databaseName: String,
         defaultEnablement: Enablement = Enablement.Auto,
         defaultSeverity: Severity = Severity.Warning,

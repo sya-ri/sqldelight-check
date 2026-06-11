@@ -12,7 +12,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Reports parameterized `LIKE` predicates that do not declare an `ESCAPE` clause.
  */
 public class RequireLikeEscapeForUserInputRule : Rule {
-    override val id: String = "require-like-escape-for-user-input"
+    override val id: RuleId = RuleId("require-like-escape-for-user-input")
     override val defaultSeverity: Severity = Severity.Info
     override val defaultEnable: Boolean = true
 
@@ -37,7 +37,7 @@ public class RequireLikeEscapeForUserInputRule : Rule {
 
             reporter.report(
                 Diagnostic(
-                    ruleId = RuleId(id),
+                    ruleId = id,
                     severity = defaultSeverity,
                     message = "Parameterized LIKE predicates should specify ESCAPE so user input wildcards are explicit.",
                     file = context.file,
