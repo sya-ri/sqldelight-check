@@ -48,16 +48,15 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("printSqldelightCheckModel")
 
         assertEquals(SUCCESS, result.task(":printSqldelightCheckModel")?.outcome)
-        assertContentEquals(
+        val expectedOutput =
             listOf(
                 "hasExtension=true",
                 "hasRuleSetConfiguration=true",
                 "hasReporterConfiguration=true",
                 "task.sqldelightCheck=true",
                 "task.sqldelightFix=true",
-            ),
-            result.output.lines().filter { line -> line.startsWith("has") || line.startsWith("task.") },
-        )
+            )
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
     }
 
     @Test
@@ -174,6 +173,9 @@ class SqlDelightCheckGradlePluginTest {
                         html {
                             required.set(true)
                         }
+                        json {
+                            prettyPrint.set(true)
+                        }
                     }
                 }
                 """.trimIndent(),
@@ -183,6 +185,7 @@ class SqlDelightCheckGradlePluginTest {
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertEquals(true, project.file("build/reports/sqldelight-check/report.html").exists())
+        assertEquals(EMPTY_PRETTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
@@ -204,7 +207,8 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertContentEquals(listOf("sqldelight-check analyzed 1 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
+        val expectedOutput = listOf("sqldelight-check analyzed 1 SQLDelight database(s).")
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
@@ -237,14 +241,13 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertContentEquals(
+        val expectedOutput =
             listOf(
                 "sqldelight-check [Database] files (1):",
                 "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
-            ),
-            result.sqldelightCheckOutputLines(),
-        )
+            )
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
     }
 
     @Test
@@ -287,16 +290,15 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertContentEquals(
+        val expectedOutput =
             listOf(
                 "sqldelight-check [Database] files (1):",
                 "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
                 "sqldelight-check [Database] src/main/sqldelight/com/example/Player.sq rules (1):",
                 "sqldelight-check [Database] - [x] standard:final-newline",
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
-            ),
-            result.sqldelightCheckOutputLines(),
-        )
+            )
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
     }
 
     @Test
@@ -328,14 +330,13 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("-PsqldelightCheck.logLevel=verbose", "sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertContentEquals(
+        val expectedOutput =
             listOf(
                 "sqldelight-check [Database] files (1):",
                 "sqldelight-check [Database]   - src/main/sqldelight/com/example/Player.sq",
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
-            ),
-            result.sqldelightCheckOutputLines(),
-        )
+            )
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
     }
 
     @Test
@@ -391,7 +392,8 @@ class SqlDelightCheckGradlePluginTest {
         val result = project.run("sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
-        assertContentEquals(listOf("sqldelight-check analyzed 2 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
+        val expectedOutput = listOf("sqldelight-check analyzed 2 SQLDelight database(s).")
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
@@ -553,7 +555,8 @@ class SqlDelightCheckGradlePluginTest {
                 }
 
             assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome, "SQLDelight $version should be supported.")
-            assertContentEquals(listOf("sqldelight-check analyzed 1 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
+            val expectedOutput = listOf("sqldelight-check analyzed 1 SQLDelight database(s).")
+            assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
         }
     }
 
@@ -592,7 +595,8 @@ class SqlDelightCheckGradlePluginTest {
                 }
 
             assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome, "SQLDelight $version should be supported.")
-            assertContentEquals(listOf("sqldelight-check analyzed 1 SQLDelight database(s)."), result.sqldelightCheckOutputLines())
+            val expectedOutput = listOf("sqldelight-check analyzed 1 SQLDelight database(s).")
+            assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
         }
     }
 
@@ -626,12 +630,11 @@ class SqlDelightCheckGradlePluginTest {
 
         val result = project.runAndFail("sqldelightCheck")
 
-        assertContentEquals(
+        val expectedOutput =
             listOf(
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
-            ),
-            result.sqldelightCheckOutputLines(),
-        )
+            )
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
         assertEquals(sqlDelightCompilerErrorJsonReport(), project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
@@ -689,12 +692,11 @@ class SqlDelightCheckGradlePluginTest {
 
         val result = project.runAndFail("sqldelightCheck")
 
-        assertContentEquals(
+        val expectedOutput =
             listOf(
                 "sqldelight-check analyzed 1 SQLDelight database(s).",
-            ),
-            result.sqldelightCheckOutputLines(),
-        )
+            )
+        assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
         val report = project.file("build/reports/sqldelight-check/report.json").readText()
         assertEquals(finalNewlineErrorJsonReport(), report)
     }
@@ -943,6 +945,17 @@ class SqlDelightCheckGradlePluginTest {
         private const val SQLDELIGHT_SNAPSHOT_REPOSITORY_URL = "https://central.sonatype.com/repository/maven-snapshots/"
         private const val EMPTY_JSON_REPORT =
             """{"formatVersion":"0.1.0","summary":{"diagnostics":0,"errors":0,"warnings":0,"infos":0},"diagnostics":[]}"""
+        private const val EMPTY_PRETTY_JSON_REPORT =
+            "{\n" +
+                "    \"formatVersion\": \"0.1.0\",\n" +
+                "    \"summary\": {\n" +
+                "        \"diagnostics\": 0,\n" +
+                "        \"errors\": 0,\n" +
+                "        \"warnings\": 0,\n" +
+                "        \"infos\": 0\n" +
+                "    },\n" +
+                "    \"diagnostics\": []\n" +
+                "}"
         private const val EMPTY_SARIF_REPORT =
             """{"version":"2.1.0","${'$'}schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[{"tool":{"driver":{"name":"sqldelight-check","semanticVersion":"0.1.0","rules":[]}},"results":[]}]}"""
 
@@ -1132,7 +1145,7 @@ class SqlDelightCheckGradlePluginTest {
     }
 }
 
-private fun BuildResult.sqldelightCheckOutputLines(): List<String> =
+private fun BuildResult.outputLinesMatching(expectedLines: List<String>): List<String> =
     output
         .lines()
-        .filter { line -> line.startsWith("sqldelight-check ") }
+        .filter { line -> line in expectedLines }

@@ -26,7 +26,7 @@ Rule IDs use the `standard:<rule-name>` form.
 Every rule has:
 
 - `🔘` in the Enable column when enabled by default.
-- `⚠️` in the Severity column for the built-in default severity.
+- `⚠️` or `ℹ️` in the Severity column for the built-in default severity.
 - `✅` or `🛠️` in the Fix column when write tasks can apply a fix.
 
 Built-in rules default to `Severity.Warning` in `v0.1.0`. `Severity.Error`
@@ -96,10 +96,12 @@ The standard rule set uses two safety levels:
 | --- | --- | --- | --- | --- |
 | `standard:blank-line-between-statements` | 🔘 | ⚠️ | ✅ | Require a blank line between adjacent top-level SQLDelight statements. |
 | `standard:blocked-words` | 🔘 | ⚠️ |  | Report configured blocked words outside comments and quoted text by default. |
+| `standard:avoid-model-bound-insert-for-public-api` | 🔘 | ℹ️ |  | Discourage SQLDelight model-bound `INSERT ... VALUES ?` APIs. |
 | `standard:clause-keyword-newline` | 🔘 | ⚠️ |  | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
 | `standard:consistent-column-references` | 🔘 | ⚠️ |  | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | `standard:consistent-not-equal-operator` | 🔘 | ⚠️ | 🛠️ | Keep `!=` and `<>` not-equal operators consistent within a file. |
 | `standard:consistent-order-by-direction` | 🔘 | ⚠️ |  | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
+| `standard:consistent-parameter-names` | 🔘 | ⚠️ |  | Require repeated predicates on the same column to reuse the same named parameter. |
 | `standard:consistent-reference-qualification` | 🔘 | ⚠️ |  | Require single-table SELECT result columns to qualify references consistently. |
 | `standard:consistent-set-operation-column-count` | 🔘 | ⚠️ |  | Require adjacent set-operation SELECT lists to return the same number of columns. |
 | `standard:data-type-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL data type names outside comments and quoted text. |
@@ -108,6 +110,7 @@ The standard rule set uses two safety levels:
 | `standard:explicit-union-operator` | 🔘 | ⚠️ |  | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
 | `standard:final-newline` | 🔘 | ⚠️ | ✅ | Require files to end with one LF newline. |
 | `standard:function-name-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL function names outside comments and quoted text. |
+| `standard:grouped-statement-has-single-purpose` | 🔘 | ℹ️ |  | Discourage SQLDelight grouped statements that mix reads and writes. |
 | `standard:keyword-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
 | `standard:line-ending-lf` | 🔘 | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
 | `standard:literal-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
@@ -122,10 +125,12 @@ The standard rule set uses two safety levels:
 | `standard:no-distinct-parentheses` | 🔘 | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
 | `standard:no-else-null` | 🔘 | ⚠️ |  | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
 | `standard:no-from-subquery` | 🔘 | ⚠️ |  | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
+| `standard:no-implicit-cross-join-comma` | 🔘 | ⚠️ |  | Disallow comma-separated `FROM` sources that imply a cross join. |
 | `standard:no-leading-blank-lines` | 🔘 | ⚠️ | ✅ | Disallow blank lines before the first content line. |
 | `standard:no-leading-comma` | 🔘 | ⚠️ |  | Disallow comma tokens as the first non-whitespace character on a line. |
 | `standard:no-leading-whitespace` | 🔘 | ⚠️ | ✅ | Disallow any whitespace before the first file content. |
 | `standard:no-leading-wildcard-like` | 🔘 | ⚠️ |  | Disallow `LIKE` patterns that start with `%` or `_`. |
+| `standard:no-not-in-nullable-subquery` | 🔘 | ⚠️ |  | Require `NOT IN` subqueries to exclude `NULL` values or use `NOT EXISTS`. |
 | `standard:no-redundant-semicolons` | 🔘 | ⚠️ | ✅ | Disallow repeated semicolons separated only by whitespace. |
 | `standard:no-space-after-dot` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately after `.`. |
 | `standard:no-space-after-opening-parenthesis` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately after `(`. |
@@ -144,22 +149,30 @@ The standard rule set uses two safety levels:
 | `standard:no-tab-indentation` | 🔘 | ⚠️ | ✅ | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | 🔘 | ⚠️ | ✅ | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | 🔘 | ⚠️ | ✅ | Remove spaces or tabs at line ends. |
+| `standard:no-transaction-in-migration` | 🔘 | ⚠️ |  | Disallow explicit transaction statements in SQLDelight migration files. |
 | `standard:no-unknown-qualifier` | 🔘 | ⚠️ |  | Disallow qualified column references whose qualifier is not visible in `FROM`. |
 | `standard:no-unused-cte` | 🔘 | ⚠️ |  | Disallow CTEs that are not referenced by the main query. |
 | `standard:no-unused-join` | 🔘 | ⚠️ |  | Disallow JOIN sources that are not referenced by later qualified column reads. |
 | `standard:no-unnecessary-statement-parentheses` | 🔘 | ⚠️ |  | Disallow redundant parentheses around whole top-level `SELECT` statements. |
 | `standard:no-update-without-where` | 🔘 | ⚠️ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
 | `standard:operator-line-position` | 🔘 | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
+| `standard:prefer-between-for-inclusive-range` | 🔘 | ℹ️ |  | Prefer `BETWEEN` for simple inclusive ranges on the same expression. |
 | `standard:prefer-coalesce` | 🔘 | ⚠️ | 🛠️ | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | `standard:prefer-count-star` | 🔘 | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
+| `standard:prefer-exists-over-count-for-existence` | 🔘 | ⚠️ |  | Prefer `EXISTS` over `COUNT(*) > 0` when only existence is needed. |
 | `standard:prefer-explicit-column-list-in-insert` | 🔘 | ⚠️ |  | Require explicit target columns in `INSERT` statements. |
+| `standard:prefer-named-parameters` | 🔘 | ⚠️ |  | Prefer named SQLDelight parameters over anonymous `?` parameters. |
 | `standard:prefer-simple-boolean-case` | 🔘 | ⚠️ |  | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
+| `standard:query-name-case` | 🔘 | ⚠️ |  | Require SQLDelight query labels to use lower camel case. |
 | `standard:require-column-alias-as` | 🔘 | ⚠️ |  | Require `AS` for SELECT result column aliases. |
+| `standard:require-explicit-null-ordering` | 🔘 | ℹ️ |  | Require `NULLS FIRST` or `NULLS LAST` with explicit `ORDER BY` directions. |
 | `standard:require-order-by-with-limit` | 🔘 | ⚠️ |  | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
 | `standard:require-parentheses-for-mixed-boolean-operators` | 🔘 | ⚠️ |  | Require parentheses when `AND` and `OR` are mixed at the same predicate level. |
+| `standard:require-query-label` | 🔘 | ⚠️ |  | Require executable statements in `.sq` files to have SQLDelight query labels. |
 | `standard:require-result-column-alias` | 🔘 | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
 | `standard:require-table-alias-as` | 🔘 | ⚠️ |  | Require `AS` for table aliases. |
 | `standard:require-table-alias-for-subquery` | 🔘 | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
+| `standard:require-where-index-friendly-predicate` | 🔘 | ℹ️ |  | Flag common function-wrapped `WHERE` predicates that can be hard to use with indexes. |
 | `standard:select-comma-line-position` | 🔘 | ⚠️ |  | Require multiline `SELECT` list commas to trail the previous result expression. |
 | `standard:select-modifier-line-position` | 🔘 | ⚠️ |  | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
 | `standard:select-target-newline` | 🔘 | ⚠️ |  | Require one result expression per line in multiline `SELECT` lists. |
@@ -1551,6 +1564,37 @@ Why this fix is opt-in:
   rely on dialect-specific explanation plans.
 - Users must opt in before write tasks apply fixes.
 
+## `standard:prefer-exists-over-count-for-existence`
+
+Reports `COUNT(*) > 0` when the expression is only checking whether at least one row exists.
+
+`COUNT(*)` is correct when the count value is needed. For boolean existence checks, `EXISTS` communicates intent more
+directly and can let the database stop after finding a matching row.
+
+Invalid:
+
+```sql
+hasPlayers:
+SELECT COUNT(*) > 0
+FROM player;
+```
+
+Valid:
+
+```sql
+hasPlayers:
+SELECT EXISTS(
+  SELECT 1
+  FROM player
+);
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Reports only the conservative `COUNT(*) > 0` shape.
+- Skips comments, string literals, and quoted identifiers.
+
 ## `standard:use-is-null`
 
 Reports equality comparisons where `NULL` appears on the right-hand side.
@@ -2496,6 +2540,389 @@ Fix behavior:
 - Skips comments, string literals, quoted identifiers, and nested subqueries.
 - Skips ambiguous constructs until parser-backed table-expression ranges are exposed.
 
+## `standard:no-implicit-cross-join-comma`
+
+Reports comma-separated `FROM` sources.
+
+Comma joins hide the cross-join behavior inside punctuation. Prefer explicit `CROSS JOIN` so reviews can distinguish an
+intentional Cartesian product from a missing join condition.
+
+Invalid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM player, team;
+```
+
+Valid:
+
+```sql
+selectPlayerTeams:
+SELECT player.id, team.name
+FROM player
+CROSS JOIN team;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Reports each top-level comma in a `FROM` source list.
+- Skips comments, string literals, quoted identifiers, and commas inside parentheses.
+
+## `standard:no-transaction-in-migration`
+
+Reports explicit transaction statements in SQLDelight `.sqm` migration files.
+
+SQLDelight may run migrations in a transaction when the driver supports it. Explicit transaction statements in migration
+files can conflict with that execution model and reduce portability across drivers.
+
+Invalid in `.sqm` files:
+
+```sql
+BEGIN TRANSACTION;
+ALTER TABLE player ADD COLUMN score INTEGER;
+COMMIT;
+```
+
+Valid:
+
+```sql
+ALTER TABLE player ADD COLUMN score INTEGER;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Applies only to `.sqm` files.
+- Reports `BEGIN`, `COMMIT`, `ROLLBACK`, and `END TRANSACTION` outside comments, string literals, and quoted
+  identifiers.
+
+## `standard:prefer-named-parameters`
+
+Reports anonymous SQLDelight `?` parameters in `.sq` files.
+
+Named parameters make generated Kotlin method signatures easier to read and keep argument order changes visible in code
+review. SQLDelight variable arguments such as `IN ?` are allowed because they have a distinct call-site shape.
+
+Invalid:
+
+```sql
+selectByNameAndScore:
+SELECT id, name
+FROM player
+WHERE name = ?
+  AND score > ?;
+```
+
+Valid:
+
+```sql
+selectByNameAndScore:
+SELECT id, name
+FROM player
+WHERE name = :name
+  AND score > :minimumScore;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Applies only to `.sq` files.
+- Skips `IN ?` variable arguments.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:query-name-case`
+
+Reports SQLDelight query labels that are not lower camel case.
+
+Query labels become generated API members. Keeping them lower camel case makes the generated Kotlin API idiomatic and
+predictable.
+
+Invalid:
+
+```sql
+Select_All:
+SELECT id, name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectAll:
+SELECT id, name
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Applies only to `.sq` files.
+- Checks labels that appear at the start of a source line.
+- Leaves grouped statement names such as `upsertPlayer { ... }` alone when they are already lower camel case.
+
+## `standard:avoid-model-bound-insert-for-public-api`
+
+Reports SQLDelight model-bound inserts that use `INSERT INTO table VALUES ?`.
+
+Model-bound inserts are concise, but they couple the generated method signature to the full table row shape. Explicit
+column lists and named values are less fragile when generated APIs are public or shared across modules.
+
+Advisory:
+
+```sql
+insertPlayer:
+INSERT INTO player
+VALUES ?;
+```
+
+Preferred for stable APIs:
+
+```sql
+insertPlayer:
+INSERT INTO player(id, name)
+VALUES (:id, :name);
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Defaults to `Severity.Info`.
+- Applies only to `.sq` files.
+- Skips comments, string literals, and quoted identifiers.
+
+## `standard:consistent-parameter-names`
+
+Reports repeated predicates on the same column that use different SQLDelight named parameters.
+
+The rule is intentionally conservative. It only checks direct comparison predicates such as `name = :name` and
+`name = :otherName`; it does not try to infer semantic equivalence across transformed expressions.
+
+Invalid:
+
+```sql
+selectByName:
+SELECT id, name
+FROM player
+WHERE name = :name
+   OR name = :otherName;
+```
+
+Valid:
+
+```sql
+selectByName:
+SELECT id, name
+FROM player
+WHERE name = :name
+   OR name = :name;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Applies only to `.sq` files.
+- Checks direct named-parameter comparison predicates.
+
+## `standard:require-query-label`
+
+Reports executable statements in `.sq` files that are not introduced by a SQLDelight query label.
+
+Executable SQL in `.sq` files becomes part of the generated API. Requiring labels makes that API surface intentional.
+
+Invalid:
+
+```sql
+SELECT id, name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectAll:
+SELECT id, name
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Applies only to `.sq` files.
+- Excludes schema statements such as `CREATE TABLE`.
+- Accepts statements inside grouped SQLDelight blocks.
+
+## `standard:grouped-statement-has-single-purpose`
+
+Reports SQLDelight grouped statement blocks that mix reads and writes.
+
+SQLDelight groups execute multiple statements together. Mixing `SELECT` with mutating statements makes generated APIs
+harder to name and review. Write-only groups such as upserts are accepted.
+
+Invalid:
+
+```sql
+updateAndRead {
+  UPDATE player
+  SET name = :name
+  WHERE id = :id;
+
+  SELECT id, name
+  FROM player;
+}
+```
+
+Valid:
+
+```sql
+upsertPlayer {
+  UPDATE player
+  SET name = :name
+  WHERE id = :id;
+
+  INSERT INTO player(id, name)
+  VALUES (:id, :name);
+}
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Defaults to `Severity.Info`.
+- Applies only to `.sq` files.
+
+## `standard:no-not-in-nullable-subquery`
+
+Reports `NOT IN (SELECT ...)` subqueries that do not exclude `NULL` values.
+
+`NOT IN` can produce surprising results when the subquery returns `NULL`. Prefer `NOT EXISTS`, or filter `NULL` values
+inside the subquery.
+
+Invalid:
+
+```sql
+selectTeams:
+SELECT id
+FROM team
+WHERE id NOT IN (
+  SELECT team_id
+  FROM player
+);
+```
+
+Valid:
+
+```sql
+selectTeams:
+SELECT id
+FROM team
+WHERE id NOT IN (
+  SELECT team_id
+  FROM player
+  WHERE team_id IS NOT NULL
+);
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Reports `NOT IN` subqueries that do not contain an `IS NOT NULL` predicate.
+- Skips `NOT IN` value lists.
+
+## `standard:require-where-index-friendly-predicate`
+
+Reports common function-wrapped `WHERE` predicates such as `LOWER(name) = :name`.
+
+Wrapping the column side of a predicate in a function can prevent ordinary indexes from being used. The rule only checks
+common function-call comparison shapes and leaves schema-specific tuning to the database.
+
+Invalid:
+
+```sql
+selectByName:
+SELECT id, name
+FROM player
+WHERE LOWER(name) = :name;
+```
+
+Valid:
+
+```sql
+selectByName:
+SELECT id, name
+FROM player
+WHERE normalized_name = :name;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Defaults to `Severity.Info`.
+- Checks `WHERE` clauses only.
+
+## `standard:prefer-between-for-inclusive-range`
+
+Reports simple inclusive ranges that can be written with `BETWEEN`.
+
+The rule only checks direct `column >= lower AND column <= upper` shapes on the same expression. More complex boolean
+logic is left alone.
+
+Invalid:
+
+```sql
+selectByScore:
+SELECT id, name
+FROM player
+WHERE score >= :minimumScore AND score <= :maximumScore;
+```
+
+Valid:
+
+```sql
+selectByScore:
+SELECT id, name
+FROM player
+WHERE score BETWEEN :minimumScore AND :maximumScore;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Defaults to `Severity.Info`.
+- Reports only simple inclusive ranges on the same expression.
+
+## `standard:require-explicit-null-ordering`
+
+Reports `ORDER BY` items that specify `ASC` or `DESC` without `NULLS FIRST` or `NULLS LAST`.
+
+Null ordering differs across databases. Making it explicit keeps sorted query results stable across dialects and
+database settings.
+
+Invalid:
+
+```sql
+selectAll:
+SELECT id, name
+FROM player
+ORDER BY name ASC;
+```
+
+Valid:
+
+```sql
+selectAll:
+SELECT id, name
+FROM player
+ORDER BY name ASC NULLS LAST;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+- Defaults to `Severity.Info`.
+- Reports explicit `ASC` and `DESC` directions that do not specify `NULLS FIRST` or `NULLS LAST`.
+
 ## Current Boundaries
 
 The standard rule set does not yet include:
@@ -2504,9 +2931,7 @@ The standard rule set does not yet include:
 - SQLDelight PSI-backed AST rules
 - indentation reflow
 - column layout alignment
-- aliasing rules
-- query naming rules
-- migration-number rules
+- parser-backed schema and nullability rules
 
 Those rules should be added when the public rule model can expose enough SQLDelight-derived facts without coupling custom
 rules to SQLDelight internals.

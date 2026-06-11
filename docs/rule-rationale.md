@@ -83,17 +83,22 @@ SQL clarity:
 - `standard:consistent-column-references`
 - `standard:consistent-not-equal-operator`
 - `standard:consistent-order-by-direction`
+- `standard:consistent-parameter-names`
 - `standard:consistent-reference-qualification`
 - `standard:explicit-cross-join`
 - `standard:explicit-inner-join`
 - `standard:explicit-union-operator`
 - `standard:no-else-null`
+- `standard:no-implicit-cross-join-comma`
 - `standard:no-self-alias`
 - `standard:no-self-column-alias`
 - `standard:no-unnecessary-statement-parentheses`
 - `standard:prefer-coalesce`
 - `standard:prefer-count-star`
+- `standard:prefer-exists-over-count-for-existence`
+- `standard:prefer-between-for-inclusive-range`
 - `standard:prefer-simple-boolean-case`
+- `standard:require-explicit-null-ordering`
 - `standard:require-column-alias-as`
 - `standard:require-parentheses-for-mixed-boolean-operators`
 - `standard:require-result-column-alias`
@@ -107,6 +112,7 @@ Query safety:
 
 - `standard:no-delete-without-where`
 - `standard:no-leading-wildcard-like`
+- `standard:no-not-in-nullable-subquery`
 - `standard:no-select-distinct-with-group-by`
 - `standard:no-select-star`
 - `standard:no-update-without-where`
@@ -125,9 +131,16 @@ Maintainability:
 - `standard:no-unused-join`
 - `standard:no-unknown-qualifier`
 - `standard:prefer-explicit-column-list-in-insert`
+- `standard:query-name-case`
+- `standard:require-query-label`
+- `standard:require-where-index-friendly-predicate`
 
 SQLDelight portability:
 
+- `standard:avoid-model-bound-insert-for-public-api`
+- `standard:grouped-statement-has-single-purpose`
+- `standard:no-transaction-in-migration`
+- `standard:prefer-named-parameters`
 - `standard:no-right-join`
 - `standard:no-special-character-identifiers`
 

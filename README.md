@@ -111,7 +111,7 @@ sqldelightCheck {
         json {
             required.set(true)
             outputFile.set(layout.buildDirectory.file("reports/sqldelight-check/report.json"))
-            options.put("prettyPrint", "true")
+            prettyPrint.set(true)
         }
         sarif {
             required.set(true)
@@ -263,6 +263,7 @@ Authoring guides:
 
 - [Rule Set Author Guide](docs/rule-set-authors.md)
 - [Reporter Author Guide](docs/reporter-authors.md)
+- [Branch Protection](docs/branch-protection.md)
 
 ## SQLDelight And Dialects
 

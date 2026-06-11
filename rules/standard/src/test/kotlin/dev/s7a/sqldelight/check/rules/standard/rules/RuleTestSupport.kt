@@ -37,11 +37,11 @@ internal val cleanPlayerSq: String =
     selectById:
     SELECT id, name, score
     FROM player
-    WHERE id = ?;
+    WHERE id = :id;
 
     insertPlayer:
     INSERT INTO player(id, name, score)
-    VALUES (?, ?, ?);
+    VALUES (:id, :name, :score);
     """.trimIndent() + "\n"
 
 internal val cleanMigrationSqm: String =

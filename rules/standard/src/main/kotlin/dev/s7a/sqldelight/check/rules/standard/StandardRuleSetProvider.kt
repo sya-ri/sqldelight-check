@@ -3,10 +3,12 @@ package dev.s7a.sqldelight.check.rules.standard
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rules.standard.rules.BlankLineBetweenStatementsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.BlockedWordsRule
+import dev.s7a.sqldelight.check.rules.standard.rules.AvoidModelBoundInsertForPublicApiRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ClauseKeywordNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentColumnReferencesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentOrderByDirectionRule
+import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentParameterNamesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentReferenceQualificationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentSetOperationColumnCountRule
 import dev.s7a.sqldelight.check.rules.standard.rules.DataTypeCaseRule
@@ -18,6 +20,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.FunctionNameCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.KeywordCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.LineEndingLfRule
 import dev.s7a.sqldelight.check.rules.standard.rules.LiteralCaseRule
+import dev.s7a.sqldelight.check.rules.standard.rules.GroupedStatementHasSinglePurposeRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxCaseDepthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxJoinsRule
@@ -29,10 +32,12 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDistinctParenthesesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoElseNullRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoFromSubqueryRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoImplicitCrossJoinCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingWhitespaceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoLeadingWildcardLikeRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoNotInNullableSubqueryRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoRedundantSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceAfterDotRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceAfterOpeningParenthesisRule
@@ -51,6 +56,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoSpecialCharacterIdentifie
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoTransactionInMigrationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnknownQualifierRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedCteRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedJoinRule
@@ -58,15 +64,22 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoUnnecessaryStatementParen
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUpdateWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.OperatorLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCoalesceRule
+import dev.s7a.sqldelight.check.rules.standard.rules.PreferBetweenForInclusiveRangeRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
+import dev.s7a.sqldelight.check.rules.standard.rules.PreferExistsOverCountForExistenceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferExplicitColumnListInInsertRule
+import dev.s7a.sqldelight.check.rules.standard.rules.PreferNamedParametersRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferSimpleBooleanCaseRule
+import dev.s7a.sqldelight.check.rules.standard.rules.QueryNameCaseRule
+import dev.s7a.sqldelight.check.rules.standard.rules.RequireExplicitNullOrderingRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireOrderByWithLimitRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireColumnAliasAsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireParenthesesForMixedBooleanOperatorsRule
+import dev.s7a.sqldelight.check.rules.standard.rules.RequireQueryLabelRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireResultColumnAliasRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasAsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasForSubqueryRule
+import dev.s7a.sqldelight.check.rules.standard.rules.RequireWhereIndexFriendlyPredicateRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SelectCommaLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SelectModifierLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SelectTargetNewlineRule
@@ -97,11 +110,13 @@ public class StandardRuleSetProvider : RuleSetProvider {
     override fun ruleProviders(): Set<RuleProvider> =
         setOf(
             RuleProvider(::BlankLineBetweenStatementsRule),
+            RuleProvider(::AvoidModelBoundInsertForPublicApiRule),
             RuleProvider(::BlockedWordsRule),
             RuleProvider(::ClauseKeywordNewlineRule),
             RuleProvider(::ConsistentColumnReferencesRule),
             RuleProvider(::ConsistentNotEqualOperatorRule),
             RuleProvider(::ConsistentOrderByDirectionRule),
+            RuleProvider(::ConsistentParameterNamesRule),
             RuleProvider(::ConsistentReferenceQualificationRule),
             RuleProvider(::ConsistentSetOperationColumnCountRule),
             RuleProvider(::DataTypeCaseRule),
@@ -110,6 +125,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::ExplicitUnionOperatorRule),
             RuleProvider(::FinalNewlineRule),
             RuleProvider(::FunctionNameCaseRule),
+            RuleProvider(::GroupedStatementHasSinglePurposeRule),
             RuleProvider(::KeywordCaseRule),
             RuleProvider(::LineEndingLfRule),
             RuleProvider(::LiteralCaseRule),
@@ -124,10 +140,12 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoDistinctParenthesesRule),
             RuleProvider(::NoElseNullRule),
             RuleProvider(::NoFromSubqueryRule),
+            RuleProvider(::NoImplicitCrossJoinCommaRule),
             RuleProvider(::NoLeadingBlankLinesRule),
             RuleProvider(::NoLeadingCommaRule),
             RuleProvider(::NoLeadingWhitespaceRule),
             RuleProvider(::NoLeadingWildcardLikeRule),
+            RuleProvider(::NoNotInNullableSubqueryRule),
             RuleProvider(::NoRedundantSemicolonsRule),
             RuleProvider(::NoSpaceAfterDotRule),
             RuleProvider(::NoSpaceAfterOpeningParenthesisRule),
@@ -146,22 +164,30 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
+            RuleProvider(::NoTransactionInMigrationRule),
             RuleProvider(::NoUnknownQualifierRule),
             RuleProvider(::NoUnusedCteRule),
             RuleProvider(::NoUnusedJoinRule),
             RuleProvider(::NoUnnecessaryStatementParenthesesRule),
             RuleProvider(::NoUpdateWithoutWhereRule),
             RuleProvider(::OperatorLinePositionRule),
+            RuleProvider(::PreferBetweenForInclusiveRangeRule),
             RuleProvider(::PreferCoalesceRule),
             RuleProvider(::PreferCountStarRule),
+            RuleProvider(::PreferExistsOverCountForExistenceRule),
             RuleProvider(::PreferExplicitColumnListInInsertRule),
+            RuleProvider(::PreferNamedParametersRule),
             RuleProvider(::PreferSimpleBooleanCaseRule),
+            RuleProvider(::QueryNameCaseRule),
+            RuleProvider(::RequireExplicitNullOrderingRule),
             RuleProvider(::RequireOrderByWithLimitRule),
             RuleProvider(::RequireColumnAliasAsRule),
             RuleProvider(::RequireParenthesesForMixedBooleanOperatorsRule),
+            RuleProvider(::RequireQueryLabelRule),
             RuleProvider(::RequireResultColumnAliasRule),
             RuleProvider(::RequireTableAliasAsRule),
             RuleProvider(::RequireTableAliasForSubqueryRule),
+            RuleProvider(::RequireWhereIndexFriendlyPredicateRule),
             RuleProvider(::SelectCommaLinePositionRule),
             RuleProvider(::SelectModifierLinePositionRule),
             RuleProvider(::SelectTargetNewlineRule),

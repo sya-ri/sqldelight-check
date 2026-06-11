@@ -43,7 +43,15 @@ public open class SqlDelightCheckExtension
          */
         public val reports: NamedDomainObjectContainer<ReporterExtension> =
             objects.domainObjectContainer(ReporterExtension::class.java) { name ->
-                objects.newInstance(ReporterExtension::class.java, name)
+                when (name) {
+                    "github-annotations" -> objects.newInstance(GitHubAnnotationsReporterExtension::class.java, name)
+                    "html" -> objects.newInstance(HtmlReporterExtension::class.java, name)
+                    "json" -> objects.newInstance(JsonReporterExtension::class.java, name)
+                    "markdown" -> objects.newInstance(MarkdownReporterExtension::class.java, name)
+                    "sarif" -> objects.newInstance(SarifReporterExtension::class.java, name)
+                    "text" -> objects.newInstance(TextReporterExtension::class.java, name)
+                    else -> objects.newInstance(ReporterExtension::class.java, name)
+                }
             }
 
         /**

@@ -39,5 +39,13 @@ public open class ReporterExtension
         public val options: MapProperty<String, String> =
             objects.mapProperty(String::class.java, String::class.java).convention(emptyMap())
 
+        /**
+         * Returns reporter options after applying typed DSL properties.
+         *
+         * Reporter-specific Gradle extensions can override this to translate
+         * typed properties into the string options consumed by `ReporterProvider`.
+         */
+        public open fun resolvedOptions(): Map<String, String> = options.get()
+
         override fun getName(): String = name
     }

@@ -91,6 +91,50 @@ sqldelightCheck {
 }
 ```
 
+## Typed Gradle DSL
+
+Reporter providers receive options as `Map<String, String>`, so every reporter can be configured with `options`.
+If a reporter is bundled with a Gradle plugin, prefer exposing common options through a typed extension that extends
+`ReporterExtension`, while still mapping those values to the reporter's string options before creating the reporter.
+Override `resolvedOptions()` to make that mapping reusable by the Gradle task.
+
+Built-in reporters follow this pattern: `JsonReporterExtension` and `SarifReporterExtension` expose
+`prettyPrint: Property<Boolean>`, while `TextReporterExtension`, `HtmlReporterExtension`,
+`MarkdownReporterExtension`, and `GitHubAnnotationsReporterExtension` exist as reporter-specific extension types even
+when they currently only inherit the shared reporter settings.
+
+```kotlin
+public open class ExampleReporterExtension
+    @Inject
+    constructor(
+        name: String,
+        objects: ObjectFactory,
+    ) : ReporterExtension(name, objects) {
+        public val compact: Property<Boolean> =
+            objects.property(Boolean::class.java)
+
+        override fun resolvedOptions(): Map<String, String> =
+            buildMap {
+                putAll(super.resolvedOptions())
+                if (compact.isPresent) {
+                    put("compact", compact.get().toString())
+                }
+            }
+    }
+```
+
+Users can then configure the typed option without stringly-typed Gradle code:
+
+```kotlin
+sqldelightCheck {
+    reports {
+        json {
+            prettyPrint.set(true)
+        }
+    }
+}
+```
+
 Reporter output files are managed by sqldelight-check. Single-file reporters should write to `output.file()`.
 Reporters that need assets or shards can write relative paths with `output.file("assets/report.css")`. A reporter
 should avoid reading project files directly unless its format explicitly requires it.

@@ -14,7 +14,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import kotlin.test.Test
-import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 /**
@@ -33,7 +33,7 @@ class ProviderRegistryTest {
                 )
             }
 
-        assertContains(error.message.orEmpty(), "Duplicate sqldelight-check reporter provider ID(s): json")
+        assertEquals("Duplicate sqldelight-check reporter provider ID(s): json", error.message)
     }
 
     @Test
@@ -48,7 +48,7 @@ class ProviderRegistryTest {
                 )
             }
 
-        assertContains(error.message.orEmpty(), "Duplicate sqldelight-check rule set provider ID(s): standard")
+        assertEquals("Duplicate sqldelight-check rule set provider ID(s): standard", error.message)
     }
 
     @Test
@@ -63,7 +63,7 @@ class ProviderRegistryTest {
                 )
             }
 
-        assertContains(error.message.orEmpty(), "Duplicate sqldelight-check rule ID(s): custom:duplicate in first, second")
+        assertEquals("Duplicate sqldelight-check rule ID(s): custom:duplicate in first, second", error.message)
     }
 
     private fun reporterProvider(id: String): ReporterProvider =

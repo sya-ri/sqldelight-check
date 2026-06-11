@@ -188,7 +188,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 val outputFile = reporter.outputFile.get().asFile
                 val outputDirectory = reporter.outputDirectory.get().asFile
                 provider
-                    .create(reporter.options.get())
+                    .create(reporter.resolvedOptions())
                     .write(
                         report,
                         GradleReportOutput(

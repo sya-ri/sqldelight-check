@@ -34,8 +34,12 @@ public class ReporterContainerExtension(
      * Configures the built-in JSON reporter used for machine-readable report
      * output.
      */
-    public fun json(configure: Action<in ReporterExtension>) {
-        report("json", configure)
+    public fun json(configure: Action<in JsonReporterExtension>) {
+        val reporter = maybeCreate("json")
+        require(reporter is JsonReporterExtension) {
+            "Reporter 'json' must use JsonReporterExtension."
+        }
+        configure.execute(reporter)
     }
 
     /**
@@ -43,16 +47,24 @@ public class ReporterContainerExtension(
      *
      * The generated report follows the SARIF 2.1.0 schema.
      */
-    public fun sarif(configure: Action<in ReporterExtension>) {
-        report("sarif", configure)
+    public fun sarif(configure: Action<in SarifReporterExtension>) {
+        val reporter = maybeCreate("sarif")
+        require(reporter is SarifReporterExtension) {
+            "Reporter 'sarif' must use SarifReporterExtension."
+        }
+        configure.execute(reporter)
     }
 
     /**
      * Configures the built-in text reporter used for compact console-friendly
      * output.
      */
-    public fun text(configure: Action<in ReporterExtension>) {
-        report("text", configure)
+    public fun text(configure: Action<in TextReporterExtension>) {
+        val reporter = maybeCreate("text")
+        require(reporter is TextReporterExtension) {
+            "Reporter 'text' must use TextReporterExtension."
+        }
+        configure.execute(reporter)
     }
 
     /**
@@ -60,24 +72,36 @@ public class ReporterContainerExtension(
      *
      * The report includes grouped diagnostics and source excerpts.
      */
-    public fun html(configure: Action<in ReporterExtension>) {
-        report("html", configure)
+    public fun html(configure: Action<in HtmlReporterExtension>) {
+        val reporter = maybeCreate("html")
+        require(reporter is HtmlReporterExtension) {
+            "Reporter 'html' must use HtmlReporterExtension."
+        }
+        configure.execute(reporter)
     }
 
     /**
      * Configures the built-in Markdown reporter used for GitHub Actions job
      * summaries.
      */
-    public fun markdown(configure: Action<in ReporterExtension>) {
-        report("markdown", configure)
+    public fun markdown(configure: Action<in MarkdownReporterExtension>) {
+        val reporter = maybeCreate("markdown")
+        require(reporter is MarkdownReporterExtension) {
+            "Reporter 'markdown' must use MarkdownReporterExtension."
+        }
+        configure.execute(reporter)
     }
 
     /**
      * Configures the built-in GitHub annotations reporter used for workflow
      * command output.
      */
-    public fun githubAnnotations(configure: Action<in ReporterExtension>) {
-        report("github-annotations", configure)
+    public fun githubAnnotations(configure: Action<in GitHubAnnotationsReporterExtension>) {
+        val reporter = maybeCreate("github-annotations")
+        require(reporter is GitHubAnnotationsReporterExtension) {
+            "Reporter 'github-annotations' must use GitHubAnnotationsReporterExtension."
+        }
+        configure.execute(reporter)
     }
 
     override fun iterator(): Iterator<ReporterExtension> = elements.iterator()

@@ -31,16 +31,17 @@ sqldelightCheck {
 }
 ```
 
-Reporter-specific options can be set with `options`; the built-in JSON and SARIF reporters support `prettyPrint`.
+Reporter-specific options can be set with `options`; the built-in JSON and SARIF reporters also expose typed
+`prettyPrint` configuration.
 
 ```kotlin
 sqldelightCheck {
     reports {
         json {
-            options.put("prettyPrint", "true")
+            prettyPrint.set(true)
         }
         sarif {
-            options.put("prettyPrint", "true")
+            prettyPrint.set(true)
         }
     }
 }
