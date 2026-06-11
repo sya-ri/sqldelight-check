@@ -148,11 +148,6 @@ public final class dev/s7a/sqldelight/check/rule/api/SqlTableReferenceFacts {
 
 public final class dev/s7a/sqldelight/check/rule/api/SqlToken {
 	public fun <init> (Ljava/lang/String;II)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()I
-	public final fun component3 ()I
-	public final fun copy (Ljava/lang/String;II)Ldev/s7a/sqldelight/check/rule/api/SqlToken;
-	public static synthetic fun copy$default (Ldev/s7a/sqldelight/check/rule/api/SqlToken;Ljava/lang/String;IIILjava/lang/Object;)Ldev/s7a/sqldelight/check/rule/api/SqlToken;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getEndOffset ()I
 	public final fun getNormalizedText ()Ljava/lang/String;

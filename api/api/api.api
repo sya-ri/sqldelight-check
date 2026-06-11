@@ -92,10 +92,6 @@ public final class dev/s7a/sqldelight/check/api/LogLevel : java/lang/Enum {
 
 public final class dev/s7a/sqldelight/check/api/QualifiedRuleId {
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1-wigqPlY ()Ljava/lang/String;
-	public final fun component2-cwxIa2A ()Ljava/lang/String;
-	public final fun copy-zIWqXKc (Ljava/lang/String;Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
-	public static synthetic fun copy-zIWqXKc$default (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getRuleId-cwxIa2A ()Ljava/lang/String;
 	public final fun getRuleSetId-wigqPlY ()Ljava/lang/String;

@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.rule.api
 /**
  * SQL-like source token outside comments and quoted text.
  */
-public data class SqlToken(
+public class SqlToken(
     public val text: String,
     public val startOffset: Int,
     public val endOffset: Int,
@@ -12,6 +12,23 @@ public data class SqlToken(
      * Lowercase token text for case-insensitive matching.
      */
     public val normalizedText: String = text.lowercase()
+
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is SqlToken &&
+            text == other.text &&
+            startOffset == other.startOffset &&
+            endOffset == other.endOffset
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + startOffset
+        result = 31 * result + endOffset
+        return result
+    }
+
+    override fun toString(): String =
+        "SqlToken(text=$text, startOffset=$startOffset, endOffset=$endOffset)"
 }
 
 /**
