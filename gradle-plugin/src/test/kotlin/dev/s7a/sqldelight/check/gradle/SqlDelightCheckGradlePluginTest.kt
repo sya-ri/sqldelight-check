@@ -85,6 +85,46 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `check task runs official dialect rule sets without extra dependencies`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Enablement
+                        import dev.s7a.sqldelight.check.api.Severity
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            rules {
+                                rule("sqlite:prefer-integer-primary-key") {
+                                    enabled.set(Enablement.Enabled)
+                                    severity.set(Severity.Error)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+              id INT PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+        )
+
+        project.runAndFail("sqldelightCheck")
+
+        assertEquals(
+            sqlitePreferIntegerPrimaryKeyErrorJsonReport(),
+            project.file("build/reports/sqldelight-check/report.json").readText(),
+        )
+    }
+
+    @Test
     fun `check task enables github annotations report on GitHub Actions`() {
         val project =
             testProject(
@@ -981,6 +1021,9 @@ class SqlDelightCheckGradlePluginTest {
 
         fun unsafeComparisonSpacingJsonReport(): String =
             """{"summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
+
+        fun sqlitePreferIntegerPrimaryKeyErrorJsonReport(): String =
+            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"sqlite:prefer-integer-primary-key","severity":"error","message":"Use INTEGER PRIMARY KEY for SQLite rowid primary keys.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":2,"column":6},"end":{"line":2,"column":21}},"database":${sqliteDatabaseJson()},"fixes":[]}]}"""
 
         fun sqliteDatabaseJson(): String =
             """{"name":"Database","dialect":{"family":"SQLite","capabilities":["sqlite"]}}"""

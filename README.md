@@ -37,8 +37,8 @@ sqldelight {
 }
 ```
 
-The plugin installs the standard rule set and standard reporters by default. Dialect-specific rule sets are published
-separately so projects can opt into rules that only make sense for a specific SQLDelight dialect.
+The plugin installs the standard rule set, official dialect rule sets, and standard reporters by default. Dialect-specific
+rules stay inactive under `Auto` unless a database exposes the matching SQLDelight dialect capability.
 
 ## Run
 
@@ -185,7 +185,7 @@ Omitting rule IDs suppresses all rule diagnostics covered by that directive.
 
 ## Rule Sets
 
-Built-in rule set artifacts:
+Built-in rule set artifacts are installed with the Gradle plugin and are also published separately for custom setups:
 
 - `sqldelight-check-rules-standard`: dialect-independent rules for `.sq` and `.sqm` files.
 - `sqldelight-check-rules-postgres`: PostgreSQL-specific rules gated by `DialectCapability.PostgreSql`.

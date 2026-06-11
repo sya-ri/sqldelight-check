@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import java.util.ServiceLoader
 
@@ -18,6 +19,21 @@ public class RuleRegistry private constructor(
      * Returns discovered rule set providers.
      */
     public fun providers(): List<RuleSetProvider> = ruleSetProviders
+
+    /**
+     * Returns the rule set IDs discovered in this registry.
+     */
+    public fun ruleSetIds(): Set<RuleSetId> = ruleSetProviders.mapTo(linkedSetOf()) { provider -> provider.id }
+
+    /**
+     * Returns every qualified rule ID discovered in this registry.
+     */
+    public fun ruleIds(): Set<QualifiedRuleId> =
+        ruleSetProviders.flatMapTo(linkedSetOf()) { provider ->
+            provider.ruleProviders().map { ruleProvider ->
+                QualifiedRuleId(provider.id, ruleProvider.create().id)
+            }
+        }
 
     public companion object {
         internal fun create(providers: List<RuleSetProvider>): RuleRegistry = RuleRegistry(providers)

@@ -8,8 +8,10 @@ import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.CheckConfig
+import dev.s7a.sqldelight.check.core.DatabaseConfig
 import dev.s7a.sqldelight.check.core.FixApplier
 import dev.s7a.sqldelight.check.core.FixSkipReason
+import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
@@ -80,10 +82,12 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         trace: AnalysisTrace,
     ): AnalysisRunResult {
         val inputs = SqlDelightProjectResolver(project, project.sqldelightCheckDialectsRegistry()).resolve()
+        val ruleRegistry = project.sqldelightCheckRuleRegistry()
+        validateConfiguredRules(config, ruleRegistry)
         val diagnostics =
             SqlDelightCheckEngine().run(
                 inputs = inputs.map { input -> input.analysisInput },
-                ruleSetProviders = project.sqldelightCheckRuleRegistry().providers(),
+                ruleSetProviders = ruleRegistry.providers(),
                 config = config,
                 trace = trace,
             )
@@ -284,3 +288,28 @@ internal data class FileRuleKey(
     val databaseName: String,
     val filePath: String,
 )
+
+private fun validateConfiguredRules(
+    config: CheckConfig,
+    registry: RuleRegistry,
+) {
+    val configuredRuleSetIds =
+        (config.ruleSets.keys + config.databases.values.flatMap(DatabaseConfig::ruleSetIds))
+            .mapTo(linkedSetOf()) { ruleSetId -> ruleSetId }
+    val unknownRuleSetIds = configuredRuleSetIds - registry.ruleSetIds()
+    require(unknownRuleSetIds.isEmpty()) {
+        "Unknown sqldelight-check rule set ID(s): ${unknownRuleSetIds.joinToString { ruleSetId -> ruleSetId.value }}"
+    }
+
+    val configuredRuleIds =
+        (config.rules.keys + config.databases.values.flatMap(DatabaseConfig::ruleIds))
+            .mapTo(linkedSetOf()) { ruleId -> ruleId }
+    val unknownRuleIds = configuredRuleIds - registry.ruleIds()
+    require(unknownRuleIds.isEmpty()) {
+        "Unknown sqldelight-check rule ID(s): ${unknownRuleIds.joinToString { ruleId -> ruleId.value }}"
+    }
+}
+
+private fun DatabaseConfig.ruleSetIds() = ruleSets.keys
+
+private fun DatabaseConfig.ruleIds() = rules.keys
