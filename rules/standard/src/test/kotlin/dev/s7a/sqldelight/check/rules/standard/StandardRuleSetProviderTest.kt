@@ -65,6 +65,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:no-tab-indentation"),
                 RuleId("standard:no-trailing-blank-lines"),
                 RuleId("standard:no-trailing-whitespace"),
+                RuleId("standard:no-unknown-qualifier"),
                 RuleId("standard:no-unused-cte"),
                 RuleId("standard:no-unused-join"),
                 RuleId("standard:no-unnecessary-statement-parentheses"),

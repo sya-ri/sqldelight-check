@@ -130,6 +130,7 @@ The standard rule set uses two safety levels:
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
+| `standard:no-unknown-qualifier` | Warning / Auto | No | None | Disallow qualified column references whose qualifier is not visible in `FROM`. |
 | `standard:no-unused-cte` | Warning / Auto | No | None | Disallow CTEs that are not referenced by the main query. |
 | `standard:no-unused-join` | Warning / Auto | No | None | Disallow JOIN sources that are not referenced by later qualified column reads. |
 | `standard:no-unnecessary-statement-parentheses` | Warning / Auto | No | None | Disallow redundant parentheses around whole top-level `SELECT` statements. |
@@ -193,6 +194,7 @@ Useful sqlfluff concepts reflected here:
   `standard:no-special-character-identifiers`.
 - Parse-light reference checks from SQLFluff ST03 and ST11: `standard:no-unused-cte` and
   `standard:no-unused-join`.
+- Source-facts reference checks from SQLFluff RF01: `standard:no-unknown-qualifier`.
 
 ## `standard:blocked-words`
 
@@ -362,6 +364,32 @@ Fix behavior:
 
 - No fix is provided.
 - Recursive or ambiguous CTE layouts are left to future SQLDelight-derived facts.
+
+## `standard:no-unknown-qualifier`
+
+Reports qualified column references whose qualifier is not declared by a table reference in the same statement.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT missing.id
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player AS p;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- The rule checks table names and aliases only; it does not resolve whether the column itself exists.
+- Schema-qualified table references in `FROM` and `JOIN` are ignored.
 
 ## `standard:no-unused-join`
 

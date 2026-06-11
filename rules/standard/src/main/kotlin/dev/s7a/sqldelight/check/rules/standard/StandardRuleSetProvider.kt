@@ -48,6 +48,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoSpecialCharacterIdentifie
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoUnknownQualifierRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedCteRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnnecessaryStatementParenthesesRule
@@ -136,6 +137,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
+            RuleProvider(::NoUnknownQualifierRule),
             RuleProvider(::NoUnusedCteRule),
             RuleProvider(::NoUnusedJoinRule),
             RuleProvider(::NoUnnecessaryStatementParenthesesRule),

@@ -58,6 +58,7 @@ internal fun Rule.diagnostics(
     content: String,
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
+    facts: SqlFacts = SqlFacts(),
 ): List<Diagnostic> {
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -70,7 +71,7 @@ internal fun Rule.diagnostics(
                     )
                 override val file: SourceFile = SourceFile(path = path, content = content)
                 override val options: Map<String, String> = options
-                override val facts: SqlFacts = SqlFacts()
+                override val facts: SqlFacts = facts
             },
         reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic },
     )
@@ -82,8 +83,9 @@ internal fun Rule.assertDiagnosticCount(
     expected: Int,
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
+    facts: SqlFacts = SqlFacts(),
 ) {
-    assertEquals(expected, diagnostics(content, path, options).size)
+    assertEquals(expected, diagnostics(content, path, options, facts).size)
 }
 
 internal fun Rule.singleReplacement(
