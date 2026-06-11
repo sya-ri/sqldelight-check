@@ -42,6 +42,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectDistinctWithGroupBy
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelectTrailingCommaRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSelfAliasRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoSpecialCharacterIdentifiersRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
@@ -53,7 +54,9 @@ import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferExplicitColumnListInInsertRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferSimpleBooleanCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireOrderByWithLimitRule
+import dev.s7a.sqldelight.check.rules.standard.rules.RequireColumnAliasAsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireResultColumnAliasRule
+import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasAsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.RequireTableAliasForSubqueryRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SelectModifierLinePositionRule
 import dev.s7a.sqldelight.check.rules.standard.rules.SetOperatorLinePositionRule
@@ -65,6 +68,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.SpaceAroundComparisonOperat
 import dev.s7a.sqldelight.check.rules.standard.rules.SpaceBeforeBlockCommentEndRule
 import dev.s7a.sqldelight.check.rules.standard.rules.StatementTerminatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UniqueTableAliasesRule
+import dev.s7a.sqldelight.check.rules.standard.rules.UniqueColumnAliasesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.UseIsNullRule
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -122,6 +126,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoSelectStarRule),
             RuleProvider(::NoSelectTrailingCommaRule),
             RuleProvider(::NoSelfAliasRule),
+            RuleProvider(::NoSpecialCharacterIdentifiersRule),
             RuleProvider(::NoTabIndentationRule),
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
@@ -133,7 +138,9 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::PreferExplicitColumnListInInsertRule),
             RuleProvider(::PreferSimpleBooleanCaseRule),
             RuleProvider(::RequireOrderByWithLimitRule),
+            RuleProvider(::RequireColumnAliasAsRule),
             RuleProvider(::RequireResultColumnAliasRule),
+            RuleProvider(::RequireTableAliasAsRule),
             RuleProvider(::RequireTableAliasForSubqueryRule),
             RuleProvider(::SelectModifierLinePositionRule),
             RuleProvider(::SetOperatorLinePositionRule),
@@ -144,6 +151,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::SpaceAroundComparisonOperatorsRule),
             RuleProvider(::SpaceBeforeBlockCommentEndRule),
             RuleProvider(::StatementTerminatorRule),
+            RuleProvider(::UniqueColumnAliasesRule),
             RuleProvider(::UniqueTableAliasesRule),
             RuleProvider(::UseIsNullRule),
         )

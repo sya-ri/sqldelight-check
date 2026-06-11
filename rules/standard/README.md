@@ -124,6 +124,7 @@ The standard rule set uses two safety levels:
 | `standard:no-select-star` | Warning / Auto | No | None | Disallow `SELECT *` result columns. |
 | `standard:no-select-trailing-comma` | Warning / Auto | Yes | Unsafe | Disallow trailing commas at the end of `SELECT` clauses. |
 | `standard:no-self-alias` | Warning / Auto | No | None | Disallow table aliases that repeat the table name they alias. |
+| `standard:no-special-character-identifiers` | Warning / Auto | No | None | Disallow quoted identifiers that need non-portable special characters. |
 | `standard:no-tab-indentation` | Warning / Auto | Yes | Safe | Replace leading indentation tabs with spaces. |
 | `standard:no-trailing-blank-lines` | Warning / Auto | Yes | Safe | Disallow blank lines after the last content line. |
 | `standard:no-trailing-whitespace` | Warning / Auto | Yes | Safe | Remove spaces or tabs at line ends. |
@@ -134,8 +135,10 @@ The standard rule set uses two safety levels:
 | `standard:prefer-count-star` | Warning / Auto | Yes | Unsafe | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
 | `standard:prefer-explicit-column-list-in-insert` | Warning / Auto | No | None | Require explicit target columns in `INSERT` statements. |
 | `standard:prefer-simple-boolean-case` | Warning / Auto | No | None | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
+| `standard:require-column-alias-as` | Warning / Auto | No | None | Require `AS` for SELECT result column aliases. |
 | `standard:require-order-by-with-limit` | Warning / Auto | No | None | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
 | `standard:require-result-column-alias` | Warning / Auto | No | None | Require aliases for computed `SELECT` result columns. |
+| `standard:require-table-alias-as` | Warning / Auto | No | None | Require `AS` for table aliases. |
 | `standard:require-table-alias-for-subquery` | Warning / Auto | No | None | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
 | `standard:select-modifier-line-position` | Warning / Auto | No | None | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
 | `standard:set-operator-line-position` | Warning / Auto | No | None | Require multiline set operators to begin their own line after indentation. |
@@ -146,6 +149,7 @@ The standard rule set uses two safety levels:
 | `standard:space-around-comparison-operators` | Warning / Auto | Yes | Unsafe | Prefer one inline space around comparison operators. |
 | `standard:space-before-block-comment-end` | Warning / Auto | Yes | Safe | Require one space before a block comment closing marker. |
 | `standard:statement-terminator` | Warning / Auto | No | None | Require statement blocks to end with semicolons. |
+| `standard:unique-column-aliases` | Warning / Auto | No | None | Require SELECT result column aliases to be unique within a SELECT list. |
 | `standard:unique-table-aliases` | Warning / Auto | No | None | Require top-level table aliases to be unique within a statement. |
 | `standard:use-is-null` | Warning / Auto | Yes | Unsafe | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
 
@@ -178,6 +182,9 @@ Useful sqlfluff concepts reflected here:
 - Parse-light convention checks for blocked words and table aliases: `standard:blocked-words`,
   `standard:no-self-alias`, `standard:require-table-alias-for-subquery`, and
   `standard:unique-table-aliases`.
+- Parse-light alias and identifier checks from SQLFluff AL01, AL02, AL08, and RF05:
+  `standard:require-table-alias-as`, `standard:require-column-alias-as`,
+  `standard:unique-column-aliases`, and `standard:no-special-character-identifiers`.
 
 ## `standard:blocked-words`
 
@@ -218,6 +225,79 @@ Invalid:
 selectPlayers:
 SELECT player.id
 FROM player AS player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player AS p;
+```
+
+Fix behavior:
+
+- No fix is provided.
+
+## `standard:no-special-character-identifiers`
+
+Reports quoted identifiers that contain characters outside letters, digits, and `_`.
+
+Invalid:
+
+```sql
+CREATE TABLE "player score" (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Valid:
+
+```sql
+CREATE TABLE player_score (
+  id INTEGER NOT NULL PRIMARY KEY
+);
+```
+
+Fix behavior:
+
+- No fix is provided.
+- Single-quoted string literals and comments are ignored.
+
+## `standard:require-column-alias-as`
+
+Reports SELECT result aliases that omit `AS`.
+
+Invalid:
+
+```sql
+selectStats:
+SELECT count(*) total
+FROM player;
+```
+
+Valid:
+
+```sql
+selectStats:
+SELECT count(*) AS total
+FROM player;
+```
+
+Fix behavior:
+
+- No fix is provided.
+
+## `standard:require-table-alias-as`
+
+Reports table aliases that omit `AS`.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT p.id
+FROM player p;
 ```
 
 Valid:
@@ -283,6 +363,31 @@ Fix behavior:
 
 - No fix is provided.
 - Nested aliases are not compared with outer statement aliases.
+
+## `standard:unique-column-aliases`
+
+Reports duplicate aliases within the same SELECT list.
+
+Invalid:
+
+```sql
+selectStats:
+SELECT count(*) AS total, max(score) AS total
+FROM player;
+```
+
+Valid:
+
+```sql
+selectStats:
+SELECT count(*) AS total, max(score) AS max_score
+FROM player;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- Nested SELECT lists are checked independently from outer SELECT lists.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
 dialect-specific grammar facts should be added after the public rule model exposes SQLDelight-derived facts. Until then,

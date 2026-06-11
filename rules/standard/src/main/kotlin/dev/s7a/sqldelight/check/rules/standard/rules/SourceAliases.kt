@@ -7,6 +7,7 @@ internal data class TableReference(
     val sourceEndOffset: Int,
     val tableName: String?,
     val alias: SqlToken?,
+    val aliasUsesAs: Boolean,
     val isSubquery: Boolean,
 )
 
@@ -74,7 +75,8 @@ private fun String.tableReferenceInSegment(
             sourceStartOffset = open.offset,
             sourceEndOffset = closeOffset + 1,
             tableName = null,
-            alias = alias,
+            alias = alias?.token,
+            aliasUsesAs = alias?.usesAs == true,
             isSubquery = true,
         )
     }
@@ -96,7 +98,8 @@ private fun String.tableReferenceInSegment(
         sourceStartOffset = firstToken.startOffset,
         sourceEndOffset = firstToken.endOffset,
         tableName = tableName,
-        alias = alias,
+        alias = alias?.token,
+        aliasUsesAs = alias?.usesAs == true,
         isSubquery = false,
     )
 }
@@ -113,12 +116,17 @@ private fun String.qualifiedIdentifierTokens(segmentTokens: List<SqlToken>): Lis
     return sourceTokens
 }
 
+private data class AliasToken(
+    val token: SqlToken,
+    val usesAs: Boolean,
+)
+
 private fun String.aliasAfterSource(
     tokens: List<SqlToken>,
     startOffset: Int,
     endOffset: Int,
     depth: Int,
-): SqlToken? {
+): AliasToken? {
     val aliasTokens =
         tokens.filter { token ->
             token.startOffset >= startOffset &&
@@ -127,7 +135,11 @@ private fun String.aliasAfterSource(
         }
     if (aliasTokens.isEmpty()) return null
     val first = aliasTokens.first()
-    return if (first.isKeyword("as")) aliasTokens.getOrNull(1) else first
+    return if (first.isKeyword("as")) {
+        aliasTokens.getOrNull(1)?.let { token -> AliasToken(token = token, usesAs = true) }
+    } else {
+        AliasToken(token = first, usesAs = false)
+    }
 }
 
 private fun String.firstReferenceBoundaryAfter(
