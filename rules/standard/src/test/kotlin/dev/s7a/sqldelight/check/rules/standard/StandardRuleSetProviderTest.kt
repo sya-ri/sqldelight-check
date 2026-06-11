@@ -23,6 +23,7 @@ class StandardRuleSetProviderTest {
                 RuleId("standard:consistent-column-references"),
                 RuleId("standard:consistent-not-equal-operator"),
                 RuleId("standard:consistent-order-by-direction"),
+                RuleId("standard:consistent-reference-qualification"),
                 RuleId("standard:consistent-set-operation-column-count"),
                 RuleId("standard:data-type-case"),
                 RuleId("standard:explicit-cross-join"),

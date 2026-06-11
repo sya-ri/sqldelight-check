@@ -88,6 +88,7 @@ The standard rule set uses two safety levels:
 | `standard:consistent-column-references` | Warning / Auto | No | None | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | `standard:consistent-not-equal-operator` | Warning / Auto | Yes | Unsafe | Keep `!=` and `<>` not-equal operators consistent within a file. |
 | `standard:consistent-order-by-direction` | Warning / Auto | No | None | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
+| `standard:consistent-reference-qualification` | Warning / Auto | No | None | Require single-table SELECT result columns to qualify references consistently. |
 | `standard:consistent-set-operation-column-count` | Warning / Auto | No | None | Require adjacent set-operation SELECT lists to return the same number of columns. |
 | `standard:data-type-case` | Warning / Auto | Yes | Unsafe | Prefer uppercase common SQL data type names outside comments and quoted text. |
 | `standard:explicit-cross-join` | Warning / Auto | No | None | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
@@ -194,7 +195,8 @@ Useful sqlfluff concepts reflected here:
   `standard:no-special-character-identifiers`.
 - Parse-light reference checks from SQLFluff ST03 and ST11: `standard:no-unused-cte` and
   `standard:no-unused-join`.
-- Source-facts reference checks from SQLFluff RF01: `standard:no-unknown-qualifier`.
+- Source-facts reference checks from SQLFluff RF01 and RF03: `standard:no-unknown-qualifier` and
+  `standard:consistent-reference-qualification`.
 
 ## `standard:blocked-words`
 
@@ -1715,6 +1717,39 @@ Fix behavior:
 - No automatic fix is provided because the rule cannot know which branch should add or remove columns.
 - Branches with wildcard targets are skipped because their result count is unknown.
 - Skips comments, string literals, and quoted identifiers.
+
+## `standard:consistent-reference-qualification`
+
+Reports single-table `SELECT` result lists that mix qualified and unqualified simple column references.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT player.id, name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT player.id, player.name
+FROM player;
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id, name
+FROM player;
+```
+
+Fix behavior:
+
+- No fix is provided.
+- Multi-table statements, expressions, and wildcard targets are ignored until name resolution can prove column origin.
 
 ## `standard:no-select-trailing-comma`
 

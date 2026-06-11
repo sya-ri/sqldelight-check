@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.ClauseKeywordNewlineRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentColumnReferencesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentNotEqualOperatorRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentOrderByDirectionRule
+import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentReferenceQualificationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ConsistentSetOperationColumnCountRule
 import dev.s7a.sqldelight.check.rules.standard.rules.DataTypeCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.ExplicitCrossJoinRule
@@ -95,6 +96,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::ConsistentColumnReferencesRule),
             RuleProvider(::ConsistentNotEqualOperatorRule),
             RuleProvider(::ConsistentOrderByDirectionRule),
+            RuleProvider(::ConsistentReferenceQualificationRule),
             RuleProvider(::ConsistentSetOperationColumnCountRule),
             RuleProvider(::DataTypeCaseRule),
             RuleProvider(::ExplicitCrossJoinRule),
