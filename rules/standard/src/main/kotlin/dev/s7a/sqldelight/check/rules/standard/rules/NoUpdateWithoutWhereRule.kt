@@ -25,6 +25,7 @@ public class NoUpdateWithoutWhereRule : Rule {
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isKeyword("update")) return@forEachIndexed
+            if (content.isUpsertUpdateAction(tokens, index)) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
             if (content.hasWhereClauseAfter(tokens, index, statementEnd, depth)) return@forEachIndexed
@@ -40,4 +41,14 @@ public class NoUpdateWithoutWhereRule : Rule {
             )
         }
     }
+}
+
+private fun String.isUpsertUpdateAction(
+    tokens: List<SqlToken>,
+    updateIndex: Int,
+): Boolean {
+    val previous = tokens.getOrNull(updateIndex - 1) ?: return false
+    val update = tokens[updateIndex]
+    return previous.isKeyword("do") &&
+        sqlParenthesisDepthAt(previous.startOffset) == sqlParenthesisDepthAt(update.startOffset)
 }
