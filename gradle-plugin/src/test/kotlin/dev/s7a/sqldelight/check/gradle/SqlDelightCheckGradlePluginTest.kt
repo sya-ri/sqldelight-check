@@ -72,7 +72,7 @@ class SqlDelightCheckGradlePluginTest {
                 """.trimIndent(),
             )
 
-        val result = project.run("sqldelightCheck")
+        val result = project.runWithEnvironment(mapOf("GITHUB_ACTIONS" to "false"), "sqldelightCheck")
 
         assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
         assertEquals(true, project.file("build/reports/sqldelight-check/report.json").exists())
