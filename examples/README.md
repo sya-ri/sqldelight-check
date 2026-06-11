@@ -1,7 +1,17 @@
 # Examples
 
-This directory contains usage notes for sqldelight-check examples.
+This directory contains runnable sqldelight-check example projects.
 
-Runnable example projects will be added as the `v0.1.0` publishing flow settles. For now, the main README contains the
-canonical Gradle setup and DSL snippets for applying the plugin, configuring rules, enabling reports, and adding custom
-providers.
+## Basic
+
+`basic` is a minimal SQLDelight JVM project that applies the local sqldelight-check Gradle plugin through a composite
+build.
+
+Run it from the repository root:
+
+```shell
+./gradlew -p examples/basic sqldelightCheck
+```
+
+The task analyzes `examples/basic/src/main/sqldelight`, then writes JSON, SARIF, and text reports under
+`examples/basic/build/reports/sqldelight-check/`.

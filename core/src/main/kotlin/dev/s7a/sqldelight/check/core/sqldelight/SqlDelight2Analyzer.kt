@@ -6,7 +6,9 @@ import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.AnalysisResult
 import java.io.File
 import java.lang.reflect.Constructor
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
+import java.lang.reflect.Proxy
 import java.net.URLClassLoader
 import java.nio.file.Files
 
@@ -41,7 +43,8 @@ internal object SqlDelight2Analyzer {
                     packageName = packageName,
                 )
             }.getOrElse { failure ->
-                listOf(input.errorDiagnostic("SQLDelight 2.x analysis failed: ${failure.message ?: failure::class.java.name}"))
+                val rootCause = failure.rootCause()
+                listOf(input.errorDiagnostic("SQLDelight 2.x analysis failed: ${rootCause.message ?: rootCause::class.java.name}"))
             }
         return AnalysisResult(files = input.files, diagnostics = diagnostics)
     }
@@ -57,8 +60,15 @@ internal object SqlDelight2Analyzer {
 
         val outputDirectory = Files.createTempDirectory("sqldelight-check-${input.database.name}").toFile()
         try {
-            return URLClassLoader(classpath.map { file -> file.toURI().toURL() }.toTypedArray(), javaClass.classLoader)
-                .use { loader -> analyzeWithClassLoader(input, packageName, outputDirectory, loader) }
+            return URLClassLoader(
+                classpath.map { file -> file.toURI().toURL() }.toTypedArray(),
+                ClassLoader.getPlatformClassLoader(),
+            )
+                .use { loader ->
+                    withContextClassLoader(loader) {
+                        analyzeWithClassLoader(input, packageName, outputDirectory, loader)
+                    }
+                }
         } finally {
             outputDirectory.deleteRecursively()
         }
@@ -103,7 +113,7 @@ internal object SqlDelight2Analyzer {
         val status =
             environmentClass
                 .methodWithParameterCount("generateSqlDelightFiles", 1)
-                .invoke(environment, { _: String -> Unit })
+                .let { method -> method.invoke(environment, loader.noOpFunction(method.parameterTypes.single())) }
 
         return when {
             status.javaClass.name.endsWith("\$Failure") ->
@@ -220,4 +230,31 @@ internal object SqlDelight2Analyzer {
 
     private fun Method.signature(): String =
         "$name${parameterTypes.joinToString(prefix = "(", postfix = ")") { type -> type.name }}"
+}
+
+private fun ClassLoader.noOpFunction(functionType: Class<*>): Any {
+    val unit = Class.forName("kotlin.Unit", true, this).getField("INSTANCE").get(null)
+    return Proxy.newProxyInstance(this, arrayOf(functionType)) { _, _, _ -> unit }
+}
+
+private fun Throwable.rootCause(): Throwable {
+    var current = this
+    while (current is InvocationTargetException && current.targetException != null) {
+        current = current.targetException
+    }
+    return current
+}
+
+private inline fun <T> withContextClassLoader(
+    classLoader: ClassLoader,
+    block: () -> T,
+): T {
+    val thread = Thread.currentThread()
+    val previous = thread.contextClassLoader
+    thread.contextClassLoader = classLoader
+    return try {
+        block()
+    } finally {
+        thread.contextClassLoader = previous
+    }
 }

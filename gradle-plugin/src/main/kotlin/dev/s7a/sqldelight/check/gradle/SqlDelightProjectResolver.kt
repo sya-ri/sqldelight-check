@@ -72,7 +72,8 @@ internal class SqlDelightProjectResolver(
         val dependencySourceFolders = sourceFolders.filter { folder -> folder.dependency }
         val sourceFiles = resolveSourceFiles(localSourceFolders)
         val dialectClasspath = dialectConfiguration?.files?.toList().orEmpty()
-        val compilerClasspath = task.sqlDelightCompilerClasspath() + dialectClasspath
+        val intellijClasspath = intellijConfiguration?.files?.toList().orEmpty()
+        val compilerClasspath = task.sqlDelightCompilerClasspath() + dialectClasspath + intellijClasspath
 
         return ResolvedSqlDelightInput(
             sqlDelightVersion = version,
