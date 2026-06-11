@@ -21,17 +21,20 @@ Rule IDs use the `hsql:<rule-name>` form.
 
 ## Configuration Model
 
-- `🔘` enabled automatically
-- `⚠️` diagnostics by default
-- no write-task fixes
+- `🔘` in the Enable column when enabled automatically for HSQL dialects.
+- `⚠️` in the Severity column for the built-in default severity.
+- The Fix column is blank when write tasks do not attach a fix.
+
+Built-in rules default to `Severity.Warning` in `v0.1.0`. `Severity.Error`
+and `Severity.Info` are supported through user configuration.
 
 ## Rule Summary
 
-| Rule ID | Default | Fix | Purpose |
-| --- | --- | --- | --- |
-| `hsql:no-database-file-settings` | ⚠️ |  | Disallow database or file settings in schema and migration sources. |
-| `hsql:no-system-operations` | ⚠️ |  | Disallow HSQL system operations in schema and migration sources. |
-| `hsql:no-text-table-source` | ⚠️ |  | Disallow HSQL text-table sources in versioned SQLDelight files. |
+| Rule ID | Enable | Severity | Fix | Purpose |
+| --- | --- | --- | --- | --- |
+| `hsql:no-database-file-settings` | 🔘 | ⚠️ |  | Disallow database or file settings in schema and migration sources. |
+| `hsql:no-system-operations` | 🔘 | ⚠️ |  | Disallow HSQL system operations in schema and migration sources. |
+| `hsql:no-text-table-source` | 🔘 | ⚠️ |  | Disallow HSQL text-table sources in versioned SQLDelight files. |
 
 ## Notes
 

@@ -25,9 +25,14 @@ Rule IDs use the `standard:<rule-name>` form.
 
 Every rule has:
 
-- default enablement: `🔘`
-- default severity: `⚠️`
-- optional fixes attached to diagnostics
+- `🔘` in the Enable column when enabled by default.
+- `⚠️` in the Severity column for the built-in default severity.
+- `✅` or `🛠️` in the Fix column when write tasks can apply a fix.
+
+Built-in rules default to `Severity.Warning` in `v0.1.0`. `Severity.Error`
+and `Severity.Info` are supported through user configuration, so teams can
+promote high-confidence project rules or demote advisory style rules without
+forking the rule set.
 
 Users can override enablement and severity in `build.gradle.kts`:
 
@@ -87,83 +92,83 @@ The standard rule set uses two safety levels:
 
 ## Rule Summary
 
-| Rule ID | Default | Fix | Purpose |
-| --- | --- | --- | --- |
-| `standard:blocked-words` | ⚠️ |  | Report configured blocked words outside comments and quoted text by default. |
-| `standard:clause-keyword-newline` | ⚠️ |  | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
-| `standard:consistent-column-references` | ⚠️ |  | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
-| `standard:consistent-not-equal-operator` | ⚠️ | 🛠️ | Keep `!=` and `<>` not-equal operators consistent within a file. |
-| `standard:consistent-order-by-direction` | ⚠️ |  | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
-| `standard:consistent-reference-qualification` | ⚠️ |  | Require single-table SELECT result columns to qualify references consistently. |
-| `standard:consistent-set-operation-column-count` | ⚠️ |  | Require adjacent set-operation SELECT lists to return the same number of columns. |
-| `standard:data-type-case` | ⚠️ | 🛠️ | Prefer uppercase common SQL data type names outside comments and quoted text. |
-| `standard:explicit-cross-join` | ⚠️ |  | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
-| `standard:explicit-inner-join` | ⚠️ |  | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
-| `standard:explicit-union-operator` | ⚠️ |  | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
-| `standard:final-newline` | ⚠️ | ✅ | Require files to end with one LF newline. |
-| `standard:function-name-case` | ⚠️ | 🛠️ | Prefer uppercase common SQL function names outside comments and quoted text. |
-| `standard:keyword-case` | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
-| `standard:line-ending-lf` | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
-| `standard:literal-case` | ⚠️ | 🛠️ | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
-| `standard:max-blank-lines` | ⚠️ | ✅ | Disallow more than one consecutive blank line. |
-| `standard:max-case-depth` | ⚠️ |  | Disallow `CASE` expressions nested deeper than `maxDepth`. |
-| `standard:max-joins` | ⚠️ |  | Disallow statements with more than `max` `JOIN` clauses. |
-| `standard:max-line-length` | ⚠️ |  | Report non-blank lines longer than 120 characters. |
-| `standard:max-subquery-depth` | ⚠️ |  | Disallow nested `SELECT` statements deeper than `maxDepth`. |
-| `standard:no-consecutive-semicolons` | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
-| `standard:no-delete-without-where` | ⚠️ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
-| `standard:no-distinct-parentheses` | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
-| `standard:no-else-null` | ⚠️ |  | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
-| `standard:no-from-subquery` | ⚠️ |  | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
-| `standard:no-leading-blank-lines` | ⚠️ | ✅ | Disallow blank lines before the first content line. |
-| `standard:no-leading-comma` | ⚠️ |  | Disallow comma tokens as the first non-whitespace character on a line. |
-| `standard:no-leading-whitespace` | ⚠️ | ✅ | Disallow any whitespace before the first file content. |
-| `standard:no-leading-wildcard-like` | ⚠️ |  | Disallow `LIKE` patterns that start with `%` or `_`. |
-| `standard:no-redundant-semicolons` | ⚠️ | ✅ | Disallow repeated semicolons separated only by whitespace. |
-| `standard:no-space-after-dot` | ⚠️ | ✅ | Disallow inline whitespace immediately after `.`. |
-| `standard:no-space-after-opening-parenthesis` | ⚠️ | ✅ | Disallow inline whitespace immediately after `(`. |
-| `standard:no-space-before-closing-parenthesis` | ⚠️ | ✅ | Disallow inline whitespace immediately before `)`. |
-| `standard:no-space-before-comma` | ⚠️ | ✅ | Disallow inline whitespace before `,`. |
-| `standard:no-space-before-dot` | ⚠️ | ✅ | Disallow inline whitespace immediately before `.`. |
-| `standard:no-space-before-function-parenthesis` | ⚠️ | ✅ | Disallow inline whitespace between common SQL function names and `(`. |
-| `standard:no-space-before-semicolon` | ⚠️ | ✅ | Disallow inline whitespace before `;`. |
-| `standard:no-right-join` | ⚠️ |  | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
-| `standard:no-select-distinct-with-group-by` | ⚠️ |  | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
-| `standard:no-select-star` | ⚠️ |  | Disallow `SELECT *` result columns. |
-| `standard:no-select-trailing-comma` | ⚠️ | 🛠️ | Disallow trailing commas at the end of `SELECT` clauses. |
-| `standard:no-self-column-alias` | ⚠️ |  | Disallow SELECT result aliases that repeat the source column name. |
-| `standard:no-self-alias` | ⚠️ |  | Disallow table aliases that repeat the table name they alias. |
-| `standard:no-special-character-identifiers` | ⚠️ |  | Disallow quoted identifiers that need non-portable special characters. |
-| `standard:no-tab-indentation` | ⚠️ | ✅ | Replace leading indentation tabs with spaces. |
-| `standard:no-trailing-blank-lines` | ⚠️ | ✅ | Disallow blank lines after the last content line. |
-| `standard:no-trailing-whitespace` | ⚠️ | ✅ | Remove spaces or tabs at line ends. |
-| `standard:no-unknown-qualifier` | ⚠️ |  | Disallow qualified column references whose qualifier is not visible in `FROM`. |
-| `standard:no-unused-cte` | ⚠️ |  | Disallow CTEs that are not referenced by the main query. |
-| `standard:no-unused-join` | ⚠️ |  | Disallow JOIN sources that are not referenced by later qualified column reads. |
-| `standard:no-unnecessary-statement-parentheses` | ⚠️ |  | Disallow redundant parentheses around whole top-level `SELECT` statements. |
-| `standard:no-update-without-where` | ⚠️ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
-| `standard:operator-line-position` | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
-| `standard:prefer-coalesce` | ⚠️ | 🛠️ | Prefer `COALESCE` over `IFNULL` and `NVL`. |
-| `standard:prefer-count-star` | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
-| `standard:prefer-explicit-column-list-in-insert` | ⚠️ |  | Require explicit target columns in `INSERT` statements. |
-| `standard:prefer-simple-boolean-case` | ⚠️ |  | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
-| `standard:require-column-alias-as` | ⚠️ |  | Require `AS` for SELECT result column aliases. |
-| `standard:require-order-by-with-limit` | ⚠️ |  | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
-| `standard:require-result-column-alias` | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
-| `standard:require-table-alias-as` | ⚠️ |  | Require `AS` for table aliases. |
-| `standard:require-table-alias-for-subquery` | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
-| `standard:select-modifier-line-position` | ⚠️ |  | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
-| `standard:set-operator-line-position` | ⚠️ |  | Require multiline set operators to begin their own line after indentation. |
-| `standard:space-after-block-comment-start` | ⚠️ | ✅ | Require one space after a block comment opening marker. |
-| `standard:space-after-comma` | ⚠️ | ✅ | Require one inline space after `,` when another token follows. |
-| `standard:space-after-line-comment-marker` | ⚠️ | ✅ | Require one space after `--` when comment text follows. |
-| `standard:space-around-binary-operators` | ⚠️ | 🛠️ | Prefer one inline space around binary arithmetic and concatenation operators. |
-| `standard:space-around-comparison-operators` | ⚠️ | 🛠️ | Prefer one inline space around comparison operators. |
-| `standard:space-before-block-comment-end` | ⚠️ | ✅ | Require one space before a block comment closing marker. |
-| `standard:statement-terminator` | ⚠️ |  | Require statement blocks to end with semicolons. |
-| `standard:unique-column-aliases` | ⚠️ |  | Require SELECT result column aliases to be unique within a SELECT list. |
-| `standard:unique-table-aliases` | ⚠️ |  | Require top-level table aliases to be unique within a statement. |
-| `standard:use-is-null` | ⚠️ | 🛠️ | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
+| Rule ID | Enable | Severity | Fix | Purpose |
+| --- | --- | --- | --- | --- |
+| `standard:blocked-words` | 🔘 | ⚠️ |  | Report configured blocked words outside comments and quoted text by default. |
+| `standard:clause-keyword-newline` | 🔘 | ⚠️ |  | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
+| `standard:consistent-column-references` | 🔘 | ⚠️ |  | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
+| `standard:consistent-not-equal-operator` | 🔘 | ⚠️ | 🛠️ | Keep `!=` and `<>` not-equal operators consistent within a file. |
+| `standard:consistent-order-by-direction` | 🔘 | ⚠️ |  | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
+| `standard:consistent-reference-qualification` | 🔘 | ⚠️ |  | Require single-table SELECT result columns to qualify references consistently. |
+| `standard:consistent-set-operation-column-count` | 🔘 | ⚠️ |  | Require adjacent set-operation SELECT lists to return the same number of columns. |
+| `standard:data-type-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL data type names outside comments and quoted text. |
+| `standard:explicit-cross-join` | 🔘 | ⚠️ |  | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
+| `standard:explicit-inner-join` | 🔘 | ⚠️ |  | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
+| `standard:explicit-union-operator` | 🔘 | ⚠️ |  | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
+| `standard:final-newline` | 🔘 | ⚠️ | ✅ | Require files to end with one LF newline. |
+| `standard:function-name-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL function names outside comments and quoted text. |
+| `standard:keyword-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
+| `standard:line-ending-lf` | 🔘 | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
+| `standard:literal-case` | 🔘 | ⚠️ | 🛠️ | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
+| `standard:max-blank-lines` | 🔘 | ⚠️ | ✅ | Disallow more than one consecutive blank line. |
+| `standard:max-case-depth` | 🔘 | ⚠️ |  | Disallow `CASE` expressions nested deeper than `maxDepth`. |
+| `standard:max-joins` | 🔘 | ⚠️ |  | Disallow statements with more than `max` `JOIN` clauses. |
+| `standard:max-line-length` | 🔘 | ⚠️ |  | Report non-blank lines longer than 120 characters. |
+| `standard:max-subquery-depth` | 🔘 | ⚠️ |  | Disallow nested `SELECT` statements deeper than `maxDepth`. |
+| `standard:no-consecutive-semicolons` | 🔘 | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
+| `standard:no-delete-without-where` | 🔘 | ⚠️ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
+| `standard:no-distinct-parentheses` | 🔘 | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
+| `standard:no-else-null` | 🔘 | ⚠️ |  | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
+| `standard:no-from-subquery` | 🔘 | ⚠️ |  | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
+| `standard:no-leading-blank-lines` | 🔘 | ⚠️ | ✅ | Disallow blank lines before the first content line. |
+| `standard:no-leading-comma` | 🔘 | ⚠️ |  | Disallow comma tokens as the first non-whitespace character on a line. |
+| `standard:no-leading-whitespace` | 🔘 | ⚠️ | ✅ | Disallow any whitespace before the first file content. |
+| `standard:no-leading-wildcard-like` | 🔘 | ⚠️ |  | Disallow `LIKE` patterns that start with `%` or `_`. |
+| `standard:no-redundant-semicolons` | 🔘 | ⚠️ | ✅ | Disallow repeated semicolons separated only by whitespace. |
+| `standard:no-space-after-dot` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately after `.`. |
+| `standard:no-space-after-opening-parenthesis` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately after `(`. |
+| `standard:no-space-before-closing-parenthesis` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately before `)`. |
+| `standard:no-space-before-comma` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace before `,`. |
+| `standard:no-space-before-dot` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace immediately before `.`. |
+| `standard:no-space-before-function-parenthesis` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace between common SQL function names and `(`. |
+| `standard:no-space-before-semicolon` | 🔘 | ⚠️ | ✅ | Disallow inline whitespace before `;`. |
+| `standard:no-right-join` | 🔘 | ⚠️ |  | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
+| `standard:no-select-distinct-with-group-by` | 🔘 | ⚠️ |  | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
+| `standard:no-select-star` | 🔘 | ⚠️ |  | Disallow `SELECT *` result columns. |
+| `standard:no-select-trailing-comma` | 🔘 | ⚠️ | 🛠️ | Disallow trailing commas at the end of `SELECT` clauses. |
+| `standard:no-self-column-alias` | 🔘 | ⚠️ |  | Disallow SELECT result aliases that repeat the source column name. |
+| `standard:no-self-alias` | 🔘 | ⚠️ |  | Disallow table aliases that repeat the table name they alias. |
+| `standard:no-special-character-identifiers` | 🔘 | ⚠️ |  | Disallow quoted identifiers that need non-portable special characters. |
+| `standard:no-tab-indentation` | 🔘 | ⚠️ | ✅ | Replace leading indentation tabs with spaces. |
+| `standard:no-trailing-blank-lines` | 🔘 | ⚠️ | ✅ | Disallow blank lines after the last content line. |
+| `standard:no-trailing-whitespace` | 🔘 | ⚠️ | ✅ | Remove spaces or tabs at line ends. |
+| `standard:no-unknown-qualifier` | 🔘 | ⚠️ |  | Disallow qualified column references whose qualifier is not visible in `FROM`. |
+| `standard:no-unused-cte` | 🔘 | ⚠️ |  | Disallow CTEs that are not referenced by the main query. |
+| `standard:no-unused-join` | 🔘 | ⚠️ |  | Disallow JOIN sources that are not referenced by later qualified column reads. |
+| `standard:no-unnecessary-statement-parentheses` | 🔘 | ⚠️ |  | Disallow redundant parentheses around whole top-level `SELECT` statements. |
+| `standard:no-update-without-where` | 🔘 | ⚠️ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
+| `standard:operator-line-position` | 🔘 | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
+| `standard:prefer-coalesce` | 🔘 | ⚠️ | 🛠️ | Prefer `COALESCE` over `IFNULL` and `NVL`. |
+| `standard:prefer-count-star` | 🔘 | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
+| `standard:prefer-explicit-column-list-in-insert` | 🔘 | ⚠️ |  | Require explicit target columns in `INSERT` statements. |
+| `standard:prefer-simple-boolean-case` | 🔘 | ⚠️ |  | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
+| `standard:require-column-alias-as` | 🔘 | ⚠️ |  | Require `AS` for SELECT result column aliases. |
+| `standard:require-order-by-with-limit` | 🔘 | ⚠️ |  | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
+| `standard:require-result-column-alias` | 🔘 | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
+| `standard:require-table-alias-as` | 🔘 | ⚠️ |  | Require `AS` for table aliases. |
+| `standard:require-table-alias-for-subquery` | 🔘 | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
+| `standard:select-modifier-line-position` | 🔘 | ⚠️ |  | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
+| `standard:set-operator-line-position` | 🔘 | ⚠️ |  | Require multiline set operators to begin their own line after indentation. |
+| `standard:space-after-block-comment-start` | 🔘 | ⚠️ | ✅ | Require one space after a block comment opening marker. |
+| `standard:space-after-comma` | 🔘 | ⚠️ | ✅ | Require one inline space after `,` when another token follows. |
+| `standard:space-after-line-comment-marker` | 🔘 | ⚠️ | ✅ | Require one space after `--` when comment text follows. |
+| `standard:space-around-binary-operators` | 🔘 | ⚠️ | 🛠️ | Prefer one inline space around binary arithmetic and concatenation operators. |
+| `standard:space-around-comparison-operators` | 🔘 | ⚠️ | 🛠️ | Prefer one inline space around comparison operators. |
+| `standard:space-before-block-comment-end` | 🔘 | ⚠️ | ✅ | Require one space before a block comment closing marker. |
+| `standard:statement-terminator` | 🔘 | ⚠️ |  | Require statement blocks to end with semicolons. |
+| `standard:unique-column-aliases` | 🔘 | ⚠️ |  | Require SELECT result column aliases to be unique within a SELECT list. |
+| `standard:unique-table-aliases` | 🔘 | ⚠️ |  | Require top-level table aliases to be unique within a statement. |
+| `standard:use-is-null` | 🔘 | ⚠️ | 🛠️ | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
 
 ## `standard:blocked-words`
 

@@ -21,20 +21,23 @@ Rule IDs use the `sqlite:<rule-name>` form.
 
 ## Configuration Model
 
-- `🔘` enabled automatically
-- `⚠️` diagnostics by default
-- no write-task fixes
+- `🔘` in the Enable column when enabled automatically for SQLite dialects.
+- `⚠️` in the Severity column for the built-in default severity.
+- The Fix column is blank when write tasks do not attach a fix.
+
+Built-in rules default to `Severity.Warning` in `v0.1.0`. `Severity.Error`
+and `Severity.Info` are supported through user configuration.
 
 ## Rule Summary
 
-| Rule ID | Default | Fix | Purpose |
-| --- | --- | --- | --- |
-| `sqlite:consistent-conflict-resolution` | ⚠️ |  | Require conflict resolution syntax to stay consistent within a file. |
-| `sqlite:foreign-keys-restored` | ⚠️ |  | Require foreign key enforcement to be restored after temporary disablement. |
-| `sqlite:prefer-integer-primary-key` | ⚠️ |  | Prefer exact `INTEGER PRIMARY KEY` for rowid alias behavior. |
-| `sqlite:no-autoincrement-without-need` | ⚠️ |  | Disallow `AUTOINCREMENT` when the stricter rowid behavior is not needed. |
-| `sqlite:no-alter-table-complex-change` | ⚠️ |  | Disallow complex `ALTER TABLE` changes that SQLite cannot apply in place. |
-| `sqlite:prefer-without-rowid-for-composite-pk` | ⚠️ |  | Prefer `WITHOUT ROWID` for tables with composite primary keys. |
+| Rule ID | Enable | Severity | Fix | Purpose |
+| --- | --- | --- | --- | --- |
+| `sqlite:consistent-conflict-resolution` | 🔘 | ⚠️ |  | Require conflict resolution syntax to stay consistent within a file. |
+| `sqlite:foreign-keys-restored` | 🔘 | ⚠️ |  | Require foreign key enforcement to be restored after temporary disablement. |
+| `sqlite:prefer-integer-primary-key` | 🔘 | ⚠️ |  | Prefer exact `INTEGER PRIMARY KEY` for rowid alias behavior. |
+| `sqlite:no-autoincrement-without-need` | 🔘 | ⚠️ |  | Disallow `AUTOINCREMENT` when the stricter rowid behavior is not needed. |
+| `sqlite:no-alter-table-complex-change` | 🔘 | ⚠️ |  | Disallow complex `ALTER TABLE` changes that SQLite cannot apply in place. |
+| `sqlite:prefer-without-rowid-for-composite-pk` | 🔘 | ⚠️ |  | Prefer `WITHOUT ROWID` for tables with composite primary keys. |
 
 ## Notes
 
