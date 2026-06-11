@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.1
+
+Maintenance release for the `0.1.x` line.
+
+- Added `sqldelightCheck` to Gradle `check` task execution.
+- Marked sqldelight-check Gradle tasks as incompatible with Gradle configuration cache.
+- Added `core:no-redundant-suppression` for disable directives that no longer suppress any diagnostics.
+- Moved suppression reason enforcement to `core:require-suppression-reason` and documented core diagnostics separately.
+- Fixed false positives for `standard:no-delete-without-where` on foreign key `ON DELETE` actions.
+- Fixed false positives for `standard:no-update-without-where` on upsert `DO UPDATE` actions.
+- Documented suppression reason comments.
+- Preserved indentation for multiline `CHECK` constraint closing parentheses.
+
 ## v0.1.0
 
 Initial release of sqldelight-check.
