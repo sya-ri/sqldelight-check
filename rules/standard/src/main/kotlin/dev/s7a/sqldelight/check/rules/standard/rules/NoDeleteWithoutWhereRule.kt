@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,7 +25,7 @@ public class NoDeleteWithoutWhereRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("delete")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Delete)) return@forEachIndexed
             if (content.isReferentialDeleteAction(tokens, index)) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
@@ -49,6 +50,6 @@ private fun String.isReferentialDeleteAction(
 ): Boolean {
     val previous = tokens.getOrNull(deleteIndex - 1) ?: return false
     val delete = tokens[deleteIndex]
-    return previous.isKeyword("on") &&
+    return previous.isTerm(SqlDialectSourceTerm.On) &&
         sqlParenthesisDepthAt(previous.startOffset) == sqlParenthesisDepthAt(delete.startOffset)
 }

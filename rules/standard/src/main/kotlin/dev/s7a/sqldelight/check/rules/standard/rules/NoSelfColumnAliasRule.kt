@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -26,7 +27,7 @@ public class NoSelfColumnAliasRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content.resultColumnAliases().forEach { alias ->
+        content.resultColumnAliases(context.database.dialect.sourcePatterns).forEach { alias ->
             if (!alias.repeatsSourceColumnNameIn(content)) return@forEach
 
             reporter.report(
@@ -48,7 +49,7 @@ private fun ResultColumnAlias.repeatsSourceColumnNameIn(content: String): Boolea
             .substring(targetStartOffset, token.startOffset)
             .sqlTokens()
             .toList()
-            .dropLastWhile { candidate -> candidate.isKeyword("as") }
+            .dropLastWhile { candidate -> candidate.isTerm(SqlDialectSourceTerm.As) }
     if (sourceTokens.isEmpty()) return false
     if (!content.isSimpleColumnReference(targetStartOffset, sourceTokens.last().endOffset + targetStartOffset)) return false
 

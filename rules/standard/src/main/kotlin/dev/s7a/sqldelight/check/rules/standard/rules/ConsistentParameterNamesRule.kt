@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -61,8 +62,8 @@ private fun String.namedParameterPredicates(): Sequence<NamedParameterPredicate>
         tokens.forEachIndexed { index, token ->
             val operator = nextComparisonOperatorAfter(token.endOffset) ?: return@forEachIndexed
             val parameter = namedParameterAfter(operator.endOffset) ?: return@forEachIndexed
-            val previous = tokens.getOrNull(index - 1)?.normalizedText
-            if (previous in setOf("from", "join", "as")) return@forEachIndexed
+            val previous = tokens.getOrNull(index - 1)
+            if (previous != null && parameterColumnPrefixTerms.any { term -> previous.isTerm(term) }) return@forEachIndexed
             yield(
                 NamedParameterPredicate(
                     column = token.text,
@@ -75,6 +76,13 @@ private fun String.namedParameterPredicates(): Sequence<NamedParameterPredicate>
             )
         }
     }
+
+private val parameterColumnPrefixTerms =
+    setOf(
+        SqlDialectSourceTerm.From,
+        SqlDialectSourceTerm.Join,
+        SqlDialectSourceTerm.As,
+    )
 
 private data class ParameterComparisonOperator(
     val text: String,

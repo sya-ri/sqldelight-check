@@ -366,6 +366,490 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatterns$Compani
 	public final fun getSourceScannerDefault ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
 }
 
+public abstract interface class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public abstract fun getNormalizedText ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$All : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$All;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$And : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$And;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$As : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$As;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Asc : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Asc;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Between : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Between;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$By : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$By;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Case : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Case;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Count : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Count;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Create : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Create;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Delete : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Delete;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Desc : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Desc;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Distinct : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Distinct;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Do : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Do;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Drop : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Drop;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Else : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Else;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$End : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$End;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Escape : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Escape;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Exists : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Exists;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$False : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$False;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Fetch : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Fetch;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Filter : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Filter;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$First : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$First;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$From : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$From;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Group : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Group;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Having : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Having;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$In : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$In;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Insert : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Insert;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Into : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Into;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Is : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Is;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Join : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Join;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Last : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Last;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Like : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Like;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Limit : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Limit;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Not : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Not;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Null : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Null;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Nulls : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Nulls;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Offset : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Offset;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$On : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$On;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Or : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Or;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Order : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Order;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Outer : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Outer;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Over : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Over;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Right : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Right;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Rollback : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Rollback;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Select : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Select;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Set : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Set;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Table : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Table;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Then : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Then;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Transaction : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Transaction;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Trigger : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Trigger;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$True : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$True;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Union : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Union;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Update : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Update;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Using : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Using;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Values : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Values;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$View : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$View;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$When : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$When;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Where : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Where;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Window : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$Window;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$With : dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlDialectSourceTerm$With;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getNormalizedText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/api/TextEdit {
 	public fun <init> (Ldev/s7a/sqldelight/check/api/SourceRange;Ljava/lang/String;)V
 	public fun equals (Ljava/lang/Object;)Z

@@ -1,5 +1,9 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+
 internal data class ResultColumnAlias(
     val selectStartOffset: Int,
     val targetStartOffset: Int,
@@ -20,7 +24,7 @@ internal fun String.selectFromRanges(): Sequence<SelectFromRange> =
     sequence {
         val tokens = sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
             val selectDepth = sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = statementEndAfter(token.startOffset)
             val fromToken =
@@ -29,7 +33,7 @@ internal fun String.selectFromRanges(): Sequence<SelectFromRange> =
                     .firstOrNull { candidate ->
                         candidate.startOffset < statementEnd &&
                             sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
-                            candidate.isKeyword("from")
+                            candidate.isTerm(SqlDialectSourceTerm.From)
                     } ?: return@forEachIndexed
             yield(
                 SelectFromRange(
@@ -43,11 +47,13 @@ internal fun String.selectFromRanges(): Sequence<SelectFromRange> =
         }
     }
 
-internal fun String.resultColumnAliases(): List<ResultColumnAlias> {
+internal fun String.resultColumnAliases(
+    sourcePatterns: SqlDialectSourcePatterns = SqlDialectSourcePatterns.SourceScannerDefault,
+): List<ResultColumnAlias> {
     val aliases = mutableListOf<ResultColumnAlias>()
     selectFromRanges().forEach { select ->
         selectTargets(select.selectEndOffset, select.fromStartOffset, select.depth).forEach { target ->
-            target.aliasIn(this)?.let { alias ->
+            target.aliasIn(this, sourcePatterns)?.let { alias ->
                 aliases +=
                     ResultColumnAlias(
                         selectStartOffset = select.selectStartOffset,
@@ -100,15 +106,18 @@ private fun AliasSelectTarget.trimmedIn(content: String): AliasSelectTarget {
     return AliasSelectTarget(start, end)
 }
 
-private fun AliasSelectTarget.aliasIn(content: String): TargetAlias? {
+private fun AliasSelectTarget.aliasIn(
+    content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
+): TargetAlias? {
     val targetText = content.substring(startOffset, endOffset)
     val tokens = targetText.sqlTokens().toList()
     if (tokens.size < 2) return null
 
     val last = tokens.last().toSourceToken(startOffset)
     val previous = tokens[tokens.lastIndex - 1]
-    if (previous.isKeyword("as")) return TargetAlias(token = last, usesAs = true)
-    if (last.normalizedText in columnAliasBoundaryKeywords) return null
+    if (previous.isTerm(SqlDialectSourceTerm.As)) return TargetAlias(token = last, usesAs = true)
+    if (last.matches(sourcePatterns, AliasBoundary)) return null
     if (previous.endOffset >= tokens.last().startOffset) return null
     return TargetAlias(token = last, usesAs = false)
 }
@@ -118,22 +127,4 @@ private fun SqlToken.toSourceToken(baseOffset: Int): SqlToken =
         text = text,
         startOffset = baseOffset + startOffset,
         endOffset = baseOffset + endOffset,
-    )
-
-private val columnAliasBoundaryKeywords =
-    setOf(
-        "case",
-        "cast",
-        "coalesce",
-        "count",
-        "else",
-        "end",
-        "false",
-        "filter",
-        "from",
-        "null",
-        "over",
-        "then",
-        "true",
-        "when",
     )

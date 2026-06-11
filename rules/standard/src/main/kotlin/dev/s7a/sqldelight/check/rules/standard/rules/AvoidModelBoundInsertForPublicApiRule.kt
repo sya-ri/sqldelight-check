@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFileKind
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -27,10 +28,12 @@ public class AvoidModelBoundInsertForPublicApiRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("insert")) return@forEachIndexed
-            val into = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("into") } ?: return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Insert)) return@forEachIndexed
+            val into = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.Into) } ?: return@forEachIndexed
             tokens.getOrNull(index + 2) ?: return@forEachIndexed
-            val values = tokens.firstKeywordAfter(index + 3, content.statementEndAfter(token.startOffset), "values") ?: return@forEachIndexed
+            val values =
+                tokens.firstTermAfter(index + 3, content.statementEndAfter(token.startOffset), SqlDialectSourceTerm.Values)
+                    ?: return@forEachIndexed
             val parameter = content.nextSqlCharacterAfter(values.endOffset) ?: return@forEachIndexed
             if (parameter.value != '?') return@forEachIndexed
 

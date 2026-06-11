@@ -135,6 +135,253 @@ public class SqlDialectSourcePatternExpressionBuilder {
 }
 
 /**
+ * A SQL source term that source-text rules may need to recognize directly.
+ */
+public sealed interface SqlDialectSourceTerm {
+    public val normalizedText: String
+
+    public data object All : SqlDialectSourceTerm {
+        override val normalizedText: String = "all"
+    }
+
+    public data object And : SqlDialectSourceTerm {
+        override val normalizedText: String = "and"
+    }
+
+    public data object As : SqlDialectSourceTerm {
+        override val normalizedText: String = "as"
+    }
+
+    public data object Asc : SqlDialectSourceTerm {
+        override val normalizedText: String = "asc"
+    }
+
+    public data object Between : SqlDialectSourceTerm {
+        override val normalizedText: String = "between"
+    }
+
+    public data object By : SqlDialectSourceTerm {
+        override val normalizedText: String = "by"
+    }
+
+    public data object Case : SqlDialectSourceTerm {
+        override val normalizedText: String = "case"
+    }
+
+    public data object Count : SqlDialectSourceTerm {
+        override val normalizedText: String = "count"
+    }
+
+    public data object Create : SqlDialectSourceTerm {
+        override val normalizedText: String = "create"
+    }
+
+    public data object Delete : SqlDialectSourceTerm {
+        override val normalizedText: String = "delete"
+    }
+
+    public data object Desc : SqlDialectSourceTerm {
+        override val normalizedText: String = "desc"
+    }
+
+    public data object Distinct : SqlDialectSourceTerm {
+        override val normalizedText: String = "distinct"
+    }
+
+    public data object Do : SqlDialectSourceTerm {
+        override val normalizedText: String = "do"
+    }
+
+    public data object Drop : SqlDialectSourceTerm {
+        override val normalizedText: String = "drop"
+    }
+
+    public data object Else : SqlDialectSourceTerm {
+        override val normalizedText: String = "else"
+    }
+
+    public data object End : SqlDialectSourceTerm {
+        override val normalizedText: String = "end"
+    }
+
+    public data object Escape : SqlDialectSourceTerm {
+        override val normalizedText: String = "escape"
+    }
+
+    public data object Exists : SqlDialectSourceTerm {
+        override val normalizedText: String = "exists"
+    }
+
+    public data object False : SqlDialectSourceTerm {
+        override val normalizedText: String = "false"
+    }
+
+    public data object Fetch : SqlDialectSourceTerm {
+        override val normalizedText: String = "fetch"
+    }
+
+    public data object Filter : SqlDialectSourceTerm {
+        override val normalizedText: String = "filter"
+    }
+
+    public data object First : SqlDialectSourceTerm {
+        override val normalizedText: String = "first"
+    }
+
+    public data object From : SqlDialectSourceTerm {
+        override val normalizedText: String = "from"
+    }
+
+    public data object Group : SqlDialectSourceTerm {
+        override val normalizedText: String = "group"
+    }
+
+    public data object Having : SqlDialectSourceTerm {
+        override val normalizedText: String = "having"
+    }
+
+    public data object In : SqlDialectSourceTerm {
+        override val normalizedText: String = "in"
+    }
+
+    public data object Insert : SqlDialectSourceTerm {
+        override val normalizedText: String = "insert"
+    }
+
+    public data object Into : SqlDialectSourceTerm {
+        override val normalizedText: String = "into"
+    }
+
+    public data object Is : SqlDialectSourceTerm {
+        override val normalizedText: String = "is"
+    }
+
+    public data object Join : SqlDialectSourceTerm {
+        override val normalizedText: String = "join"
+    }
+
+    public data object Last : SqlDialectSourceTerm {
+        override val normalizedText: String = "last"
+    }
+
+    public data object Like : SqlDialectSourceTerm {
+        override val normalizedText: String = "like"
+    }
+
+    public data object Limit : SqlDialectSourceTerm {
+        override val normalizedText: String = "limit"
+    }
+
+    public data object Not : SqlDialectSourceTerm {
+        override val normalizedText: String = "not"
+    }
+
+    public data object Null : SqlDialectSourceTerm {
+        override val normalizedText: String = "null"
+    }
+
+    public data object Nulls : SqlDialectSourceTerm {
+        override val normalizedText: String = "nulls"
+    }
+
+    public data object Offset : SqlDialectSourceTerm {
+        override val normalizedText: String = "offset"
+    }
+
+    public data object On : SqlDialectSourceTerm {
+        override val normalizedText: String = "on"
+    }
+
+    public data object Or : SqlDialectSourceTerm {
+        override val normalizedText: String = "or"
+    }
+
+    public data object Order : SqlDialectSourceTerm {
+        override val normalizedText: String = "order"
+    }
+
+    public data object Over : SqlDialectSourceTerm {
+        override val normalizedText: String = "over"
+    }
+
+    public data object Outer : SqlDialectSourceTerm {
+        override val normalizedText: String = "outer"
+    }
+
+    public data object Right : SqlDialectSourceTerm {
+        override val normalizedText: String = "right"
+    }
+
+    public data object Rollback : SqlDialectSourceTerm {
+        override val normalizedText: String = "rollback"
+    }
+
+    public data object Select : SqlDialectSourceTerm {
+        override val normalizedText: String = "select"
+    }
+
+    public data object Set : SqlDialectSourceTerm {
+        override val normalizedText: String = "set"
+    }
+
+    public data object Table : SqlDialectSourceTerm {
+        override val normalizedText: String = "table"
+    }
+
+    public data object Then : SqlDialectSourceTerm {
+        override val normalizedText: String = "then"
+    }
+
+    public data object Transaction : SqlDialectSourceTerm {
+        override val normalizedText: String = "transaction"
+    }
+
+    public data object Trigger : SqlDialectSourceTerm {
+        override val normalizedText: String = "trigger"
+    }
+
+    public data object True : SqlDialectSourceTerm {
+        override val normalizedText: String = "true"
+    }
+
+    public data object Union : SqlDialectSourceTerm {
+        override val normalizedText: String = "union"
+    }
+
+    public data object Update : SqlDialectSourceTerm {
+        override val normalizedText: String = "update"
+    }
+
+    public data object Using : SqlDialectSourceTerm {
+        override val normalizedText: String = "using"
+    }
+
+    public data object Values : SqlDialectSourceTerm {
+        override val normalizedText: String = "values"
+    }
+
+    public data object View : SqlDialectSourceTerm {
+        override val normalizedText: String = "view"
+    }
+
+    public data object When : SqlDialectSourceTerm {
+        override val normalizedText: String = "when"
+    }
+
+    public data object Where : SqlDialectSourceTerm {
+        override val normalizedText: String = "where"
+    }
+
+    public data object Window : SqlDialectSourceTerm {
+        override val normalizedText: String = "window"
+    }
+
+    public data object With : SqlDialectSourceTerm {
+        override val normalizedText: String = "with"
+    }
+}
+
+/**
  * The source-scanner meaning attached to a dialect pattern.
  */
 public sealed interface SqlDialectSourcePatternRole {

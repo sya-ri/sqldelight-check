@@ -1,5 +1,9 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+
 internal data class SqlToken(
     val text: String,
     val startOffset: Int,
@@ -43,7 +47,16 @@ internal fun String.identifierTokenAt(offset: Int): SqlToken? {
     return SqlToken(text = substring(offset, end), startOffset = offset, endOffset = end)
 }
 
+internal fun SqlToken.isTerm(term: SqlDialectSourceTerm): Boolean =
+    normalizedText == term.normalizedText
+
 internal fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
+
+internal fun SqlToken.matches(
+    sourcePatterns: SqlDialectSourcePatterns,
+    role: SqlDialectSourcePatternRole,
+): Boolean =
+    sourcePatterns.matches(role, listOf(normalizedText))
 
 internal fun List<SqlToken>.containsKeywordPair(
     first: String,
@@ -52,6 +65,23 @@ internal fun List<SqlToken>.containsKeywordPair(
     asSequence()
         .zipWithNext()
         .any { (left, right) -> left.isKeyword(first) && right.isKeyword(second) }
+
+internal fun List<SqlToken>.containsTermPair(
+    first: SqlDialectSourceTerm,
+    second: SqlDialectSourceTerm,
+): Boolean =
+    asSequence()
+        .zipWithNext()
+        .any { (left, right) -> left.isTerm(first) && right.isTerm(second) }
+
+internal fun List<SqlToken>.firstTermAfter(
+    startIndex: Int,
+    statementEnd: Int,
+    term: SqlDialectSourceTerm,
+): SqlToken? =
+    asSequence()
+        .drop(startIndex)
+        .firstOrNull { token -> token.startOffset < statementEnd && token.isTerm(term) }
 
 internal fun List<SqlToken>.firstKeywordAfter(
     startIndex: Int,
@@ -73,6 +103,30 @@ internal fun List<SqlToken>.firstBoundaryOffsetAfter(
         ?.startOffset
         ?: statementEnd
 
+internal fun List<SqlToken>.firstBoundaryOffsetAfter(
+    startIndex: Int,
+    statementEnd: Int,
+    sourcePatterns: SqlDialectSourcePatterns,
+    role: SqlDialectSourcePatternRole,
+): Int =
+    asSequence()
+        .drop(startIndex)
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
+            token.startOffset < statementEnd &&
+                sourcePatterns.matches(role, normalizedTextsFrom(startIndex + relativeIndex))
+        }?.value?.startOffset
+        ?: statementEnd
+
+internal fun List<SqlToken>.lastTermBefore(
+    offset: Int,
+    terms: Set<SqlDialectSourceTerm>,
+): SqlDialectSourceTerm? =
+    asSequence()
+        .takeWhile { token -> token.startOffset < offset }
+        .mapNotNull { token -> terms.firstOrNull { term -> token.isTerm(term) } }
+        .lastOrNull()
+
 internal fun List<SqlToken>.lastKeywordBefore(
     offset: Int,
     keywords: Set<String>,
@@ -81,3 +135,6 @@ internal fun List<SqlToken>.lastKeywordBefore(
         .takeWhile { token -> token.startOffset < offset }
         .map { token -> token.normalizedText }
         .lastOrNull { token -> token in keywords }
+
+internal fun List<SqlToken>.normalizedTextsFrom(index: Int): List<String> =
+    drop(index).map { token -> token.normalizedText }

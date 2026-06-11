@@ -1,5 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+
 internal fun String.hasWhereClauseAfter(
     tokens: List<SqlToken>,
     startIndex: Int,
@@ -9,4 +11,4 @@ internal fun String.hasWhereClauseAfter(
     tokens
         .drop(startIndex + 1)
         .takeWhile { candidate -> candidate.startOffset < statementEnd }
-        .any { candidate -> candidate.isKeyword("where") && sqlParenthesisDepthAt(candidate.startOffset) == depth }
+        .any { candidate -> candidate.isTerm(SqlDialectSourceTerm.Where) && sqlParenthesisDepthAt(candidate.startOffset) == depth }

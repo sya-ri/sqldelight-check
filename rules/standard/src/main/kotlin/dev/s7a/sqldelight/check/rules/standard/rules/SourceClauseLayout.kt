@@ -1,5 +1,8 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+
 internal data class ClauseItem(
     val startOffset: Int,
     val endOffset: Int,
@@ -56,5 +59,25 @@ internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
                 content.sqlParenthesisDepthAt(token.startOffset) == depth &&
                 token.normalizedText in boundaryKeywords
         }
+        ?.startOffset
+        ?: statementEnd
+
+internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
+    content: String,
+    startIndex: Int,
+    statementEnd: Int,
+    depth: Int,
+    sourcePatterns: SqlDialectSourcePatterns,
+    role: SqlDialectSourcePatternRole,
+): Int =
+    asSequence()
+        .drop(startIndex)
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
+            token.startOffset < statementEnd &&
+                content.sqlParenthesisDepthAt(token.startOffset) == depth &&
+                sourcePatterns.matches(role, normalizedTextsFrom(startIndex + relativeIndex))
+        }
+        ?.value
         ?.startOffset
         ?: statementEnd

@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,7 +25,7 @@ public class NoOffsetPaginationRule : Rule {
         val content = context.file.content
         content.sqlTokens()
             .filter { token ->
-                token.isKeyword("offset") &&
+                token.isTerm(SqlDialectSourceTerm.Offset) &&
                     content.sqlParenthesisDepthAt(token.startOffset) == 0 &&
                     content.previousSqlCharacterBefore(token.startOffset)?.value != ':'
             }

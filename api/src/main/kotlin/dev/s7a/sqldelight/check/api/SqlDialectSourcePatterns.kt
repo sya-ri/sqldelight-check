@@ -94,8 +94,10 @@ public class SqlDialectSourcePatterns(
                             "ELSE",
                             "END",
                             "FALSE",
+                            "FILTER",
                             "FROM",
                             "NULL",
+                            "OVER",
                             "THEN",
                             "TRUE",
                             "WHEN",
@@ -135,6 +137,7 @@ public class SqlDialectSourcePatterns(
                             "BY",
                             "CROSS JOIN",
                             "EXCEPT",
+                            "FETCH",
                             "FOR UPDATE",
                             "FROM",
                             "FULL [OUTER] JOIN",
@@ -159,6 +162,7 @@ public class SqlDialectSourcePatterns(
                             "USING",
                             "VALUES",
                             "WHERE",
+                            "WINDOW",
                             roles = arrayOf(ClauseBoundary),
                         ) +
                         sourcePatterns(

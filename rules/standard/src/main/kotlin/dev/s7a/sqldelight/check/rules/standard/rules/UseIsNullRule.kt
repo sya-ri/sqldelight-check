@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -33,11 +34,11 @@ public class UseIsNullRule : Rule {
             .forEach { operator ->
                 val operatorText = content.substring(operator.startOffset, operator.endOffset)
                 if (operatorText !in setOf("=", "!=", "<>")) return@forEach
-                if (tokens.lastKeywordBefore(operator.startOffset, nullComparisonClauseKeywords) == "set") return@forEach
+                if (tokens.lastTermBefore(operator.startOffset, nullComparisonClauseTerms) == SqlDialectSourceTerm.Set) return@forEach
 
                 val rightStart = content.horizontalWhitespaceEndAfter(operator.endOffset)
                 val rightToken = content.identifierTokenAt(rightStart) ?: return@forEach
-                if (!rightToken.text.equals("null", ignoreCase = true)) return@forEach
+                if (!rightToken.isTerm(SqlDialectSourceTerm.Null)) return@forEach
 
                 val replacement = replacementFor(operatorText, isUppercase = rightToken.text.first().isUpperCase())
                 val range = content.rangeAtOffsets(operator.startOffset, operator.endOffset)
@@ -73,14 +74,14 @@ public class UseIsNullRule : Rule {
     }
 }
 
-private val nullComparisonClauseKeywords =
+private val nullComparisonClauseTerms =
     setOf(
-        "from",
-        "having",
-        "join",
-        "on",
-        "set",
-        "then",
-        "when",
-        "where",
+        SqlDialectSourceTerm.From,
+        SqlDialectSourceTerm.Having,
+        SqlDialectSourceTerm.Join,
+        SqlDialectSourceTerm.On,
+        SqlDialectSourceTerm.Set,
+        SqlDialectSourceTerm.Then,
+        SqlDialectSourceTerm.When,
+        SqlDialectSourceTerm.Where,
     )

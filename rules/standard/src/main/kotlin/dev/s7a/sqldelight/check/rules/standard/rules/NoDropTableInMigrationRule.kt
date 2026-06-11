@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFileKind
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -28,8 +29,8 @@ public class NoDropTableInMigrationRule : Rule {
         val tokens = content.sqlTokens().toList()
         tokens.zipWithNext()
             .filter { (drop, table) ->
-                drop.isKeyword("drop") &&
-                    table.isKeyword("table") &&
+                drop.isTerm(SqlDialectSourceTerm.Drop) &&
+                    table.isTerm(SqlDialectSourceTerm.Table) &&
                     content.sqlParenthesisDepthAt(drop.startOffset) == 0
             }
             .forEach { (drop, table) ->

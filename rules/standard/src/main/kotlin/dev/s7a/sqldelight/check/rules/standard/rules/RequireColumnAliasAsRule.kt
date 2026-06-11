@@ -25,7 +25,7 @@ public class RequireColumnAliasAsRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content.resultColumnAliases()
+        content.resultColumnAliases(context.database.dialect.sourcePatterns)
             .filterNot { alias -> alias.usesAs }
             .forEach { alias ->
                 reporter.report(
