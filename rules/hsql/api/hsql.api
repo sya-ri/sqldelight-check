@@ -5,3 +5,24 @@ public final class dev/s7a/sqldelight/check/rules/hsql/HsqlRuleSetProvider : dev
 	public fun ruleProviders ()Ljava/util/Set;
 }
 
+public final class dev/s7a/sqldelight/check/rules/hsql/rules/NoDatabaseFileSettingsRule : dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule {
+	public fun <init> ()V
+}
+
+public final class dev/s7a/sqldelight/check/rules/hsql/rules/NoSystemOperationsRule : dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule {
+	public fun <init> ()V
+}
+
+public final class dev/s7a/sqldelight/check/rules/hsql/rules/NoTextTableSourceRule : dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule {
+	public fun <init> ()V
+}
+
+public abstract class dev/s7a/sqldelight/check/rules/hsql/rules/RegexHsqlRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun getDefaultEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
