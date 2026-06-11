@@ -2224,8 +2224,8 @@ Invalid:
 
 ```sql
 CREATE TABLE player (
-  id INTEGER PRIMARY KEY, name TEXT,
-  UNIQUE (name)
+  id INTEGER PRIMARY KEY,
+  name TEXT, UNIQUE (name)
 );
 ```
 
