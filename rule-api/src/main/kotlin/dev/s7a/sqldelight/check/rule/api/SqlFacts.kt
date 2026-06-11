@@ -41,6 +41,10 @@ public data class SqlStatementFacts(
      * JOIN clauses visible at the statement's top level.
      */
     public val joins: List<SqlJoinFacts> = emptyList(),
+    /**
+     * Qualified column-like references discovered in the statement.
+     */
+    public val qualifiedReferences: List<SqlQualifiedReferenceFacts> = emptyList(),
 )
 
 /**
@@ -151,4 +155,25 @@ public data class SqlJoinFacts(
      * Joined table or derived-table reference.
      */
     public val table: SqlTableReferenceFacts,
+)
+
+/**
+ * Stable facts for a qualified reference such as `table.column`.
+ *
+ * The model records source syntax only. It does not claim that the qualifier
+ * resolves to a table in scope or that the name resolves to a real column.
+ */
+public data class SqlQualifiedReferenceFacts(
+    /**
+     * Source range covered by the whole qualified reference.
+     */
+    public val range: SourceRange,
+    /**
+     * Qualifier text before the dot.
+     */
+    public val qualifier: String,
+    /**
+     * Referenced name after the dot.
+     */
+    public val name: String,
 )

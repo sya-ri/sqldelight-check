@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import dev.s7a.sqldelight.check.rule.api.SqlJoinFacts
+import dev.s7a.sqldelight.check.rule.api.SqlQualifiedReferenceFacts
 import dev.s7a.sqldelight.check.rule.api.SqlResultColumnFacts
 import dev.s7a.sqldelight.check.rule.api.SqlSelectFacts
 import dev.s7a.sqldelight.check.rule.api.SqlStatementFacts
@@ -41,12 +42,14 @@ internal object SourceSqlFactsExtractor {
         val select = if (kind == SqlStatementKind.Select) selectFacts(leading, range, statementTokens) else null
         val tables = tableReferences(range, statementTokens)
         val joins = joinFacts(range, statementTokens, tables)
+        val qualifiedReferences = qualifiedReferences(range, statementTokens)
         return SqlStatementFacts(
             kind = kind,
             range = rangeAtOffsets(range.startOffset, range.endOffset),
             select = select,
             tableReferences = tables,
             joins = joins,
+            qualifiedReferences = qualifiedReferences,
         )
     }
 
@@ -198,6 +201,24 @@ internal object SourceSqlFactsExtractor {
                 .takeLastWhile { token -> token.normalizedText in joinModifierKeywords }
         return (modifiers.map { token -> token.text } + join.text).joinToString(" ")
     }
+
+    private fun String.qualifiedReferences(
+        range: OffsetRange,
+        statementTokens: List<SqlToken>,
+    ): List<SqlQualifiedReferenceFacts> =
+        statementTokens
+            .zipWithNext()
+            .mapNotNull { (left, right) ->
+                if (left.startOffset !in range.startOffset..<range.endOffset) return@mapNotNull null
+                if (right.endOffset !in range.startOffset..range.endOffset) return@mapNotNull null
+                val dot = nextSqlCharacterAfter(left.endOffset)
+                if (dot?.value != '.' || dot.offset >= right.startOffset) return@mapNotNull null
+                SqlQualifiedReferenceFacts(
+                    range = rangeAtOffsets(left.startOffset, right.endOffset),
+                    qualifier = left.text,
+                    name = right.text,
+                )
+            }
 
     private fun String.statementRanges(): Sequence<OffsetRange> =
         sequence {

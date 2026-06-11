@@ -170,6 +170,9 @@ class SqlDelightCheckEngineTest {
                                         statement.select?.resultColumns?.size,
                                         statement.tableReferences.size,
                                         statement.joins.size,
+                                        statement.qualifiedReferences.joinToString(",") { reference ->
+                                            reference.qualifier + "." + reference.name
+                                        },
                                     ).joinToString(":")
                                 },
                             ),
@@ -177,7 +180,7 @@ class SqlDelightCheckEngineTest {
                     ),
             )
 
-        assertEquals("Select:2:2:1", diagnostics.single().message)
+        assertEquals("Select:2:2:1:player.id,team.name,team.id,player.team_id", diagnostics.single().message)
         assertEquals(SqlStatementKind.Select, SqlStatementKind.valueOf(diagnostics.single().message.substringBefore(":")))
     }
 
