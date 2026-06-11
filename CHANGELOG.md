@@ -15,60 +15,13 @@ This version establishes the first Gradle plugin and API surface for checking SQ
   verification for `2.4.0-SNAPSHOT`.
 - Added best-effort file and source range mapping for SQLDelight parser/compiler diagnostics.
 - Added stable API modules for diagnostics, rule sets, and reporters.
-- Added standard rules:
-  - `standard:consistent-not-equal-operator`
-  - `standard:consistent-order-by-direction`
-  - `standard:data-type-case`
-  - `standard:explicit-union-operator`
-  - `standard:final-newline`
-  - `standard:function-name-case`
-  - `standard:keyword-case`
-  - `standard:line-ending-lf`
-  - `standard:literal-case`
-  - `standard:max-blank-lines`
-  - `standard:no-consecutive-semicolons`
-  - `standard:no-leading-blank-lines`
-  - `standard:no-space-after-dot`
-  - `standard:no-space-after-opening-parenthesis`
-  - `standard:no-space-before-closing-parenthesis`
-  - `standard:no-space-before-comma`
-  - `standard:no-space-before-dot`
-  - `standard:no-space-before-function-parenthesis`
-  - `standard:no-space-before-semicolon`
-  - `standard:no-right-join`
-  - `standard:no-select-distinct-with-group-by`
-  - `standard:no-select-trailing-comma`
-  - `standard:no-tab-indentation`
-  - `standard:no-trailing-blank-lines`
-  - `standard:no-trailing-whitespace`
-  - `standard:prefer-coalesce`
-  - `standard:prefer-count-star`
-  - `standard:space-after-block-comment-start`
-  - `standard:space-after-comma`
-  - `standard:space-after-line-comment-marker`
-  - `standard:space-around-binary-operators`
-  - `standard:space-around-comparison-operators`
-  - `standard:space-before-block-comment-end`
-  - `standard:use-is-null`
+- Added built-in rule sets for standard, PostgreSQL, MySQL, SQLite, and HSQL rule families. See the rule set READMEs,
+  including [the standard rule set README](rules/standard/README.md), for the maintained rule lists and examples.
 - Added safe fix application for write tasks.
-- Added JSON, SARIF, text, navigable HTML, and GitHub Actions-friendly Markdown reporters.
+- Added JSON, SARIF, text, navigable HTML, GitHub Actions annotations, and GitHub Actions-friendly Markdown reporters.
 - Added reporter options in the Gradle DSL; JSON and SARIF support `prettyPrint`.
 - Added external provider discovery through `sqldelightCheckRuleSet` and `sqldelightCheckReporter`.
 - Added Qodana configuration and Gradle TestKit coverage for the plugin.
-
-### Published Artifacts
-
-- Gradle plugin `dev.s7a.sqldelight.check`
-- `dev.s7a:sqldelight-check-api:0.1.0`
-- `dev.s7a:sqldelight-check-rule-api:0.1.0`
-- `dev.s7a:sqldelight-check-reporter-api:0.1.0`
-- `dev.s7a:sqldelight-check-core:0.1.0`
-- `dev.s7a:sqldelight-check-rules-standard:0.1.0`
-- `dev.s7a:sqldelight-check-reporter-json:0.1.0`
-- `dev.s7a:sqldelight-check-reporter-sarif:0.1.0`
-- `dev.s7a:sqldelight-check-reporter-text:0.1.0`
-- `dev.s7a:sqldelight-check-reporter-html:0.1.0`
-- `dev.s7a:sqldelight-check-reporter-markdown:0.1.0`
 
 ### Notes
 

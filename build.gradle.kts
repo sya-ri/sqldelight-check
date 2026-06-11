@@ -4,6 +4,7 @@ import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SourcesJar
+import org.gradle.api.tasks.PathSensitivity
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
@@ -19,6 +20,8 @@ plugins {
 
 group = "dev.s7a"
 version = "0.1.0"
+
+val dokkaOlderVersionsDir = layout.buildDirectory.dir("dokka/olderVersions")
 
 val publishedArtifacts =
     mapOf(
@@ -38,6 +41,41 @@ val publishedArtifacts =
         ":rules:sqlite" to "sqldelight-check-rules-sqlite",
         ":rules:standard" to "sqldelight-check-rules-standard",
     )
+
+dependencies {
+    publishedArtifacts.keys.forEach {
+        dokka(project(it))
+    }
+    dokkaPlugin(libs.dokka.versioning.plugin)
+}
+
+dokka {
+    pluginsConfiguration {
+        versioning {
+            version.set(project.version.toString())
+            olderVersionsDir.set(dokkaOlderVersionsDir)
+        }
+    }
+}
+
+val prepareDokkaVersioning by tasks.registering {
+    doLast {
+        dokkaOlderVersionsDir.get().asFile.mkdirs()
+    }
+}
+
+tasks.matching { it.name == "dokkaGenerateHtml" || it.name == "dokkaGeneratePublicationHtml" }.configureEach {
+    dependsOn(prepareDokkaVersioning)
+    inputs.dir(dokkaOlderVersionsDir)
+        .withPropertyName("dokkaOlderVersions")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+}
+
+tasks.register("printVersion") {
+    doLast {
+        println(project.version)
+    }
+}
 
 subprojects {
     group = rootProject.group

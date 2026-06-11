@@ -27,3 +27,4 @@ sqldelight-sqlite338-dialect = { module = "app.cash.sqldelight:sqlite-3-38-diale
 sql-psi-environment = { module = "app.cash.sql-psi:environment", version.ref = "sqlPsi" }
 kotlinx-html-jvm = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinxHtml" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+dokka-versioning-plugin = { module = "org.jetbrains.dokka:versioning-plugin", version.ref = "dokka" }
