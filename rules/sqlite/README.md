@@ -21,9 +21,9 @@ Rule IDs use the `sqlite:<rule-name>` form.
 
 ## Configuration Model
 
-- default enablement: `🔘`
-- default severity: `⚠️`
-- write-task fixes: none
+- `🔘` enabled automatically
+- `⚠️` diagnostics by default
+- no write-task fixes
 
 ## Rule Summary
 
