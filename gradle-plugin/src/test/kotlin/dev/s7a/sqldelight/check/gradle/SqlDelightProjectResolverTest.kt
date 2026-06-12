@@ -1,7 +1,6 @@
 package dev.s7a.sqldelight.check.gradle
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
