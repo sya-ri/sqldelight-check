@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":dialects:postgres"))
+    implementation(project(":dialects:dialect-postgres"))
     implementation(project(":api"))
     implementation(project(":rule-api"))
     testImplementation(kotlin("test"))

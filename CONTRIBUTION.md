@@ -89,10 +89,10 @@ Publishing is not automated yet. Use this checklist for each release.
    ./gradlew --no-daemon \
        :api:publishAndReleaseToMavenCentral \
        :core:publishAndReleaseToMavenCentral \
-       :dialects:hsql:publishAndReleaseToMavenCentral \
-       :dialects:mysql:publishAndReleaseToMavenCentral \
-       :dialects:postgres:publishAndReleaseToMavenCentral \
-       :dialects:sqlite:publishAndReleaseToMavenCentral \
+       :dialects:dialect-hsql:publishAndReleaseToMavenCentral \
+       :dialects:dialect-mysql:publishAndReleaseToMavenCentral \
+       :dialects:dialect-postgres:publishAndReleaseToMavenCentral \
+       :dialects:dialect-sqlite:publishAndReleaseToMavenCentral \
        :reporter-api:publishAndReleaseToMavenCentral \
        :reporters:html:publishAndReleaseToMavenCentral \
        :reporters:github-annotations:publishAndReleaseToMavenCentral \

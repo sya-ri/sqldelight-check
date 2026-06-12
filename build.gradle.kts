@@ -28,10 +28,10 @@ val publishedArtifacts =
     mapOf(
         ":api" to "sqldelight-check-api",
         ":core" to "sqldelight-check-core",
-        ":dialects:hsql" to "sqldelight-check-dialect-hsql",
-        ":dialects:mysql" to "sqldelight-check-dialect-mysql",
-        ":dialects:postgres" to "sqldelight-check-dialect-postgres",
-        ":dialects:sqlite" to "sqldelight-check-dialect-sqlite",
+        ":dialects:dialect-hsql" to "sqldelight-check-dialect-hsql",
+        ":dialects:dialect-mysql" to "sqldelight-check-dialect-mysql",
+        ":dialects:dialect-postgres" to "sqldelight-check-dialect-postgres",
+        ":dialects:dialect-sqlite" to "sqldelight-check-dialect-sqlite",
         ":reporter-api" to "sqldelight-check-reporter-api",
         ":reporters:html" to "sqldelight-check-reporter-html",
         ":reporters:github-annotations" to "sqldelight-check-reporter-github-annotations",
@@ -94,12 +94,7 @@ tasks.register("releaseCheck") {
 }
 
 subprojects {
-    group =
-        if (path.startsWith(":dialects:")) {
-            "${rootProject.group}.dialects"
-        } else {
-            rootProject.group
-        }
+    group = rootProject.group
     version = rootProject.version
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
