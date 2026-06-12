@@ -1,7 +1,7 @@
 # Dialects Author Guide
 
 sqldelight-check loads SQL dialect metadata through Java `ServiceLoader`. Built-in SQLDelight dialect metadata is
-packaged as a dialects module, and third-party dialects can be added through the `sqldelightCheckDialects` Gradle
+packaged as dialect modules, and third-party dialects can be added through the `sqldelightCheckDialects` Gradle
 configuration.
 
 ## Dependency
@@ -132,5 +132,5 @@ Common `SqlDialectSourcePatternRole` and `SqlSourceBlockKind` values describe ru
 their syntax to those meanings through source and block patterns. A custom dialect or custom rule can still define
 additional role or block-kind implementations when it needs a meaning that the built-in rules do not share.
 
-Built-in SQLDelight dialect metadata uses dedicated source pattern presets such as `SqlDialectSourcePatterns.MySql` and
-`SqlDialectSourcePatterns.PostgreSql`.
+Built-in SQLDelight dialect metadata lives in dedicated dialect modules, with source pattern presets such as
+`MySqlDialectSourcePatterns` and `PostgresDialectSourcePatterns`.

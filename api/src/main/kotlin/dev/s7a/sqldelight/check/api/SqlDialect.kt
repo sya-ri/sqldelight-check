@@ -15,7 +15,7 @@ public class SqlDialect(
     /**
      * Source patterns used by source-level SQL fact extraction.
      */
-    public val sourcePatterns: SqlDialectSourcePatterns = family.sourcePatterns(),
+    public val sourcePatterns: SqlDialectSourcePatterns = SqlDialectSourcePatterns.SourceScannerDefault,
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||
@@ -34,12 +34,3 @@ public class SqlDialect(
     override fun toString(): String =
         "SqlDialect(family=$family, capabilities=$capabilities, sourcePatterns=$sourcePatterns)"
 }
-
-private fun DialectFamily.sourcePatterns(): SqlDialectSourcePatterns =
-    when (this) {
-        DialectFamily.Hsql -> SqlDialectSourcePatterns.Hsql
-        DialectFamily.MySql -> SqlDialectSourcePatterns.MySql
-        DialectFamily.PostgreSql -> SqlDialectSourcePatterns.PostgreSql
-        DialectFamily.SQLite -> SqlDialectSourcePatterns.SQLite
-        DialectFamily.Custom -> SqlDialectSourcePatterns.SourceScannerDefault
-    }

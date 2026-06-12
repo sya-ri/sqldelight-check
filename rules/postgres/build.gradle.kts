@@ -6,5 +6,7 @@ plugins {
 dependencies {
     implementation(project(":api"))
     implementation(project(":rule-api"))
+    runtimeOnly(project(":dialects:postgres"))
+    testImplementation(project(":dialects:postgres"))
     testImplementation(kotlin("test"))
 }

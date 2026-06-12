@@ -12,6 +12,7 @@ import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -37,6 +38,7 @@ internal fun Rule.diagnostics(
                             SqlDialect(
                                 family = DialectFamily.PostgreSql,
                                 capabilities = capabilities,
+                                sourcePatterns = PostgresDialectSourcePatterns,
                             ),
                     )
                 override val file: SourceFile =

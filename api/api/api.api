@@ -827,10 +827,6 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatterns {
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatterns$Companion {
-	public final fun getHsql ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
-	public final fun getMySql ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
-	public final fun getPostgreSql ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
-	public final fun getSQLite ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
 	public final fun getSourceScannerDefault ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
 }
 

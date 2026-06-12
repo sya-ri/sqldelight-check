@@ -12,6 +12,7 @@ import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -38,6 +39,7 @@ internal fun Rule.diagnostics(
                             SqlDialect(
                                 family = DialectFamily.SQLite,
                                 capabilities = capabilities,
+                                sourcePatterns = SQLiteDialectSourcePatterns,
                             ),
                     )
                 override val file: SourceFile = SourceFile(path, content.trimIndent() + "\n")
