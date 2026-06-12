@@ -327,6 +327,8 @@ Fix behavior:
 
 Reports multiline SQL lines whose indentation does not match their dialect-aware source block layout.
 
+Configure the number of spaces per indentation level with the positive integer `indentSize` option. The default is `4`.
+
 Invalid:
 
 ```sql

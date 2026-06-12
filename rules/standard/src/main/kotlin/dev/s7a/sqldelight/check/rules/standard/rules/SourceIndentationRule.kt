@@ -14,6 +14,7 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
 /**
@@ -34,6 +35,7 @@ public class SourceIndentationRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val indentSize = context.options.positiveIntOption("indentSize", DEFAULT_INDENT_SIZE)
         val lines = content.linesWithRanges()
         val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
         val statementBlocks =
@@ -47,7 +49,7 @@ public class SourceIndentationRule : Rule {
             val statementBlock = statementBlocks[tokenContext.statementIndex] ?: return@forEach
             if (!content.substring(statementBlock.startOffset, statementBlock.endOffset).contains('\n')) return@forEach
 
-            val expectedIndentation = " ".repeat(tokenContext.expectedIndentation(structure))
+            val expectedIndentation = " ".repeat(tokenContext.expectedIndentationLevel(structure) * indentSize)
             val actualIndentation = line.text.takeWhile { character -> character == ' ' || character == '\t' }
             if (actualIndentation == expectedIndentation) return@forEach
 
@@ -73,16 +75,16 @@ public class SourceIndentationRule : Rule {
     }
 }
 
-private const val INDENT_SIZE = 4
+private const val DEFAULT_INDENT_SIZE = 4
 
-private fun SqlSourceTokenContext.expectedIndentation(
+private fun SqlSourceTokenContext.expectedIndentationLevel(
     structure: SqlSourceStructure,
 ): Int {
-    val blockIndentation = sourceBlockDepth(structure) * INDENT_SIZE
-    val subqueryBodyIndentation = subqueryBodyDepth(structure) * INDENT_SIZE
-    val clauseIndentation = if (isClauseContinuation(structure)) INDENT_SIZE else 0
-    val continuationIndentation = if (isExpressionContinuation()) INDENT_SIZE else 0
-    val caseIndentation = if (isCaseContinuation(structure)) INDENT_SIZE else 0
+    val blockIndentation = sourceBlockDepth(structure)
+    val subqueryBodyIndentation = subqueryBodyDepth(structure)
+    val clauseIndentation = if (isClauseContinuation(structure)) 1 else 0
+    val continuationIndentation = if (isExpressionContinuation()) 1 else 0
+    val caseIndentation = if (isCaseContinuation(structure)) 1 else 0
     return blockIndentation + subqueryBodyIndentation + maxOf(clauseIndentation, continuationIndentation) + caseIndentation
 }
 

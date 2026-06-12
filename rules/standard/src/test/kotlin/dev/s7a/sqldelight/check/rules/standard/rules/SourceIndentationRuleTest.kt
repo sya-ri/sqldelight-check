@@ -63,6 +63,35 @@ class SourceIndentationRuleTest {
     }
 
     @Test
+    fun `uses configured indentation size`() {
+        val input =
+            """
+            SELECT id,
+            name
+            FROM player
+            WHERE active = 1
+            AND (
+            score > 10
+            OR score IS NULL
+            );
+            """.asSqlDelightFile()
+
+        val expected =
+            """
+            SELECT id,
+              name
+            FROM player
+            WHERE active = 1
+              AND (
+                score > 10
+                OR score IS NULL
+              );
+            """.asSqlDelightFile()
+
+        assertEquals(expected, SourceIndentationRule().applyAllFixes(input, options = mapOf("indentSize" to "2")))
+    }
+
+    @Test
     fun `aligns query body from the file base indentation`() {
         val input =
             """
