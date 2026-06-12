@@ -1,7 +1,9 @@
 package dev.s7a.sqldelight.check.dialects.sqlite
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
@@ -19,8 +21,8 @@ class SQLiteDialectProviderTest {
             SQLiteDialect,
             SQLiteDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "sqlite-3-38-dialect", null)),
         )
-        assertEquals(DialectFamily.SQLite, SQLiteDialect.family)
-        assertEquals(setOf(DialectCapability.SQLite), SQLiteDialect.capabilities)
+        assertEquals(SQLiteDialectFamily, SQLiteDialect.family)
+        assertEquals(setOf(SQLiteDialectCapability), SQLiteDialect.capabilities)
     }
 
     @Test

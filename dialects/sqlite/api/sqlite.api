@@ -1,5 +1,77 @@
+public final class dev/s7a/sqldelight/check/dialects/sqlite/AutoincrementKeyword : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/AutoincrementKeyword;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/ComplexAlterTableOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/ComplexAlterTableOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/DoUpdateClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/DoUpdateClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/ForeignKeysOffValue : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/ForeignKeysOffValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/ForeignKeysOnValue : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/ForeignKeysOnValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/ForeignKeysPragmaStatementStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/ForeignKeysPragmaStatementStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/InsertOrReplaceStatementStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/InsertOrReplaceStatementStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/NonIntegerRowidPrimaryKeyType : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/NonIntegerRowidPrimaryKeyType;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/OnConflictClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/OnConflictClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/ReplaceIntoStatementStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/ReplaceIntoStatementStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/dialects/sqlite/SQLiteDialectKt {
 	public static final fun getSQLiteDialect ()Ldev/s7a/sqldelight/check/api/SqlDialect;
+	public static final fun getSQLiteDialectCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public static final fun getSQLiteDialectFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
 }
 
 public final class dev/s7a/sqldelight/check/dialects/sqlite/SQLiteDialectProvider : dev/s7a/sqldelight/check/api/SqlDialectProvider {
@@ -9,5 +81,12 @@ public final class dev/s7a/sqldelight/check/dialects/sqlite/SQLiteDialectProvide
 
 public final class dev/s7a/sqldelight/check/dialects/sqlite/SQLiteDialectSourcePatternsKt {
 	public static final fun getSQLiteDialectSourcePatterns ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/sqlite/WithoutRowidClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/sqlite/WithoutRowidClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 

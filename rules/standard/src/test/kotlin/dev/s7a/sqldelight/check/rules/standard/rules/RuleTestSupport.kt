@@ -69,7 +69,7 @@ internal val cleanMigrationSqm: String =
 
 internal val braceSubqueryDialect: SqlDialect =
     SqlDialect(
-        family = DialectFamily.SQLite,
+        family = DialectFamily.Named("default"),
         sourcePatterns =
             SqlDialectSourcePatterns(
                 blockPatterns =
@@ -97,7 +97,7 @@ internal val braceSubqueryDialect: SqlDialect =
 
 internal val atomicCaseDialect: SqlDialect =
     SqlDialect(
-        family = DialectFamily.SQLite,
+        family = DialectFamily.Named("default"),
         sourcePatterns =
             SqlDialectSourcePatterns(
                 blockPatterns =
@@ -119,7 +119,7 @@ internal fun Rule.diagnostics(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
     facts: SqlFacts = SqlFacts(),
-    dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
+    dialect: SqlDialect = SqlDialect(family = DialectFamily.Named("default")),
 ): List<Diagnostic> {
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -159,7 +159,7 @@ internal fun Rule.assertDiagnosticCount(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
     facts: SqlFacts = SqlFacts(),
-    dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
+    dialect: SqlDialect = SqlDialect(family = DialectFamily.Named("default")),
 ) {
     assertEquals(expected, diagnostics(content, path, options, facts, dialect).size)
 }

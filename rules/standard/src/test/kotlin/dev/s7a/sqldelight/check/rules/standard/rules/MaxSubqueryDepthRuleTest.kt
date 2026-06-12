@@ -108,7 +108,7 @@ class MaxSubqueryDepthRuleTest {
 
 private val braceDialect =
     SqlDialect(
-        family = DialectFamily.SQLite,
+        family = DialectFamily.Named("default"),
         sourcePatterns =
             SqlDialectSourcePatterns(
                 blockPatterns =

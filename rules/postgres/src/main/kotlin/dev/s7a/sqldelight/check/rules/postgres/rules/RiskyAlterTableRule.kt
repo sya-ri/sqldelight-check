@@ -4,11 +4,11 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.rule.api.SqlToken
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AlterTableStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnAlterOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnDropOperation
+import dev.s7a.sqldelight.check.dialects.postgres.ColumnDropOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnSetNotNullOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnTypeChangeOperation
+import dev.s7a.sqldelight.check.dialects.postgres.ColumnTypeChangeOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ConstraintAddOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.NotValidConstraintClause
+import dev.s7a.sqldelight.check.dialects.postgres.NotValidConstraintClause
 import dev.s7a.sqldelight.check.rule.api.containsSourcePattern
 import dev.s7a.sqldelight.check.rule.api.findSourcePattern
 import dev.s7a.sqldelight.check.rule.api.findSourcePatternsInOrder
@@ -17,6 +17,7 @@ import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -33,7 +34,7 @@ public class RiskyAlterTableRule : Rule {
     override val id: RuleId = RuleId("risky-alter-table")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
+    override val targetCapability: DialectCapability = PostgresDialectCapability
 
     override fun run(
         context: RuleContext,

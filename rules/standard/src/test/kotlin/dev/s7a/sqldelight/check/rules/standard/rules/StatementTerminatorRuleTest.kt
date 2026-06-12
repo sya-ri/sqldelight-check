@@ -225,7 +225,7 @@ class StatementTerminatorRuleTest {
     fun `uses dialect source patterns for custom statement continuations`() {
         val dialect =
             SqlDialect(
-                family = DialectFamily.Custom,
+                family = DialectFamily.Unknown,
                 sourcePatterns =
                     SqlDialectSourcePatterns(
                         patterns =

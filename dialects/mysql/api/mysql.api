@@ -1,5 +1,56 @@
+public final class dev/s7a/sqldelight/check/dialects/mysql/ColumnChangeOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/ColumnChangeOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/mysql/ColumnDropOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/ColumnDropOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/mysql/ColumnModifyOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/ColumnModifyOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/mysql/CopyAlgorithmClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/CopyAlgorithmClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/mysql/ExclusiveLockClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/ExclusiveLockClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/mysql/IntegerDisplayWidthType : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/IntegerDisplayWidthType;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/mysql/LegacyUtf8CharsetDeclaration : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/LegacyUtf8CharsetDeclaration;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/dialects/mysql/MySqlDialectKt {
 	public static final fun getMySqlDialect ()Ldev/s7a/sqldelight/check/api/SqlDialect;
+	public static final fun getMySqlDialectCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public static final fun getMySqlDialectFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
 }
 
 public final class dev/s7a/sqldelight/check/dialects/mysql/MySqlDialectProvider : dev/s7a/sqldelight/check/api/SqlDialectProvider {
@@ -9,5 +60,12 @@ public final class dev/s7a/sqldelight/check/dialects/mysql/MySqlDialectProvider 
 
 public final class dev/s7a/sqldelight/check/dialects/mysql/MySqlDialectSourcePatternsKt {
 	public static final fun getMySqlDialectSourcePatterns ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/mysql/ReplaceIntoStatementStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/mysql/ReplaceIntoStatementStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 

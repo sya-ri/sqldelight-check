@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -86,7 +87,7 @@ class ForeignKeysRestoredRuleTest {
                     """
                     PRAGMA foreign_keys = OFF;
                     """,
-                capabilities = setOf(DialectCapability.PostgreSql),
+                capabilities = setOf(DialectCapability("other")),
             )
 
         assertEquals(emptyList(), diagnostics)

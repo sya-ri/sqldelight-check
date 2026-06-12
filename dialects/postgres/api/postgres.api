@@ -1,5 +1,49 @@
+public final class dev/s7a/sqldelight/check/dialects/postgres/ColumnDropOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/ColumnDropOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/ColumnRenameOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/ColumnRenameOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/ColumnTypeChangeOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/ColumnTypeChangeOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/ConcurrentlyClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/ConcurrentlyClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/CreateConcurrentIndexStatementStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/CreateConcurrentIndexStatementStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/NotValidConstraintClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/NotValidConstraintClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/dialects/postgres/PostgresDialectKt {
 	public static final fun getPostgresDialect ()Ldev/s7a/sqldelight/check/api/SqlDialect;
+	public static final fun getPostgresDialectCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public static final fun getPostgresDialectFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
 }
 
 public final class dev/s7a/sqldelight/check/dialects/postgres/PostgresDialectProvider : dev/s7a/sqldelight/check/api/SqlDialectProvider {
@@ -9,5 +53,40 @@ public final class dev/s7a/sqldelight/check/dialects/postgres/PostgresDialectPro
 
 public final class dev/s7a/sqldelight/check/dialects/postgres/PostgresDialectSourcePatternsKt {
 	public static final fun getPostgresDialectSourcePatterns ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/ReindexStatementStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/ReindexStatementStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/ReindexSystemTarget : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/ReindexSystemTarget;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/SerialDataTypeName : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/SerialDataTypeName;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/TableRenameOperation : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/TableRenameOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/postgres/VolatileDefaultFunction : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/postgres/VolatileDefaultFunction;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 

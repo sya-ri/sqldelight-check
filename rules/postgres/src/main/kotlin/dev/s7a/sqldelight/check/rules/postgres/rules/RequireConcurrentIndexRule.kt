@@ -1,9 +1,10 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CreateConcurrentIndexStatementStart
+import dev.s7a.sqldelight.check.dialects.postgres.CreateConcurrentIndexStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CreateIndexStatementStart
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -22,7 +23,7 @@ public class RequireConcurrentIndexRule : Rule {
     override val id: RuleId = RuleId("require-concurrent-index")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
+    override val targetCapability: DialectCapability = PostgresDialectCapability
 
     override fun run(
         context: RuleContext,

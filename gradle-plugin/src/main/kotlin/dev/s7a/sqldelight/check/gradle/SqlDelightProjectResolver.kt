@@ -153,7 +153,7 @@ internal class SqlDelightProjectResolver(
             )
         }
 
-        return SqlDialect(family = DialectFamily.Custom)
+        return SqlDialect(family = DialectFamily.Unknown)
     }
 
     private fun resolveDialectCoordinate(coordinate: SqlDialectCoordinate): SqlDialect = dialectRegistry.resolve(coordinate)

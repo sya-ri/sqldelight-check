@@ -1,9 +1,10 @@
 package dev.s7a.sqldelight.check.rules.hsql.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SystemOperationStatement
+import dev.s7a.sqldelight.check.dialects.hsql.SystemOperationStatement
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -20,7 +21,7 @@ public class NoSystemOperationsRule : Rule {
     override val id: RuleId = RuleId("no-system-operations")
     override val defaultSeverity: Severity = Severity.Error
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.Hsql
+    override val targetCapability: DialectCapability = HsqlDialectCapability
 
     override fun run(
         context: RuleContext,

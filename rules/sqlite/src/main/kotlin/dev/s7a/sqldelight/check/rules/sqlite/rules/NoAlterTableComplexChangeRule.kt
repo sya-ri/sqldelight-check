@@ -1,10 +1,11 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AlterTableStatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ComplexAlterTableOperation
+import dev.s7a.sqldelight.check.dialects.sqlite.ComplexAlterTableOperation
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -21,7 +22,7 @@ public class NoAlterTableComplexChangeRule : Rule {
     override val id: RuleId = RuleId("no-alter-table-complex-change")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.SQLite
+    override val targetCapability: DialectCapability = SQLiteDialectCapability
 
     override fun run(
         context: RuleContext,

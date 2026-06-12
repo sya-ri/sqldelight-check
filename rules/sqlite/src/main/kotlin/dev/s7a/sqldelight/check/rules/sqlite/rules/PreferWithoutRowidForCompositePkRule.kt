@@ -1,11 +1,12 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CreateTableStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PrimaryKeyConstraint
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.WithoutRowidClause
+import dev.s7a.sqldelight.check.dialects.sqlite.WithoutRowidClause
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -26,7 +27,7 @@ public class PreferWithoutRowidForCompositePkRule : Rule {
     override val id: RuleId = RuleId("prefer-without-rowid-for-composite-pk")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.SQLite
+    override val targetCapability: DialectCapability = SQLiteDialectCapability
 
     override fun run(
         context: RuleContext,

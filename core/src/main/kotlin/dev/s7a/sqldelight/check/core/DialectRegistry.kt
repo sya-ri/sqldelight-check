@@ -17,7 +17,7 @@ public class DialectRegistry private constructor(
      */
     public fun resolve(coordinate: SqlDialectCoordinate): SqlDialect =
         providers.firstNotNullOfOrNull { provider -> provider.resolve(coordinate) }
-            ?: SqlDialect(family = DialectFamily.Custom)
+            ?: SqlDialect(family = DialectFamily.Unknown)
 
     /**
      * Returns discovered dialect providers.

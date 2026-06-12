@@ -4,7 +4,9 @@ package dev.s7a.sqldelight.check.rules.mysql.rules
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectFamily
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
@@ -21,7 +23,7 @@ import kotlin.test.assertEquals
 
 internal fun Rule.diagnostics(
     content: String,
-    capabilities: Set<DialectCapability> = setOf(DialectCapability.MySql),
+    capabilities: Set<DialectCapability> = setOf(MySqlDialectCapability),
     path: String = "src/main/sqldelight/com/example/1.sqm",
     options: Map<String, String> = emptyMap(),
 ): List<Diagnostic> {
@@ -37,7 +39,7 @@ internal fun Rule.diagnostics(
                         name = "Database",
                         dialect =
                             SqlDialect(
-                                family = DialectFamily.MySql,
+                                family = MySqlDialectFamily,
                                 capabilities = capabilities,
                                 sourcePatterns = MySqlDialectSourcePatterns,
                             ),

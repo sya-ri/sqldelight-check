@@ -78,12 +78,12 @@ class SqlDelightCheckEngineTest {
     fun `auto rule is skipped when dialect applicability rejects the database`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
-                inputs = listOf(testInput(DialectFamily.MySql)),
+                inputs = listOf(testInput(SourceDialectFamily)),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
                             testRule(
-                                isApplicable = { context -> context.database.dialect.family == DialectFamily.SQLite },
+                                isApplicable = { context -> context.database.dialect.family == TargetDialectFamily },
                             ),
                         ),
                     ),
@@ -99,14 +99,14 @@ class SqlDelightCheckEngineTest {
                 inputs =
                     listOf(
                         testInput(
-                            DialectFamily.MySql,
-                            capabilities = setOf(DialectCapability.MySql),
+                            SourceDialectFamily,
+                            capabilities = setOf(SourceDialectCapability),
                         ),
                     ),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
-                            testRule(targetCapability = DialectCapability.SQLite),
+                            testRule(targetCapability = TargetDialectCapability),
                         ),
                     ),
             )
@@ -118,12 +118,12 @@ class SqlDelightCheckEngineTest {
     fun `explicit rule enablement overrides dialect auto applicability`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
-                inputs = listOf(testInput(DialectFamily.MySql)),
+                inputs = listOf(testInput(SourceDialectFamily)),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
                             testRule(
-                                isApplicable = { context -> context.database.dialect.family == DialectFamily.SQLite },
+                                isApplicable = { context -> context.database.dialect.family == TargetDialectFamily },
                             ),
                         ),
                     ),
@@ -143,14 +143,14 @@ class SqlDelightCheckEngineTest {
                 inputs =
                     listOf(
                         testInput(
-                            DialectFamily.MySql,
-                            capabilities = setOf(DialectCapability.MySql),
+                            SourceDialectFamily,
+                            capabilities = setOf(SourceDialectCapability),
                         ),
                     ),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
-                            testRule(targetCapability = DialectCapability.SQLite),
+                            testRule(targetCapability = TargetDialectCapability),
                         ),
                     ),
                 config =
@@ -585,8 +585,8 @@ class SqlDelightCheckEngineTest {
         }
 
     private fun testInput(
-        family: DialectFamily = DialectFamily.SQLite,
-        capabilities: Set<DialectCapability> = setOf(DialectCapability.SQLite),
+        family: DialectFamily = TargetDialectFamily,
+        capabilities: Set<DialectCapability> = setOf(TargetDialectCapability),
         content: String = "SELECT 1;",
     ): AnalysisInput =
         AnalysisInput(
@@ -601,7 +601,18 @@ class SqlDelightCheckEngineTest {
     private companion object {
         val ruleSetId = RuleSetId("standard")
         val ruleId = qualifiedRuleId("standard:test")
+
+        val SourceDialectCapability: DialectCapability = DialectCapability("source")
+        val TargetDialectCapability: DialectCapability = DialectCapability("target")
     }
+}
+
+private object SourceDialectFamily : DialectFamily {
+    override val id: String = "source"
+}
+
+private object TargetDialectFamily : DialectFamily {
+    override val id: String = "target"
 }
 
 private fun singleCharacterRange(line: Int): SourceRange =

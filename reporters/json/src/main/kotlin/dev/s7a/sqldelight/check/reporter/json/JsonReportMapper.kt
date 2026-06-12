@@ -41,7 +41,7 @@ private fun DatabaseContext.toJsonDatabase(): JsonDatabase =
 
 private fun SqlDialect.toJsonDialect(): JsonDialect =
     JsonDialect(
-        family = family.name,
+        family = family.id,
         capabilities = capabilities.map { capability -> capability.id }.sorted(),
     )
 

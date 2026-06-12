@@ -1,17 +1,9 @@
 package dev.s7a.sqldelight.check.dialects.mysql
 
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnChangeOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnDropOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnModifyOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CommonFunctionName
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CopyAlgorithmClause
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DataTypeName
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ExclusiveLockClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IntegerDisplayWidthType
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarget
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.LegacyUtf8CharsetDeclaration
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReplaceIntoStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation

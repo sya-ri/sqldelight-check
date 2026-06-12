@@ -75,7 +75,7 @@ class ExampleRule : Rule {
     override val defaultEnable = true
 
     override fun isApplicable(context: RuleContext): Boolean =
-        context.database.dialect.family == DialectFamily.PostgreSql
+        context.database.dialect.family == DialectFamily.Named("example")
 
     override fun run(
         context: RuleContext,
@@ -126,7 +126,7 @@ class NoUnsafePragmaRule : RegexRule(
     pattern = """\bPRAGMA\s+writable_schema\s*=\s*ON\b""",
     message = "Avoid enabling writable_schema in checked SQLDelight sources.",
     defaultSeverity = Severity.Error,
-    targetCapability = DialectCapability.SQLite,
+    targetCapability = DialectCapability("example"),
 )
 ```
 

@@ -1,7 +1,9 @@
 package dev.s7a.sqldelight.check.dialects.hsql
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
@@ -20,8 +22,8 @@ class HsqlDialectProviderTest {
             HsqlDialect,
             HsqlDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "hsql-dialect", null)),
         )
-        assertEquals(DialectFamily.Hsql, HsqlDialect.family)
-        assertEquals(setOf(DialectCapability.Hsql), HsqlDialect.capabilities)
+        assertEquals(HsqlDialectFamily, HsqlDialect.family)
+        assertEquals(setOf(HsqlDialectCapability), HsqlDialect.capabilities)
     }
 
     @Test

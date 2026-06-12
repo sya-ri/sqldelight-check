@@ -5,11 +5,21 @@ import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 
 /**
+ * HSQL dialect family.
+ */
+public val HsqlDialectFamily: DialectFamily = DialectFamily.Named("hsql")
+
+/**
+ * HSQL-compatible syntax and behavior.
+ */
+public val HsqlDialectCapability: DialectCapability = DialectCapability("hsql")
+
+/**
  * SQLDelight HSQL dialect metadata.
  */
 public val HsqlDialect: SqlDialect =
     SqlDialect(
-        family = DialectFamily.Hsql,
-        capabilities = setOf(DialectCapability.Hsql),
+        family = HsqlDialectFamily,
+        capabilities = setOf(HsqlDialectCapability),
         sourcePatterns = HsqlDialectSourcePatterns,
     )

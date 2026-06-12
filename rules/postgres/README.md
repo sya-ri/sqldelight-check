@@ -2,7 +2,7 @@
 
 `sqldelight-check-rules-postgres` is the PostgreSQL-specific rule set.
 
-These rules are gated by `DialectCapability.PostgreSql` and focus on schema
+These rules are gated by `PostgresDialectCapability` and focus on schema
 and migration patterns that are important for live PostgreSQL databases.
 
 ## Rule Set ID

@@ -152,7 +152,7 @@ class SourceSqlFactsExtractorTest {
             """.trimIndent()
         val dialect =
             SqlDialect(
-                family = DialectFamily.Custom,
+                family = DialectFamily.Named("sample"),
                 sourcePatterns =
                     SqlDialectSourcePatterns(
                         patterns =
@@ -169,7 +169,7 @@ class SourceSqlFactsExtractorTest {
 
     private fun extract(
         content: String,
-        dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
+        dialect: SqlDialect = SqlDialect(family = DialectFamily.Named("default")),
     ) = SourceSqlFactsExtractor.extract(SourceFile(path = "src/main/sqldelight/com/example/Test.sq", content = content), dialect)
 
     private fun String.textIn(range: SourceRange): String = substring(range.start.toOffsetIn(this), range.end.toOffsetIn(this))

@@ -1,11 +1,12 @@
 package dev.s7a.sqldelight.check.rules.hsql.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceBindingStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceStatement
+import dev.s7a.sqldelight.check.dialects.hsql.TextTableSourceBindingStart
+import dev.s7a.sqldelight.check.dialects.hsql.TextTableSourceClause
+import dev.s7a.sqldelight.check.dialects.hsql.TextTableSourceStatement
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,7 +24,7 @@ public class NoTextTableSourceRule : Rule {
     override val id: RuleId = RuleId("no-text-table-source")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.Hsql
+    override val targetCapability: DialectCapability = HsqlDialectCapability
 
     override fun run(
         context: RuleContext,

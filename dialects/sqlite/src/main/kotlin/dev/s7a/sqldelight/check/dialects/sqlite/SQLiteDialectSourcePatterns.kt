@@ -1,22 +1,11 @@
 package dev.s7a.sqldelight.check.dialects.sqlite
 
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AutoincrementKeyword
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ComplexAlterTableOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DataTypeName
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DoUpdateClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysOffValue
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysOnValue
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysPragmaStatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.InsertOrReplaceStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarget
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.NonIntegerRowidPrimaryKeyType
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OnConflictClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReplaceIntoStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.WithoutRowidClause
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.sourcePatterns
 import dev.s7a.sqldelight.check.api.withoutExpressions

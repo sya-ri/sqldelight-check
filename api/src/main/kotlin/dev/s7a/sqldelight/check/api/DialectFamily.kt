@@ -1,31 +1,37 @@
 package dev.s7a.sqldelight.check.api
 
 /**
- * Database family for known SQLDelight dialects.
+ * Database family for SQL dialects.
+ *
+ * Dialect modules can define their own implementation when they need a stable
+ * family identity, or use [Named] for a string-backed identity.
  */
-public enum class DialectFamily {
+public interface DialectFamily {
     /**
-     * SQLite dialect family, including SQLDelight's versioned SQLite dialect artifacts.
+     * Stable identifier for this dialect family.
      */
-    SQLite,
+    public val id: String
 
     /**
-     * MySQL dialect family.
+     * Dialect family used when no provider resolves a dialect artifact.
      */
-    MySql,
+    public data object Unknown : DialectFamily {
+        override val id: String = "unknown"
+    }
 
     /**
-     * PostgreSQL dialect family.
+     * Named dialect family for integrations that do not need their own type.
      */
-    PostgreSql,
+    public class Named(
+        override val id: String,
+    ) : DialectFamily {
+        override fun equals(other: Any?): Boolean =
+            this === other ||
+                other is Named &&
+                id == other.id
 
-    /**
-     * HSQL dialect family.
-     */
-    Hsql,
+        override fun hashCode(): Int = id.hashCode()
 
-    /**
-     * Third-party or otherwise unknown dialect family.
-     */
-    Custom,
+        override fun toString(): String = "DialectFamily.Named(id=$id)"
+    }
 }

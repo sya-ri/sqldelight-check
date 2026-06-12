@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectCapability
+import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -26,7 +28,7 @@ class HsqlRuleSetProviderTest {
         val rules = provider.ruleProviders().map { ruleProvider -> ruleProvider.create() }
 
         assertEquals(RuleSetId("hsql"), provider.id)
-        assertEquals(setOf(DialectCapability.Hsql), rules.map { rule -> rule.targetCapability }.toSet())
+        assertEquals(setOf(HsqlDialectCapability), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
                 qualifiedRuleId("hsql:no-database-file-settings"),

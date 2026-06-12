@@ -2,7 +2,6 @@ package dev.s7a.sqldelight.check.dialects.hsql
 
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DataTypeName
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DatabaseFileSettingStatement
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.GroupByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinConditionBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarget
@@ -12,11 +11,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightExecut
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SystemOperationStatement
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceBindingStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceStatement
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.sourcePatterns
 import dev.s7a.sqldelight.check.api.withoutExpressions

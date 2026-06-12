@@ -130,44 +130,14 @@ public interface SqlDialectSourcePatternRole {
     public data object AlterTableStatementStart : SqlDialectSourcePatternRole
 
     /**
-     * Drops a column from an existing table.
-     */
-    public data object ColumnDropOperation : SqlDialectSourcePatternRole
-
-    /**
-     * Renames a column in an existing table.
-     */
-    public data object ColumnRenameOperation : SqlDialectSourcePatternRole
-
-    /**
-     * Renames an existing table.
-     */
-    public data object TableRenameOperation : SqlDialectSourcePatternRole
-
-    /**
      * Adds a column to an existing table.
      */
     public data object ColumnAddOperation : SqlDialectSourcePatternRole
 
     /**
-     * Modifies an existing column definition.
-     */
-    public data object ColumnModifyOperation : SqlDialectSourcePatternRole
-
-    /**
-     * Changes an existing column definition.
-     */
-    public data object ColumnChangeOperation : SqlDialectSourcePatternRole
-
-    /**
      * Alters a column in an existing table.
      */
     public data object ColumnAlterOperation : SqlDialectSourcePatternRole
-
-    /**
-     * Changes an existing column type.
-     */
-    public data object ColumnTypeChangeOperation : SqlDialectSourcePatternRole
 
     /**
      * Changes an existing column to `NOT NULL`.
@@ -180,11 +150,6 @@ public interface SqlDialectSourcePatternRole {
     public data object ConstraintAddOperation : SqlDialectSourcePatternRole
 
     /**
-     * Marks a `NOT VALID` constraint clause.
-     */
-    public data object NotValidConstraintClause : SqlDialectSourcePatternRole
-
-    /**
      * Starts a `CREATE INDEX` statement.
      */
     public data object CreateIndexStatementStart : SqlDialectSourcePatternRole
@@ -193,26 +158,6 @@ public interface SqlDialectSourcePatternRole {
      * Starts a `CREATE TABLE` statement.
      */
     public data object CreateTableStatementStart : SqlDialectSourcePatternRole
-
-    /**
-     * Starts a concurrent `CREATE INDEX` statement.
-     */
-    public data object CreateConcurrentIndexStatementStart : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a `CONCURRENTLY` clause.
-     */
-    public data object ConcurrentlyClause : SqlDialectSourcePatternRole
-
-    /**
-     * Starts a `REINDEX` statement.
-     */
-    public data object ReindexStatementStart : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a `REINDEX SYSTEM` target.
-     */
-    public data object ReindexSystemTarget : SqlDialectSourcePatternRole
 
     /**
      * Starts an explicit transaction.
@@ -225,124 +170,14 @@ public interface SqlDialectSourcePatternRole {
     public data object TransactionEndStatement : SqlDialectSourcePatternRole
 
     /**
-     * Marks a volatile default function.
-     */
-    public data object VolatileDefaultFunction : SqlDialectSourcePatternRole
-
-    /**
      * Starts a default-value clause.
      */
     public data object DefaultValueClause : SqlDialectSourcePatternRole
 
     /**
-     * Marks a serial-style generated integer type.
-     */
-    public data object SerialDataTypeName : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a MySQL `COPY` alter-table algorithm clause.
-     */
-    public data object CopyAlgorithmClause : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a MySQL exclusive lock clause.
-     */
-    public data object ExclusiveLockClause : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a legacy MySQL `utf8` character set declaration.
-     */
-    public data object LegacyUtf8CharsetDeclaration : SqlDialectSourcePatternRole
-
-    /**
-     * Starts a MySQL `REPLACE INTO` statement.
-     */
-    public data object ReplaceIntoStatementStart : SqlDialectSourcePatternRole
-
-    /**
-     * Marks an integer type that can carry a display width.
-     */
-    public data object IntegerDisplayWidthType : SqlDialectSourcePatternRole
-
-    /**
-     * Marks SQLite `AUTOINCREMENT`.
-     */
-    public data object AutoincrementKeyword : SqlDialectSourcePatternRole
-
-    /**
-     * Starts a SQLite `INSERT OR REPLACE` statement.
-     */
-    public data object InsertOrReplaceStatementStart : SqlDialectSourcePatternRole
-
-    /**
-     * Starts a SQLite `ON CONFLICT` clause.
-     */
-    public data object OnConflictClause : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a SQLite `DO UPDATE` conflict action.
-     */
-    public data object DoUpdateClause : SqlDialectSourcePatternRole
-
-    /**
-     * Starts a SQLite foreign-key pragma statement.
-     */
-    public data object ForeignKeysPragmaStatementStart : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a SQLite foreign-key pragma value that disables enforcement.
-     */
-    public data object ForeignKeysOffValue : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a SQLite foreign-key pragma value that enables enforcement.
-     */
-    public data object ForeignKeysOnValue : SqlDialectSourcePatternRole
-
-    /**
-     * Marks an alter-table operation that SQLite cannot apply in place.
-     */
-    public data object ComplexAlterTableOperation : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a SQLite rowid-primary-key type that is not exact `INTEGER`.
-     */
-    public data object NonIntegerRowidPrimaryKeyType : SqlDialectSourcePatternRole
-
-    /**
      * Marks a primary-key constraint.
      */
     public data object PrimaryKeyConstraint : SqlDialectSourcePatternRole
-
-    /**
-     * Marks a SQLite `WITHOUT ROWID` clause.
-     */
-    public data object WithoutRowidClause : SqlDialectSourcePatternRole
-
-    /**
-     * Marks an HSQL database or file setting statement.
-     */
-    public data object DatabaseFileSettingStatement : SqlDialectSourcePatternRole
-
-    /**
-     * Marks an HSQL system operation statement.
-     */
-    public data object SystemOperationStatement : SqlDialectSourcePatternRole
-
-    /**
-     * Marks an HSQL text-table source statement.
-     */
-    public data object TextTableSourceStatement : SqlDialectSourcePatternRole
-
-    /**
-     * Marks an HSQL text-table source clause.
-     */
-    public data object TextTableSourceClause : SqlDialectSourcePatternRole
-
-    /**
-     * Starts an HSQL text-table source binding statement.
-     */
-    public data object TextTableSourceBindingStart : SqlDialectSourcePatternRole
 
     /**
      * Marks a SQLDelight storage type that can be mapped to a Kotlin type.

@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectCapability
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -24,7 +26,7 @@ class MySqlRuleSetProviderTest {
         val ruleIds = rules.map { rule -> QualifiedRuleId(provider.id, rule.id) }.toSet()
 
         assertEquals(RuleSetId("mysql"), provider.id)
-        assertEquals(setOf(DialectCapability.MySql), rules.map { rule -> rule.targetCapability }.toSet())
+        assertEquals(setOf(MySqlDialectCapability), rules.map { rule -> rule.targetCapability }.toSet())
         assertEquals(
             setOf(
                 qualifiedRuleId("mysql:no-utf8-charset"),

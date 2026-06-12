@@ -1,7 +1,9 @@
 package dev.s7a.sqldelight.check.dialects.postgres
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
@@ -18,8 +20,8 @@ class PostgresDialectProviderTest {
             PostgresDialect,
             PostgresDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "postgresql-dialect", null)),
         )
-        assertEquals(DialectFamily.PostgreSql, PostgresDialect.family)
-        assertEquals(setOf(DialectCapability.PostgreSql), PostgresDialect.capabilities)
+        assertEquals(PostgresDialectFamily, PostgresDialect.family)
+        assertEquals(setOf(PostgresDialectCapability), PostgresDialect.capabilities)
     }
 
     @Test

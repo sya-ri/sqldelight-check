@@ -45,7 +45,7 @@ class ExampleDialectProvider : SqlDialectProvider {
         if (coordinate.module != "example-dialect") return null
 
         return SqlDialect(
-            family = DialectFamily.Custom,
+            family = DialectFamily.Named("example"),
             capabilities = setOf(DialectCapability("example")),
             sourcePatterns =
                 SqlDialectSourcePatterns(
@@ -82,7 +82,7 @@ providers for metadata. Providers from `sqldelightCheckDialects` are consulted b
 override built-in SQLDelight dialect metadata when needed. Third-party providers should still return `null` for
 unrelated coordinates.
 
-When no provider resolves a coordinate, sqldelight-check falls back to `DialectFamily.Custom` with
+When no provider resolves a coordinate, sqldelight-check falls back to `DialectFamily.Unknown` with
 `SqlDialectSourcePatterns.SourceScannerDefault`.
 
 ## Source Scanner Patterns

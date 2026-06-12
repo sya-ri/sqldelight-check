@@ -97,7 +97,7 @@ class BlankLineBetweenStatementsRuleTest {
     fun `uses dialect source patterns for custom statement starts`() {
         val dialect =
             SqlDialect(
-                family = DialectFamily.Custom,
+                family = DialectFamily.Unknown,
                 sourcePatterns =
                     SqlDialectSourcePatterns(
                         patterns =

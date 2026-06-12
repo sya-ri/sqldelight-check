@@ -5,11 +5,21 @@ import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 
 /**
+ * SQLite dialect family.
+ */
+public val SQLiteDialectFamily: DialectFamily = DialectFamily.Named("sqlite")
+
+/**
+ * SQLite-compatible syntax and behavior.
+ */
+public val SQLiteDialectCapability: DialectCapability = DialectCapability("sqlite")
+
+/**
  * SQLDelight SQLite dialect metadata.
  */
 public val SQLiteDialect: SqlDialect =
     SqlDialect(
-        family = DialectFamily.SQLite,
-        capabilities = setOf(DialectCapability.SQLite),
+        family = SQLiteDialectFamily,
+        capabilities = setOf(SQLiteDialectCapability),
         sourcePatterns = SQLiteDialectSourcePatterns,
     )

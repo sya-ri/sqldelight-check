@@ -1,11 +1,12 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ConcurrentlyClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReindexStatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReindexSystemTarget
+import dev.s7a.sqldelight.check.dialects.postgres.ConcurrentlyClause
+import dev.s7a.sqldelight.check.dialects.postgres.ReindexStatementStart
+import dev.s7a.sqldelight.check.dialects.postgres.ReindexSystemTarget
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,7 +24,7 @@ public class ReindexConcurrentlyRule : Rule {
     override val id: RuleId = RuleId("reindex-concurrently")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
+    override val targetCapability: DialectCapability = PostgresDialectCapability
 
     override fun run(
         context: RuleContext,

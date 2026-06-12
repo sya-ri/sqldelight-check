@@ -2,27 +2,16 @@ package dev.s7a.sqldelight.check.dialects.postgres
 
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnDropOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnRenameOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnTypeChangeOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CommonFunctionName
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ConcurrentlyClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CreateConcurrentIndexStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DataTypeName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.GroupByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinConditionBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarget
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.NotValidConstraintClause
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OrderByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateBoundary
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReindexStatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReindexSystemTarget
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SerialDataTypeName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableRenameOperation
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.VolatileDefaultFunction
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.sourcePatterns
 

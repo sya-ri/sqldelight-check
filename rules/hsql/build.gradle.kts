@@ -4,9 +4,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":dialects:hsql"))
     implementation(project(":api"))
     implementation(project(":rule-api"))
-    runtimeOnly(project(":dialects:hsql"))
-    testImplementation(project(":dialects:hsql"))
     testImplementation(kotlin("test"))
 }

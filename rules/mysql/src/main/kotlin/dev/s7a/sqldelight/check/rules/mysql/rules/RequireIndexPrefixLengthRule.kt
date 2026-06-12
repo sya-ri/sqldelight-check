@@ -1,6 +1,7 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectCapability
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -22,7 +23,7 @@ public class RequireIndexPrefixLengthRule : Rule {
     override val id: RuleId = RuleId("require-index-prefix-length")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.MySql
+    override val targetCapability: DialectCapability = MySqlDialectCapability
 
     override fun run(
         context: RuleContext,

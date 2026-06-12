@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -75,7 +76,7 @@ class ExcessiveLocksRuleTest {
                     """
                     CREATE INDEX player_name ON player(name);
                     """,
-                capabilities = setOf(DialectCapability.SQLite),
+                capabilities = setOf(DialectCapability("other")),
             )
 
         assertEquals(emptyList(), diagnostics)

@@ -1,7 +1,9 @@
 package dev.s7a.sqldelight.check.dialects.mysql
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
@@ -20,8 +22,8 @@ class MySqlDialectProviderTest {
             MySqlDialect,
             MySqlDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "mysql-dialect", null)),
         )
-        assertEquals(DialectFamily.MySql, MySqlDialect.family)
-        assertEquals(setOf(DialectCapability.MySql), MySqlDialect.capabilities)
+        assertEquals(MySqlDialectFamily, MySqlDialect.family)
+        assertEquals(setOf(MySqlDialectCapability), MySqlDialect.capabilities)
     }
 
     @Test

@@ -4,9 +4,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":dialects:mysql"))
     implementation(project(":api"))
     implementation(project(":rule-api"))
-    runtimeOnly(project(":dialects:mysql"))
-    testImplementation(project(":dialects:mysql"))
     testImplementation(kotlin("test"))
 }

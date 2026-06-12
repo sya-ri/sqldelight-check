@@ -1,10 +1,11 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AlterTableStatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableRenameOperation
+import dev.s7a.sqldelight.check.dialects.postgres.TableRenameOperation
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -21,7 +22,7 @@ public class NoRenameTableRule : Rule {
     override val id: RuleId = RuleId("no-rename-table")
     override val defaultSeverity: Severity = Severity.Error
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
+    override val targetCapability: DialectCapability = PostgresDialectCapability
 
     override fun run(
         context: RuleContext,
