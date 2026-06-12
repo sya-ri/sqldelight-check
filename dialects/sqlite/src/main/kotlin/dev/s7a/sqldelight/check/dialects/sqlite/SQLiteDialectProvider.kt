@@ -5,7 +5,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 
 private const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
-private const val DIALECT_SUFFIX = "-dialect"
+private val sqliteDialectModulePattern = Regex("""sqlite-.+-dialect""")
 
 /**
  * Resolves SQLDelight's SQLite dialect artifacts.
@@ -13,7 +13,7 @@ private const val DIALECT_SUFFIX = "-dialect"
 public class SQLiteDialectProvider : SqlDialectProvider {
     override fun resolve(coordinate: SqlDialectCoordinate): SqlDialect? {
         if (coordinate.group != SQLDELIGHT_GROUP) return null
-        if (!coordinate.module.startsWith("sqlite-") || !coordinate.module.endsWith(DIALECT_SUFFIX)) return null
+        if (!sqliteDialectModulePattern.matches(coordinate.module)) return null
         return SQLiteDialect
     }
 }

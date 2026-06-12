@@ -1,7 +1,5 @@
 package dev.s7a.sqldelight.check.dialects.sqlite
 
-import dev.s7a.sqldelight.check.api.DialectId
-import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
@@ -25,6 +23,7 @@ class SQLiteDialectProviderTest {
     @Test
     fun `does not resolve non SQLite SQLDelight dialects`() {
         assertNull(SQLiteDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "mysql-dialect", null)))
+        assertNull(SQLiteDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "sqlite-3-38", null)))
     }
 
     @Test

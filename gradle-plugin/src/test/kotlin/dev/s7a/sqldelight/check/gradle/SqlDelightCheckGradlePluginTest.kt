@@ -1358,7 +1358,7 @@ class SqlDelightCheckGradlePluginTest {
                         if (!coordinate.getGroup().equals("app.cash.sqldelight")) {
                             return null;
                         }
-                        if (!coordinate.getModule().startsWith("sqlite-")) {
+                        if (!coordinate.getModule().matches("sqlite-.+-dialect")) {
                             return null;
                         }
                         return new SqlDialect(
