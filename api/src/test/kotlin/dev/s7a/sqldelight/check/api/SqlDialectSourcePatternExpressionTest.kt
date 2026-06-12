@@ -13,9 +13,9 @@ class SqlDialectSourcePatternExpressionTest {
 
         assertEquals(
             listOf(
-                SqlDialectSourcePatternPart.required("fetch"),
-                SqlDialectSourcePatternPart.oneOf("first", "next"),
-                SqlDialectSourcePatternPart.optional("row"),
+                SqlDialectSourcePatternPart(setOf("fetch")),
+                SqlDialectSourcePatternPart(setOf("first", "next")),
+                SqlDialectSourcePatternPart(setOf("row"), optional = true),
             ),
             expression.parts,
         )

@@ -22,18 +22,4 @@ public class SqlDialectSourcePatternPart(
 
     override fun toString(): String =
         "SqlDialectSourcePatternPart(alternatives=$alternatives, optional=$optional)"
-
-    public companion object {
-        public fun required(term: String): SqlDialectSourcePatternPart =
-            SqlDialectSourcePatternPart(setOf(term))
-
-        public fun oneOf(vararg terms: String): SqlDialectSourcePatternPart =
-            SqlDialectSourcePatternPart(terms.toSet())
-
-        public fun optional(term: String): SqlDialectSourcePatternPart =
-            SqlDialectSourcePatternPart(setOf(term), optional = true)
-
-        public fun optionalOneOf(vararg terms: String): SqlDialectSourcePatternPart =
-            SqlDialectSourcePatternPart(terms.toSet(), optional = true)
-    }
 }

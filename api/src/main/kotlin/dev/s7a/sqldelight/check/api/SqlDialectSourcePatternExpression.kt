@@ -37,15 +37,6 @@ public class SqlDialectSourcePatternExpression(
         "SqlDialectSourcePatternExpression(parts=$parts)"
 
     public companion object {
-        public fun terms(vararg terms: String): SqlDialectSourcePatternExpression =
-            SqlDialectSourcePatternExpression(terms.map { term -> SqlDialectSourcePatternPart.required(term) })
-
-        public fun sequence(vararg parts: SqlDialectSourcePatternPart): SqlDialectSourcePatternExpression =
-            SqlDialectSourcePatternExpression(parts.toList())
-
-        public fun build(block: SqlDialectSourcePatternExpressionBuilder.() -> Unit): SqlDialectSourcePatternExpression =
-            SqlDialectSourcePatternExpressionBuilder().apply(block).build()
-
         /**
          * Parses a compact source pattern expression.
          *

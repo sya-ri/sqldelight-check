@@ -238,23 +238,10 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpressio
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression$Companion {
-	public final fun build (Lkotlin/jvm/functions/Function1;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;
 	public final fun parse (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;
-	public final fun sequence ([Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;
-	public final fun terms ([Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;
-}
-
-public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpressionBuilder {
-	public fun <init> ()V
-	public final fun build ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;
-	public final fun oneOf ([Ljava/lang/String;)V
-	public final fun optionalOneOf ([Ljava/lang/String;)V
-	public final fun unaryMinus (Ljava/lang/String;)V
-	public final fun unaryPlus (Ljava/lang/String;)V
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart {
-	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart$Companion;
 	public fun <init> (Ljava/util/Set;Z)V
 	public synthetic fun <init> (Ljava/util/Set;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
@@ -262,13 +249,6 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart {
 	public final fun getOptional ()Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart$Companion {
-	public final fun oneOf ([Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart;
-	public final fun optional (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart;
-	public final fun optionalOneOf ([Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart;
-	public final fun required (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternPart;
 }
 
 public abstract interface class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
