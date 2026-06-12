@@ -346,6 +346,7 @@ private fun String.sqlSourceTokens(): List<SqlSourceToken> =
                     this@sqlSourceTokens[index] == '`' -> skipQuoted(index, '`')
                     this@sqlSourceTokens[index] == '[' -> skipBracketQuoted(index)
                     this@sqlSourceTokens[index] == '$' -> skipDollarQuoted(index) ?: readSymbol(this@sqlSourceTokens, index)
+                    this@sqlSourceTokens.isNamedParameterStart(index) -> skipNamedParameter(index)
                     this@sqlSourceTokens[index].isIdentifierStart() -> readIdentifier(this@sqlSourceTokens, index)
                     this@sqlSourceTokens[index].isDigit() -> readNumber(this@sqlSourceTokens, index)
                     this@sqlSourceTokens[index].isSqlStructureSymbol() -> readSymbol(this@sqlSourceTokens, index)
@@ -442,6 +443,19 @@ private fun String.skipDollarQuoted(start: Int): Int? {
     val delimiter = substring(start, endOfTag + 1)
     val end = indexOf(delimiter, startIndex = endOfTag + 1)
     return if (end == -1) length else end + delimiter.length
+}
+
+private fun String.isNamedParameterStart(index: Int): Boolean =
+    this[index] == ':' &&
+        getOrNull(index + 1)?.isIdentifierStart() == true &&
+        getOrNull(index - 1) != ':'
+
+private fun String.skipNamedParameter(start: Int): Int {
+    var index = start + 2
+    while (index < length && this[index].isIdentifierPart()) {
+        index++
+    }
+    return index
 }
 
 private fun Char.isSqlStructureSymbol(): Boolean =
