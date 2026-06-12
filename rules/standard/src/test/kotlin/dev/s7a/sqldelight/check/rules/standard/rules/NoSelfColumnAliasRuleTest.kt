@@ -56,6 +56,21 @@ class NoSelfColumnAliasRuleTest {
     }
 
     @Test
+    fun `accepts aggregate functions aliased to matching output concepts`() {
+        NoSelfColumnAliasRule().assertDiagnosticCount(
+            """
+            selectPlayerStats:
+            SELECT
+              COUNT(*) AS count,
+              SUM(score) AS sum,
+              MAX(score) AS max
+            FROM player;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
     fun `accepts result columns without aliases`() {
         NoSelfColumnAliasRule().assertDiagnosticCount(
             """
