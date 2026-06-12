@@ -86,6 +86,25 @@ class SqlSourceStructureTest {
     }
 
     @Test
+    fun `does not match SQLDelight named parameters as clause starts`() {
+        val structure =
+            SqlSourceStructure.parse(
+                """
+                selectPlayers:
+                SELECT id, name
+                FROM player
+                LIMIT :limit
+                OFFSET :offset;
+                """.trimIndent(),
+            )
+
+        assertEquals(1, structure.context("LIMIT").matchLength(SqlDialectSourcePatternRole.MajorClauseStart))
+        assertEquals(1, structure.context("OFFSET").matchLength(SqlDialectSourcePatternRole.MajorClauseStart))
+        assertEquals(1, structure.tokens.count { context -> context.token.text.equals("limit", ignoreCase = true) })
+        assertEquals(1, structure.tokens.count { context -> context.token.text.equals("offset", ignoreCase = true) })
+    }
+
+    @Test
     fun `keeps dialect specific multi term pattern lengths`() {
         val structure =
             SqlSourceStructure.parse(
