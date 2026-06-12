@@ -40,10 +40,10 @@
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
         <div class="library-version" id="library-version">
 <dokka-template-command data="{&quot;@class&quot;:&quot;org.jetbrains.dokka.base.templating.ReplaceVersionsCommand&quot;,&quot;location&quot;:&quot;dev.s7a.sqldelight.check.api/-sql-dialect/index.html&quot;}"><div class="dropdown versions-dropdown" data-role="dropdown">
-  <div class="button button_dropdown versions-dropdown-button" role="combobox" data-role="dropdown-toggle" aria-controls="versions-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select version" tabindex="0" title="0.1.1"><span class="versions-dropdown-button-text">0.1.1</span></div>
+  <div class="button button_dropdown versions-dropdown-button" role="combobox" data-role="dropdown-toggle" aria-controls="versions-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select version" tabindex="0" title="0.2.0"><span class="versions-dropdown-button-text">0.2.0</span></div>
   <div class="dropdown--list dropdown--list_positioned_left versions-dropdown-data" role="listbox" data-role="dropdown-listbox" aria-label="Versions" id="versions-listbox">
     <div class="dropdown--header" data-remove-style="true" style="display: none"><span>Select version</span><button class="button" data-role="dropdown-toggle" aria-label="Close versions selection"><i class="ui-kit-icon ui-kit-icon_cross"></i></button></div>
-<a href="index.html" class="dropdown--option dropdown--option_active dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.1"><span class="dropdown--option-icon dropdown--option-icon_selected"></span><span class="dropdown--option-text">0.1.1</span></a><a href="../../../older/0.1.0/api/dev.s7a.sqldelight.check.api/-sql-dialect/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.0</span></a></div>
+<a href="index.html" class="dropdown--option dropdown--option_active dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.0"><span class="dropdown--option-icon dropdown--option-icon_selected"></span><span class="dropdown--option-text">0.2.0</span></a><a href="../../../older/0.1.1/api/dev.s7a.sqldelight.check.api/-sql-dialect/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.1</span></a><a href="../../../older/0.1.0/api/dev.s7a.sqldelight.check.api/-sql-dialect/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.0</span></a></div>
   <div class="dropdown--overlay"></div>
 </div>
 </dokka-template-command>        </div>
@@ -100,24 +100,24 @@
   <div class="breadcrumbs"><a href="../../index.html">sqldelight-check-api</a><span class="delimiter">/</span><a href="../index.html">dev.s7a.sqldelight.check.api</a><span class="delimiter">/</span><span class="current">SqlDialect</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Sql</span><wbr><span><span>Dialect</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">SqlDialect</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>family<span class="token operator">: </span><a href="../-dialect-family/index.html">DialectFamily</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>capabilities<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../-dialect-capability/index.html">DialectCapability</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>sourceKeywords<span class="token operator">: </span><a href="../-sql-dialect-source-keywords/index.html">SqlDialectSourceKeywords</a><span class="token operator"> = </span>SqlDialectSourceKeywords.SourceScannerDefault</span></span><span class="token punctuation">)</span></div><p class="paragraph">Rule-relevant SQL dialect metadata for a SQLDelight database.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">SqlDialect</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>ids<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../-dialect-id/index.html">DialectId</a><span class="token operator">&gt;</span><span class="token operator"> = </span>setOf(DialectId.Unknown)<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>sourcePatterns<span class="token operator">: </span><a href="../-sql-dialect-source-patterns/index.html">SqlDialectSourcePatterns</a><span class="token operator"> = </span>SqlDialectSourcePatterns.SourceScannerDefault</span></span><span class="token punctuation">)</span></div><p class="paragraph">Rule-relevant SQL dialect metadata for a SQLDelight database.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="tableheader">Constructors</h2>
-        <div class="table"><a data-name="1904436580%2FConstructors%2F1081350600" anchor-label="SqlDialect" id="1904436580%2FConstructors%2F1081350600" data-filterable-set=":api/main"></a>
+        <div class="table"><a data-name="-483018616%2FConstructors%2F1081350600" anchor-label="SqlDialect" id="-483018616%2FConstructors%2F1081350600" data-filterable-set=":api/main"></a>
           <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":api/main" data-filterable-set=":api/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-sql-dialect.html"><span>Sql</span><wbr><span><span>Dialect</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1904436580%2FConstructors%2F1081350600"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-483018616%2FConstructors%2F1081350600"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">family<span class="token operator">: </span><a href="../-dialect-family/index.html">DialectFamily</a><span class="token punctuation">, </span></span><span class="parameter ">capabilities<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../-dialect-capability/index.html">DialectCapability</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptySet()<span class="token punctuation">, </span></span><span class="parameter ">sourceKeywords<span class="token operator">: </span><a href="../-sql-dialect-source-keywords/index.html">SqlDialectSourceKeywords</a><span class="token operator"> = </span>SqlDialectSourceKeywords.SourceScannerDefault</span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ids<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../-dialect-id/index.html">DialectId</a><span class="token operator">&gt;</span><span class="token operator"> = </span>setOf(DialectId.Unknown)<span class="token punctuation">, </span></span><span class="parameter ">sourcePatterns<span class="token operator">: </span><a href="../-sql-dialect-source-patterns/index.html">SqlDialectSourcePatterns</a><span class="token operator"> = </span>SqlDialectSourcePatterns.SourceScannerDefault</span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -126,47 +126,32 @@
       </div>
       <div data-togglable="PROPERTY">
         <h2 class="tableheader">Properties</h2>
-        <div class="table"><a data-name="24317608%2FProperties%2F1081350600" anchor-label="capabilities" id="24317608%2FProperties%2F1081350600" data-filterable-set=":api/main"></a>
+        <div class="table"><a data-name="1796684036%2FProperties%2F1081350600" anchor-label="ids" id="1796684036%2FProperties%2F1081350600" data-filterable-set=":api/main"></a>
           <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="capabilities.html"><span><span>capabilities</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="24317608%2FProperties%2F1081350600"></span>
+                  <div><a href="ids.html"><span><span>ids</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1796684036%2FProperties%2F1081350600"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="capabilities.html">capabilities</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../-dialect-capability/index.html">DialectCapability</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Capabilities discovered or inferred for this dialect.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ids.html">ids</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../-dialect-id/index.html">DialectId</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Dialect IDs discovered or inferred for this dialect.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="991682426%2FProperties%2F1081350600" anchor-label="family" id="991682426%2FProperties%2F1081350600" data-filterable-set=":api/main"></a>
+<a data-name="2124474112%2FProperties%2F1081350600" anchor-label="sourcePatterns" id="2124474112%2FProperties%2F1081350600" data-filterable-set=":api/main"></a>
           <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="family.html"><span><span>family</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="991682426%2FProperties%2F1081350600"></span>
+                  <div><a href="source-patterns.html"><span>source</span><wbr><span><span>Patterns</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2124474112%2FProperties%2F1081350600"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="family.html">family</a><span class="token operator">: </span><a href="../-dialect-family/index.html">DialectFamily</a></div><div class="brief "><p class="paragraph">Broad dialect family used by rule applicability checks.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-189699047%2FProperties%2F1081350600" anchor-label="sourceKeywords" id="-189699047%2FProperties%2F1081350600" data-filterable-set=":api/main"></a>
-          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="source-keywords.html"><span>source</span><wbr><span><span>Keywords</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-189699047%2FProperties%2F1081350600"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="source-keywords.html">sourceKeywords</a><span class="token operator">: </span><a href="../-sql-dialect-source-keywords/index.html">SqlDialectSourceKeywords</a></div><div class="brief "><p class="paragraph">Keyword groups used by source-level SQL fact extraction.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="source-patterns.html">sourcePatterns</a><span class="token operator">: </span><a href="../-sql-dialect-source-patterns/index.html">SqlDialectSourcePatterns</a></div><div class="brief "><p class="paragraph">Source patterns used by source-level SQL fact extraction.</p></div></div></div>
                 </div>
               </div>
             </div>
