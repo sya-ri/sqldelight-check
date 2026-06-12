@@ -10,6 +10,13 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.api.SqlDialectSourceBlockPatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePairedBlockPattern
+import dev.s7a.sqldelight.check.api.SqlDialectSourceParenthesisDepthTerms
+import dev.s7a.sqldelight.check.api.SqlDialectSourceParenthesizedBlockPattern
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlSourceBlockKind
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.TextEdit
@@ -59,6 +66,53 @@ internal val cleanMigrationSqm: String =
 
     ALTER TABLE player ADD COLUMN score INTEGER NOT NULL DEFAULT 0;
     """.trimIndent() + "\n"
+
+internal val braceSubqueryDialect: SqlDialect =
+    SqlDialect(
+        family = DialectFamily.SQLite,
+        sourcePatterns =
+            SqlDialectSourcePatterns(
+                blockPatterns =
+                    SqlDialectSourceBlockPatterns(
+                        parenthesisDepthTerms =
+                            setOf(
+                                SqlDialectSourceParenthesisDepthTerms(
+                                    openTerm = "{",
+                                    closeTerm = "}",
+                                ),
+                            ),
+                        parenthesizedBlocks =
+                            setOf(
+                                SqlDialectSourceParenthesizedBlockPattern(
+                                    openTerm = "{",
+                                    closeTerm = "}",
+                                    defaultKind = SqlSourceBlockKind.ParenthesizedExpression,
+                                    innerStartRoles = setOf(SqlDialectSourcePatternRole.SelectListStart),
+                                    innerStartKind = SqlSourceBlockKind.Subquery,
+                                ),
+                            ),
+                    ),
+            ),
+    )
+
+internal val atomicCaseDialect: SqlDialect =
+    SqlDialect(
+        family = DialectFamily.SQLite,
+        sourcePatterns =
+            SqlDialectSourcePatterns(
+                blockPatterns =
+                    SqlDialectSourceBlockPatterns(
+                        pairedBlocks =
+                            setOf(
+                                SqlDialectSourcePairedBlockPattern.parse(
+                                    startExpression = "BEGIN ATOMIC",
+                                    endExpression = "END",
+                                    kind = SqlSourceBlockKind.CaseExpression,
+                                ),
+                            ),
+                    ),
+            ),
+    )
 
 internal fun Rule.diagnostics(
     content: String,

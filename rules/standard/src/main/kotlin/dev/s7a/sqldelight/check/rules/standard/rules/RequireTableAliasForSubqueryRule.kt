@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,15 +24,17 @@ public class RequireTableAliasForSubqueryRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        context.file.content.tableReferences(context.database.dialect.sourcePatterns).forEach { reference ->
-            if (reference.depth != 0 || !reference.isSubquery || reference.alias != null) return@forEach
+        val content = context.file.content
+        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        structure.topLevelSubqueryTableReferences(content, context.database.dialect.sourcePatterns).forEach { reference ->
+            if (reference.alias != null) return@forEach
 
             reporter.report(
                 RuleDiagnostic(
                     severity = defaultSeverity,
                     message = "FROM and JOIN subqueries should have a table alias.",
                     file = context.file,
-                    range = context.file.content.rangeAtOffsets(reference.sourceStartOffset, reference.sourceEndOffset),
+                    range = content.rangeAtOffsets(reference.block.startOffset, reference.block.endOffset),
                     database = context.database,
                 ),
             )

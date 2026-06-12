@@ -38,6 +38,26 @@ class MaxCaseDepthRuleTest {
     }
 
     @Test
+    fun `uses dialect case expression block patterns`() {
+        val diagnostics =
+            MaxCaseDepthRule().diagnostics(
+                """
+                selectBucket:
+                SELECT BEGIN ATOMIC
+                  WHEN score > 0 THEN BEGIN ATOMIC WHEN score > 10 THEN 1 ELSE 0 END
+                  ELSE 0
+                END AS bucket
+                FROM player;
+                """.asSqlDelightFile(),
+                options = mapOf("maxDepth" to "1"),
+                dialect = atomicCaseDialect,
+            )
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(3, diagnostics.single().range?.start?.line)
+    }
+
+    @Test
     fun `rejects invalid max depth option`() {
         assertFailsWith<IllegalArgumentException> {
             MaxCaseDepthRule().diagnostics(cleanPlayerSq, options = mapOf("maxDepth" to "0"))
