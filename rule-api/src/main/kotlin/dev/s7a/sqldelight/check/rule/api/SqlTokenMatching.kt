@@ -30,10 +30,7 @@ public fun List<SqlToken>.findSourcePattern(
     role: SqlDialectSourcePatternRole,
     sourcePatterns: SqlDialectSourcePatterns,
 ): SqlTokenMatch? =
-    indices
-        .asSequence()
-        .mapNotNull { index -> sourcePatternAt(index, role, sourcePatterns) }
-        .firstOrNull()
+    indices.firstNotNullOfOrNull { index -> sourcePatternAt(index, role, sourcePatterns) }
 
 /**
  * Returns true when a source pattern match for [role] exists.
@@ -56,13 +53,10 @@ public fun List<SqlToken>.findSourcePatternsInOrder(
     var startToken: SqlToken? = null
     var endToken: SqlToken? = null
     var searchIndex = 0
-    roles.forEach { role ->
+    for (role in roles) {
+        if (searchIndex > lastIndex) return null
         val match =
-            indices
-                .asSequence()
-                .dropWhile { index -> index < searchIndex }
-                .mapNotNull { index -> sourcePatternAt(index, role, sourcePatterns) }
-                .firstOrNull()
+            (searchIndex..lastIndex).firstNotNullOfOrNull { index -> sourcePatternAt(index, role, sourcePatterns) }
                 ?: return null
         if (startToken == null) startToken = match.startToken
         endToken = match.endToken

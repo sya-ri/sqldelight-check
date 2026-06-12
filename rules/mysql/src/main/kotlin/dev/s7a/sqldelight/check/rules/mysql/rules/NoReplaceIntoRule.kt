@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
-import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
