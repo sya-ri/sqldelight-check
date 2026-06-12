@@ -1,7 +1,14 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.rule.api.RegexRule
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SerialDataTypeName
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.findSourcePattern
+import dev.s7a.sqldelight.check.rule.api.reportSqlStatementMatches
 
 /**
  * Reports PostgreSQL serial pseudo-types when identity columns are preferred.
@@ -9,9 +16,22 @@ import dev.s7a.sqldelight.check.rule.api.RegexRule
  * Identity columns are the modern PostgreSQL mechanism for generated numeric
  * keys.
  */
-public class PreferIdentityOverSerialRule : RegexRule(
-    ruleName = "prefer-identity-over-serial",
-    pattern = """\b(?:SMALLSERIAL|SERIAL|BIGSERIAL)\b""",
-    message = "Prefer GENERATED AS IDENTITY columns over PostgreSQL serial types.",
-    targetCapability = DialectCapability.PostgreSql,
-)
+public class PreferIdentityOverSerialRule : Rule {
+    override val id: RuleId = RuleId("prefer-identity-over-serial")
+    override val defaultSeverity: Severity = Severity.Warning
+    override val defaultEnable: Boolean = true
+    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
+
+    override fun run(
+        context: RuleContext,
+        reporter: DiagnosticReporter,
+    ) {
+        reportSqlStatementMatches(
+            context = context,
+            reporter = reporter,
+            message = "Prefer GENERATED AS IDENTITY columns over PostgreSQL serial types.",
+        ) { statement ->
+            statement.findSourcePattern(SerialDataTypeName, context.database.dialect.sourcePatterns)
+        }
+    }
+}

@@ -1,8 +1,14 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
 import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.rule.api.RegexRule
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ExclusiveLockClause
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.findSourcePattern
+import dev.s7a.sqldelight.check.rule.api.reportSqlStatementMatches
 
 /**
  * Reports MySQL ALTER TABLE statements that request an exclusive lock.
@@ -10,11 +16,23 @@ import dev.s7a.sqldelight.check.rule.api.RegexRule
  * Exclusive locks block concurrent access and are risky for migrations that run
  * against live databases.
  */
-public class NoExclusiveLockRule : RegexRule(
-    ruleName = "no-exclusive-lock",
-    pattern = """\bLOCK\s*=\s*EXCLUSIVE\b""",
-    message = "Avoid MySQL ALTER TABLE LOCK=EXCLUSIVE for online migrations.",
-    defaultSeverity = Severity.Error,
-    targetCapability = DialectCapability.MySql,
-    hashLineComments = true,
-)
+public class NoExclusiveLockRule : Rule {
+    override val id: RuleId = RuleId("no-exclusive-lock")
+    override val defaultSeverity: Severity = Severity.Error
+    override val defaultEnable: Boolean = true
+    override val targetCapability: DialectCapability = DialectCapability.MySql
+
+    override fun run(
+        context: RuleContext,
+        reporter: DiagnosticReporter,
+    ) {
+        reportSqlStatementMatches(
+            context = context,
+            reporter = reporter,
+            message = "Avoid MySQL ALTER TABLE LOCK=EXCLUSIVE for online migrations.",
+            hashLineComments = true,
+        ) { statement ->
+            statement.findSourcePattern(ExclusiveLockClause, context.database.dialect.sourcePatterns)
+        }
+    }
+}
