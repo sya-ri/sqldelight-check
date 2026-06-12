@@ -3,8 +3,14 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class KeywordCaseRuleTest {
+    @Test
+    fun `is disabled by default`() {
+        assertFalse(KeywordCaseRule().defaultEnable)
+    }
+
     @Test
     fun `reports lowercase keywords in sq named queries`() {
         val content =
