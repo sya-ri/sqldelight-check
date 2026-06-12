@@ -213,6 +213,66 @@ public abstract interface class dev/s7a/sqldelight/check/api/SqlDialectProvider 
 	public abstract fun resolve (Ldev/s7a/sqldelight/check/api/SqlDialectCoordinate;)Ldev/s7a/sqldelight/check/api/SqlDialect;
 }
 
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceBlockPatterns {
+	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlDialectSourceBlockPatterns$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;)V
+	public synthetic fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getClauseStartRoles ()Ljava/util/Set;
+	public final fun getPairedBlocks ()Ljava/util/Set;
+	public final fun getParenthesisDepthTerms ()Ljava/util/Set;
+	public final fun getParenthesizedBlocks ()Ljava/util/Set;
+	public final fun getStatementSeparatorTerms ()Ljava/util/Set;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceBlockPatterns$Companion {
+	public final fun getDefault ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceBlockPatterns;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePairedBlockPattern {
+	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlDialectSourcePairedBlockPattern$Companion;
+	public fun <init> (Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndExpression ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;
+	public final fun getKind ()Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;
+	public final fun getStartExpression ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePairedBlockPattern$Companion {
+	public final fun parse (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;)Ldev/s7a/sqldelight/check/api/SqlDialectSourcePairedBlockPattern;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceParenthesisDepthTerms {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCloseTerm ()Ljava/lang/String;
+	public final fun getNormalizedCloseTerm ()Ljava/lang/String;
+	public final fun getNormalizedOpenTerm ()Ljava/lang/String;
+	public final fun getOpenTerm ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourceParenthesizedBlockPattern {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCloseTerm ()Ljava/lang/String;
+	public final fun getDefaultKind ()Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;
+	public final fun getInnerStartKind ()Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;
+	public final fun getInnerStartRoles ()Ljava/util/Set;
+	public final fun getNormalizedCloseTerm ()Ljava/lang/String;
+	public final fun getNormalizedOpenTerm ()Ljava/lang/String;
+	public final fun getOpenTerm ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePattern {
 	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlDialectSourcePattern$Companion;
 	public fun <init> (Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternExpression;Ljava/util/Set;)V
@@ -446,9 +506,10 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole$Tabl
 public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatterns {
 	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns$Companion;
 	public fun <init> ()V
-	public fun <init> (Ljava/util/Set;)V
-	public synthetic fun <init> (Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceBlockPatterns;)V
+	public synthetic fun <init> (Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourceBlockPatterns;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBlockPatterns ()Ldev/s7a/sqldelight/check/api/SqlDialectSourceBlockPatterns;
 	public final fun getPatterns ()Ljava/util/Set;
 	public fun hashCode ()I
 	public final fun matchPrefix (Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole;Ljava/util/List;)Ljava/lang/Integer;
@@ -1098,6 +1159,63 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$With : dev/
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class dev/s7a/sqldelight/check/api/SqlSourceBlock {
+	public fun <init> (Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;IIIIILjava/lang/Integer;Ldev/s7a/sqldelight/check/api/SqlSourcePatternMatch;)V
+	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;IIIIILjava/lang/Integer;Ldev/s7a/sqldelight/check/api/SqlSourcePatternMatch;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun contains (Ldev/s7a/sqldelight/check/api/SqlSourceBlock;)Z
+	public final fun contains (Ldev/s7a/sqldelight/check/api/SqlSourceTokenContext;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndOffset ()I
+	public final fun getEndTokenIndex ()I
+	public final fun getKind ()Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind;
+	public final fun getParentBlockIndex ()Ljava/lang/Integer;
+	public final fun getSize ()I
+	public final fun getSourcePatternMatch ()Ldev/s7a/sqldelight/check/api/SqlSourcePatternMatch;
+	public final fun getStartOffset ()I
+	public final fun getStartTokenIndex ()I
+	public final fun getStatementIndex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class dev/s7a/sqldelight/check/api/SqlSourceBlockKind {
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceBlockKind$CaseExpression : dev/s7a/sqldelight/check/api/SqlSourceBlockKind {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind$CaseExpression;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceBlockKind$Clause : dev/s7a/sqldelight/check/api/SqlSourceBlockKind {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind$Clause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceBlockKind$ParenthesizedExpression : dev/s7a/sqldelight/check/api/SqlSourceBlockKind {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind$ParenthesizedExpression;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceBlockKind$Statement : dev/s7a/sqldelight/check/api/SqlSourceBlockKind {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind$Statement;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceBlockKind$Subquery : dev/s7a/sqldelight/check/api/SqlSourceBlockKind {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/SqlSourceBlockKind$Subquery;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/api/SqlSourcePatternMatch {
 	public fun <init> (Ldev/s7a/sqldelight/check/api/SqlDialectSourcePattern;I)V
 	public fun equals (Ljava/lang/Object;)Z
@@ -1110,12 +1228,16 @@ public final class dev/s7a/sqldelight/check/api/SqlSourcePatternMatch {
 
 public final class dev/s7a/sqldelight/check/api/SqlSourceStructure {
 	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlSourceStructure$Companion;
-	public fun <init> (Ljava/util/List;)V
+	public fun <init> (Ljava/util/List;Ljava/util/List;)V
+	public final fun childBlocks (Ldev/s7a/sqldelight/check/api/SqlSourceBlock;)Ljava/util/List;
 	public final fun contextAtOffset (I)Ldev/s7a/sqldelight/check/api/SqlSourceTokenContext;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBlocks ()Ljava/util/List;
 	public final fun getTokens ()Ljava/util/List;
 	public fun hashCode ()I
+	public final fun innermostBlockContaining (Ldev/s7a/sqldelight/check/api/SqlSourceTokenContext;)Ldev/s7a/sqldelight/check/api/SqlSourceBlock;
 	public fun toString ()Ljava/lang/String;
+	public final fun tokensInBlock (Ldev/s7a/sqldelight/check/api/SqlSourceBlock;)Ljava/util/List;
 	public final fun tokensInStatement (I)Ljava/util/List;
 }
 
