@@ -121,5 +121,10 @@ reference scanning, `AliasBoundary` prevents reserved constructs from being trea
 alternatives with `{A|B}`, and optional alternatives with `[A|B]`. Use `sourcePatterns` when adding patterns with the
 same roles, and use `withoutExpressions` when a dialect removes or changes a default source pattern.
 
+`SqlSourceStructure.parse(source, sourcePatterns)` combines these patterns with token nesting. It returns source tokens
+annotated with statement index, parenthesis depth, `CASE` depth, and the dialect pattern matches that start at each
+token. Dialect-specific constructs such as `QUALIFY`, `FETCH {FIRST|NEXT} [ROW|ROWS]`, or custom clause boundaries
+should be registered as source patterns so source scanners can use the same structure across engines.
+
 Built-in SQLDelight dialect metadata uses dedicated source pattern presets such as `SqlDialectSourcePatterns.MySql` and
 `SqlDialectSourcePatterns.PostgreSql`.

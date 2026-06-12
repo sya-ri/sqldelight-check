@@ -1098,6 +1098,58 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm$With : dev/
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class dev/s7a/sqldelight/check/api/SqlSourcePatternMatch {
+	public fun <init> (Ldev/s7a/sqldelight/check/api/SqlDialectSourcePattern;I)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLength ()I
+	public final fun getPattern ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePattern;
+	public final fun getRoles ()Ljava/util/Set;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceStructure {
+	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlSourceStructure$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun contextAtOffset (I)Ldev/s7a/sqldelight/check/api/SqlSourceTokenContext;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTokens ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+	public final fun tokensInStatement (I)Ljava/util/List;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceStructure$Companion {
+	public final fun parse (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;)Ldev/s7a/sqldelight/check/api/SqlSourceStructure;
+	public static synthetic fun parse$default (Ldev/s7a/sqldelight/check/api/SqlSourceStructure$Companion;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;ILjava/lang/Object;)Ldev/s7a/sqldelight/check/api/SqlSourceStructure;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceToken {
+	public fun <init> (Ljava/lang/String;II)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndOffset ()I
+	public final fun getNormalizedText ()Ljava/lang/String;
+	public final fun getStartOffset ()I
+	public final fun getText ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/SqlSourceTokenContext {
+	public fun <init> (Ldev/s7a/sqldelight/check/api/SqlSourceToken;IIIILjava/util/Set;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCaseDepth ()I
+	public final fun getIndex ()I
+	public final fun getParenthesisDepth ()I
+	public final fun getPatternMatches ()Ljava/util/Set;
+	public final fun getStatementIndex ()I
+	public final fun getToken ()Ldev/s7a/sqldelight/check/api/SqlSourceToken;
+	public fun hashCode ()I
+	public final fun matchLength (Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole;)Ljava/lang/Integer;
+	public final fun matches (Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole;)Z
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/api/TextEdit {
 	public fun <init> (Ldev/s7a/sqldelight/check/api/SourceRange;Ljava/lang/String;)V
 	public fun equals (Ljava/lang/Object;)Z
