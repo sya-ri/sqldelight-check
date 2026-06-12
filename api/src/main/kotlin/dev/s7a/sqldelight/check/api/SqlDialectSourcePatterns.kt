@@ -9,6 +9,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CommonFunctionNa
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DataTypeName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ExpressionContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.GroupByBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IndexUnfriendlyFunction
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinConditionBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinModifier
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarget
@@ -17,7 +18,6 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OrderByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ParenthesizedExpressionContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IndexUnfriendlyFunction
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SelectListStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SetOperator
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart
@@ -77,7 +77,7 @@ public class SqlDialectSourcePatterns(
                 patterns =
                     sourcePatterns(
                         "ALTER",
-                        roles = arrayOf(StatementStart, SqlDelightStatementStart),
+                        roles = setOf(StatementStart, SqlDelightStatementStart),
                     ) +
                         sourcePatterns(
                             "CREATE",
@@ -86,18 +86,18 @@ public class SqlDialectSourcePatterns(
                             "SELECT",
                             "UPDATE",
                             "WITH",
-                            roles = arrayOf(StatementStart, SqlDelightStatementStart),
+                            roles = setOf(StatementStart, SqlDelightStatementStart),
                         ) +
                         sourcePatterns(
                             "DELETE",
                             "INSERT",
                             "SELECT",
                             "UPDATE",
-                            roles = arrayOf(SqlDelightExecutableStatementStart),
+                            roles = setOf(SqlDelightExecutableStatementStart),
                         ) +
                         sourcePatterns(
                             "DROP",
-                            roles = arrayOf(StatementStart, SqlDelightStatementStart),
+                            roles = setOf(StatementStart, SqlDelightStatementStart),
                         ) +
                         sourcePatterns(
                             "CREATE SELECT",
@@ -108,7 +108,7 @@ public class SqlDialectSourcePatterns(
                             "WITH INSERT",
                             "WITH SELECT",
                             "WITH UPDATE",
-                            roles = arrayOf(StatementContinuation),
+                            roles = setOf(StatementContinuation),
                         ) +
                         sourcePatterns(
                             "CASE",
@@ -125,7 +125,7 @@ public class SqlDialectSourcePatterns(
                             "THEN",
                             "TRUE",
                             "WHEN",
-                            roles = arrayOf(AliasBoundary),
+                            roles = setOf(AliasBoundary),
                         ) +
                         sourcePatterns(
                             "CROSS",
@@ -146,7 +146,7 @@ public class SqlDialectSourcePatterns(
                             "UNION",
                             "USING",
                             "WHERE",
-                            roles = arrayOf(TableReferenceBoundary),
+                            roles = setOf(TableReferenceBoundary),
                         ) +
                         sourcePatterns(
                             "CROSS",
@@ -157,7 +157,7 @@ public class SqlDialectSourcePatterns(
                             "NATURAL",
                             "OUTER",
                             "RIGHT",
-                            roles = arrayOf(JoinModifier),
+                            roles = setOf(JoinModifier),
                         ) +
                         sourcePatterns(
                             "BY",
@@ -189,13 +189,13 @@ public class SqlDialectSourcePatterns(
                             "VALUES",
                             "WHERE",
                             "WINDOW",
-                            roles = arrayOf(ClauseBoundary),
+                            roles = setOf(ClauseBoundary),
                         ) +
                         sourcePatterns(
                             "WHERE",
                             "HAVING",
                             "ON",
-                            roles = arrayOf(PredicateStart),
+                            roles = setOf(PredicateStart),
                         ) +
                         sourcePatterns(
                             "FROM",
@@ -205,7 +205,7 @@ public class SqlDialectSourcePatterns(
                             "OFFSET",
                             "ORDER BY",
                             "WHERE",
-                            roles = arrayOf(MajorClauseStart),
+                            roles = setOf(MajorClauseStart),
                         ) +
                         sourcePatterns(
                             "EXCEPT",
@@ -221,7 +221,7 @@ public class SqlDialectSourcePatterns(
                             "UNION",
                             "WHERE",
                             "WINDOW",
-                            roles = arrayOf(PredicateBoundary),
+                            roles = setOf(PredicateBoundary),
                         ) +
                         sourcePatterns(
                             "CROSS JOIN",
@@ -245,18 +245,18 @@ public class SqlDialectSourcePatterns(
                             "UNION",
                             "WHERE",
                             "WINDOW",
-                            roles = arrayOf(JoinConditionBoundary),
+                            roles = setOf(JoinConditionBoundary),
                         ) +
                         sourcePatterns(
                             "AND",
                             "OR",
-                            roles = arrayOf(BooleanOperator),
+                            roles = setOf(BooleanOperator),
                         ) +
                         sourcePatterns(
                             "EXCEPT",
                             "INTERSECT",
                             "UNION",
-                            roles = arrayOf(SetOperator),
+                            roles = setOf(SetOperator),
                         ) +
                         sourcePatterns(
                             "CHECK",
@@ -269,7 +269,7 @@ public class SqlDialectSourcePatterns(
                             "PRIMARY KEY",
                             "REFERENCES",
                             "UNIQUE",
-                            roles = arrayOf(ColumnConstraintStart),
+                            roles = setOf(ColumnConstraintStart),
                         ) +
                         sourcePatterns(
                             "CHECK",
@@ -277,7 +277,7 @@ public class SqlDialectSourcePatterns(
                             "FOREIGN KEY",
                             "PRIMARY KEY",
                             "UNIQUE",
-                            roles = arrayOf(TableConstraintStart),
+                            roles = setOf(TableConstraintStart),
                         ) +
                         sourcePatterns(
                             "EXCEPT",
@@ -290,7 +290,7 @@ public class SqlDialectSourcePatterns(
                             "UNION",
                             "WHERE",
                             "WINDOW",
-                            roles = arrayOf(GroupByBoundary),
+                            roles = setOf(GroupByBoundary),
                         ) +
                         sourcePatterns(
                             "EXCEPT",
@@ -300,7 +300,7 @@ public class SqlDialectSourcePatterns(
                             "OFFSET",
                             "UNION",
                             "WHERE",
-                            roles = arrayOf(OrderByBoundary),
+                            roles = setOf(OrderByBoundary),
                         ) +
                         sourcePatterns(
                             "ADD",
@@ -356,7 +356,7 @@ public class SqlDialectSourcePatterns(
                             "VALUES",
                             "WHEN",
                             "WHERE",
-                            roles = arrayOf(KeywordCaseTarget),
+                            roles = setOf(KeywordCaseTarget),
                         ) +
                         sourcePatterns(
                             "ABS",
@@ -388,12 +388,12 @@ public class SqlDialectSourcePatterns(
                             "TRIM",
                             "TYPEOF",
                             "UPPER",
-                            roles = arrayOf(CommonFunctionName),
+                            roles = setOf(CommonFunctionName),
                         ) +
                         sourcePatterns(
                             "IFNULL",
                             "NVL",
-                            roles = arrayOf(CoalesceAlternativeFunction),
+                            roles = setOf(CoalesceAlternativeFunction),
                         ) +
                         sourcePatterns(
                             "COALESCE",
@@ -404,7 +404,7 @@ public class SqlDialectSourcePatterns(
                             "SUBSTRING",
                             "TRIM",
                             "UPPER",
-                            roles = arrayOf(IndexUnfriendlyFunction),
+                            roles = setOf(IndexUnfriendlyFunction),
                         ) +
                         sourcePatterns(
                             "BIGINT",
@@ -424,7 +424,7 @@ public class SqlDialectSourcePatterns(
                             "TEXT",
                             "TIMESTAMP",
                             "VARCHAR",
-                            roles = arrayOf(DataTypeName),
+                            roles = setOf(DataTypeName),
                         ) +
                         sourcePatterns(
                             "ANY",
@@ -445,11 +445,11 @@ public class SqlDialectSourcePatterns(
                             "TIME",
                             "TIMESTAMP",
                             "VARCHAR",
-                            roles = arrayOf(SqlDelightMappableStorageTypeName),
+                            roles = setOf(SqlDelightMappableStorageTypeName),
                         ) +
                         sourcePatterns(
                             "SELECT",
-                            roles = arrayOf(SelectListStart),
+                            roles = setOf(SelectListStart),
                         ) +
                         sourcePatterns(
                             "AND",
@@ -461,7 +461,7 @@ public class SqlDialectSourcePatterns(
                             "ROWS",
                             "THEN",
                             "WHEN",
-                            roles = arrayOf(ExpressionContinuation),
+                            roles = setOf(ExpressionContinuation),
                         ) +
                         sourcePatterns(
                             "OR",
@@ -471,7 +471,7 @@ public class SqlDialectSourcePatterns(
                             "PARTITION BY",
                             "RANGE",
                             "ROWS",
-                            roles = arrayOf(ParenthesizedExpressionContinuation),
+                            roles = setOf(ParenthesizedExpressionContinuation),
                         ),
             )
 
@@ -493,7 +493,7 @@ public class SqlDialectSourcePatterns(
             SqlDialectSourcePatterns(
                 patterns =
                     SourceScannerDefault.patterns +
-                        sourcePatterns("FOR", roles = arrayOf(TableReferenceBoundary, ClauseBoundary)),
+                        sourcePatterns("FOR", roles = setOf(TableReferenceBoundary, ClauseBoundary)),
             )
 
         /**
@@ -503,8 +503,8 @@ public class SqlDialectSourcePatterns(
             SqlDialectSourcePatterns(
                 patterns =
                     SourceScannerDefault.patterns +
-                        sourcePatterns("FETCH", "FOR", roles = arrayOf(TableReferenceBoundary, ClauseBoundary)) +
-                        sourcePatterns("FETCH {FIRST|NEXT}", roles = arrayOf(ClauseBoundary)),
+                        sourcePatterns("FETCH", "FOR", roles = setOf(TableReferenceBoundary, ClauseBoundary)) +
+                        sourcePatterns("FETCH {FIRST|NEXT}", roles = setOf(ClauseBoundary)),
             )
 
         /**
@@ -514,22 +514,37 @@ public class SqlDialectSourcePatterns(
             SqlDialectSourcePatterns(
                 patterns =
                     SourceScannerDefault.patterns +
-                        sourcePatterns("FETCH", roles = arrayOf(TableReferenceBoundary, ClauseBoundary)) +
-                        sourcePatterns("FETCH {FIRST|NEXT}", roles = arrayOf(ClauseBoundary)),
+                        sourcePatterns("FETCH", roles = setOf(TableReferenceBoundary, ClauseBoundary)) +
+                        sourcePatterns("FETCH {FIRST|NEXT}", roles = setOf(ClauseBoundary)),
             )
     }
 }
 
-private fun sourcePatterns(
+/**
+ * Parses source pattern [expressions] and attaches [roles] to each pattern.
+ *
+ * This is intended for dialect presets and custom dialect definitions that
+ * extend or replace [SqlDialectSourcePatterns].
+ */
+public fun sourcePatterns(
     vararg expressions: String,
-    roles: Array<SqlDialectSourcePatternRole>,
+    roles: Set<SqlDialectSourcePatternRole>,
 ): Set<SqlDialectSourcePattern> =
     expressions
         .mapTo(mutableSetOf()) { expression ->
-            SqlDialectSourcePattern.parse(expression, *roles)
+            SqlDialectSourcePattern(
+                expression = SqlDialectSourcePatternExpression.parse(expression),
+                roles = roles,
+            )
         }
 
-private fun Set<SqlDialectSourcePattern>.withoutExpressions(vararg expressions: String): Set<SqlDialectSourcePattern> {
+/**
+ * Removes patterns whose expression exactly matches one of [expressions].
+ *
+ * This is useful for dialects that start from an existing preset and subtract
+ * syntax that the target engine does not support.
+ */
+public fun Set<SqlDialectSourcePattern>.withoutExpressions(vararg expressions: String): Set<SqlDialectSourcePattern> {
     val removals = expressions.mapTo(mutableSetOf()) { expression -> SqlDialectSourcePatternExpression.parse(expression) }
     return filterTo(mutableSetOf()) { pattern -> pattern.expression !in removals }
 }

@@ -485,6 +485,11 @@ public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatterns$Compani
 	public final fun getSourceScannerDefault ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
 }
 
+public final class dev/s7a/sqldelight/check/api/SqlDialectSourcePatternsKt {
+	public static final fun sourcePatterns ([Ljava/lang/String;Ljava/util/Set;)Ljava/util/Set;
+	public static final fun withoutExpressions (Ljava/util/Set;[Ljava/lang/String;)Ljava/util/Set;
+}
+
 public abstract interface class dev/s7a/sqldelight/check/api/SqlDialectSourceTerm {
 	public abstract fun getNormalizedText ()Ljava/lang/String;
 }
