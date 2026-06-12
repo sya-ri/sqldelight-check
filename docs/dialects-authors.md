@@ -121,10 +121,16 @@ reference scanning, `AliasBoundary` prevents reserved constructs from being trea
 alternatives with `{A|B}`, and optional alternatives with `[A|B]`. Use `sourcePatterns` when adding patterns with the
 same roles, and use `withoutExpressions` when a dialect removes or changes a default source pattern.
 
-`SqlSourceStructure.parse(source, sourcePatterns)` combines these patterns with token nesting. It returns source tokens
-annotated with statement index, parenthesis depth, `CASE` depth, and the dialect pattern matches that start at each
-token. Dialect-specific constructs such as `QUALIFY`, `FETCH {FIRST|NEXT} [ROW|ROWS]`, or custom clause boundaries
-should be registered as source patterns so source scanners can use the same structure across engines.
+`SqlSourceStructure.parse(source, sourcePatterns)` combines these patterns with token nesting and conservative source
+blocks. It returns source tokens annotated with statement index, parenthesis depth, `CASE` depth, and the dialect pattern
+matches that start at each token. It also returns statement, clause, parenthesized, subquery, and `CASE` blocks with
+parent-child relationships. Dialect-specific constructs such as `QUALIFY`, `FETCH {FIRST|NEXT} [ROW|ROWS]`, or custom
+clause boundaries should be registered as source patterns so source scanners can use the same structure across engines.
+For dialects that need different statement separators, parenthesis depth terms, paired blocks, or parenthesized block
+classification, pass `blockPatterns = SqlDialectSourceBlockPatterns(...)` to `SqlDialectSourcePatterns`.
+Common `SqlDialectSourcePatternRole` and `SqlSourceBlockKind` values describe rule-facing meanings. Dialects should map
+their syntax to those meanings through source and block patterns. A custom dialect or custom rule can still define
+additional role or block-kind implementations when it needs a meaning that the built-in rules do not share.
 
 Built-in SQLDelight dialect metadata uses dedicated source pattern presets such as `SqlDialectSourcePatterns.MySql` and
 `SqlDialectSourcePatterns.PostgreSql`.

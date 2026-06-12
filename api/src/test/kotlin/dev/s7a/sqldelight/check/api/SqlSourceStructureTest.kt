@@ -98,6 +98,129 @@ class SqlSourceStructureTest {
         assertEquals(3, fetch.matchLength(SqlDialectSourcePatternRole.ClauseBoundary))
     }
 
+    @Test
+    fun `builds statement clause and subquery blocks`() {
+        val structure =
+            SqlSourceStructure.parse(
+                """
+                SELECT account.id
+                FROM account
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM orders
+                    WHERE orders.account_id = account.id
+                )
+                ORDER BY account.id;
+                """.trimIndent(),
+            )
+        val statement = structure.blockStartingAt(SqlSourceBlockKind.Statement, "SELECT")
+        val outerWhere = structure.blockStartingAt(SqlSourceBlockKind.Clause, "WHERE")
+        val subquery = structure.blockStartingAt(SqlSourceBlockKind.Subquery, "(")
+        val innerSelect = structure.blockStartingAt(SqlSourceBlockKind.Clause, "SELECT", occurrence = 2)
+
+        assertEquals(structure.blocks.indexOf(statement), structure.blockStartingAt(SqlSourceBlockKind.Clause, "SELECT").parentBlockIndex)
+        assertEquals(structure.blocks.indexOf(outerWhere), subquery.parentBlockIndex)
+        assertEquals(structure.blocks.indexOf(subquery), innerSelect.parentBlockIndex)
+        assertEquals(
+            0,
+            structure.blocks.count { block ->
+                block.kind == SqlSourceBlockKind.Clause &&
+                    structure.tokens[block.startTokenIndex].token.text.equals("BY", ignoreCase = true)
+            },
+        )
+    }
+
+    @Test
+    fun `builds case expression blocks inside clauses`() {
+        val structure =
+            SqlSourceStructure.parse(
+                """
+                SELECT CASE
+                    WHEN status = 'A' THEN 1
+                    ELSE 0
+                END AS rank
+                FROM sample;
+                """.trimIndent(),
+            )
+        val select = structure.blockStartingAt(SqlSourceBlockKind.Clause, "SELECT")
+        val case = structure.blockStartingAt(SqlSourceBlockKind.CaseExpression, "CASE")
+        val whenContext = structure.context("WHEN")
+
+        assertEquals(structure.blocks.indexOf(select), case.parentBlockIndex)
+        assertEquals(case, structure.innermostBlockContaining(whenContext))
+        assertEquals(listOf("CASE", "WHEN", "status"), structure.tokensInBlock(case).take(3).map { context -> context.token.text })
+    }
+
+    @Test
+    fun `uses custom dialect clause patterns for blocks`() {
+        val patterns =
+            SqlDialectSourcePatterns(
+                patterns =
+                    SqlDialectSourcePatterns.SourceScannerDefault.patterns +
+                        sourcePatterns(
+                            "QUALIFY",
+                            roles = setOf(SqlDialectSourcePatternRole.ClauseBoundary),
+                        ),
+            )
+        val structure =
+            SqlSourceStructure.parse(
+                source = "SELECT * FROM sample QUALIFY row_number() = 1",
+                sourcePatterns = patterns,
+            )
+        val qualify = structure.blockStartingAt(SqlSourceBlockKind.Clause, "QUALIFY")
+
+        assertEquals(1, qualify.sourcePatternMatch?.length)
+        assertTrue(SqlDialectSourcePatternRole.ClauseBoundary in qualify.sourcePatternMatch?.roles.orEmpty())
+    }
+
+    @Test
+    fun `uses injected dialect block patterns for nesting and blocks`() {
+        val patterns =
+            SqlDialectSourcePatterns(
+                blockPatterns =
+                    SqlDialectSourceBlockPatterns(
+                        statementSeparatorTerms = setOf("@"),
+                        parenthesisDepthTerms =
+                            setOf(
+                                SqlDialectSourceParenthesisDepthTerms(
+                                    openTerm = "{",
+                                    closeTerm = "}",
+                                ),
+                            ),
+                        pairedBlocks =
+                            setOf(
+                                SqlDialectSourcePairedBlockPattern.parse(
+                                    startExpression = "BEGIN ATOMIC",
+                                    endExpression = "END",
+                                    kind = SqlSourceBlockKind.CaseExpression,
+                                ),
+                            ),
+                        parenthesizedBlocks =
+                            setOf(
+                                SqlDialectSourceParenthesizedBlockPattern(
+                                    openTerm = "{",
+                                    closeTerm = "}",
+                                    defaultKind = SqlSourceBlockKind.ParenthesizedExpression,
+                                    innerStartRoles = setOf(SqlDialectSourcePatternRole.SelectListStart),
+                                    innerStartKind = SqlSourceBlockKind.Subquery,
+                                ),
+                            ),
+                    ),
+            )
+        val structure =
+            SqlSourceStructure.parse(
+                source = "SELECT { SELECT BEGIN ATOMIC WHEN ready THEN 1 END } @ SELECT 2",
+                sourcePatterns = patterns,
+            )
+        val subquery = structure.blockStartingAt(SqlSourceBlockKind.Subquery, "{")
+        val injectedCase = structure.blockStartingAt(SqlSourceBlockKind.CaseExpression, "BEGIN")
+
+        assertEquals(1, structure.context("SELECT", occurrence = 2).parenthesisDepth)
+        assertEquals(1, structure.context("WHEN").caseDepth)
+        assertEquals(1, structure.context("SELECT", occurrence = 3).statementIndex)
+        assertEquals(structure.blocks.indexOf(subquery), injectedCase.parentBlockIndex)
+    }
+
     private fun SqlSourceStructure.context(
         text: String,
         occurrence: Int = 1,
@@ -108,5 +231,22 @@ class SqlSourceStructureTest {
                 .drop(occurrence - 1)
                 .firstOrNull()
         return assertNotNull(context, "Expected token $text occurrence $occurrence")
+    }
+
+    private fun SqlSourceStructure.blockStartingAt(
+        kind: SqlSourceBlockKind,
+        text: String,
+        occurrence: Int = 1,
+    ): SqlSourceBlock {
+        var seen = 0
+        blocks.forEach { block ->
+            if (block.kind == kind && tokens[block.startTokenIndex].token.text.equals(text, ignoreCase = true)) {
+                seen++
+                if (seen == occurrence) {
+                    return block
+                }
+            }
+        }
+        return assertNotNull(null, "Expected $kind block at $text")
     }
 }

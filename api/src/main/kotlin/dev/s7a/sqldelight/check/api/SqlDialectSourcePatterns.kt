@@ -43,6 +43,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableConstraintS
  */
 public class SqlDialectSourcePatterns(
     public val patterns: Set<SqlDialectSourcePattern> = SourceScannerDefault.patterns,
+    public val blockPatterns: SqlDialectSourceBlockPatterns = SqlDialectSourceBlockPatterns.Default,
 ) {
     public fun matchPrefix(
         role: SqlDialectSourcePatternRole,
@@ -66,12 +67,13 @@ public class SqlDialectSourcePatterns(
     override fun equals(other: Any?): Boolean =
         this === other ||
             other is SqlDialectSourcePatterns &&
-            patterns == other.patterns
+            patterns == other.patterns &&
+            blockPatterns == other.blockPatterns
 
-    override fun hashCode(): Int = patterns.hashCode()
+    override fun hashCode(): Int = 31 * patterns.hashCode() + blockPatterns.hashCode()
 
     override fun toString(): String =
-        "SqlDialectSourcePatterns(patterns=$patterns)"
+        "SqlDialectSourcePatterns(patterns=$patterns, blockPatterns=$blockPatterns)"
 
     public companion object {
         /**
