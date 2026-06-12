@@ -149,6 +149,8 @@ class SqlDialectSourcePatternExpressionTest {
 
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart, listOf("replace")))
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("pragma")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("json")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.KeywordCaseTarget, listOf("excluded")))
         assertNull(sourcePatterns.matchPrefix(SqlDialectSourcePatternRole.ClauseBoundary, listOf("right", "join", "team")))
     }
 
@@ -156,6 +158,7 @@ class SqlDialectSourcePatternExpressionTest {
     fun `builtin mysql patterns include mysql family syntax`() {
         val sourcePatterns = SqlDialectSourcePatterns.MySql
 
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("show")))
         assertEquals(
             4,
             sourcePatterns.matchPrefix(
@@ -163,7 +166,16 @@ class SqlDialectSourcePatternExpressionTest {
                 listOf("on", "duplicate", "key", "update"),
             ),
         )
+        assertEquals(
+            4,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("lock", "in", "share", "mode"),
+            ),
+        )
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("tinyint")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.CommonFunctionName, listOf("date_format")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.KeywordCaseTarget, listOf("unsigned")))
         assertFalse(sourcePatterns.containsPattern("ON CONFLICT", SqlDialectSourcePatternRole.ClauseBoundary))
     }
 
@@ -171,6 +183,14 @@ class SqlDialectSourcePatternExpressionTest {
     fun `builtin postgresql patterns include postgresql family syntax`() {
         val sourcePatterns = SqlDialectSourcePatterns.PostgreSql
 
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("copy")))
+        assertEquals(
+            2,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("distinct", "on", "(", "id", ")"),
+            ),
+        )
         assertEquals(
             4,
             sourcePatterns.matchPrefix(
@@ -186,6 +206,9 @@ class SqlDialectSourcePatternExpressionTest {
             ),
         )
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("uuid")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.CommonFunctionName, listOf("json_agg")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.AliasBoundary, listOf("lateral")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.OrderByBoundary, listOf("returning")))
     }
 
     @Test
@@ -194,13 +217,76 @@ class SqlDialectSourcePatternExpressionTest {
 
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart, listOf("merge")))
         assertEquals(
+            2,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("merge", "into", "player"),
+            ),
+        )
+        assertEquals(
+            3,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("when", "not", "matched", "then"),
+            ),
+        )
+        assertEquals(
             3,
             sourcePatterns.matchPrefix(
                 SqlDialectSourcePatternRole.ClauseBoundary,
                 listOf("fetch", "next", "rows", "only"),
             ),
         )
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("identity")))
         assertFalse(sourcePatterns.containsPattern("ON CONFLICT", SqlDialectSourcePatternRole.ClauseBoundary))
+    }
+
+    @Test
+    fun `builtin dialects keep rule oriented roles populated`() {
+        val roles =
+            listOf(
+                SqlDialectSourcePatternRole.AliasBoundary,
+                SqlDialectSourcePatternRole.TableReferenceBoundary,
+                SqlDialectSourcePatternRole.JoinModifier,
+                SqlDialectSourcePatternRole.StatementStart,
+                SqlDialectSourcePatternRole.SqlDelightStatementStart,
+                SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart,
+                SqlDialectSourcePatternRole.StatementContinuation,
+                SqlDialectSourcePatternRole.SelectListStart,
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                SqlDialectSourcePatternRole.MajorClauseStart,
+                SqlDialectSourcePatternRole.PredicateStart,
+                SqlDialectSourcePatternRole.PredicateBoundary,
+                SqlDialectSourcePatternRole.JoinConditionBoundary,
+                SqlDialectSourcePatternRole.BooleanOperator,
+                SqlDialectSourcePatternRole.SetOperator,
+                SqlDialectSourcePatternRole.ColumnConstraintStart,
+                SqlDialectSourcePatternRole.TableConstraintStart,
+                SqlDialectSourcePatternRole.GroupByBoundary,
+                SqlDialectSourcePatternRole.OrderByBoundary,
+                SqlDialectSourcePatternRole.KeywordCaseTarget,
+                SqlDialectSourcePatternRole.CommonFunctionName,
+                SqlDialectSourcePatternRole.CoalesceAlternativeFunction,
+                SqlDialectSourcePatternRole.IndexUnfriendlyFunction,
+                SqlDialectSourcePatternRole.DataTypeName,
+                SqlDialectSourcePatternRole.SqlDelightMappableStorageTypeName,
+                SqlDialectSourcePatternRole.ExpressionContinuation,
+                SqlDialectSourcePatternRole.ParenthesizedExpressionContinuation,
+            )
+
+        listOf(
+            SqlDialectSourcePatterns.SQLite,
+            SqlDialectSourcePatterns.MySql,
+            SqlDialectSourcePatterns.PostgreSql,
+            SqlDialectSourcePatterns.Hsql,
+        ).forEach { sourcePatterns ->
+            roles.forEach { role ->
+                assertTrue(
+                    sourcePatterns.patternsFor(role).isNotEmpty(),
+                    "Expected patterns for $role in $sourcePatterns",
+                )
+            }
+        }
     }
 
     private fun SqlDialectSourcePatterns.containsPattern(
