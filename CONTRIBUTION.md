@@ -89,7 +89,10 @@ Publishing is not automated yet. Use this checklist for each release.
    ./gradlew --no-daemon \
        :api:publishAndReleaseToMavenCentral \
        :core:publishAndReleaseToMavenCentral \
-       :dialects:sqldelight:publishAndReleaseToMavenCentral \
+       :dialects:dialect-hsql:publishAndReleaseToMavenCentral \
+       :dialects:dialect-mysql:publishAndReleaseToMavenCentral \
+       :dialects:dialect-postgres:publishAndReleaseToMavenCentral \
+       :dialects:dialect-sqlite:publishAndReleaseToMavenCentral \
        :reporter-api:publishAndReleaseToMavenCentral \
        :reporters:html:publishAndReleaseToMavenCentral \
        :reporters:github-annotations:publishAndReleaseToMavenCentral \
@@ -144,7 +147,10 @@ Publishing is not automated yet. Use this checklist for each release.
 
    - `dev.s7a:sqldelight-check-api:<version>`
    - `dev.s7a:sqldelight-check-core:<version>`
-   - `dev.s7a:sqldelight-check-dialect-sqldelight:<version>`
+   - `dev.s7a:sqldelight-check-dialect-hsql:<version>`
+   - `dev.s7a:sqldelight-check-dialect-mysql:<version>`
+   - `dev.s7a:sqldelight-check-dialect-postgres:<version>`
+   - `dev.s7a:sqldelight-check-dialect-sqlite:<version>`
    - `dev.s7a:sqldelight-check-reporter-api:<version>`
    - `dev.s7a:sqldelight-check-reporter-html:<version>`
    - `dev.s7a:sqldelight-check-reporter-github-annotations:<version>`

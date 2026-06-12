@@ -28,7 +28,10 @@ val publishedArtifacts =
     mapOf(
         ":api" to "sqldelight-check-api",
         ":core" to "sqldelight-check-core",
-        ":dialects:sqldelight" to "sqldelight-check-dialect-sqldelight",
+        ":dialects:dialect-hsql" to "sqldelight-check-dialect-hsql",
+        ":dialects:dialect-mysql" to "sqldelight-check-dialect-mysql",
+        ":dialects:dialect-postgres" to "sqldelight-check-dialect-postgres",
+        ":dialects:dialect-sqlite" to "sqldelight-check-dialect-sqlite",
         ":reporter-api" to "sqldelight-check-reporter-api",
         ":reporters:html" to "sqldelight-check-reporter-html",
         ":reporters:github-annotations" to "sqldelight-check-reporter-github-annotations",

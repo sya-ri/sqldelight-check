@@ -2,10 +2,10 @@ package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.rule.api.SqlToken
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DoUpdateClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.InsertOrReplaceStatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OnConflictClause
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReplaceIntoStatementStart
+import dev.s7a.sqldelight.check.dialects.sqlite.DoUpdateClause
+import dev.s7a.sqldelight.check.dialects.sqlite.InsertOrReplaceStatementStart
+import dev.s7a.sqldelight.check.dialects.sqlite.OnConflictClause
+import dev.s7a.sqldelight.check.dialects.sqlite.ReplaceIntoStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.findSourcePattern
 import dev.s7a.sqldelight.check.rule.api.findSourcePatternsInOrder
@@ -13,7 +13,8 @@ import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -30,7 +31,7 @@ public class ConsistentConflictResolutionRule : Rule {
     override val id: RuleId = RuleId("consistent-conflict-resolution")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.SQLite
+    override val targetDialect: DialectId = SQLiteDialectId
 
     override fun run(
         context: RuleContext,

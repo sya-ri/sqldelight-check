@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
@@ -17,7 +16,7 @@ public class DialectRegistry private constructor(
      */
     public fun resolve(coordinate: SqlDialectCoordinate): SqlDialect =
         providers.firstNotNullOfOrNull { provider -> provider.resolve(coordinate) }
-            ?: SqlDialect(family = DialectFamily.Custom)
+            ?: SqlDialect()
 
     /**
      * Returns discovered dialect providers.

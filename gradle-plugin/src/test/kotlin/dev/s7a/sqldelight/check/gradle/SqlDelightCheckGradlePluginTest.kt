@@ -1065,7 +1065,7 @@ class SqlDelightCheckGradlePluginTest {
         project.runAndFail("sqldelightCheck")
 
         assertEquals(
-            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":{"name":"Database","dialect":{"family":"Custom","capabilities":["external"]}},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}""",
+            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":{"name":"Database","dialect":{"ids":["external"]}},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}""",
             project.file("build/reports/sqldelight-check/report.json").readText(),
         )
     }
@@ -1197,7 +1197,7 @@ class SqlDelightCheckGradlePluginTest {
             """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"sqlite:prefer-integer-primary-key","severity":"error","message":"Use INTEGER PRIMARY KEY for SQLite rowid primary keys.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":2,"column":8},"end":{"line":2,"column":23}},"database":${sqliteDatabaseJson()},"fixes":[]}]}"""
 
         fun sqliteDatabaseJson(): String =
-            """{"name":"Database","dialect":{"family":"SQLite","capabilities":["sqlite"]}}"""
+            """{"name":"Database","dialect":{"ids":["sqlite"]}}"""
     }
 
     /**
@@ -1345,8 +1345,7 @@ class SqlDelightCheckGradlePluginTest {
                 """
                 package com.example;
 
-                import dev.s7a.sqldelight.check.api.DialectCapability;
-                import dev.s7a.sqldelight.check.api.DialectFamily;
+                import dev.s7a.sqldelight.check.api.DialectId;
                 import dev.s7a.sqldelight.check.api.SqlDialect;
                 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate;
                 import dev.s7a.sqldelight.check.api.SqlDialectProvider;
@@ -1359,12 +1358,11 @@ class SqlDelightCheckGradlePluginTest {
                         if (!coordinate.getGroup().equals("app.cash.sqldelight")) {
                             return null;
                         }
-                        if (!coordinate.getModule().startsWith("sqlite-")) {
+                        if (!coordinate.getModule().matches("sqlite-.+-dialect")) {
                             return null;
                         }
                         return new SqlDialect(
-                            DialectFamily.Custom,
-                            Collections.singleton(new DialectCapability("external")),
+                            Collections.singleton(new DialectId("external")),
                             new SqlDialectSourcePatterns()
                         );
                     }

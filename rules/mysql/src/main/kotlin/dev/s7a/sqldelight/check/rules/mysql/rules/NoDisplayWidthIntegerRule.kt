@@ -1,9 +1,10 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IntegerDisplayWidthType
+import dev.s7a.sqldelight.check.dialects.mysql.IntegerDisplayWidthType
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -22,7 +23,7 @@ public class NoDisplayWidthIntegerRule : Rule {
     override val id: RuleId = RuleId("no-display-width-integer")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.MySql
+    override val targetDialect: DialectId = MySqlDialectId
 
     override fun run(
         context: RuleContext,

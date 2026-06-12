@@ -1,9 +1,10 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AutoincrementKeyword
+import dev.s7a.sqldelight.check.dialects.sqlite.AutoincrementKeyword
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -20,7 +21,7 @@ public class NoAutoincrementWithoutNeedRule : Rule {
     override val id: RuleId = RuleId("no-autoincrement-without-need")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.SQLite
+    override val targetDialect: DialectId = SQLiteDialectId
 
     override fun run(
         context: RuleContext,

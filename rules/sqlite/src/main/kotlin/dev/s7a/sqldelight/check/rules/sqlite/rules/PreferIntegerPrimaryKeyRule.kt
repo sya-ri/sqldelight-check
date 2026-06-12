@@ -1,9 +1,10 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.NonIntegerRowidPrimaryKeyType
+import dev.s7a.sqldelight.check.dialects.sqlite.NonIntegerRowidPrimaryKeyType
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PrimaryKeyConstraint
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -24,7 +25,7 @@ public class PreferIntegerPrimaryKeyRule : Rule {
     override val id: RuleId = RuleId("prefer-integer-primary-key")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.SQLite
+    override val targetDialect: DialectId = SQLiteDialectId
 
     override fun run(
         context: RuleContext,

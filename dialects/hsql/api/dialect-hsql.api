@@ -1,0 +1,49 @@
+public final class dev/s7a/sqldelight/check/dialects/hsql/DatabaseFileSettingStatement : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/hsql/DatabaseFileSettingStatement;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/hsql/HsqlDialectKt {
+	public static final fun getHsqlDialect ()Ldev/s7a/sqldelight/check/api/SqlDialect;
+	public static final fun getHsqlDialectId ()Ldev/s7a/sqldelight/check/api/DialectId;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/hsql/HsqlDialectProvider : dev/s7a/sqldelight/check/api/SqlDialectProvider {
+	public fun <init> ()V
+	public fun resolve (Ldev/s7a/sqldelight/check/api/SqlDialectCoordinate;)Ldev/s7a/sqldelight/check/api/SqlDialect;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/hsql/HsqlDialectSourcePatternsKt {
+	public static final fun getHsqlDialectSourcePatterns ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/hsql/SystemOperationStatement : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/hsql/SystemOperationStatement;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/hsql/TextTableSourceBindingStart : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/hsql/TextTableSourceBindingStart;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/hsql/TextTableSourceClause : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/hsql/TextTableSourceClause;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/dialects/hsql/TextTableSourceStatement : dev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole {
+	public static final field INSTANCE Ldev/s7a/sqldelight/check/dialects/hsql/TextTableSourceStatement;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

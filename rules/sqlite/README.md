@@ -2,7 +2,7 @@
 
 `sqldelight-check-rules-sqlite` is the SQLite-specific rule set.
 
-These rules are gated by `DialectCapability.SQLite` and focus on schema and
+These rules are gated by `SQLiteDialectId` and focus on schema and
 migration patterns that matter for SQLite rowid behavior and table rebuilds.
 
 ## Rule Set ID

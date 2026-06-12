@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":dialects:dialect-sqlite"))
     implementation(project(":api"))
     implementation(project(":rule-api"))
     testImplementation(kotlin("test"))

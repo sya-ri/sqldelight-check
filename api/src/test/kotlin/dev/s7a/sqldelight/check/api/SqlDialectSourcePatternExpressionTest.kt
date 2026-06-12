@@ -144,105 +144,7 @@ class SqlDialectSourcePatternExpressionTest {
     }
 
     @Test
-    fun `builtin sqlite patterns include broad sqlite family syntax`() {
-        val sourcePatterns = SqlDialectSourcePatterns.SQLite
-
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart, listOf("replace")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("pragma")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("json")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.KeywordCaseTarget, listOf("excluded")))
-        assertNull(sourcePatterns.matchPrefix(SqlDialectSourcePatternRole.ClauseBoundary, listOf("right", "join", "team")))
-    }
-
-    @Test
-    fun `builtin mysql patterns include mysql family syntax`() {
-        val sourcePatterns = SqlDialectSourcePatterns.MySql
-
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("show")))
-        assertEquals(
-            4,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("on", "duplicate", "key", "update"),
-            ),
-        )
-        assertEquals(
-            4,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("lock", "in", "share", "mode"),
-            ),
-        )
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("tinyint")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.CommonFunctionName, listOf("date_format")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.KeywordCaseTarget, listOf("unsigned")))
-        assertFalse(sourcePatterns.containsPattern("ON CONFLICT", SqlDialectSourcePatternRole.ClauseBoundary))
-    }
-
-    @Test
-    fun `builtin postgresql patterns include postgresql family syntax`() {
-        val sourcePatterns = SqlDialectSourcePatterns.PostgreSql
-
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("copy")))
-        assertEquals(
-            2,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("distinct", "on", "(", "id", ")"),
-            ),
-        )
-        assertEquals(
-            4,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("for", "no", "key", "update"),
-            ),
-        )
-        assertEquals(
-            3,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("fetch", "first", "rows", "only"),
-            ),
-        )
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("uuid")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.CommonFunctionName, listOf("json_agg")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.AliasBoundary, listOf("lateral")))
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.OrderByBoundary, listOf("returning")))
-    }
-
-    @Test
-    fun `builtin hsql patterns include hsql family syntax`() {
-        val sourcePatterns = SqlDialectSourcePatterns.Hsql
-
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart, listOf("merge")))
-        assertEquals(
-            2,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("merge", "into", "player"),
-            ),
-        )
-        assertEquals(
-            3,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("when", "not", "matched", "then"),
-            ),
-        )
-        assertEquals(
-            3,
-            sourcePatterns.matchPrefix(
-                SqlDialectSourcePatternRole.ClauseBoundary,
-                listOf("fetch", "next", "rows", "only"),
-            ),
-        )
-        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("identity")))
-        assertFalse(sourcePatterns.containsPattern("ON CONFLICT", SqlDialectSourcePatternRole.ClauseBoundary))
-    }
-
-    @Test
-    fun `builtin dialects keep rule oriented roles populated`() {
+    fun `default source scanner keeps standard rule oriented roles populated`() {
         val roles =
             listOf(
                 SqlDialectSourcePatternRole.AliasBoundary,
@@ -274,24 +176,11 @@ class SqlDialectSourcePatternExpressionTest {
                 SqlDialectSourcePatternRole.ParenthesizedExpressionContinuation,
             )
 
-        listOf(
-            SqlDialectSourcePatterns.SQLite,
-            SqlDialectSourcePatterns.MySql,
-            SqlDialectSourcePatterns.PostgreSql,
-            SqlDialectSourcePatterns.Hsql,
-        ).forEach { sourcePatterns ->
-            roles.forEach { role ->
-                assertTrue(
-                    sourcePatterns.patternsFor(role).isNotEmpty(),
-                    "Expected patterns for $role in $sourcePatterns",
-                )
-            }
+        roles.forEach { role ->
+            assertTrue(
+                SqlDialectSourcePatterns.SourceScannerDefault.patternsFor(role).isNotEmpty(),
+                "Expected default source scanner patterns for $role",
+            )
         }
     }
-
-    private fun SqlDialectSourcePatterns.containsPattern(
-        expression: String,
-        role: SqlDialectSourcePatternRole,
-    ): Boolean =
-        SqlDialectSourcePattern.parse(expression, role) in patternsFor(role)
 }

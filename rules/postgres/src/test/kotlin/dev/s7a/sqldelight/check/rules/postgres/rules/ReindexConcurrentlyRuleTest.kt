@@ -3,7 +3,8 @@ package dev.s7a.sqldelight.check.rules.postgres.rules
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -76,14 +77,14 @@ class ReindexConcurrentlyRuleTest {
     }
 
     @Test
-    fun `does not report for non postgres capabilities`() {
+    fun `does not report for non postgres dialect IDs`() {
         val diagnostics =
             ReindexConcurrentlyRule().diagnostics(
                 content =
                     """
                     REINDEX INDEX player_name_idx;
                     """,
-                capabilities = setOf(DialectCapability.SQLite),
+                ids = setOf(DialectId("other")),
             )
 
         assertEquals(emptyList(), diagnostics)

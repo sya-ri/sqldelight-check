@@ -41,8 +41,7 @@ private fun DatabaseContext.toJsonDatabase(): JsonDatabase =
 
 private fun SqlDialect.toJsonDialect(): JsonDialect =
     JsonDialect(
-        family = family.name,
-        capabilities = capabilities.map { capability -> capability.id }.sorted(),
+        ids = ids.map { id -> id.id }.sorted(),
     )
 
 private fun Fix.toJsonFix(): JsonFix =

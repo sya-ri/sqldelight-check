@@ -106,10 +106,19 @@ class SqlSourceStructureTest {
 
     @Test
     fun `keeps dialect specific multi term pattern lengths`() {
+        val sourcePatterns =
+            SqlDialectSourcePatterns(
+                patterns =
+                    SqlDialectSourcePatterns.SourceScannerDefault.patterns +
+                        sourcePatterns(
+                            "FETCH {FIRST|NEXT} [ROW|ROWS]",
+                            roles = setOf(SqlDialectSourcePatternRole.ClauseBoundary),
+                        ),
+            )
         val structure =
             SqlSourceStructure.parse(
                 source = "SELECT * FROM sample ORDER BY id FETCH FIRST ROWS ONLY",
-                sourcePatterns = SqlDialectSourcePatterns.PostgreSql,
+                sourcePatterns = sourcePatterns,
             )
         val fetch = structure.context("FETCH")
 

@@ -43,7 +43,7 @@ public class RuleSetContainerExtension(
      * Configures the built-in PostgreSQL rule set.
      *
      * Rules in this set stay inactive under `Auto` unless the database exposes
-     * PostgreSQL dialect capabilities.
+     * PostgreSQL dialect IDs.
      */
     public fun postgres(configure: Action<in RuleSetExtension>) {
         ruleSet("postgres", configure)
@@ -53,7 +53,7 @@ public class RuleSetContainerExtension(
      * Configures the built-in MySQL rule set.
      *
      * Rules in this set stay inactive under `Auto` unless the database exposes
-     * MySQL dialect capabilities.
+     * MySQL dialect IDs.
      */
     public fun mysql(configure: Action<in RuleSetExtension>) {
         ruleSet("mysql", configure)
@@ -63,7 +63,7 @@ public class RuleSetContainerExtension(
      * Configures the built-in SQLite rule set.
      *
      * Rules in this set stay inactive under `Auto` unless the database exposes
-     * SQLite dialect capabilities.
+     * SQLite dialect IDs.
      */
     public fun sqlite(configure: Action<in RuleSetExtension>) {
         ruleSet("sqlite", configure)
@@ -73,7 +73,7 @@ public class RuleSetContainerExtension(
      * Configures the built-in HSQL rule set.
      *
      * Rules in this set stay inactive under `Auto` unless the database exposes
-     * HSQL dialect capabilities.
+     * HSQL dialect IDs.
      */
     public fun hsql(configure: Action<in RuleSetExtension>) {
         ruleSet("hsql", configure)

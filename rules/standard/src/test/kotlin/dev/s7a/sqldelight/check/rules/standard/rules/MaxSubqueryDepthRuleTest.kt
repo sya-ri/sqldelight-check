@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectSourceBlockPatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourceParenthesisDepthTerms
@@ -108,7 +108,7 @@ class MaxSubqueryDepthRuleTest {
 
 private val braceDialect =
     SqlDialect(
-        family = DialectFamily.SQLite,
+        ids = setOf(DialectId("default")),
         sourcePatterns =
             SqlDialectSourcePatterns(
                 blockPatterns =

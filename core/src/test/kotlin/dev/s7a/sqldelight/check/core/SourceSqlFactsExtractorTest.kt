@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.core
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
@@ -152,7 +152,7 @@ class SourceSqlFactsExtractorTest {
             """.trimIndent()
         val dialect =
             SqlDialect(
-                family = DialectFamily.Custom,
+                ids = setOf(DialectId("sample")),
                 sourcePatterns =
                     SqlDialectSourcePatterns(
                         patterns =
@@ -169,7 +169,7 @@ class SourceSqlFactsExtractorTest {
 
     private fun extract(
         content: String,
-        dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
+        dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
     ) = SourceSqlFactsExtractor.extract(SourceFile(path = "src/main/sqldelight/com/example/Test.sq", content = content), dialect)
 
     private fun String.textIn(range: SourceRange): String = substring(range.start.toOffsetIn(this), range.end.toOffsetIn(this))

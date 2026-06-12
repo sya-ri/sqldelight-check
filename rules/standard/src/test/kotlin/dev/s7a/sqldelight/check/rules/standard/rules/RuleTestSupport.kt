@@ -3,7 +3,7 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
@@ -69,7 +69,7 @@ internal val cleanMigrationSqm: String =
 
 internal val braceSubqueryDialect: SqlDialect =
     SqlDialect(
-        family = DialectFamily.SQLite,
+        ids = setOf(DialectId("default")),
         sourcePatterns =
             SqlDialectSourcePatterns(
                 blockPatterns =
@@ -97,7 +97,7 @@ internal val braceSubqueryDialect: SqlDialect =
 
 internal val atomicCaseDialect: SqlDialect =
     SqlDialect(
-        family = DialectFamily.SQLite,
+        ids = setOf(DialectId("default")),
         sourcePatterns =
             SqlDialectSourcePatterns(
                 blockPatterns =
@@ -119,7 +119,7 @@ internal fun Rule.diagnostics(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
     facts: SqlFacts = SqlFacts(),
-    dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
+    dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
 ): List<Diagnostic> {
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -159,7 +159,7 @@ internal fun Rule.assertDiagnosticCount(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
     facts: SqlFacts = SqlFacts(),
-    dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
+    dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
 ) {
     assertEquals(expected, diagnostics(content, path, options, facts, dialect).size)
 }

@@ -5,41 +5,26 @@ package dev.s7a.sqldelight.check.api
  */
 public class SqlDialect(
     /**
-     * Broad dialect family used by rule applicability checks.
+     * Dialect IDs discovered or inferred for this dialect.
      */
-    public val family: DialectFamily,
-    /**
-     * Capabilities discovered or inferred for this dialect.
-     */
-    public val capabilities: Set<DialectCapability> = emptySet(),
+    public val ids: Set<DialectId> = setOf(DialectId.Unknown),
     /**
      * Source patterns used by source-level SQL fact extraction.
      */
-    public val sourcePatterns: SqlDialectSourcePatterns = family.sourcePatterns(),
+    public val sourcePatterns: SqlDialectSourcePatterns = SqlDialectSourcePatterns.SourceScannerDefault,
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||
             other is SqlDialect &&
-            family == other.family &&
-            capabilities == other.capabilities &&
+            ids == other.ids &&
             sourcePatterns == other.sourcePatterns
 
     override fun hashCode(): Int {
-        var result = family.hashCode()
-        result = 31 * result + capabilities.hashCode()
+        var result = ids.hashCode()
         result = 31 * result + sourcePatterns.hashCode()
         return result
     }
 
     override fun toString(): String =
-        "SqlDialect(family=$family, capabilities=$capabilities, sourcePatterns=$sourcePatterns)"
+        "SqlDialect(ids=$ids, sourcePatterns=$sourcePatterns)"
 }
-
-private fun DialectFamily.sourcePatterns(): SqlDialectSourcePatterns =
-    when (this) {
-        DialectFamily.Hsql -> SqlDialectSourcePatterns.Hsql
-        DialectFamily.MySql -> SqlDialectSourcePatterns.MySql
-        DialectFamily.PostgreSql -> SqlDialectSourcePatterns.PostgreSql
-        DialectFamily.SQLite -> SqlDialectSourcePatterns.SQLite
-        DialectFamily.Custom -> SqlDialectSourcePatterns.SourceScannerDefault
-    }
