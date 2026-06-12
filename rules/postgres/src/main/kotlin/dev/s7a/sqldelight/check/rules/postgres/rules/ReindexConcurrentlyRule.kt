@@ -1,17 +1,18 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
-import dev.s7a.sqldelight.check.rule.api.isKeyword
-import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
-import dev.s7a.sqldelight.check.rule.api.SqlToken
-import dev.s7a.sqldelight.check.rule.api.sqlTokens
-
-import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.dialects.postgres.ConcurrentlyClause
+import dev.s7a.sqldelight.check.dialects.postgres.ReindexStatementStart
+import dev.s7a.sqldelight.check.dialects.postgres.ReindexSystemTarget
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.containsSourcePattern
+import dev.s7a.sqldelight.check.rule.api.findSourcePattern
+import dev.s7a.sqldelight.check.rule.api.reportSqlStatementMatches
 
 /**
  * Reports PostgreSQL REINDEX statements that omit CONCURRENTLY.
@@ -23,52 +24,24 @@ public class ReindexConcurrentlyRule : Rule {
     override val id: RuleId = RuleId("reindex-concurrently")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.PostgreSql
+    override val targetDialect: DialectId = PostgresDialectId
 
     override fun run(
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        if (!isApplicable(context)) return
-
-        val content = context.file.content
-        val tokens = content.sqlTokens().toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("reindex")) return@forEachIndexed
-            if (tokens.reindexTargetKeywordAfter(index)?.isKeyword("system") == true) return@forEachIndexed
-            if (tokens.statementTokensAfter(index).any { candidate -> candidate.isKeyword("concurrently") }) {
-                return@forEachIndexed
+        reportSqlStatementMatches(
+            context = context,
+            reporter = reporter,
+            message = "Use REINDEX CONCURRENTLY for PostgreSQL reindex operations on live objects.",
+        ) { statement ->
+            if (statement.containsSourcePattern(ReindexSystemTarget, context.database.dialect.sourcePatterns)) {
+                return@reportSqlStatementMatches null
             }
-
-            reporter.report(
-                RuleDiagnostic(
-                    severity = defaultSeverity,
-                    message = "Use REINDEX CONCURRENTLY for PostgreSQL reindex operations on live objects.",
-                    file = context.file,
-                    range = content.rangeAtOffsets(token.startOffset, token.endOffset),
-                    database = context.database,
-                ),
-            )
+            if (statement.containsSourcePattern(ConcurrentlyClause, context.database.dialect.sourcePatterns)) {
+                return@reportSqlStatementMatches null
+            }
+            statement.findSourcePattern(ReindexStatementStart, context.database.dialect.sourcePatterns)
         }
     }
-}
-
-private fun List<SqlToken>.reindexTargetKeywordAfter(startIndex: Int): SqlToken? =
-    statementTokensAfter(startIndex)
-        .firstOrNull { token ->
-            token.isKeyword("index") ||
-                token.isKeyword("table") ||
-                token.isKeyword("schema") ||
-                token.isKeyword("database") ||
-                token.isKeyword("system")
-        }
-
-private fun List<SqlToken>.statementTokensAfter(startIndex: Int): List<SqlToken> {
-    val result = mutableListOf<SqlToken>()
-    var index = startIndex + 1
-    while (index < size && this[index].text != ";") {
-        result += this[index]
-        index++
-    }
-    return result
 }

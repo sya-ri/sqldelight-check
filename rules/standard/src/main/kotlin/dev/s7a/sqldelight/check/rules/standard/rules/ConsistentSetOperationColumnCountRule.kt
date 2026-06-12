@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -28,10 +31,12 @@ public class ConsistentSetOperationColumnCountRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens
-            .filter { token -> token.normalizedText in setOperationKeywords }
+            .filter { token -> token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.SetOperator) }
             .forEach { operator ->
                 val left = content.selectColumnCountBefore(operator, tokens) ?: return@forEach
-                val right = content.selectColumnCountAfter(operator, tokens) ?: return@forEach
+                val right =
+                    content.selectColumnCountAfter(operator, tokens, context.database.dialect.sourcePatterns)
+                        ?: return@forEach
                 if (left.count == null || right.count == null) return@forEach
                 if (left.count == right.count) return@forEach
 
@@ -67,9 +72,9 @@ private fun String.selectColumnCountBefore(
         tokens
             .asReversed()
             .firstOrNull { token ->
-                token.startOffset >= start &&
-                    token.startOffset < operator.startOffset &&
-                    token.isKeyword("select") &&
+                    token.startOffset >= start &&
+                        token.startOffset < operator.startOffset &&
+                    token.isTerm(SqlDialectSourceTerm.Select) &&
                     sqlParenthesisDepthAt(token.startOffset) == depth
             } ?: return null
     return selectColumnCount(select, operator.startOffset, depth, tokens)
@@ -78,15 +83,16 @@ private fun String.selectColumnCountBefore(
 private fun String.selectColumnCountAfter(
     operator: SqlToken,
     tokens: List<SqlToken>,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): SelectColumnCount? {
     val depth = sqlParenthesisDepthAt(operator.startOffset)
     val end = statementEndAfter(operator.startOffset)
     val select =
         tokens
             .firstOrNull { token ->
-                token.startOffset > operator.endOffset &&
-                    token.startOffset < end &&
-                    token.isKeyword("select") &&
+                    token.startOffset > operator.endOffset &&
+                        token.startOffset < end &&
+                    token.isTerm(SqlDialectSourceTerm.Select) &&
                     sqlParenthesisDepthAt(token.startOffset) == depth
             } ?: return null
     val nextOperator =
@@ -94,7 +100,7 @@ private fun String.selectColumnCountAfter(
             .firstOrNull { token ->
                 token.startOffset > select.endOffset &&
                     token.startOffset < end &&
-                    token.normalizedText in setOperationKeywords &&
+                    token.matches(sourcePatterns, SqlDialectSourcePatternRole.SetOperator) &&
                     sqlParenthesisDepthAt(token.startOffset) == depth
             }
     return selectColumnCount(select, nextOperator?.startOffset ?: end, depth, tokens)
@@ -109,9 +115,9 @@ private fun String.selectColumnCount(
     val from =
         tokens
             .firstOrNull { token ->
-                token.startOffset > select.endOffset &&
-                    token.startOffset < segmentEndOffset &&
-                    token.isKeyword("from") &&
+                    token.startOffset > select.endOffset &&
+                        token.startOffset < segmentEndOffset &&
+                    token.isTerm(SqlDialectSourceTerm.From) &&
                     sqlParenthesisDepthAt(token.startOffset) == depth
             }
     val listEnd = from?.startOffset ?: segmentEndOffset
@@ -165,5 +171,3 @@ private fun String.previousStatementBoundaryBefore(offset: Int): Int =
         .lastOrNull { character -> character.value == ';' }
         ?.let { character -> character.offset + 1 }
         ?: 0
-
-private val setOperationKeywords = setOf("except", "intersect", "union")

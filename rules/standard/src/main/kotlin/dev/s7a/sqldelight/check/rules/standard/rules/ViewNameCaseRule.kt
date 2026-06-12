@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -40,7 +41,7 @@ internal fun String.viewNameTokens(): Sequence<SqlToken> =
     sequence {
         val tokens = sqlTokens().toList()
         tokens.windowed(size = 3).forEach { (create, view, name) ->
-            if (create.isKeyword("create") && view.isKeyword("view")) {
+            if (create.isTerm(SqlDialectSourceTerm.Create) && view.isTerm(SqlDialectSourceTerm.View)) {
                 yield(name)
             }
         }

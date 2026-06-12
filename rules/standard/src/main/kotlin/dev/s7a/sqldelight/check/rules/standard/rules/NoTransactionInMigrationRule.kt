@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFileKind
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -30,8 +31,9 @@ public class NoTransactionInMigrationRule : Rule {
             if (!content.isStatementStart(token.startOffset)) return@forEachIndexed
 
             val isTransactionStatement =
-                token.normalizedText in transactionKeywords ||
-                    (token.isKeyword("end") && tokens.getOrNull(index + 1)?.isKeyword("transaction") == true)
+                transactionTerms.any { term -> token.isTerm(term) } ||
+                    (token.isTerm(SqlDialectSourceTerm.End) &&
+                        tokens.getOrNull(index + 1)?.isTerm(SqlDialectSourceTerm.Transaction) == true)
             if (!isTransactionStatement) return@forEachIndexed
 
             reporter.report(
@@ -47,7 +49,12 @@ public class NoTransactionInMigrationRule : Rule {
     }
 }
 
-private val transactionKeywords = setOf("begin", "commit", "rollback")
+private val transactionTerms =
+    setOf(
+        SqlDialectSourceTerm.Begin,
+        SqlDialectSourceTerm.Commit,
+        SqlDialectSourceTerm.Rollback,
+    )
 
 private fun String.isStatementStart(offset: Int): Boolean {
     val previous = previousSqlCharacterBefore(offset) ?: return true

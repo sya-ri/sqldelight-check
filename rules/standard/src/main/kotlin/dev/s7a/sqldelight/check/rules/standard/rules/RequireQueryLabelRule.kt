@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
 import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -29,7 +30,9 @@ public class RequireQueryLabelRule : Rule {
         lines.forEachIndexed { index, line ->
             val first = line.firstNonWhitespaceOffset ?: return@forEachIndexed
             val token = content.identifierTokenAt(first) ?: return@forEachIndexed
-            if (token.normalizedText !in executableStatementStarts) return@forEachIndexed
+            if (!token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart)) {
+                return@forEachIndexed
+            }
             if (content.sqlParenthesisDepthAt(token.startOffset) > 0) return@forEachIndexed
             val previousLine = lines.previousSignificantLine(index)
             if (previousLine?.isSqlDelightLabelOrGroupStart() == true) return@forEachIndexed
@@ -47,8 +50,6 @@ public class RequireQueryLabelRule : Rule {
         }
     }
 }
-
-private val executableStatementStarts = setOf("delete", "insert", "select", "update")
 
 private fun String.isExecutableStatementStart(offset: Int): Boolean {
     val previous = previousSqlCharacterBefore(offset) ?: return true

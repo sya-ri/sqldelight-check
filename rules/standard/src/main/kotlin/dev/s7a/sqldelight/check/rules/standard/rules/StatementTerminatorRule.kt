@@ -6,6 +6,11 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFileKind
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,11 +28,12 @@ public class StatementTerminatorRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val sourcePatterns = context.database.dialect.sourcePatterns
         val starts =
             if (context.file.kind == SourceFileKind.Migration) {
-                content.statementStarts()
+                content.statementStarts(sourcePatterns, StatementStart)
             } else {
-                content.statementStarts().filter { start -> start.keyword in sqlDelightStatementStartKeywords }
+                content.statementStarts(sourcePatterns, SqlDelightStatementStart)
             }
         val labelOffsets =
             if (context.file.kind == SourceFileKind.Query) {
@@ -37,9 +43,9 @@ public class StatementTerminatorRule : Rule {
             }
 
         starts.forEachIndexed { index, start ->
-            if (starts.isContinuationStart(index)) return@forEachIndexed
+            if (starts.isContinuationStart(index, sourcePatterns)) return@forEachIndexed
 
-            val nextStartOffset = starts.nextBoundaryOffset(index, start)
+            val nextStartOffset = starts.nextBoundaryOffset(index, start, sourcePatterns)
             val nextLabelOffset = labelOffsets.firstOrNull { offset -> offset > start.offset } ?: content.length
             val boundaryOffset = minOf(nextStartOffset, nextLabelOffset)
             val lastSqlCharacter = content.lastSqlCharacterBefore(start.offset, boundaryOffset) ?: return@forEachIndexed
@@ -59,20 +65,23 @@ public class StatementTerminatorRule : Rule {
     }
 }
 
-private data class StatementStart(
+private data class DetectedStatementStart(
     val keyword: String,
     val offset: Int,
 )
 
-private fun String.statementStarts(): List<StatementStart> {
+private fun String.statementStarts(
+    sourcePatterns: SqlDialectSourcePatterns,
+    role: dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole,
+): List<DetectedStatementStart> {
     val tokens = sqlTokens().toList()
     val depths = topLevelDepthsByOffset()
     return tokens.asSequence()
-        .filter { token -> token.normalizedText in statementStartKeywords }
+        .filter { token -> sourcePatterns.matches(role, listOf(token.normalizedText)) }
         .filter { token -> depths[token.startOffset] == 0 }
         .filter { token -> isFirstSqlTokenOnLine(token.startOffset) }
-        .filterNot { token -> token.normalizedText == "create" && isCreateTrigger(tokens, token) }
-        .map { token -> StatementStart(keyword = token.normalizedText, offset = token.startOffset) }
+        .filterNot { token -> token.isTerm(SqlDialectSourceTerm.Create) && isCreateTrigger(tokens, token) }
+        .map { token -> DetectedStatementStart(keyword = token.normalizedText, offset = token.startOffset) }
         .toList()
 }
 
@@ -110,29 +119,34 @@ private fun isCreateTrigger(
 ): Boolean {
     val createIndex = tokens.indexOf(createToken)
     val nextToken = tokens.getOrNull(createIndex + 1) ?: return false
-    return nextToken.isKeyword("trigger")
+    return nextToken.isTerm(SqlDialectSourceTerm.Trigger)
 }
 
-private fun List<StatementStart>.nextBoundaryOffset(
+private fun List<DetectedStatementStart>.nextBoundaryOffset(
     index: Int,
-    current: StatementStart,
+    current: DetectedStatementStart,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int {
     val next = asSequence().drop(index + 1).firstOrNull { start ->
-        !current.hasContinuation(start)
+        !current.hasContinuation(start, sourcePatterns)
     }
     return next?.offset ?: Int.MAX_VALUE
 }
 
-private fun List<StatementStart>.isContinuationStart(index: Int): Boolean {
+private fun List<DetectedStatementStart>.isContinuationStart(
+    index: Int,
+    sourcePatterns: SqlDialectSourcePatterns,
+): Boolean {
     val current = this[index]
     val previous = getOrNull(index - 1) ?: return false
-    return previous.hasContinuation(current)
+    return previous.hasContinuation(current, sourcePatterns)
 }
 
-private fun StatementStart.hasContinuation(next: StatementStart): Boolean {
-    val continuationKeywords = statementContinuationKeywords[keyword] ?: return false
-    return next.keyword in continuationKeywords
-}
+private fun DetectedStatementStart.hasContinuation(
+    next: DetectedStatementStart,
+    sourcePatterns: SqlDialectSourcePatterns,
+): Boolean =
+    sourcePatterns.matches(StatementContinuation, listOf(keyword, next.keyword))
 
 private fun String.lastSqlCharacterBefore(
     startOffset: Int,
@@ -148,24 +162,3 @@ private fun String.sqlDelightLabelOffsets(): List<Int> =
         .map { line -> line.startOffset }
 
 private val sqlDelightLabelRegex = Regex("""\s*[A-Za-z_][A-Za-z0-9_]*\s*:\s*""")
-
-private val statementStartKeywords =
-    setOf(
-        "alter",
-        "create",
-        "delete",
-        "drop",
-        "insert",
-        "select",
-        "update",
-        "with",
-    )
-
-private val sqlDelightStatementStartKeywords = statementStartKeywords
-
-private val statementContinuationKeywords =
-    mapOf(
-        "create" to setOf("select", "with"),
-        "insert" to setOf("select", "with"),
-        "with" to setOf("delete", "insert", "select", "update"),
-    )

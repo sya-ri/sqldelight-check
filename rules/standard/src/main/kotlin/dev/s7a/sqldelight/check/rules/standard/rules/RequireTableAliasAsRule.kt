@@ -25,7 +25,7 @@ public class RequireTableAliasAsRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content.tableReferences(context.database.dialect.sourceKeywords).forEach { reference ->
+        content.tableReferences(context.database.dialect.sourcePatterns).forEach { reference ->
             val alias = reference.alias ?: return@forEach
             if (reference.aliasUsesAs) return@forEach
 

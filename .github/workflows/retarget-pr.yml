@@ -1,0 +1,41 @@
+name: Retarget PR
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - ready_for_review
+
+permissions:
+  pull-requests: write
+
+concurrency:
+  group: retarget-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  retarget:
+    name: Retarget PR to release branch
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.pull_request.base.ref == 'main' &&
+      !startsWith(github.event.pull_request.head.ref, 'release/') &&
+      !startsWith(github.event.pull_request.head.ref, 'hotfix/') &&
+      !contains(github.event.pull_request.title, 'hotfix')
+
+    steps:
+      - name: Retarget PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          TARGET_BRANCH: release/0.x
+        run: |
+          set -euo pipefail
+
+          gh api \
+            --method PATCH \
+            "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" \
+            -f "base=${TARGET_BRANCH}"

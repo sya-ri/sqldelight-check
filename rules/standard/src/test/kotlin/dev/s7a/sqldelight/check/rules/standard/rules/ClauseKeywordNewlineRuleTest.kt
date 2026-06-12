@@ -52,6 +52,21 @@ class ClauseKeywordNewlineRuleTest {
     }
 
     @Test
+    fun `accepts SQLDelight named parameters that match clause keywords`() {
+        ClauseKeywordNewlineRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT id, name
+            FROM player
+            ORDER BY name, id
+            LIMIT :limit
+            OFFSET :offset;
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
     fun `accepts single line and skips nested parenthesized select statements`() {
         ClauseKeywordNewlineRule().assertDiagnosticCount("SELECT name FROM player WHERE id = ?;", 0)
         ClauseKeywordNewlineRule().assertDiagnosticCount(

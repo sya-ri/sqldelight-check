@@ -11,38 +11,23 @@ resolves database source files and dialect metadata, then runs sqldelight-check 
 
 ## Status
 
-sqldelight-check is pre-release. The repository is being prepared for `v0.1.1`.
+sqldelight-check is pre-release. The latest release is `v0.2.0`.
 
 The initial release focuses on Gradle plugin usage. There is no standalone CLI.
 
 ## Install
 
-Apply SQLDelight and sqldelight-check to the same Gradle project:
+Apply the sqldelight-check Gradle plugin to the Gradle project that already applies SQLDelight:
 
 ```kotlin
 plugins {
-    kotlin("jvm") version "2.4.0"
-    id("app.cash.sqldelight") version "2.3.2"
-    id("dev.s7a.sqldelight.check") version "0.1.1"
-}
-
-repositories {
-    mavenCentral()
-}
-
-sqldelight {
-    databases {
-        create("Database") {
-            packageName.set("com.example")
-            srcDirs("src/main/sqldelight")
-            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
-        }
-    }
+    id("dev.s7a.sqldelight.check") version "0.2.0"
 }
 ```
 
-The plugin installs the standard rule set, official dialect rule sets, and standard reporters by default. Dialect-specific
-rules stay inactive under `Auto` unless a database exposes the matching SQLDelight dialect capability.
+No sqldelight-check dependencies are required for the default setup. The plugin installs the standard rule set, official
+dialect rule sets, and standard reporters by default. Dialect-specific rules stay inactive under `Auto` unless a
+database exposes the matching SQLDelight dialect capability.
 
 ## Run
 

@@ -34,6 +34,28 @@ class RequireTableAliasForSubqueryRuleTest {
     }
 
     @Test
+    fun `does not treat table reference boundaries as aliases`() {
+        RequireTableAliasForSubqueryRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT player.id
+            FROM (SELECT id FROM player)
+            JOIN score ON score.player_id = player.id;
+            """.asSqlDelightFile(),
+            1,
+        )
+        RequireTableAliasForSubqueryRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT player.id
+            FROM (SELECT id FROM player),
+                 score;
+            """.asSqlDelightFile(),
+            1,
+        )
+    }
+
+    @Test
     fun `accepts explicit and implicit subquery aliases`() {
         RequireTableAliasForSubqueryRule().assertDiagnosticCount(
             """
@@ -60,6 +82,28 @@ class RequireTableAliasForSubqueryRuleTest {
             );
             """.asSqlDelightFile(),
             0,
+        )
+    }
+
+    @Test
+    fun `uses dialect subquery block patterns`() {
+        RequireTableAliasForSubqueryRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT id
+            FROM {SELECT id FROM player};
+            """.asSqlDelightFile(),
+            1,
+            dialect = braceSubqueryDialect,
+        )
+        RequireTableAliasForSubqueryRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT ranked.id
+            FROM {SELECT id FROM player} AS ranked;
+            """.asSqlDelightFile(),
+            0,
+            dialect = braceSubqueryDialect,
         )
     }
 }

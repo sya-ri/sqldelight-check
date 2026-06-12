@@ -87,7 +87,7 @@ class ConfigurationResolverTest {
 
     @Test
     fun `database rule set overrides global rule set`() {
-        val ruleSetId = RuleSetId("sqlite")
+        val ruleSetId = RuleSetId("dialect-rules")
         val resolver =
             ConfigurationResolver(
                 CheckConfig(

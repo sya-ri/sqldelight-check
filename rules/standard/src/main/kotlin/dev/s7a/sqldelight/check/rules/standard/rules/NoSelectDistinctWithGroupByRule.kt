@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,14 +25,14 @@ public class NoSelectDistinctWithGroupByRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
             val distinct = tokens
                 .getOrNull(index + 1)
-                ?.takeIf { it.isKeyword("distinct") }
+                ?.takeIf { it.isTerm(SqlDialectSourceTerm.Distinct) }
                 ?: return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
             val statementTokens = tokens.drop(index + 2).takeWhile { candidate -> candidate.startOffset < statementEnd }
-            if (!statementTokens.containsKeywordPair("group", "by")) return@forEachIndexed
+            if (!statementTokens.containsTermPair(SqlDialectSourceTerm.Group, SqlDialectSourceTerm.By)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(

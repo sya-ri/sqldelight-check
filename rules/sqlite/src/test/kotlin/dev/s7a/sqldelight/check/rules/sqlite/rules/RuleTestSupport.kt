@@ -3,8 +3,8 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
@@ -12,6 +12,7 @@ import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -20,12 +21,12 @@ import kotlin.test.assertEquals
 
 internal fun Rule.diagnostics(
     content: String,
-    capabilities: Set<DialectCapability> = setOf(DialectCapability.SQLite),
+    ids: Set<DialectId> = setOf(SQLiteDialectId),
     path: String = "src/main/sqldelight/com/example/1.sqm",
     options: Map<String, String> = emptyMap(),
 ): List<Diagnostic> {
-    val targetCapability = this.targetCapability
-    if (targetCapability != null && targetCapability !in capabilities) return emptyList()
+    val targetDialect = this.targetDialect
+    if (targetDialect != null && targetDialect !in ids) return emptyList()
 
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -36,8 +37,8 @@ internal fun Rule.diagnostics(
                         name = "Database",
                         dialect =
                             SqlDialect(
-                                family = DialectFamily.SQLite,
-                                capabilities = capabilities,
+                                ids = ids,
+                                sourcePatterns = SQLiteDialectSourcePatterns,
                             ),
                     )
                 override val file: SourceFile = SourceFile(path, content.trimIndent() + "\n")

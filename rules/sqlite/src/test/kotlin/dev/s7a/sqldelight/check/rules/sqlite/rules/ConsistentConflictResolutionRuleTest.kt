@@ -3,7 +3,8 @@ package dev.s7a.sqldelight.check.rules.sqlite.rules
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -85,7 +86,7 @@ class ConsistentConflictResolutionRuleTest {
     }
 
     @Test
-    fun `does not report for non sqlite capabilities`() {
+    fun `does not report for non sqlite dialect IDs`() {
         val diagnostics =
             ConsistentConflictResolutionRule().diagnostics(
                 content =
@@ -93,7 +94,7 @@ class ConsistentConflictResolutionRuleTest {
                     INSERT OR REPLACE INTO player(id, name) VALUES (1, 'Ada');
                     REPLACE INTO team(id, name) VALUES (1, 'Core');
                     """,
-                capabilities = setOf(DialectCapability.PostgreSql),
+                ids = setOf(DialectId("other")),
                 path = "src/main/sqldelight/com/example/Player.sq",
             )
 

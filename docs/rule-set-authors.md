@@ -9,7 +9,7 @@ Custom rule set projects should compile against the rule API:
 
 ```kotlin
 dependencies {
-    compileOnly("dev.s7a:sqldelight-check-rule-api:0.1.1")
+    compileOnly("dev.s7a:sqldelight-check-rule-api:0.2.0")
 }
 ```
 
@@ -62,7 +62,7 @@ Rules implement `Rule` and report diagnostics through `DiagnosticReporter`.
 package com.example.sqldelight.rules
 
 import dev.s7a.sqldelight.check.api.Enablement
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -75,7 +75,7 @@ class ExampleRule : Rule {
     override val defaultEnable = true
 
     override fun isApplicable(context: RuleContext): Boolean =
-        context.database.dialect.family == DialectFamily.PostgreSql
+        DialectId("example") in context.database.dialect.ids
 
     override fun run(
         context: RuleContext,
@@ -117,8 +117,6 @@ Use `RegexRule` for simple source-text policies before writing the same masking
 and range mapping by hand:
 
 ```kotlin
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.RegexRule
 
 class NoUnsafePragmaRule : RegexRule(
@@ -126,7 +124,7 @@ class NoUnsafePragmaRule : RegexRule(
     pattern = """\bPRAGMA\s+writable_schema\s*=\s*ON\b""",
     message = "Avoid enabling writable_schema in checked SQLDelight sources.",
     defaultSeverity = Severity.Error,
-    targetCapability = DialectCapability.SQLite,
+    targetDialect = DialectId("example"),
 )
 ```
 
@@ -153,7 +151,7 @@ sqldelightCheck {
 
 Custom rules can set `defaultEnable = false` to stay disabled unless users
 explicitly enable them. When `defaultEnable = true`, rules use automatic
-applicability: `Rule.targetCapability` and `Rule.isApplicable(context)` decide
+applicability: `Rule.targetDialect` and `Rule.isApplicable(context)` decide
 whether the rule runs for a database/file. Explicit `Enabled` and `Disabled`
 settings remain user overrides.
 

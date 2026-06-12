@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,11 +27,12 @@ public class NoImplicitCrossJoinCommaRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("from")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.From)) return@forEachIndexed
 
             val fromDepth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val segmentEnd = tokens.fromSegmentEnd(index + 1, statementEnd, fromDepth, content)
+            val segmentEnd =
+                tokens.fromSegmentEnd(index + 1, statementEnd, fromDepth, content, context.database.dialect.sourcePatterns)
             content
                 .sqlCharacters()
                 .dropWhile { character -> character.offset <= token.endOffset }
@@ -54,27 +58,16 @@ private fun List<SqlToken>.fromSegmentEnd(
     statementEnd: Int,
     fromDepth: Int,
     content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     asSequence()
         .drop(startIndex)
-        .firstOrNull { token ->
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
                 content.sqlParenthesisDepthAt(token.startOffset) == fromDepth &&
-                token.normalizedText in fromBoundaryKeywords
+                sourcePatterns.matches(SqlDialectSourcePatternRole.TableReferenceBoundary, normalizedTextsFrom(startIndex + relativeIndex))
         }
+        ?.value
         ?.startOffset
         ?: statementEnd
-
-private val fromBoundaryKeywords =
-    setOf(
-        "except",
-        "group",
-        "having",
-        "intersect",
-        "limit",
-        "offset",
-        "order",
-        "union",
-        "where",
-        "window",
-    )

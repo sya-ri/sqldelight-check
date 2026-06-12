@@ -129,7 +129,7 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INT PRIMARY KEY
+                id INT PRIMARY KEY
             );
             """.trimIndent() + "\n",
         )
@@ -258,8 +258,8 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY,
-              name TEXT NOT NULL
+                id INTEGER NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL
             );
             """.trimIndent() + "\n",
         )
@@ -293,7 +293,7 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent(),
         )
@@ -342,7 +342,7 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent(),
         )
@@ -381,7 +381,7 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent() + "\n",
         )
@@ -478,8 +478,8 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/primarysqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY,
-              name TEXT NOT NULL
+                id INTEGER NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL
             );
             """.trimIndent() + "\n",
         )
@@ -487,8 +487,8 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/reportingsqldelight/com/example/Report.sq",
             """
             CREATE TABLE report (
-              id INTEGER NOT NULL PRIMARY KEY,
-              title TEXT NOT NULL
+                id INTEGER NOT NULL PRIMARY KEY,
+                title TEXT NOT NULL
             );
             """.trimIndent() + "\n",
         )
@@ -557,7 +557,7 @@ class SqlDelightCheckGradlePluginTest {
             "app/src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent(),
         )
@@ -624,7 +624,7 @@ class SqlDelightCheckGradlePluginTest {
             "app/src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent(),
         )
@@ -692,7 +692,7 @@ class SqlDelightCheckGradlePluginTest {
             path,
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent(),
         )
@@ -706,7 +706,7 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent() + "\n",
             workspace.file(path).readText(),
@@ -828,7 +828,7 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent(),
         )
@@ -879,7 +879,7 @@ class SqlDelightCheckGradlePluginTest {
 
         assertEquals(SUCCESS, result.task(":sqldelightFix")?.outcome)
         assertEquals(
-            "CREATE TABLE player (\n  id INTEGER NOT NULL PRIMARY KEY\n);\n",
+            "CREATE TABLE player (\n    id INTEGER NOT NULL PRIMARY KEY\n);\n",
             project.file("src/main/sqldelight/com/example/Player.sq").readText(),
         )
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
@@ -910,7 +910,7 @@ class SqlDelightCheckGradlePluginTest {
         val content =
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
 
             selectById:
@@ -956,7 +956,7 @@ class SqlDelightCheckGradlePluginTest {
             path,
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
 
             selectById:
@@ -972,7 +972,7 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
 
             selectById:
@@ -1057,7 +1057,7 @@ class SqlDelightCheckGradlePluginTest {
             "src/main/sqldelight/com/example/Player.sq",
             """
             CREATE TABLE player (
-              id INTEGER NOT NULL PRIMARY KEY
+                id INTEGER NOT NULL PRIMARY KEY
             );
             """.trimIndent(),
         )
@@ -1065,7 +1065,7 @@ class SqlDelightCheckGradlePluginTest {
         project.runAndFail("sqldelightCheck")
 
         assertEquals(
-            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":{"name":"Database","dialect":{"family":"Custom","capabilities":["external"]}},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}""",
+            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"standard:final-newline","severity":"error","message":"File should end with a newline.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"database":{"name":"Database","dialect":{"ids":["external"]}},"fixes":[{"title":"Insert final newline","safety":"safe","edits":[{"range":{"start":{"line":3,"column":3},"end":{"line":3,"column":3}},"replacement":"\n"}]}]}]}""",
             project.file("build/reports/sqldelight-check/report.json").readText(),
         )
     }
@@ -1134,7 +1134,7 @@ class SqlDelightCheckGradlePluginTest {
     private fun finalNewlineDiagnosticSql(): String =
         """
         CREATE TABLE player (
-          id INTEGER NOT NULL PRIMARY KEY
+            id INTEGER NOT NULL PRIMARY KEY
         );
         """.trimIndent()
 
@@ -1194,10 +1194,10 @@ class SqlDelightCheckGradlePluginTest {
             """{"summary":{"diagnostics":1,"errors":0,"warnings":1,"infos":0},"diagnostics":[{"ruleId":"standard:space-around-comparison-operators","severity":"warning","message":"Comparison operator '=' should have one space on both sides.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"database":${sqliteDatabaseJson()},"fixes":[{"title":"Normalize comparison operator spacing","safety":"unsafe","edits":[{"range":{"start":{"line":8,"column":9},"end":{"line":8,"column":10}},"replacement":" = "}]}]}]}"""
 
         fun sqlitePreferIntegerPrimaryKeyErrorJsonReport(): String =
-            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"sqlite:prefer-integer-primary-key","severity":"error","message":"Use INTEGER PRIMARY KEY for SQLite rowid primary keys.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":2,"column":6},"end":{"line":2,"column":21}},"database":${sqliteDatabaseJson()},"fixes":[]}]}"""
+            """{"summary":{"diagnostics":1,"errors":1,"warnings":0,"infos":0},"diagnostics":[{"ruleId":"sqlite:prefer-integer-primary-key","severity":"error","message":"Use INTEGER PRIMARY KEY for SQLite rowid primary keys.","file":"src/main/sqldelight/com/example/Player.sq","range":{"start":{"line":2,"column":8},"end":{"line":2,"column":23}},"database":${sqliteDatabaseJson()},"fixes":[]}]}"""
 
         fun sqliteDatabaseJson(): String =
-            """{"name":"Database","dialect":{"family":"SQLite","capabilities":["sqlite"]}}"""
+            """{"name":"Database","dialect":{"ids":["sqlite"]}}"""
     }
 
     /**
@@ -1345,12 +1345,11 @@ class SqlDelightCheckGradlePluginTest {
                 """
                 package com.example;
 
-                import dev.s7a.sqldelight.check.api.DialectCapability;
-                import dev.s7a.sqldelight.check.api.DialectFamily;
+                import dev.s7a.sqldelight.check.api.DialectId;
                 import dev.s7a.sqldelight.check.api.SqlDialect;
                 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate;
                 import dev.s7a.sqldelight.check.api.SqlDialectProvider;
-                import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords;
+                import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns;
                 import java.util.Collections;
 
                 public final class ExternalDialectProvider implements SqlDialectProvider {
@@ -1359,13 +1358,12 @@ class SqlDelightCheckGradlePluginTest {
                         if (!coordinate.getGroup().equals("app.cash.sqldelight")) {
                             return null;
                         }
-                        if (!coordinate.getModule().startsWith("sqlite-")) {
+                        if (!coordinate.getModule().matches("sqlite-.+-dialect")) {
                             return null;
                         }
                         return new SqlDialect(
-                            DialectFamily.Custom,
-                            Collections.singleton(new DialectCapability("external")),
-                            new SqlDialectSourceKeywords()
+                            Collections.singleton(new DialectId("external")),
+                            new SqlDialectSourcePatterns()
                         );
                     }
                 }

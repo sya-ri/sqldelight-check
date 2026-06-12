@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,8 +28,8 @@ public class ConstraintNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("create")) return@forEachIndexed
-            val table = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("table") } ?: return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Create)) return@forEachIndexed
+            val table = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.Table) } ?: return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
             val open =
                 content.sqlCharacters()
@@ -40,7 +43,7 @@ public class ConstraintNewlineRule : Rule {
             if (!content.isMultilineItemList(items)) return@forEachIndexed
 
             items
-                .flatMap { item -> content.createTableConstraintTokens(item, itemDepth) }
+                .flatMap { item -> content.createTableConstraintTokens(item, itemDepth, context.database.dialect.sourcePatterns) }
                 .forEach { constraint ->
                     val line = lines.lineContaining(constraint.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == constraint.startOffset) return@forEach
@@ -61,6 +64,7 @@ public class ConstraintNewlineRule : Rule {
 private fun String.createTableConstraintTokens(
     item: ClauseItem,
     itemDepth: Int,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): List<SqlToken> {
     val itemTokens =
         sqlTokens()
@@ -69,29 +73,22 @@ private fun String.createTableConstraintTokens(
             .filter { token -> sqlParenthesisDepthAt(token.startOffset) == itemDepth }
             .toList()
     val first = itemTokens.firstOrNull() ?: return emptyList()
-    if (first.normalizedText in tableConstraintStartKeywords) return listOf(first)
+    if (sourcePatterns.matches(SqlDialectSourcePatternRole.TableConstraintStart, itemTokens.normalizedTextsFrom(0))) {
+        return listOf(first)
+    }
     if (!substring(item.startOffset, item.endOffset).contains('\n')) return emptyList()
-    return itemTokens.drop(1).filter { token -> token.normalizedText in columnConstraintKeywords }
+    return buildList {
+        var index = 1
+        while (index < itemTokens.size) {
+            val token = itemTokens[index]
+            val length =
+                sourcePatterns.matchPrefix(SqlDialectSourcePatternRole.ColumnConstraintStart, itemTokens.normalizedTextsFrom(index))
+            if (length != null && sqlParenthesisDepthAt(token.startOffset) == itemDepth) {
+                add(token)
+                index += length
+            } else {
+                index++
+            }
+        }
+    }
 }
-
-private val tableConstraintStartKeywords =
-    setOf(
-        "check",
-        "constraint",
-        "foreign",
-        "primary",
-        "unique",
-    )
-
-private val columnConstraintKeywords =
-    setOf(
-        "check",
-        "collate",
-        "constraint",
-        "default",
-        "generated",
-        "not",
-        "primary",
-        "references",
-        "unique",
-    )

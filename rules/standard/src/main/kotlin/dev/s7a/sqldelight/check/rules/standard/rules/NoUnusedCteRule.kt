@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -56,7 +57,7 @@ private data class CteDefinition(
 private fun String.cteBlocks(): List<CteBlock> {
     val tokens = sqlTokens().toList()
     return tokens
-        .filter { token -> token.isKeyword("with") && sqlParenthesisDepthAt(token.startOffset) == 0 }
+        .filter { token -> token.isTerm(SqlDialectSourceTerm.With) && sqlParenthesisDepthAt(token.startOffset) == 0 }
         .mapNotNull { withToken -> cteBlockAfter(withToken, tokens) }
 }
 
@@ -69,7 +70,7 @@ private fun String.cteBlockAfter(
     while (index < tokens.size) {
         val name = tokens.getOrNull(index) ?: return null
         val asToken = tokens.getOrNull(index + 1) ?: return null
-        if (!asToken.isKeyword("as")) return null
+        if (!asToken.isTerm(SqlDialectSourceTerm.As)) return null
         val open = nextSqlCharacterAfter(asToken.endOffset) ?: return null
         if (open.value != '(') return null
         val close = matchingClosingParenthesisOffset(open.offset) ?: return null

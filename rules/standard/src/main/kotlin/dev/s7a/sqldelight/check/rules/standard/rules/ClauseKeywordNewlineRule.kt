@@ -5,6 +5,10 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlSourceStructure
+import dev.s7a.sqldelight.check.api.SqlSourceTokenContext
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,19 +27,20 @@ public class ClauseKeywordNewlineRule : Rule {
     ) {
         val content = context.file.content
         val lines = content.linesWithRanges()
-        val tokens = content.sqlTokens().toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
-            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
+        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        structure.tokens.forEach { token ->
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEach
+            if (token.parenthesisDepth != 0) return@forEach
 
-            val statementEnd = content.statementEndAfter(token.startOffset)
-            if (!content.substring(token.startOffset, statementEnd).contains('\n')) return@forEachIndexed
+            val statementTokens = structure.tokensInStatement(token.statementIndex)
+            val statementEnd = statementTokens.lastOrNull()?.token?.endOffset ?: return@forEach
+            if (!content.substring(token.token.startOffset, statementEnd).contains('\n')) return@forEach
 
-            tokens
-                .drop(index + 1)
-                .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == 0 }
-                .majorClauseKeywords()
+            statementTokens
+                .asSequence()
+                .dropWhile { candidate -> candidate.index <= token.index }
+                .filter { candidate -> candidate.parenthesisDepth == 0 }
+                .majorClauseKeywords(structure.tokens)
                 .forEach { clause ->
                     val line = lines.lineContaining(clause.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == clause.startOffset) return@forEach
@@ -60,36 +65,16 @@ private data class ClauseKeyword(
     val endOffset: Int,
 )
 
-private fun List<SqlToken>.majorClauseKeywords(): List<ClauseKeyword> =
-    buildList {
-        this@majorClauseKeywords.forEachIndexed { index, token ->
-            when {
-                token.normalizedText in singleClauseKeywords ->
-                    add(
-                        ClauseKeyword(
-                            name = token.text.uppercase(),
-                            startOffset = token.startOffset,
-                            endOffset = token.endOffset,
-                        ),
-                    )
-                token.isKeyword("group") && this@majorClauseKeywords.getOrNull(index + 1)?.isKeyword("by") == true ->
-                    add(
-                        ClauseKeyword(
-                            name = "GROUP BY",
-                            startOffset = token.startOffset,
-                            endOffset = this@majorClauseKeywords[index + 1].endOffset,
-                        ),
-                    )
-                token.isKeyword("order") && this@majorClauseKeywords.getOrNull(index + 1)?.isKeyword("by") == true ->
-                    add(
-                        ClauseKeyword(
-                            name = "ORDER BY",
-                            startOffset = token.startOffset,
-                            endOffset = this@majorClauseKeywords[index + 1].endOffset,
-                        ),
-                    )
-            }
-        }
+private fun Sequence<SqlSourceTokenContext>.majorClauseKeywords(allTokens: List<SqlSourceTokenContext>): Sequence<ClauseKeyword> =
+    mapNotNull { token ->
+        val length = token.matchLength(SqlDialectSourcePatternRole.MajorClauseStart) ?: return@mapNotNull null
+        val clauseTokens = allTokens.subList(token.index, (token.index + length).coerceAtMost(allTokens.size))
+        ClauseKeyword(
+            name = clauseTokens.joinToString(separator = " ") { clausePart -> clausePart.token.text.uppercase() },
+            startOffset = token.token.startOffset,
+            endOffset = clauseTokens.last().token.endOffset,
+        )
     }
 
-private val singleClauseKeywords = setOf("from", "where", "having", "limit", "offset")
+private fun SqlSourceTokenContext.isTerm(term: SqlDialectSourceTerm): Boolean =
+    token.normalizedText == term.normalizedText

@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,18 +27,21 @@ public class RequireParenthesesForMixedBooleanOperatorsRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (token.normalizedText !in predicateStartKeywords) return@forEachIndexed
+            if (!token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.PredicateStart)) {
+                return@forEachIndexed
+            }
 
             val clauseEnd = tokens.predicateBoundaryOffsetAfter(
                 content = content,
                 startIndex = index + 1,
                 statementEnd = content.statementEndAfter(token.startOffset),
                 depth = content.sqlParenthesisDepthAt(token.startOffset),
-                boundaryKeywords = token.predicateBoundaryKeywords(),
+                sourcePatterns = context.database.dialect.sourcePatterns,
+                role = token.predicateBoundaryRole(),
             )
             tokens
                 .subList(index + 1, tokens.indexAfterOffset(index + 1, clauseEnd))
-                .mixedBooleanOperators(content, clauseEnd)
+                .mixedBooleanOperators(content, clauseEnd, context.database.dialect.sourcePatterns)
                 .forEach { mixed ->
                     reporter.report(
                         RuleDiagnostic(
@@ -57,13 +63,14 @@ private data class MixedBooleanOperators(
 )
 
 private data class BooleanOperatorState(
-    val operator: String,
+    val operator: SqlDialectSourceTerm,
     val startOffset: Int,
 )
 
 private fun List<SqlToken>.mixedBooleanOperators(
     content: String,
     clauseEnd: Int,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): List<MixedBooleanOperators> {
     val statesByDepth = mutableMapOf<Int, BooleanOperatorState>()
     val reportedDepths = mutableSetOf<Int>()
@@ -74,17 +81,18 @@ private fun List<SqlToken>.mixedBooleanOperators(
         .forEach { token ->
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             when {
-                token.isKeyword("between") -> pendingBetweenDepths += depth
-                token.isKeyword("and") && depth in pendingBetweenDepths -> pendingBetweenDepths -= depth
-                token.normalizedText in booleanOperators && depth !in reportedDepths -> {
+                token.isTerm(SqlDialectSourceTerm.Between) -> pendingBetweenDepths += depth
+                token.isTerm(SqlDialectSourceTerm.And) && depth in pendingBetweenDepths -> pendingBetweenDepths -= depth
+                token.matches(sourcePatterns, SqlDialectSourcePatternRole.BooleanOperator) && depth !in reportedDepths -> {
+                    val operator = booleanOperatorTerms.firstOrNull { term -> token.isTerm(term) } ?: return@forEach
                     val previous = statesByDepth[depth]
                     if (previous == null) {
                         statesByDepth[depth] =
                             BooleanOperatorState(
-                                operator = token.normalizedText,
+                                operator = operator,
                                 startOffset = token.startOffset,
                             )
-                    } else if (previous.operator != token.normalizedText) {
+                    } else if (previous.operator != operator) {
                         reportedDepths += depth
                         mixedOperators +=
                             MixedBooleanOperators(
@@ -104,15 +112,18 @@ private fun List<SqlToken>.predicateBoundaryOffsetAfter(
     startIndex: Int,
     statementEnd: Int,
     depth: Int,
-    boundaryKeywords: Set<String>,
+    sourcePatterns: SqlDialectSourcePatterns,
+    role: SqlDialectSourcePatternRole,
 ): Int =
     asSequence()
         .drop(startIndex)
-        .firstOrNull { token ->
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
                 content.sqlParenthesisDepthAt(token.startOffset) == depth &&
-                token.normalizedText in boundaryKeywords
+                sourcePatterns.matches(role, normalizedTextsFrom(startIndex + relativeIndex))
         }
+        ?.value
         ?.startOffset
         ?: statementEnd
 
@@ -126,34 +137,10 @@ private fun List<SqlToken>.indexAfterOffset(
     return size
 }
 
-private fun SqlToken.predicateBoundaryKeywords(): Set<String> =
-    when (normalizedText) {
-        "on" -> joinPredicateBoundaryKeywords
-        else -> wherePredicateBoundaryKeywords
+private fun SqlToken.predicateBoundaryRole(): SqlDialectSourcePatternRole =
+    when {
+        isTerm(SqlDialectSourceTerm.On) -> SqlDialectSourcePatternRole.JoinConditionBoundary
+        else -> SqlDialectSourcePatternRole.PredicateBoundary
     }
 
-private val predicateStartKeywords = setOf("where", "having", "on")
-
-private val booleanOperators = setOf("and", "or")
-
-private val wherePredicateBoundaryKeywords =
-    setOf(
-        "fetch",
-        "group",
-        "limit",
-        "offset",
-        "order",
-        "union",
-    )
-
-private val joinPredicateBoundaryKeywords =
-    wherePredicateBoundaryKeywords +
-        setOf(
-            "cross",
-            "full",
-            "inner",
-            "join",
-            "left",
-            "right",
-            "where",
-        )
+private val booleanOperatorTerms = setOf(SqlDialectSourceTerm.And, SqlDialectSourceTerm.Or)

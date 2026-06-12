@@ -1,16 +1,16 @@
 package dev.s7a.sqldelight.check.rules.mysql.rules
 
-import dev.s7a.sqldelight.check.rule.api.isKeyword
-import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
-import dev.s7a.sqldelight.check.rule.api.sqlTokens
-
-import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.dialects.mysql.ReplaceIntoStatementStart
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.findSourcePattern
+import dev.s7a.sqldelight.check.rule.api.reportSqlTokenMatch
+import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 /**
  * Reports MySQL REPLACE INTO statements.
@@ -22,7 +22,7 @@ public class NoReplaceIntoRule : Rule {
     override val id: RuleId = RuleId("no-replace-into")
     override val defaultSeverity: Severity = Severity.Error
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.MySql
+    override val targetDialect: DialectId = MySqlDialectId
 
     override fun run(
         context: RuleContext,
@@ -32,22 +32,15 @@ public class NoReplaceIntoRule : Rule {
 
         val content = context.file.content
         val tokens = content.sqlTokens(hashLineComments = true).toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("replace")) return@forEachIndexed
-
-            val intoToken = tokens.getOrNull(index + 1)
-            if (intoToken?.isKeyword("into") != true) return@forEachIndexed
-
-            reporter.report(
-                RuleDiagnostic(
-                    severity = defaultSeverity,
+        tokens.findSourcePattern(ReplaceIntoStatementStart, context.database.dialect.sourcePatterns)
+            ?.let { match ->
+                reportSqlTokenMatch(
+                    context = context,
+                    reporter = reporter,
                     message =
                         "Avoid MySQL REPLACE INTO because it can delete and insert rows instead of updating them.",
-                    file = context.file,
-                    range = content.rangeAtOffsets(token.startOffset, intoToken.endOffset),
-                    database = context.database,
-                ),
-            )
-        }
+                    match = match,
+                )
+            }
     }
 }

@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,9 +26,9 @@ public class InsertValuesNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("insert")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Insert)) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val values = tokens.firstKeywordAfter(index + 1, statementEnd, "values") ?: return@forEachIndexed
+            val values = tokens.firstTermAfter(index + 1, statementEnd, SqlDialectSourceTerm.Values) ?: return@forEachIndexed
 
             content.insertColumnListBetween(token.endOffset, values.startOffset)?.let { list ->
                 content.reportMisalignedInsertList(list, lines, reporter, context)

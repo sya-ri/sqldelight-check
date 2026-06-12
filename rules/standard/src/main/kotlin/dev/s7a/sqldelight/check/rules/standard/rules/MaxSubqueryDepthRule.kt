@@ -7,6 +7,9 @@ import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlSourceBlock
+import dev.s7a.sqldelight.check.api.SqlSourceBlockKind
+import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -14,7 +17,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 private const val DEFAULT_MAX_SUBQUERY_DEPTH = 3
 
 /**
- * Reports SELECT statements nested deeper than the configured parenthesis depth.
+ * Reports SELECT statements nested deeper than the configured subquery block depth.
  */
 public class MaxSubqueryDepthRule : Rule {
     override val id: RuleId = RuleId("max-subquery-depth")
@@ -27,11 +30,18 @@ public class MaxSubqueryDepthRule : Rule {
     ) {
         val maxDepth = context.options.positiveIntOption("maxDepth", DEFAULT_MAX_SUBQUERY_DEPTH)
         val content = context.file.content
-        content.sqlTokens()
-            .filter { token -> token.isKeyword("select") }
-            .forEach { token ->
-                val depth = content.sqlParenthesisDepthAt(token.startOffset)
+        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        structure.blocks
+            .filter { block -> block.kind == SqlSourceBlockKind.Subquery }
+            .forEach { block ->
+                val depth = structure.subqueryDepth(block)
                 if (depth <= maxDepth) return@forEach
+                val token =
+                    structure
+                        .tokensInBlock(block)
+                        .firstOrNull { context -> context.index > block.startTokenIndex }
+                        ?.token
+                        ?: return@forEach
                 reporter.report(
                     RuleDiagnostic(
                         severity = defaultSeverity,
@@ -44,3 +54,8 @@ public class MaxSubqueryDepthRule : Rule {
             }
     }
 }
+
+private fun SqlSourceStructure.subqueryDepth(block: SqlSourceBlock): Int =
+    blocks.count { candidate ->
+        candidate.kind == SqlSourceBlockKind.Subquery && candidate.contains(block)
+    }

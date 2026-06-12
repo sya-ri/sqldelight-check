@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rule.api
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 
@@ -40,11 +40,11 @@ public interface Rule {
         get() = true
 
     /**
-     * Dialect capability required when this rule is resolved with `Auto`.
+     * Dialect ID required when this rule is resolved with `Auto`.
      *
      * Rules without a dialect-specific requirement should keep this value null.
      */
-    public val targetCapability: DialectCapability?
+    public val targetDialect: DialectId?
         get() = null
 
     /**

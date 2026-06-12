@@ -1,13 +1,20 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
-import dev.s7a.sqldelight.check.rule.api.isKeyword
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.dialects.sqlite.DoUpdateClause
+import dev.s7a.sqldelight.check.dialects.sqlite.InsertOrReplaceStatementStart
+import dev.s7a.sqldelight.check.dialects.sqlite.OnConflictClause
+import dev.s7a.sqldelight.check.dialects.sqlite.ReplaceIntoStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.rule.api.findSourcePattern
+import dev.s7a.sqldelight.check.rule.api.findSourcePatternsInOrder
 import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -24,7 +31,7 @@ public class ConsistentConflictResolutionRule : Rule {
     override val id: RuleId = RuleId("consistent-conflict-resolution")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = DialectCapability.SQLite
+    override val targetDialect: DialectId = SQLiteDialectId
 
     override fun run(
         context: RuleContext,
@@ -37,7 +44,7 @@ public class ConsistentConflictResolutionRule : Rule {
             content.sqlTokens()
                 .toList()
                 .sqlStatements()
-                .flatMap { statement -> statement.conflictStyles() }
+                .flatMap { statement -> statement.conflictStyles(context.database.dialect.sourcePatterns) }
         if (conflictStyles.map { conflictStyle -> conflictStyle.kind }.toSet().size <= 1) return
 
         conflictStyles.forEach { conflictStyle ->
@@ -71,47 +78,31 @@ private enum class ConflictStyleKind {
     OnConflictDoUpdate,
 }
 
-private fun List<SqlToken>.conflictStyles(): List<ConflictStyle> =
-    mapIndexedNotNull { index, token ->
-        when {
-            token.isKeyword("insert") &&
-                getOrNull(index + 1).isKeyword("or") &&
-                getOrNull(index + 2).isKeyword("replace") ->
-                ConflictStyle(
-                    kind = ConflictStyleKind.InsertOrReplace,
-                    startToken = token,
-                    endToken = get(index + 2),
-                )
-            token.isKeyword("replace") &&
-                getOrNull(index - 1).isKeyword("or").not() &&
-                getOrNull(index + 1).isKeyword("into") ->
-                ConflictStyle(
-                    kind = ConflictStyleKind.ReplaceInto,
-                    startToken = token,
-                    endToken = get(index + 1),
-                )
-            token.isKeyword("on") &&
-                getOrNull(index + 1).isKeyword("conflict") ->
-                onConflictDoUpdate(index, token)
-            else -> null
+private fun List<SqlToken>.conflictStyles(sourcePatterns: SqlDialectSourcePatterns): List<ConflictStyle> =
+    buildList {
+        val insertOrReplace = findSourcePattern(InsertOrReplaceStatementStart, sourcePatterns)
+        if (insertOrReplace != null) {
+            add(insertOrReplace.toConflictStyle(ConflictStyleKind.InsertOrReplace))
+        } else {
+            findSourcePattern(ReplaceIntoStatementStart, sourcePatterns)
+                ?.toConflictStyle(ConflictStyleKind.ReplaceInto)
+                ?.let(::add)
         }
+        onConflictDoUpdate(sourcePatterns)?.let(::add)
     }
 
-private fun List<SqlToken>.onConflictDoUpdate(
-    index: Int,
-    token: SqlToken,
-): ConflictStyle? {
-    val updateToken =
-        drop(index + 2)
-            .windowed(size = 2)
-            .firstOrNull { tokens -> tokens[0].isKeyword("do") && tokens[1].isKeyword("update") }
-            ?.get(1)
-            ?: return null
+private fun dev.s7a.sqldelight.check.rule.api.SqlTokenMatch.toConflictStyle(kind: ConflictStyleKind): ConflictStyle =
+    ConflictStyle(
+        kind = kind,
+        startToken = startToken,
+        endToken = endToken,
+    )
+
+private fun List<SqlToken>.onConflictDoUpdate(sourcePatterns: SqlDialectSourcePatterns): ConflictStyle? {
+    val update = findSourcePatternsInOrder(sourcePatterns, OnConflictClause, DoUpdateClause) ?: return null
     return ConflictStyle(
         kind = ConflictStyleKind.OnConflictDoUpdate,
-        startToken = token,
-        endToken = updateToken,
+        startToken = update.startToken,
+        endToken = update.endToken,
     )
 }
-
-private fun SqlToken?.isKeyword(value: String): Boolean = this?.isKeyword(value) == true

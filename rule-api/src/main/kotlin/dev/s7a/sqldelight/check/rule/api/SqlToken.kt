@@ -37,7 +37,7 @@ public class SqlToken(
 public fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)
 
 /**
- * Tokenizes SQL-like identifiers and semicolons outside comments and quoted text.
+ * Tokenizes SQL-like identifiers, numbers, and semicolons outside comments and quoted text.
  */
 public fun String.sqlTokens(hashLineComments: Boolean = false): Sequence<SqlToken> =
     sequence {
@@ -60,6 +60,15 @@ public fun String.sqlTokens(hashLineComments: Boolean = false): Sequence<SqlToke
                         val start = index
                         index++
                         while (index < length && this@sqlTokens[index].isIdentifierPart()) {
+                            index++
+                        }
+                        yield(SqlToken(text = substring(start, index), startOffset = start, endOffset = index))
+                        index
+                    }
+                    this@sqlTokens[index].isDigit() -> {
+                        val start = index
+                        index++
+                        while (index < length && this@sqlTokens[index].isDigit()) {
                             index++
                         }
                         yield(SqlToken(text = substring(start, index), startOffset = start, endOffset = index))

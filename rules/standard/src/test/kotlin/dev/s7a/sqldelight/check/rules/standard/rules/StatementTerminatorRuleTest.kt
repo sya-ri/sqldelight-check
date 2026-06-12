@@ -1,5 +1,12 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -212,5 +219,28 @@ class StatementTerminatorRuleTest {
             """.asSqlDelightFile()
 
         StatementTerminatorRule().assertDiagnosticCount(content, 1)
+    }
+
+    @Test
+    fun `uses dialect source patterns for custom statement continuations`() {
+        val dialect =
+            SqlDialect(
+                ids = setOf(DialectId.Unknown),
+                sourcePatterns =
+                    SqlDialectSourcePatterns(
+                        patterns =
+                            SqlDialectSourcePatterns.SourceScannerDefault.patterns +
+                                SqlDialectSourcePattern.parse("EXPLAIN", StatementStart, SqlDelightStatementStart) +
+                                SqlDialectSourcePattern.parse("EXPLAIN SELECT", StatementContinuation),
+                    ),
+            )
+        val content =
+            """
+            EXPLAIN
+            SELECT id
+            FROM player;
+            """.asSqlDelightFile()
+
+        StatementTerminatorRule().assertDiagnosticCount(content, 0, path = MIGRATION_SQM_PATH, dialect = dialect)
     }
 }

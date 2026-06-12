@@ -21,7 +21,7 @@ public class ResultAliasNameCaseRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content.resultColumnAliases().forEach { alias ->
+        content.resultColumnAliases(context.database.dialect.sourcePatterns).forEach { alias ->
             if (alias.token.text.isSnakeCaseIdentifier()) return@forEach
             reporter.report(
                 RuleDiagnostic(

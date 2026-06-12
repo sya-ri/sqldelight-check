@@ -2,7 +2,7 @@
 
 `sqldelight-check-rules-hsql` is the HSQL-specific rule slot.
 
-These rules are gated by `DialectCapability.Hsql` and cover HSQL settings and
+These rules are gated by `HsqlDialectId` and cover HSQL settings and
 operations that are better kept out of versioned SQLDelight schema files.
 
 ## Rule Set ID

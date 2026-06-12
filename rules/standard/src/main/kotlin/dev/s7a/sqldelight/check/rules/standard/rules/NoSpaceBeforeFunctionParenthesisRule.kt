@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -27,7 +28,7 @@ public class NoSpaceBeforeFunctionParenthesisRule : Rule {
         val content = context.file.content
         content
             .sqlTokens()
-            .filter { token -> token.text.lowercase() in commonSqlFunctions }
+            .filter { token -> token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.CommonFunctionName) }
             .forEach { token ->
                 val parenthesisOffset = content.nextNonHorizontalWhitespaceOffset(token.endOffset) ?: return@forEach
                 if (content[parenthesisOffset] != '(' || parenthesisOffset == token.endOffset) return@forEach

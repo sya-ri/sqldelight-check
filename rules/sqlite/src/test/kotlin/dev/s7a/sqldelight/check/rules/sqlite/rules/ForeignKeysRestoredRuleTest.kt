@@ -3,7 +3,8 @@ package dev.s7a.sqldelight.check.rules.sqlite.rules
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -79,14 +80,14 @@ class ForeignKeysRestoredRuleTest {
     }
 
     @Test
-    fun `does not report for non sqlite capabilities`() {
+    fun `does not report for non sqlite dialect IDs`() {
         val diagnostics =
             ForeignKeysRestoredRule().diagnostics(
                 content =
                     """
                     PRAGMA foreign_keys = OFF;
                     """,
-                capabilities = setOf(DialectCapability.PostgreSql),
+                ids = setOf(DialectId("other")),
             )
 
         assertEquals(emptyList(), diagnostics)

@@ -24,7 +24,7 @@ public class UniqueTableAliasesRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         context.file.content
-            .tableReferences(context.database.dialect.sourceKeywords)
+            .tableReferences(context.database.dialect.sourcePatterns)
             .filter { reference -> reference.depth == 0 }
             .groupBy { reference -> reference.statementStartOffset }
             .values

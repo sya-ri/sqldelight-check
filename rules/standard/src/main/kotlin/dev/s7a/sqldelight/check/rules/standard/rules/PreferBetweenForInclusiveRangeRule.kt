@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,9 +26,15 @@ public class PreferBetweenForInclusiveRangeRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("where")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Where)) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val boundary = tokens.firstBoundaryOffsetAfter(index + 1, statementEnd, betweenBoundaryKeywords)
+            val boundary =
+                tokens.firstBoundaryOffsetAfter(
+                    index + 1,
+                    statementEnd,
+                    context.database.dialect.sourcePatterns,
+                    SqlDialectSourcePatternRole.PredicateBoundary,
+                )
             val segment = content.substring(token.endOffset, boundary)
             inclusiveRangePattern.findAll(segment).forEach { match ->
                 val column = match.groupValues[1]
@@ -48,6 +56,7 @@ public class PreferBetweenForInclusiveRangeRule : Rule {
 }
 
 private val inclusiveRangePattern =
-    Regex("""\b([A-Za-z_][A-Za-z0-9_.]*)\s*>=\s*(:[A-Za-z_][A-Za-z0-9_]*|\?|-?\d+(?:\.\d+)?)\s+AND\s+([A-Za-z_][A-Za-z0-9_.]*)\s*<=""", RegexOption.IGNORE_CASE)
-
-private val betweenBoundaryKeywords = setOf("except", "group", "having", "intersect", "limit", "offset", "order", "union", "window")
+    Regex(
+        """\b([A-Za-z_][A-Za-z0-9_.]*)\s*>=\s*(:[A-Za-z_][A-Za-z0-9_]*|\?|-?\d+(?:\.\d+)?)\s+${SqlDialectSourceTerm.And.normalizedText}\s+([A-Za-z_][A-Za-z0-9_.]*)\s*<=""",
+        RegexOption.IGNORE_CASE,
+    )

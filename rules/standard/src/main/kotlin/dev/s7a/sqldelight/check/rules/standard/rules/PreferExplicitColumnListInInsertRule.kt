@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,14 +25,15 @@ public class PreferExplicitColumnListInInsertRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("insert")) return@forEachIndexed
-            val into = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("into") } ?: return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Insert)) return@forEachIndexed
+            val into = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.Into) } ?: return@forEachIndexed
             val table = tokens.getOrNull(index + 2) ?: return@forEachIndexed
             val values =
                 tokens
                     .drop(index + 3)
                     .firstOrNull { candidate ->
-                        candidate.startOffset < content.statementEndAfter(token.startOffset) && candidate.isKeyword("values")
+                        candidate.startOffset < content.statementEndAfter(token.startOffset) &&
+                            candidate.isTerm(SqlDialectSourceTerm.Values)
                     } ?: return@forEachIndexed
             val betweenTableAndValues =
                 content.sqlCharacters()

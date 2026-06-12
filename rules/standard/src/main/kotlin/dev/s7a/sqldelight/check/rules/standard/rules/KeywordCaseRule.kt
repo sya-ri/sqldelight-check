@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -27,7 +28,7 @@ public class KeywordCaseRule : Rule {
         val content = context.file.content
         content
             .sqlTokens()
-            .filter { token -> token.text.lowercase() in keywords }
+            .filter { token -> token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.KeywordCaseTarget) }
             .filterNot { token -> token.text == token.text.uppercase() }
             .forEach { token ->
                 val replacement = token.text.uppercase()
@@ -50,64 +51,5 @@ public class KeywordCaseRule : Rule {
                     ),
                 )
             }
-    }
-
-    private companion object {
-        val keywords =
-            setOf(
-                "add",
-                "alter",
-                "and",
-                "as",
-                "asc",
-                "between",
-                "by",
-                "case",
-                "check",
-                "column",
-                "constraint",
-                "create",
-                "default",
-                "delete",
-                "desc",
-                "distinct",
-                "drop",
-                "else",
-                "end",
-                "exists",
-                "foreign",
-                "from",
-                "group",
-                "having",
-                "in",
-                "index",
-                "inner",
-                "insert",
-                "into",
-                "is",
-                "join",
-                "key",
-                "left",
-                "like",
-                "limit",
-                "not",
-                "on",
-                "or",
-                "order",
-                "outer",
-                "primary",
-                "references",
-                "right",
-                "select",
-                "set",
-                "table",
-                "then",
-                "union",
-                "unique",
-                "update",
-                "values",
-                "when",
-                "where",
-            )
     }
 }

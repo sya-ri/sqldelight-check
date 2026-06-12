@@ -4,7 +4,8 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
 
-import dev.s7a.sqldelight.check.api.DialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -24,7 +25,7 @@ class PostgresRuleSetProviderTest {
         val ruleIds = rules.map { rule -> QualifiedRuleId(provider.id, rule.id) }.toSet()
 
         assertEquals(RuleSetId("postgres"), provider.id)
-        assertEquals(setOf(DialectCapability.PostgreSql), rules.map { rule -> rule.targetCapability }.toSet())
+        assertEquals(setOf(PostgresDialectId), rules.map { rule -> rule.targetDialect }.toSet())
         assertEquals(
             setOf(
                 qualifiedRuleId("postgres:excessive-locks"),

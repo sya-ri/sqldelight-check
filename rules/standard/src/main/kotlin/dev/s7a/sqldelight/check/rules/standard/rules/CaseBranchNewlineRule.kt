@@ -5,6 +5,11 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+import dev.s7a.sqldelight.check.api.SqlSourceBlock
+import dev.s7a.sqldelight.check.api.SqlSourceBlockKind
+import dev.s7a.sqldelight.check.api.SqlSourceStructure
+import dev.s7a.sqldelight.check.api.SqlSourceTokenContext
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,65 +28,44 @@ public class CaseBranchNewlineRule : Rule {
     ) {
         val content = context.file.content
         val lines = content.linesWithRanges()
-        val tokens = content.sqlTokens().toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("case")) return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
-            val caseEnd = tokens.caseEndOffset(index + 1, depth, content) ?: return@forEachIndexed
-            if (!content.substring(token.startOffset, caseEnd).contains('\n')) return@forEachIndexed
+        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        structure.blocks
+            .filter { block -> block.kind == SqlSourceBlockKind.CaseExpression }
+            .forEach { block ->
+                if (!content.substring(block.startOffset, block.endOffset).contains('\n')) return@forEach
 
-            tokens
-                .drop(index + 1)
-                .takeWhile { candidate -> candidate.startOffset < caseEnd }
-                .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == depth }
-                .asSequence()
-                .branchTokensForOuterCase()
-                .forEach { branch ->
-                    val line = lines.lineContaining(branch.startOffset) ?: return@forEach
-                    if (line.firstNonWhitespaceOffset == branch.startOffset) return@forEach
-                    reporter.report(
-                        RuleDiagnostic(
-                            severity = defaultSeverity,
-                            message = "Multiline CASE branch keywords should start their own line.",
-                            file = context.file,
-                            range = content.rangeAtOffsets(branch.startOffset, branch.endOffset),
-                            database = context.database,
-                        ),
-                    )
-                }
-        }
+                structure
+                    .tokensInBlock(block)
+                    .asSequence()
+                    .drop(1)
+                    .filter { token -> token.isDirectBranchOf(structure, block) }
+                    .forEach { branch ->
+                        val line = lines.lineContaining(branch.token.startOffset) ?: return@forEach
+                        if (line.firstNonWhitespaceOffset == branch.token.startOffset) return@forEach
+                        reporter.report(
+                            RuleDiagnostic(
+                                severity = defaultSeverity,
+                                message = "Multiline CASE branch keywords should start their own line.",
+                                file = context.file,
+                                range = content.rangeAtOffsets(branch.token.startOffset, branch.token.endOffset),
+                                database = context.database,
+                            ),
+                        )
+                    }
+            }
     }
 }
 
-private fun List<SqlToken>.caseEndOffset(
-    startIndex: Int,
-    depth: Int,
-    content: String,
-): Int? {
-    var nestedCases = 0
-    asSequence()
-        .drop(startIndex)
-        .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == depth }
-        .forEach { token ->
-            when {
-                token.isKeyword("case") -> nestedCases++
-                token.isKeyword("end") && nestedCases > 0 -> nestedCases--
-                token.isKeyword("end") -> return token.endOffset
-            }
-        }
-    return null
-}
+private fun SqlSourceTokenContext.isDirectBranchOf(
+    structure: SqlSourceStructure,
+    block: SqlSourceBlock,
+): Boolean =
+    caseBranchTerms.any { term -> isSourceTerm(term) } &&
+        structure.innermostBlockContaining(this, SqlSourceBlockKind.CaseExpression) == block
 
-private fun Sequence<SqlToken>.branchTokensForOuterCase(): Sequence<SqlToken> =
-    sequence {
-        var nestedCases = 0
-        forEach { token ->
-            when {
-                token.isKeyword("case") -> nestedCases++
-                token.isKeyword("end") && nestedCases > 0 -> nestedCases--
-                nestedCases == 0 && token.normalizedText in caseBranchKeywords -> yield(token)
-            }
-        }
-    }
-
-private val caseBranchKeywords = setOf("when", "then", "else")
+private val caseBranchTerms =
+    setOf(
+        SqlDialectSourceTerm.When,
+        SqlDialectSourceTerm.Then,
+        SqlDialectSourceTerm.Else,
+    )
