@@ -44,18 +44,31 @@ public class NoSelfColumnAliasRule : Rule {
 }
 
 private fun ResultColumnAlias.repeatsSourceColumnNameIn(content: String): Boolean {
-    val sourceTokens =
-        content
-            .substring(targetStartOffset, token.startOffset)
-            .sqlTokens()
-            .toList()
-            .dropLastWhile { candidate -> candidate.isTerm(SqlDialectSourceTerm.As) }
+    val sourceExpressionEndOffset = sourceExpressionEndOffsetIn(content) ?: return false
+    val sourceTokens = content.substring(targetStartOffset, sourceExpressionEndOffset).sqlTokens().toList()
     if (sourceTokens.isEmpty()) return false
-    if (!content.isSimpleColumnReference(targetStartOffset, sourceTokens.last().endOffset + targetStartOffset)) return false
+    if (!content.isSimpleColumnReference(targetStartOffset, sourceExpressionEndOffset)) return false
 
     val sourceName = sourceTokens.last().text.normalizedIdentifier()
     val aliasName = token.text.normalizedIdentifier()
     return sourceName.equals(aliasName, ignoreCase = true)
+}
+
+private fun ResultColumnAlias.sourceExpressionEndOffsetIn(content: String): Int? {
+    val targetTokens = content.substring(targetStartOffset, targetEndOffset).sqlTokens().toList()
+    val aliasIndex =
+        targetTokens.indexOfLast { candidate ->
+            targetStartOffset + candidate.startOffset == token.startOffset &&
+                targetStartOffset + candidate.endOffset == token.endOffset
+        }
+    if (aliasIndex <= 0) return null
+
+    val previous = targetTokens[aliasIndex - 1]
+    return if (previous.isTerm(SqlDialectSourceTerm.As)) {
+        targetStartOffset + previous.startOffset
+    } else {
+        token.startOffset
+    }
 }
 
 private fun String.isSimpleColumnReference(
