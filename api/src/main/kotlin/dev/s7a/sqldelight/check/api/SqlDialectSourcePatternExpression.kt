@@ -2,7 +2,7 @@ package dev.s7a.sqldelight.check.api
 
 /**
  * A dialect source pattern expression such as `ORDER BY`, `LEFT [OUTER] JOIN`,
- * or `FETCH {FIRST|NEXT}`.
+ * `FETCH {FIRST|NEXT}`, or `FETCH {FIRST|NEXT} [ROW|ROWS]`.
  */
 public class SqlDialectSourcePatternExpression(
     parts: List<SqlDialectSourcePatternPart>,
@@ -44,7 +44,7 @@ public class SqlDialectSourcePatternExpression(
          *
          * - `ORDER BY`
          * - `LEFT [OUTER] JOIN`
-         * - `FETCH {FIRST|NEXT} [ROW]`
+         * - `FETCH {FIRST|NEXT} [ROW|ROWS]`
          */
         public fun parse(expression: String): SqlDialectSourcePatternExpression =
             SqlDialectSourcePatternExpression(expression.patternParts())

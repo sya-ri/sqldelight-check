@@ -87,9 +87,11 @@ When no provider resolves a coordinate, sqldelight-check falls back to `DialectF
 
 ## Source Scanner Patterns
 
-`SqlDialectSourcePatterns` configures conservative source-text facts used by rules. It is not a parser grammar. Each
-source pattern has one or more roles describing what the syntax means to source-text rules. Start from
-`SourceScannerDefault.patterns` and add dialect-specific patterns:
+`SqlDialectSourcePatterns` configures conservative source-text facts used by rules. It is not a parser grammar and does
+not validate whether a statement is accepted by a specific engine version. SQLDelight's parser is responsible for
+accepting or rejecting concrete SQL. Built-in presets describe broad dialect-family syntax so source-text rules do not
+misread valid-looking dialect constructs. Each source pattern has one or more roles describing what the syntax means to
+source-text rules. Start from `SourceScannerDefault.patterns` and add dialect-specific patterns:
 
 ```kotlin
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
@@ -106,7 +108,7 @@ SqlDialectSourcePatterns(
             sourcePatterns(
                 "QUALIFY",
                 "MATCH RECOGNIZE",
-                "FETCH {FIRST|NEXT} [ROW]",
+                "FETCH {FIRST|NEXT} [ROW|ROWS]",
                 roles = setOf(ClauseBoundary),
             ) +
             sourcePatterns("NATURAL", roles = setOf(JoinModifier)),
@@ -116,8 +118,8 @@ SqlDialectSourcePatterns(
 Source patterns are shared across conservative source-text rules. For example, `TableReferenceBoundary` ends table
 reference scanning, `AliasBoundary` prevents reserved constructs from being treated as implicit aliases, and
 `StatementStart` marks top-level statement boundaries. Patterns support required terms, optional terms with `[TERM]`,
-and alternatives with `{A|B}`. Use `sourcePatterns` when adding patterns with the same roles, and use
-`withoutExpressions` when a dialect removes or changes a default source pattern.
+alternatives with `{A|B}`, and optional alternatives with `[A|B]`. Use `sourcePatterns` when adding patterns with the
+same roles, and use `withoutExpressions` when a dialect removes or changes a default source pattern.
 
 Built-in SQLDelight dialect metadata uses dedicated source pattern presets such as `SqlDialectSourcePatterns.MySql` and
 `SqlDialectSourcePatterns.PostgreSql`.

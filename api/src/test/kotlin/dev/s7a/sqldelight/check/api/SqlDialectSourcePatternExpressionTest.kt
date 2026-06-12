@@ -59,6 +59,16 @@ class SqlDialectSourcePatternExpressionTest {
     }
 
     @Test
+    fun `matches optional term alternatives`() {
+        val expression = SqlDialectSourcePatternExpression.parse("FETCH {FIRST|NEXT} [ROW|ROWS]")
+
+        assertEquals(2, expression.matchPrefix(listOf("fetch", "first", "10")))
+        assertEquals(3, expression.matchPrefix(listOf("fetch", "next", "row", "only")))
+        assertEquals(3, expression.matchPrefix(listOf("fetch", "next", "rows", "only")))
+        assertEquals(2, expression.matchPrefix(listOf("fetch", "next", "rowz", "only")))
+    }
+
+    @Test
     fun `source patterns choose longest prefix for role`() {
         val sourcePatterns =
             SqlDialectSourcePatterns(
@@ -132,4 +142,70 @@ class SqlDialectSourcePatternExpressionTest {
             patterns.withoutExpressions("RIGHT [OUTER] JOIN"),
         )
     }
+
+    @Test
+    fun `builtin sqlite patterns include broad sqlite family syntax`() {
+        val sourcePatterns = SqlDialectSourcePatterns.SQLite
+
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart, listOf("replace")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("pragma")))
+        assertNull(sourcePatterns.matchPrefix(SqlDialectSourcePatternRole.ClauseBoundary, listOf("right", "join", "team")))
+    }
+
+    @Test
+    fun `builtin mysql patterns include mysql family syntax`() {
+        val sourcePatterns = SqlDialectSourcePatterns.MySql
+
+        assertEquals(
+            4,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("on", "duplicate", "key", "update"),
+            ),
+        )
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("tinyint")))
+        assertFalse(sourcePatterns.containsPattern("ON CONFLICT", SqlDialectSourcePatternRole.ClauseBoundary))
+    }
+
+    @Test
+    fun `builtin postgresql patterns include postgresql family syntax`() {
+        val sourcePatterns = SqlDialectSourcePatterns.PostgreSql
+
+        assertEquals(
+            4,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("for", "no", "key", "update"),
+            ),
+        )
+        assertEquals(
+            3,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("fetch", "first", "rows", "only"),
+            ),
+        )
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.DataTypeName, listOf("uuid")))
+    }
+
+    @Test
+    fun `builtin hsql patterns include hsql family syntax`() {
+        val sourcePatterns = SqlDialectSourcePatterns.Hsql
+
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart, listOf("merge")))
+        assertEquals(
+            3,
+            sourcePatterns.matchPrefix(
+                SqlDialectSourcePatternRole.ClauseBoundary,
+                listOf("fetch", "next", "rows", "only"),
+            ),
+        )
+        assertFalse(sourcePatterns.containsPattern("ON CONFLICT", SqlDialectSourcePatternRole.ClauseBoundary))
+    }
+
+    private fun SqlDialectSourcePatterns.containsPattern(
+        expression: String,
+        role: SqlDialectSourcePatternRole,
+    ): Boolean =
+        SqlDialectSourcePattern.parse(expression, role) in patternsFor(role)
 }

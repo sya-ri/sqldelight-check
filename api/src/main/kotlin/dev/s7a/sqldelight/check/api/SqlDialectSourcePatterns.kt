@@ -35,6 +35,11 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableConstraintS
  * grammar. Each pattern declares the scanner role it fulfills, so custom
  * dialect integrations can register engine-specific syntax once and rules can
  * ask for the meaning they need.
+ *
+ * Dialect presets intentionally describe broad dialect-family syntax rather
+ * than exact engine-version validity. SQLDelight's parser is responsible for
+ * accepting or rejecting concrete SQL. These patterns only help source scanners
+ * avoid misreading supported-looking syntax while linting.
  */
 public class SqlDialectSourcePatterns(
     public val patterns: Set<SqlDialectSourcePattern> = SourceScannerDefault.patterns,
@@ -71,6 +76,8 @@ public class SqlDialectSourcePatterns(
     public companion object {
         /**
          * Conservative fallback used by the source scanner when no known dialect preset applies.
+         *
+         * This is a broad SQL baseline, not a validation grammar.
          */
         public val SourceScannerDefault: SqlDialectSourcePatterns =
             SqlDialectSourcePatterns(
@@ -483,7 +490,48 @@ public class SqlDialectSourcePatterns(
                 patterns =
                     SourceScannerDefault.patterns
                         .withoutExpressions("FULL", "RIGHT")
-                        .withoutExpressions("FULL [OUTER] JOIN", "RIGHT [OUTER] JOIN"),
+                        .withoutExpressions("FULL [OUTER] JOIN", "RIGHT [OUTER] JOIN") +
+                        sourcePatterns(
+                            "ANALYZE",
+                            "ATTACH",
+                            "BEGIN",
+                            "COMMIT",
+                            "DETACH",
+                            "END",
+                            "EXPLAIN",
+                            "PRAGMA",
+                            "REINDEX",
+                            "RELEASE",
+                            "REPLACE",
+                            "ROLLBACK",
+                            "SAVEPOINT",
+                            "VACUUM",
+                            roles = setOf(StatementStart, SqlDelightStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "REPLACE",
+                            roles = setOf(SqlDelightExecutableStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "INSERT REPLACE",
+                            "WITH REPLACE",
+                            roles = setOf(StatementContinuation),
+                        ) +
+                        sourcePatterns(
+                            "CONFLICT",
+                            "DO",
+                            "EXCLUDED",
+                            "FAIL",
+                            "IGNORE",
+                            "REPLACE",
+                            "ROLLBACK",
+                            roles = setOf(KeywordCaseTarget),
+                        ) +
+                        sourcePatterns(
+                            "FTS5",
+                            "JSON",
+                            roles = setOf(DataTypeName),
+                        ),
             )
 
         /**
@@ -492,8 +540,78 @@ public class SqlDialectSourcePatterns(
         public val MySql: SqlDialectSourcePatterns =
             SqlDialectSourcePatterns(
                 patterns =
-                    SourceScannerDefault.patterns +
-                        sourcePatterns("FOR", roles = setOf(TableReferenceBoundary, ClauseBoundary)),
+                    SourceScannerDefault.patterns
+                        .withoutExpressions("FULL", "FULL [OUTER] JOIN", "ON CONFLICT") +
+                        sourcePatterns(
+                            "ANALYZE",
+                            "CALL",
+                            "DESCRIBE",
+                            "EXPLAIN",
+                            "OPTIMIZE",
+                            "REPLACE",
+                            "SHOW",
+                            "TRUNCATE",
+                            "USE",
+                            roles = setOf(StatementStart, SqlDelightStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "REPLACE",
+                            roles = setOf(SqlDelightExecutableStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "INSERT REPLACE",
+                            "WITH REPLACE",
+                            roles = setOf(StatementContinuation),
+                        ) +
+                        sourcePatterns("FOR", roles = setOf(TableReferenceBoundary, ClauseBoundary)) +
+                        sourcePatterns(
+                            "FOR SHARE",
+                            "FOR UPDATE",
+                            "LOCK IN SHARE MODE",
+                            "ON DUPLICATE KEY UPDATE",
+                            roles = setOf(ClauseBoundary),
+                        ) +
+                        sourcePatterns(
+                            "DUPLICATE",
+                            "KEY",
+                            "LOCK",
+                            "REPLACE",
+                            "SHARE",
+                            "UNSIGNED",
+                            "ZEROFILL",
+                            roles = setOf(KeywordCaseTarget),
+                        ) +
+                        sourcePatterns(
+                            "BIT",
+                            "DATE",
+                            "DATETIME",
+                            "ENUM",
+                            "JSON",
+                            "LONGBLOB",
+                            "LONGTEXT",
+                            "MEDIUMBLOB",
+                            "MEDIUMINT",
+                            "MEDIUMTEXT",
+                            "TINYBLOB",
+                            "TINYINT",
+                            "TINYTEXT",
+                            "TIME",
+                            "VARBINARY",
+                            "YEAR",
+                            roles = setOf(DataTypeName),
+                        ) +
+                        sourcePatterns(
+                            "CONCAT",
+                            "CURDATE",
+                            "CURRENT_DATE",
+                            "CURRENT_TIME",
+                            "CURRENT_TIMESTAMP",
+                            "DATE_FORMAT",
+                            "IF",
+                            "NOW",
+                            "RAND",
+                            roles = setOf(CommonFunctionName),
+                        ),
             )
 
         /**
@@ -503,8 +621,96 @@ public class SqlDialectSourcePatterns(
             SqlDialectSourcePatterns(
                 patterns =
                     SourceScannerDefault.patterns +
+                        sourcePatterns(
+                            "ANALYZE",
+                            "CALL",
+                            "COMMENT",
+                            "COPY",
+                            "EXPLAIN",
+                            "GRANT",
+                            "LISTEN",
+                            "NOTIFY",
+                            "RESET",
+                            "REVOKE",
+                            "SET",
+                            "SHOW",
+                            "TRUNCATE",
+                            "VACUUM",
+                            roles = setOf(StatementStart, SqlDelightStatementStart),
+                        ) +
                         sourcePatterns("FETCH", "FOR", roles = setOf(TableReferenceBoundary, ClauseBoundary)) +
-                        sourcePatterns("FETCH {FIRST|NEXT}", roles = setOf(ClauseBoundary)),
+                        sourcePatterns(
+                            "DISTINCT ON",
+                            "FETCH {FIRST|NEXT} [ROW|ROWS]",
+                            "FOR KEY SHARE",
+                            "FOR NO KEY UPDATE",
+                            "FOR SHARE",
+                            "FOR UPDATE",
+                            "ON CONFLICT",
+                            roles = setOf(ClauseBoundary),
+                        ) +
+                        sourcePatterns(
+                            "FETCH",
+                            "FOR",
+                            "RETURNING",
+                            roles = setOf(OrderByBoundary),
+                        ) +
+                        sourcePatterns(
+                            "FETCH",
+                            "FOR",
+                            "RETURNING",
+                            roles = setOf(GroupByBoundary, PredicateBoundary, JoinConditionBoundary),
+                        ) +
+                        sourcePatterns(
+                            "BIGSERIAL",
+                            "BYTEA",
+                            "CIDR",
+                            "INET",
+                            "INTERVAL",
+                            "JSON",
+                            "JSONB",
+                            "MONEY",
+                            "SERIAL",
+                            "SMALLSERIAL",
+                            "TIME",
+                            "TIMESTAMPTZ",
+                            "UUID",
+                            "XML",
+                            roles = setOf(DataTypeName),
+                        ) +
+                        sourcePatterns(
+                            "ARRAY_AGG",
+                            "CURRENT_DATE",
+                            "CURRENT_TIME",
+                            "CURRENT_TIMESTAMP",
+                            "EXTRACT",
+                            "JSON_AGG",
+                            "JSON_BUILD_OBJECT",
+                            "JSON_OBJECT_AGG",
+                            "NOW",
+                            "STRING_AGG",
+                            "UNNEST",
+                            roles = setOf(CommonFunctionName),
+                        ) +
+                        sourcePatterns(
+                            "ILIKE",
+                            "LATERAL",
+                            "MATERIALIZED",
+                            "OVERLAPS",
+                            "SIMILAR",
+                            "UNNEST",
+                            roles = setOf(AliasBoundary),
+                        ) +
+                        sourcePatterns(
+                            "ILIKE",
+                            "LATERAL",
+                            "MATERIALIZED",
+                            "OVERLAPS",
+                            "SIMILAR",
+                            "TEMPORARY",
+                            "UNLOGGED",
+                            roles = setOf(KeywordCaseTarget),
+                        ),
             )
 
         /**
@@ -513,9 +719,54 @@ public class SqlDialectSourcePatterns(
         public val Hsql: SqlDialectSourcePatterns =
             SqlDialectSourcePatterns(
                 patterns =
-                    SourceScannerDefault.patterns +
+                    SourceScannerDefault.patterns
+                        .withoutExpressions("ON CONFLICT") +
+                        sourcePatterns(
+                            "CALL",
+                            "MERGE",
+                            "SCRIPT",
+                            "SHUTDOWN",
+                            "TRUNCATE",
+                            roles = setOf(StatementStart, SqlDelightStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "MERGE",
+                            roles = setOf(SqlDelightExecutableStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "WITH MERGE",
+                            roles = setOf(StatementContinuation),
+                        ) +
                         sourcePatterns("FETCH", roles = setOf(TableReferenceBoundary, ClauseBoundary)) +
-                        sourcePatterns("FETCH {FIRST|NEXT}", roles = setOf(ClauseBoundary)),
+                        sourcePatterns(
+                            "FETCH {FIRST|NEXT} [ROW|ROWS]",
+                            "MERGE INTO",
+                            "WHEN MATCHED",
+                            "WHEN NOT MATCHED",
+                            roles = setOf(ClauseBoundary),
+                        ) +
+                        sourcePatterns(
+                            "FETCH",
+                            roles = setOf(OrderByBoundary, GroupByBoundary, PredicateBoundary, JoinConditionBoundary),
+                        ) +
+                        sourcePatterns(
+                            "IDENTITY",
+                            "INTERVAL",
+                            "LONGVARBINARY",
+                            "LONGVARCHAR",
+                            "TIME",
+                            "TINYINT",
+                            "UUID",
+                            roles = setOf(DataTypeName),
+                        ) +
+                        sourcePatterns(
+                            "MERGE",
+                            "MATCHED",
+                            "NEXT",
+                            "ROW",
+                            "ROWS",
+                            roles = setOf(KeywordCaseTarget),
+                        ),
             )
     }
 }
