@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.api
 /**
  * The source-scanner meaning attached to a dialect pattern.
  */
-public sealed interface SqlDialectSourcePatternRole {
+public interface SqlDialectSourcePatternRole {
     /**
      * Marks a term that cannot be a result alias.
      */

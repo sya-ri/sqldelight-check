@@ -3,7 +3,7 @@ package dev.s7a.sqldelight.check.api
 /**
  * A SQL source term that source-text rules may need to recognize directly.
  */
-public sealed interface SqlDialectSourceTerm {
+public interface SqlDialectSourceTerm {
     public val normalizedText: String
 
     /**
