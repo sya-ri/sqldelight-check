@@ -1,5 +1,37 @@
 # Changelog
 
+## v0.2.0
+
+Source-structure and dialect metadata release for the `0.x` line.
+
+### Breaking Changes
+
+- Replaced dialect family and capability modeling with `DialectId`.
+- Split built-in dialect metadata into separate published modules:
+  `sqldelight-check-dialect-hsql`, `sqldelight-check-dialect-mysql`,
+  `sqldelight-check-dialect-postgres`, and `sqldelight-check-dialect-sqlite`.
+- Removed `RegexRule`; rule implementations now use dialect-aware token and source-pattern matching.
+
+### Added
+
+- Added a dialect-aware source pattern DSL for reusable SQL syntax roles and terms.
+- Added source nesting and source block structures for rules that need SQL layout context.
+- Added `standard:source-indentation` with configurable indentation size.
+- Added built-in dialect metadata for HSQL, MySQL, PostgreSQL, and SQLite as independent provider modules.
+- Added PR retargeting workflow support for release branch maintenance.
+
+### Changed
+
+- Migrated standard and dialect-specific rules to use source structure and dialect source patterns where applicable.
+- Improved custom dialect authoring docs with the source pattern helpers.
+- Clarified release and installation docs for the `release/0.x` flow.
+
+### Fixed
+
+- Fixed clause newline handling for SQLDelight named parameters.
+- Fixed self column alias detection for function expressions.
+- Fixed Renovate configuration to target the `release/0.x` branch.
+
 ## v0.1.1
 
 Maintenance release for the `0.1.x` line.
