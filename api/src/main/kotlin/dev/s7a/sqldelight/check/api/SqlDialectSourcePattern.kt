@@ -5,10 +5,8 @@ package dev.s7a.sqldelight.check.api
  */
 public class SqlDialectSourcePattern(
     public val expression: SqlDialectSourcePatternExpression,
-    roles: Set<SqlDialectSourcePatternRole>,
+    public val roles: Set<SqlDialectSourcePatternRole>,
 ) {
-    public val roles: Set<SqlDialectSourcePatternRole> = roles
-
     override fun equals(other: Any?): Boolean =
         this === other ||
             other is SqlDialectSourcePattern &&

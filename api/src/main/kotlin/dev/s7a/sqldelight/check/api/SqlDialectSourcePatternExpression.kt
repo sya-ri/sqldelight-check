@@ -5,10 +5,8 @@ package dev.s7a.sqldelight.check.api
  * `FETCH {FIRST|NEXT}`, or `FETCH {FIRST|NEXT} [ROW|ROWS]`.
  */
 public class SqlDialectSourcePatternExpression(
-    parts: List<SqlDialectSourcePatternPart>,
+    public val parts: List<SqlDialectSourcePatternPart>,
 ) {
-    public val parts: List<SqlDialectSourcePatternPart> = parts
-
     /**
      * Returns the number of input terms consumed when [terms] match this expression from the start.
      */
