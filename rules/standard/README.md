@@ -203,6 +203,7 @@ The standard rule set uses two safety levels:
 | [`standard:space-around-binary-operators`](#standardspace-around-binary-operators) | 🟢 | ⚠️ | 🛠️ | Prefer one inline space around binary arithmetic and concatenation operators. |
 | [`standard:space-around-comparison-operators`](#standardspace-around-comparison-operators) | 🟢 | ⚠️ | 🛠️ | Prefer one inline space around comparison operators. |
 | [`standard:space-before-block-comment-end`](#standardspace-before-block-comment-end) | 🟢 | ⚠️ | ✅ | Require one space before a block comment closing marker. |
+| [`standard:source-indentation`](#standardsource-indentation) | 🟢 | ⚠️ | ✅ | Align multiline SQL indentation from dialect-aware source blocks. |
 | [`standard:statement-terminator`](#standardstatement-terminator) | 🟢 | ⚠️ |  | Require statement blocks to end with semicolons. |
 | [`standard:unique-column-aliases`](#standardunique-column-aliases) | 🟢 | ⚠️ |  | Require SELECT result column aliases to be unique within a SELECT list. |
 | [`standard:unique-table-aliases`](#standardunique-table-aliases) | 🟢 | ⚠️ |  | Require top-level table aliases to be unique within a statement. |
@@ -321,6 +322,44 @@ Fix behavior:
 
 - No fix is provided.
 - Single-quoted string literals and comments are ignored.
+
+## `standard:source-indentation`
+
+Reports multiline SQL lines whose indentation does not match their dialect-aware source block layout.
+
+Invalid:
+
+```sql
+selectPlayers:
+SELECT id,
+name
+  FROM player
+WHERE active = 1
+AND (
+score > 10
+ OR score IS NULL
+);
+```
+
+Valid:
+
+```sql
+selectPlayers:
+SELECT id,
+    name
+FROM player
+WHERE active = 1
+    AND (
+        score > 10
+        OR score IS NULL
+    );
+```
+
+Fix behavior:
+
+- Leading indentation is replaced with spaces.
+- Single-line statements are ignored.
+- Dialect source blocks determine nested statement, parenthesized expression, and `CASE` indentation.
 
 ## `standard:require-column-alias-as`
 
