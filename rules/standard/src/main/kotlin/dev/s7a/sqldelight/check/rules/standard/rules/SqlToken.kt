@@ -3,6 +3,8 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+import dev.s7a.sqldelight.check.api.skipSqlBracketQuoted
+import dev.s7a.sqldelight.check.api.skipSqlQuoted
 
 internal data class SqlToken(
     val text: String,
@@ -20,10 +22,10 @@ internal fun String.sqlTokens(): Sequence<SqlToken> =
                 when {
                     startsWith("--", index) -> skipLineComment(index)
                     startsWith("/*", index) -> skipBlockComment(index)
-                    this@sqlTokens[index] == '\'' -> skipQuoted(index, '\'')
-                    this@sqlTokens[index] == '"' -> skipQuoted(index, '"')
-                    this@sqlTokens[index] == '`' -> skipQuoted(index, '`')
-                    this@sqlTokens[index] == '[' -> skipBracketQuoted(index)
+                    this@sqlTokens[index] == '\'' -> skipSqlQuoted(index, '\'')
+                    this@sqlTokens[index] == '"' -> skipSqlQuoted(index, '"')
+                    this@sqlTokens[index] == '`' -> skipSqlQuoted(index, '`')
+                    this@sqlTokens[index] == '[' -> skipSqlBracketQuoted(index)
                     this@sqlTokens[index].isIdentifierStart() -> {
                         val start = index
                         index++

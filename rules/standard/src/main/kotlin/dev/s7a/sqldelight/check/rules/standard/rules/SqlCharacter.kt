@@ -1,5 +1,8 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.skipSqlBracketQuoted
+import dev.s7a.sqldelight.check.api.skipSqlQuoted
+
 internal data class SqlCharacter(
     val value: Char,
     val offset: Int,
@@ -13,10 +16,10 @@ internal fun String.sqlCharacters(): Sequence<SqlCharacter> =
                 when {
                     startsWith("--", index) -> skipLineComment(index)
                     startsWith("/*", index) -> skipBlockComment(index)
-                    this@sqlCharacters[index] == '\'' -> skipQuoted(index, '\'')
-                    this@sqlCharacters[index] == '"' -> skipQuoted(index, '"')
-                    this@sqlCharacters[index] == '`' -> skipQuoted(index, '`')
-                    this@sqlCharacters[index] == '[' -> skipBracketQuoted(index)
+                    this@sqlCharacters[index] == '\'' -> skipSqlQuoted(index, '\'')
+                    this@sqlCharacters[index] == '"' -> skipSqlQuoted(index, '"')
+                    this@sqlCharacters[index] == '`' -> skipSqlQuoted(index, '`')
+                    this@sqlCharacters[index] == '[' -> skipSqlBracketQuoted(index)
                     else -> {
                         yield(SqlCharacter(value = this@sqlCharacters[index], offset = index))
                         index + 1

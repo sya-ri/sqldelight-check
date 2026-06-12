@@ -1,5 +1,8 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.skipSqlBracketQuoted
+import dev.s7a.sqldelight.check.api.skipSqlQuoted
+
 internal data class BlockComment(
     val startOffset: Int,
     val endOffset: Int,
@@ -17,10 +20,10 @@ internal fun String.blockComments(): Sequence<BlockComment> =
                         yield(BlockComment(startOffset = index, endOffset = end))
                         end
                     }
-                    this@blockComments[index] == '\'' -> skipQuoted(index, '\'')
-                    this@blockComments[index] == '"' -> skipQuoted(index, '"')
-                    this@blockComments[index] == '`' -> skipQuoted(index, '`')
-                    this@blockComments[index] == '[' -> skipBracketQuoted(index)
+                    this@blockComments[index] == '\'' -> skipSqlQuoted(index, '\'')
+                    this@blockComments[index] == '"' -> skipSqlQuoted(index, '"')
+                    this@blockComments[index] == '`' -> skipSqlQuoted(index, '`')
+                    this@blockComments[index] == '[' -> skipSqlBracketQuoted(index)
                     else -> index + 1
                 }
         }
