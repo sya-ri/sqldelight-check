@@ -28,9 +28,9 @@ internal val cleanPlayerSq: String =
     import com.example.PlayerId;
 
     CREATE TABLE player (
-      id INTEGER AS PlayerId NOT NULL PRIMARY KEY,
-      name TEXT NOT NULL,
-      score INTEGER NOT NULL DEFAULT 0
+        id INTEGER AS PlayerId NOT NULL PRIMARY KEY,
+        name TEXT NOT NULL,
+        score INTEGER NOT NULL DEFAULT 0
     );
 
     CREATE INDEX player_name ON player(name);
@@ -53,8 +53,8 @@ internal val cleanPlayerSq: String =
 internal val cleanMigrationSqm: String =
     """
     CREATE TABLE player (
-      id INTEGER NOT NULL PRIMARY KEY,
-      name TEXT NOT NULL
+        id INTEGER NOT NULL PRIMARY KEY,
+        name TEXT NOT NULL
     );
 
     ALTER TABLE player ADD COLUMN score INTEGER NOT NULL DEFAULT 0;
@@ -128,6 +128,18 @@ internal fun Rule.applySingleFix(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
 ): String = content.applyEdit(diagnostics(content, path, options).single().fixes.single().edits.single())
+
+internal fun Rule.applyAllFixes(
+    content: String,
+    path: String = PLAYER_SQ_PATH,
+    options: Map<String, String> = emptyMap(),
+): String {
+    val edits =
+        diagnostics(content, path, options)
+            .flatMap { diagnostic -> diagnostic.fixes.single().edits }
+            .sortedByDescending { edit -> content.offsetAt(edit.range.start) }
+    return edits.fold(content) { current, edit -> current.applyEdit(edit) }
+}
 
 private fun String.applyEdit(edit: TextEdit): String {
     val startOffset = offsetAt(edit.range.start)

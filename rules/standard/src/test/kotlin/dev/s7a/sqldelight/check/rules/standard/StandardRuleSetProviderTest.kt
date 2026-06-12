@@ -135,6 +135,7 @@ class StandardRuleSetProviderTest {
                 qualifiedRuleId("standard:space-around-binary-operators"),
                 qualifiedRuleId("standard:space-around-comparison-operators"),
                 qualifiedRuleId("standard:space-before-block-comment-end"),
+                qualifiedRuleId("standard:source-indentation"),
                 qualifiedRuleId("standard:statement-terminator"),
                 qualifiedRuleId("standard:unique-column-aliases"),
                 qualifiedRuleId("standard:unique-table-aliases"),
