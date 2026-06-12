@@ -1,13 +1,13 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
-
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.skipSqlQuoted
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
 /**
  * Reports quoted identifiers that contain characters outside portable SQL names.
@@ -54,7 +54,7 @@ private fun String.quotedIdentifiers(): Sequence<QuotedIdentifier> =
                 when {
                     startsWith("--", index) -> skipLineComment(index)
                     startsWith("/*", index) -> skipBlockComment(index)
-                    this@quotedIdentifiers[index] == '\'' -> skipQuoted(index, '\'')
+                    this@quotedIdentifiers[index] == '\'' -> skipSqlQuoted(index, '\'')
                     this@quotedIdentifiers[index] == '"' -> {
                         val identifier = quotedIdentifier(index, '"', '"')
                         if (identifier != null) yield(identifier)

@@ -7,6 +7,8 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinModifier
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
+import dev.s7a.sqldelight.check.api.skipSqlBracketQuoted
+import dev.s7a.sqldelight.check.api.skipSqlQuoted
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import dev.s7a.sqldelight.check.rule.api.SqlJoinFacts
 import dev.s7a.sqldelight.check.rule.api.SqlQualifiedReferenceFacts
@@ -349,10 +351,10 @@ private fun String.sqlTokens(): Sequence<SqlToken> =
                 when {
                     startsWith("--", index) -> skipLineComment(index)
                     startsWith("/*", index) -> skipBlockComment(index)
-                    this@sqlTokens[index] == '\'' -> skipQuoted(index, '\'')
-                    this@sqlTokens[index] == '"' -> skipQuoted(index, '"')
-                    this@sqlTokens[index] == '`' -> skipQuoted(index, '`')
-                    this@sqlTokens[index] == '[' -> skipBracketQuoted(index)
+                    this@sqlTokens[index] == '\'' -> skipSqlQuoted(index, '\'')
+                    this@sqlTokens[index] == '"' -> skipSqlQuoted(index, '"')
+                    this@sqlTokens[index] == '`' -> skipSqlQuoted(index, '`')
+                    this@sqlTokens[index] == '[' -> skipSqlBracketQuoted(index)
                     this@sqlTokens[index].isIdentifierStart() -> {
                         val start = index
                         index++
@@ -373,10 +375,10 @@ private fun String.sqlCharacters(): Sequence<SqlCharacter> =
                 when {
                     startsWith("--", index) -> skipLineComment(index)
                     startsWith("/*", index) -> skipBlockComment(index)
-                    this@sqlCharacters[index] == '\'' -> skipQuoted(index, '\'')
-                    this@sqlCharacters[index] == '"' -> skipQuoted(index, '"')
-                    this@sqlCharacters[index] == '`' -> skipQuoted(index, '`')
-                    this@sqlCharacters[index] == '[' -> skipBracketQuoted(index)
+                    this@sqlCharacters[index] == '\'' -> skipSqlQuoted(index, '\'')
+                    this@sqlCharacters[index] == '"' -> skipSqlQuoted(index, '"')
+                    this@sqlCharacters[index] == '`' -> skipSqlQuoted(index, '`')
+                    this@sqlCharacters[index] == '[' -> skipSqlBracketQuoted(index)
                     else -> {
                         yield(SqlCharacter(value = this@sqlCharacters[index], offset = index))
                         index + 1
@@ -434,41 +436,6 @@ private fun String.skipLineComment(start: Int): Int {
 private fun String.skipBlockComment(start: Int): Int {
     val end = indexOf("*/", startIndex = start + 2)
     return if (end == -1) length else end + 2
-}
-
-private fun String.skipQuoted(
-    start: Int,
-    quote: Char,
-): Int {
-    var index = start + 1
-    while (index < length) {
-        if (this[index] == quote) {
-            if (quote != '`' && index + 1 < length && this[index + 1] == quote) {
-                index += 2
-            } else {
-                return index + 1
-            }
-        } else {
-            index++
-        }
-    }
-    return length
-}
-
-private fun String.skipBracketQuoted(start: Int): Int {
-    var index = start + 1
-    while (index < length) {
-        if (this[index] == ']') {
-            if (index + 1 < length && this[index + 1] == ']') {
-                index += 2
-            } else {
-                return index + 1
-            }
-        } else {
-            index++
-        }
-    }
-    return length
 }
 
 private fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)

@@ -1285,6 +1285,11 @@ public final class dev/s7a/sqldelight/check/api/SqlSourcePatternMatch {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class dev/s7a/sqldelight/check/api/SqlSourceSkippingKt {
+	public static final fun skipSqlBracketQuoted (Ljava/lang/String;I)I
+	public static final fun skipSqlQuoted (Ljava/lang/String;IC)I
+}
+
 public final class dev/s7a/sqldelight/check/api/SqlSourceStructure {
 	public static final field Companion Ldev/s7a/sqldelight/check/api/SqlSourceStructure$Companion;
 	public fun <init> (Ljava/util/List;Ljava/util/List;)V
