@@ -1,7 +1,7 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -29,7 +29,7 @@ public class ForeignKeysRestoredRule : Rule {
     override val id: RuleId = RuleId("foreign-keys-restored")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = SQLiteDialectCapability
+    override val targetDialect: DialectId = SQLiteDialectId
 
     override fun isApplicable(context: RuleContext): Boolean = context.file.kind == SourceFileKind.Migration
 

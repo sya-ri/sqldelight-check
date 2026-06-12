@@ -13,8 +13,8 @@ import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -31,7 +31,7 @@ public class ConsistentConflictResolutionRule : Rule {
     override val id: RuleId = RuleId("consistent-conflict-resolution")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = SQLiteDialectCapability
+    override val targetDialect: DialectId = SQLiteDialectId
 
     override fun run(
         context: RuleContext,

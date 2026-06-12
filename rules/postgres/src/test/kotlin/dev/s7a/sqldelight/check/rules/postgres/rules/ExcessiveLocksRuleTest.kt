@@ -3,8 +3,8 @@ package dev.s7a.sqldelight.check.rules.postgres.rules
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -69,14 +69,14 @@ class ExcessiveLocksRuleTest {
     }
 
     @Test
-    fun `does not report for non postgres capabilities`() {
+    fun `does not report for non postgres dialect IDs`() {
         val diagnostics =
             ExcessiveLocksRule().diagnostics(
                 content =
                     """
                     CREATE INDEX player_name ON player(name);
                     """,
-                capabilities = setOf(DialectCapability("other")),
+                ids = setOf(DialectId("other")),
             )
 
         assertEquals(emptyList(), diagnostics)

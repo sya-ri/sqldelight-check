@@ -4,7 +4,7 @@ import app.cash.sqldelight.gradle.SqlDelightCompilationUnitImpl
 import app.cash.sqldelight.gradle.SqlDelightDatabasePropertiesImpl
 import app.cash.sqldelight.gradle.SqlDelightTask
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
@@ -153,7 +153,7 @@ internal class SqlDelightProjectResolver(
             )
         }
 
-        return SqlDialect(family = DialectFamily.Unknown)
+        return SqlDialect()
     }
 
     private fun resolveDialectCoordinate(coordinate: SqlDialectCoordinate): SqlDialect = dialectRegistry.resolve(coordinate)

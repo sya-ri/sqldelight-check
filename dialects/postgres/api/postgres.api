@@ -42,8 +42,7 @@ public final class dev/s7a/sqldelight/check/dialects/postgres/NotValidConstraint
 
 public final class dev/s7a/sqldelight/check/dialects/postgres/PostgresDialectKt {
 	public static final fun getPostgresDialect ()Ldev/s7a/sqldelight/check/api/SqlDialect;
-	public static final fun getPostgresDialectCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public static final fun getPostgresDialectFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
+	public static final fun getPostgresDialectId ()Ldev/s7a/sqldelight/check/api/DialectId;
 }
 
 public final class dev/s7a/sqldelight/check/dialects/postgres/PostgresDialectProvider : dev/s7a/sqldelight/check/api/SqlDialectProvider {

@@ -3,10 +3,8 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
-import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
@@ -23,11 +21,11 @@ import kotlin.test.assertEquals
 
 internal fun Rule.diagnostics(
     content: String,
-    capabilities: Set<DialectCapability> = setOf(PostgresDialectCapability),
+    ids: Set<DialectId> = setOf(PostgresDialectId),
     options: Map<String, String> = emptyMap(),
 ): List<Diagnostic> {
-    val targetCapability = this.targetCapability
-    if (targetCapability != null && targetCapability !in capabilities) return emptyList()
+    val targetDialect = this.targetDialect
+    if (targetDialect != null && targetDialect !in ids) return emptyList()
 
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -38,8 +36,7 @@ internal fun Rule.diagnostics(
                         name = "Database",
                         dialect =
                             SqlDialect(
-                                family = PostgresDialectFamily,
-                                capabilities = capabilities,
+                                ids = ids,
                                 sourcePatterns = PostgresDialectSourcePatterns,
                             ),
                     )

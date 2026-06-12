@@ -16,8 +16,8 @@ import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -34,7 +34,7 @@ public class RiskyAlterTableRule : Rule {
     override val id: RuleId = RuleId("risky-alter-table")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = PostgresDialectCapability
+    override val targetDialect: DialectId = PostgresDialectId
 
     override fun run(
         context: RuleContext,

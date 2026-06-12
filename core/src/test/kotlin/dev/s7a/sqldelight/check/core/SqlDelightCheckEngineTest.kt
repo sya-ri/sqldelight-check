@@ -1,8 +1,7 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
@@ -78,12 +77,12 @@ class SqlDelightCheckEngineTest {
     fun `auto rule is skipped when dialect applicability rejects the database`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
-                inputs = listOf(testInput(SourceDialectFamily)),
+                inputs = listOf(testInput(ids = setOf(SourceDialectId))),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
                             testRule(
-                                isApplicable = { context -> context.database.dialect.family == TargetDialectFamily },
+                                isApplicable = { context -> TargetDialectId in context.database.dialect.ids },
                             ),
                         ),
                     ),
@@ -93,20 +92,19 @@ class SqlDelightCheckEngineTest {
     }
 
     @Test
-    fun `auto rule is skipped when target capability rejects the database`() {
+    fun `auto rule is skipped when target dialect rejects the database`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
                 inputs =
                     listOf(
                         testInput(
-                            SourceDialectFamily,
-                            capabilities = setOf(SourceDialectCapability),
+                            ids = setOf(SourceDialectId),
                         ),
                     ),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
-                            testRule(targetCapability = TargetDialectCapability),
+                            testRule(targetDialect = TargetDialectId),
                         ),
                     ),
             )
@@ -118,12 +116,12 @@ class SqlDelightCheckEngineTest {
     fun `explicit rule enablement overrides dialect auto applicability`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
-                inputs = listOf(testInput(SourceDialectFamily)),
+                inputs = listOf(testInput(ids = setOf(SourceDialectId))),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
                             testRule(
-                                isApplicable = { context -> context.database.dialect.family == TargetDialectFamily },
+                                isApplicable = { context -> TargetDialectId in context.database.dialect.ids },
                             ),
                         ),
                     ),
@@ -137,20 +135,19 @@ class SqlDelightCheckEngineTest {
     }
 
     @Test
-    fun `explicit rule enablement overrides target capability auto applicability`() {
+    fun `explicit rule enablement overrides target dialect auto applicability`() {
         val diagnostics =
             SqlDelightCheckEngine().run(
                 inputs =
                     listOf(
                         testInput(
-                            SourceDialectFamily,
-                            capabilities = setOf(SourceDialectCapability),
+                            ids = setOf(SourceDialectId),
                         ),
                     ),
                 ruleSetProviders =
                     listOf(
                         testRuleSet(
-                            testRule(targetCapability = TargetDialectCapability),
+                            testRule(targetDialect = TargetDialectId),
                         ),
                     ),
                 config =
@@ -555,7 +552,7 @@ class SqlDelightCheckEngineTest {
     private fun testRule(
         id: String = "test",
         severity: Severity = Severity.Warning,
-        targetCapability: DialectCapability? = null,
+        targetDialect: DialectId? = null,
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
         rangeLine: Int? = null,
@@ -564,7 +561,7 @@ class SqlDelightCheckEngineTest {
             override val id: RuleId = RuleId(id)
             override val defaultSeverity: Severity = severity
             override val defaultEnable: Boolean = true
-            override val targetCapability: DialectCapability? = targetCapability
+            override val targetDialect: DialectId? = targetDialect
 
             override fun isApplicable(context: RuleContext): Boolean = isApplicable.invoke(context)
 
@@ -585,15 +582,14 @@ class SqlDelightCheckEngineTest {
         }
 
     private fun testInput(
-        family: DialectFamily = TargetDialectFamily,
-        capabilities: Set<DialectCapability> = setOf(TargetDialectCapability),
+        ids: Set<DialectId> = setOf(TargetDialectId),
         content: String = "SELECT 1;",
     ): AnalysisInput =
         AnalysisInput(
             database =
                 DatabaseContext(
                     name = "Database",
-                    dialect = SqlDialect(family = family, capabilities = capabilities),
+                    dialect = SqlDialect(ids = ids),
                 ),
             files = listOf(SourceFile(path = "src/main/sqldelight/Test.sq", content = content)),
         )
@@ -602,17 +598,9 @@ class SqlDelightCheckEngineTest {
         val ruleSetId = RuleSetId("standard")
         val ruleId = qualifiedRuleId("standard:test")
 
-        val SourceDialectCapability: DialectCapability = DialectCapability("source")
-        val TargetDialectCapability: DialectCapability = DialectCapability("target")
+        val SourceDialectId: DialectId = DialectId("source")
+        val TargetDialectId: DialectId = DialectId("target")
     }
-}
-
-private object SourceDialectFamily : DialectFamily {
-    override val id: String = "source"
-}
-
-private object TargetDialectFamily : DialectFamily {
-    override val id: String = "target"
 }
 
 private fun singleCharacterRange(line: Int): SourceRange =

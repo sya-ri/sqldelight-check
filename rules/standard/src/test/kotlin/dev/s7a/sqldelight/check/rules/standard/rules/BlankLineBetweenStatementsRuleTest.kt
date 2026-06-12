@@ -1,6 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
@@ -97,7 +97,7 @@ class BlankLineBetweenStatementsRuleTest {
     fun `uses dialect source patterns for custom statement starts`() {
         val dialect =
             SqlDialect(
-                family = DialectFamily.Unknown,
+                ids = setOf(DialectId.Unknown),
                 sourcePatterns =
                     SqlDialectSourcePatterns(
                         patterns =

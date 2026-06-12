@@ -128,11 +128,11 @@ public class SqlDelightCheckEngine {
         when (enablement) {
             Enablement.Enabled -> true
             Enablement.Disabled -> false
-            Enablement.Auto -> hasTargetCapability(context) && isApplicable(context)
+            Enablement.Auto -> hasTargetDialect(context) && isApplicable(context)
         }
 
-    private fun Rule.hasTargetCapability(context: RuleContext): Boolean =
-        targetCapability?.let { capability -> capability in context.database.dialect.capabilities } ?: true
+    private fun Rule.hasTargetDialect(context: RuleContext): Boolean =
+        targetDialect?.let { id -> id in context.database.dialect.ids } ?: true
 }
 
 private fun RuleDiagnostic.withRuleIdentity(

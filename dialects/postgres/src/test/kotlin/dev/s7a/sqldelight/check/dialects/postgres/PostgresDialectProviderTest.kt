@@ -1,9 +1,7 @@
 package dev.s7a.sqldelight.check.dialects.postgres
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
-import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
@@ -20,8 +18,7 @@ class PostgresDialectProviderTest {
             PostgresDialect,
             PostgresDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "postgresql-dialect", null)),
         )
-        assertEquals(PostgresDialectFamily, PostgresDialect.family)
-        assertEquals(setOf(PostgresDialectCapability), PostgresDialect.capabilities)
+        assertEquals(setOf(PostgresDialectId), PostgresDialect.ids)
     }
 
     @Test
@@ -32,7 +29,7 @@ class PostgresDialectProviderTest {
     }
 
     @Test
-    fun `source patterns include postgresql family syntax`() {
+    fun `source patterns include postgresql dialect syntax`() {
         val sourcePatterns = PostgresDialectSourcePatterns
 
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("copy")))

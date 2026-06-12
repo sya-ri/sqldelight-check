@@ -1,7 +1,7 @@
 package dev.s7a.sqldelight.check.rules.postgres.rules
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AlterTableStatementStart
@@ -24,7 +24,7 @@ public class NoAddColumnWithVolatileDefaultRule : Rule {
     override val id: RuleId = RuleId("no-add-column-with-volatile-default")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
-    override val targetCapability: DialectCapability = PostgresDialectCapability
+    override val targetDialect: DialectId = PostgresDialectId
 
     override fun run(
         context: RuleContext,

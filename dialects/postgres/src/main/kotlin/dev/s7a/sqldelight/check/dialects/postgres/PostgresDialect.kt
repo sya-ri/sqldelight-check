@@ -1,25 +1,18 @@
 package dev.s7a.sqldelight.check.dialects.postgres
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.SqlDialect
 
 /**
- * PostgreSQL dialect family.
+ * PostgreSQL dialect ID.
  */
-public val PostgresDialectFamily: DialectFamily = DialectFamily.Named("postgresql")
-
-/**
- * PostgreSQL-compatible syntax and behavior.
- */
-public val PostgresDialectCapability: DialectCapability = DialectCapability("postgresql")
+public val PostgresDialectId: DialectId = DialectId("postgresql")
 
 /**
  * SQLDelight PostgreSQL dialect metadata.
  */
 public val PostgresDialect: SqlDialect =
     SqlDialect(
-        family = PostgresDialectFamily,
-        capabilities = setOf(PostgresDialectCapability),
+        ids = setOf(PostgresDialectId),
         sourcePatterns = PostgresDialectSourcePatterns,
     )

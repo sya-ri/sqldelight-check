@@ -2,7 +2,7 @@
 
 `sqldelight-check-rules-mysql` is the MySQL-specific rule set.
 
-These rules are gated by `MySqlDialectCapability` and focus on schema and
+These rules are gated by `MySqlDialectId` and focus on schema and
 migration patterns that matter for live MySQL databases.
 
 ## Rule Set ID

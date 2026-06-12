@@ -49,8 +49,7 @@ public final class dev/s7a/sqldelight/check/dialects/mysql/LegacyUtf8CharsetDecl
 
 public final class dev/s7a/sqldelight/check/dialects/mysql/MySqlDialectKt {
 	public static final fun getMySqlDialect ()Ldev/s7a/sqldelight/check/api/SqlDialect;
-	public static final fun getMySqlDialectCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public static final fun getMySqlDialectFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
+	public static final fun getMySqlDialectId ()Ldev/s7a/sqldelight/check/api/DialectId;
 }
 
 public final class dev/s7a/sqldelight/check/dialects/mysql/MySqlDialectProvider : dev/s7a/sqldelight/check/api/SqlDialectProvider {

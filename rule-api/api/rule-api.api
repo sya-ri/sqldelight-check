@@ -6,14 +6,14 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun getDefaultEnable ()Z
 	public abstract fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public abstract fun getId-cwxIa2A ()Ljava/lang/String;
-	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public abstract fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/Rule$DefaultImpls {
 	public static fun getDefaultEnable (Ldev/s7a/sqldelight/check/rule/api/Rule;)Z
-	public static fun getTargetCapability (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/DialectCapability;
+	public static fun getTargetDialect (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/DialectId;
 	public static fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 }
 

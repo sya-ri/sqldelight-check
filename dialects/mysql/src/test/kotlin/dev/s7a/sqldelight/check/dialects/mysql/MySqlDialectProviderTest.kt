@@ -1,9 +1,7 @@
 package dev.s7a.sqldelight.check.dialects.mysql
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
-import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectId
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
@@ -22,8 +20,7 @@ class MySqlDialectProviderTest {
             MySqlDialect,
             MySqlDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "mysql-dialect", null)),
         )
-        assertEquals(MySqlDialectFamily, MySqlDialect.family)
-        assertEquals(setOf(MySqlDialectCapability), MySqlDialect.capabilities)
+        assertEquals(setOf(MySqlDialectId), MySqlDialect.ids)
     }
 
     @Test
@@ -34,7 +31,7 @@ class MySqlDialectProviderTest {
     }
 
     @Test
-    fun `source patterns include mysql family syntax`() {
+    fun `source patterns include mysql dialect syntax`() {
         val sourcePatterns = MySqlDialectSourcePatterns
 
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementStart, listOf("show")))

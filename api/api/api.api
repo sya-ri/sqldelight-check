@@ -22,8 +22,8 @@ public final class dev/s7a/sqldelight/check/api/Diagnostic {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class dev/s7a/sqldelight/check/api/DialectCapability {
-	public static final field Companion Ldev/s7a/sqldelight/check/api/DialectCapability$Companion;
+public final class dev/s7a/sqldelight/check/api/DialectId {
+	public static final field Companion Ldev/s7a/sqldelight/check/api/DialectId$Companion;
 	public fun <init> (Ljava/lang/String;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getId ()Ljava/lang/String;
@@ -31,27 +31,8 @@ public final class dev/s7a/sqldelight/check/api/DialectCapability {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class dev/s7a/sqldelight/check/api/DialectCapability$Companion {
-}
-
-public abstract interface class dev/s7a/sqldelight/check/api/DialectFamily {
-	public abstract fun getId ()Ljava/lang/String;
-}
-
-public final class dev/s7a/sqldelight/check/api/DialectFamily$Named : dev/s7a/sqldelight/check/api/DialectFamily {
-	public fun <init> (Ljava/lang/String;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public fun getId ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class dev/s7a/sqldelight/check/api/DialectFamily$Unknown : dev/s7a/sqldelight/check/api/DialectFamily {
-	public static final field INSTANCE Ldev/s7a/sqldelight/check/api/DialectFamily$Unknown;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun getId ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
+public final class dev/s7a/sqldelight/check/api/DialectId$Companion {
+	public final fun getUnknown ()Ldev/s7a/sqldelight/check/api/DialectId;
 }
 
 public final class dev/s7a/sqldelight/check/api/Enablement : java/lang/Enum {
@@ -194,11 +175,11 @@ public final class dev/s7a/sqldelight/check/api/SourceRange {
 }
 
 public final class dev/s7a/sqldelight/check/api/SqlDialect {
-	public fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;)V
-	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/DialectFamily;Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;)V
+	public synthetic fun <init> (Ljava/util/Set;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getCapabilities ()Ljava/util/Set;
-	public final fun getFamily ()Ldev/s7a/sqldelight/check/api/DialectFamily;
+	public final fun getIds ()Ljava/util/Set;
 	public final fun getSourcePatterns ()Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

@@ -29,8 +29,7 @@ Implement `SqlDialectProvider` and return dialect metadata for coordinates your 
 ```kotlin
 package com.example.sqldelight.dialects
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
@@ -45,8 +44,7 @@ class ExampleDialectProvider : SqlDialectProvider {
         if (coordinate.module != "example-dialect") return null
 
         return SqlDialect(
-            family = DialectFamily.Named("example"),
-            capabilities = setOf(DialectCapability("example")),
+            ids = setOf(DialectId("example")),
             sourcePatterns =
                 SqlDialectSourcePatterns(
                     patterns =
@@ -82,22 +80,19 @@ providers for metadata. Providers from `sqldelightCheckDialects` are consulted b
 override built-in SQLDelight dialect metadata when needed. Third-party providers should still return `null` for
 unrelated coordinates.
 
-When no provider resolves a coordinate, sqldelight-check falls back to `DialectFamily.Unknown` with
+When no provider resolves a coordinate, sqldelight-check falls back to `DialectId.Unknown` with
 `SqlDialectSourcePatterns.SourceScannerDefault`.
 
 ## Source Scanner Patterns
 
 `SqlDialectSourcePatterns` configures conservative source-text facts used by rules. It is not a parser grammar and does
 not validate whether a statement is accepted by a specific engine version. SQLDelight's parser is responsible for
-accepting or rejecting concrete SQL. Built-in presets describe broad dialect-family syntax so source-text rules do not
+accepting or rejecting concrete SQL. Built-in presets describe broad dialect ID syntax so source-text rules do not
 misread valid-looking dialect constructs. Each source pattern has one or more roles describing what the syntax means to
 source-text rules. Start from `SourceScannerDefault.patterns` and add dialect-specific patterns:
 
 ```kotlin
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinModifier
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
-import dev.s7a.sqldelight.check.api.sourcePatterns
 import dev.s7a.sqldelight.check.api.withoutExpressions
 
 SqlDialectSourcePatterns(

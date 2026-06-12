@@ -3,8 +3,8 @@ package dev.s7a.sqldelight.check.rules.mysql.rules
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.mysql.MySqlDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
@@ -67,14 +67,14 @@ class NoReplaceIntoRuleTest {
     }
 
     @Test
-    fun `does not report for non mysql capabilities`() {
+    fun `does not report for non mysql dialect IDs`() {
         val diagnostics =
             NoReplaceIntoRule().diagnostics(
                 content =
                     """
                     REPLACE INTO player(id, name) VALUES (1, 'Ada');
                     """,
-                capabilities = setOf(DialectCapability("other")),
+                ids = setOf(DialectId("other")),
             )
 
         assertEquals(emptyList(), diagnostics)

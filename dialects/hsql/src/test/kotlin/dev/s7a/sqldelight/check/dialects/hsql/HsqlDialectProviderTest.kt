@@ -1,9 +1,7 @@
 package dev.s7a.sqldelight.check.dialects.hsql
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectCapability
-import dev.s7a.sqldelight.check.api.DialectFamily
-import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectFamily
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.hsql.HsqlDialectId
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
@@ -22,8 +20,7 @@ class HsqlDialectProviderTest {
             HsqlDialect,
             HsqlDialectProvider().resolve(SqlDialectCoordinate("app.cash.sqldelight", "hsql-dialect", null)),
         )
-        assertEquals(HsqlDialectFamily, HsqlDialect.family)
-        assertEquals(setOf(HsqlDialectCapability), HsqlDialect.capabilities)
+        assertEquals(setOf(HsqlDialectId), HsqlDialect.ids)
     }
 
     @Test
@@ -34,7 +31,7 @@ class HsqlDialectProviderTest {
     }
 
     @Test
-    fun `source patterns include hsql family syntax`() {
+    fun `source patterns include hsql dialect syntax`() {
         val sourcePatterns = HsqlDialectSourcePatterns
 
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart, listOf("merge")))

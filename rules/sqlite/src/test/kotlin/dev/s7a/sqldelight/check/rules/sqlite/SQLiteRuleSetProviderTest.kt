@@ -4,9 +4,8 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 
 
 
-import dev.s7a.sqldelight.check.api.DialectCapability
-import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
-import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectCapability
+import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -26,7 +25,7 @@ class SQLiteRuleSetProviderTest {
         val ruleIds = rules.map { rule -> QualifiedRuleId(provider.id, rule.id) }.toSet()
 
         assertEquals(RuleSetId("sqlite"), provider.id)
-        assertEquals(setOf(SQLiteDialectCapability), rules.map { rule -> rule.targetCapability }.toSet())
+        assertEquals(setOf(SQLiteDialectId), rules.map { rule -> rule.targetDialect }.toSet())
         assertEquals(
             setOf(
                 qualifiedRuleId("sqlite:consistent-conflict-resolution"),
