@@ -2,18 +2,6 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticRepo
 	public abstract fun report (Ldev/s7a/sqldelight/check/api/RuleDiagnostic;)V
 }
 
-public abstract class dev/s7a/sqldelight/check/rule/api/RegexRule : dev/s7a/sqldelight/check/rule/api/Rule {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;ZLdev/s7a/sqldelight/check/api/DialectCapability;Z)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Severity;ZLdev/s7a/sqldelight/check/api/DialectCapability;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun getDefaultEnable ()Z
-	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
-	public fun getId-cwxIa2A ()Ljava/lang/String;
-	public fun getTargetCapability ()Ldev/s7a/sqldelight/check/api/DialectCapability;
-	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
-	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
-	protected fun shouldReport (Lkotlin/text/MatchResult;)Z
-}
-
 public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun getDefaultEnable ()Z
 	public abstract fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -174,5 +162,23 @@ public final class dev/s7a/sqldelight/check/rule/api/SqlTokenKt {
 	public static final fun sqlStatements (Ljava/util/List;)Ljava/util/List;
 	public static final fun sqlTokens (Ljava/lang/String;Z)Lkotlin/sequences/Sequence;
 	public static synthetic fun sqlTokens$default (Ljava/lang/String;ZILjava/lang/Object;)Lkotlin/sequences/Sequence;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/SqlTokenMatch {
+	public fun <init> (Ldev/s7a/sqldelight/check/rule/api/SqlToken;Ldev/s7a/sqldelight/check/rule/api/SqlToken;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndToken ()Ldev/s7a/sqldelight/check/rule/api/SqlToken;
+	public final fun getStartToken ()Ldev/s7a/sqldelight/check/rule/api/SqlToken;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/SqlTokenMatchingKt {
+	public static final fun containsSourcePattern (Ljava/util/List;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;)Z
+	public static final fun findSourcePattern (Ljava/util/List;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;)Ldev/s7a/sqldelight/check/rule/api/SqlTokenMatch;
+	public static final fun findSourcePatternsInOrder (Ljava/util/List;Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatterns;[Ldev/s7a/sqldelight/check/api/SqlDialectSourcePatternRole;)Ldev/s7a/sqldelight/check/rule/api/SqlTokenMatch;
+	public static final fun reportSqlStatementMatches (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;)V
+	public static synthetic fun reportSqlStatementMatches$default (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static final fun reportSqlTokenMatch (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/SqlTokenMatch;)V
 }
 

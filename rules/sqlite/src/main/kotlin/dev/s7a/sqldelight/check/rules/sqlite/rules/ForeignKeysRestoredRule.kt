@@ -1,8 +1,14 @@
 package dev.s7a.sqldelight.check.rules.sqlite.rules
 
-import dev.s7a.sqldelight.check.rule.api.isKeyword
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.rule.api.SqlToken
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysOffValue
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysOnValue
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysPragmaStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.rule.api.findSourcePattern
+import dev.s7a.sqldelight.check.rule.api.findSourcePatternsInOrder
+import dev.s7a.sqldelight.check.rule.api.sqlStatements
 import dev.s7a.sqldelight.check.rule.api.sqlTokens
 
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
@@ -35,7 +41,11 @@ public class ForeignKeysRestoredRule : Rule {
         if (!isApplicable(context)) return
 
         val content = context.file.content
-        val pragmas = content.sqlTokens().toList().foreignKeyPragmas()
+        val pragmas =
+            content.sqlTokens()
+                .toList()
+                .sqlStatements()
+                .flatMap { statement -> statement.foreignKeyPragmas(context.database.dialect.sourcePatterns) }
         val disabledPragma = pragmas.firstOrNull { pragma -> pragma.value == ForeignKeyPragmaValue.Off } ?: return
         val restoredLater =
             pragmas.any { pragma ->
@@ -66,28 +76,17 @@ private enum class ForeignKeyPragmaValue {
     On,
 }
 
-private fun List<SqlToken>.foreignKeyPragmas(): List<ForeignKeyPragma> =
-    mapIndexedNotNull { index, token ->
-        if (!token.isKeyword("pragma")) return@mapIndexedNotNull null
-        val nameToken = getOrNull(index + 1)
-        if (nameToken?.isKeyword("foreign_keys") != true) return@mapIndexedNotNull null
+private fun List<SqlToken>.foreignKeyPragmas(sourcePatterns: SqlDialectSourcePatterns): List<ForeignKeyPragma> =
+    listOfNotNull(
+        foreignKeyPragma(sourcePatterns, ForeignKeysOffValue, ForeignKeyPragmaValue.Off),
+        foreignKeyPragma(sourcePatterns, ForeignKeysOnValue, ForeignKeyPragmaValue.On),
+    )
 
-        val valueToken = statementTokensAfter(index).firstOrNull { candidate ->
-            candidate.isKeyword("off") || candidate.isKeyword("on")
-        } ?: return@mapIndexedNotNull null
-
-        ForeignKeyPragma(
-            value = if (valueToken.isKeyword("off")) ForeignKeyPragmaValue.Off else ForeignKeyPragmaValue.On,
-            token = token,
-        )
-    }
-
-private fun List<SqlToken>.statementTokensAfter(startIndex: Int): List<SqlToken> {
-    val result = mutableListOf<SqlToken>()
-    var index = startIndex + 1
-    while (index < size && this[index].text != ";") {
-        result += this[index]
-        index++
-    }
-    return result
+private fun List<SqlToken>.foreignKeyPragma(
+    sourcePatterns: SqlDialectSourcePatterns,
+    valueRole: dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole,
+    value: ForeignKeyPragmaValue,
+): ForeignKeyPragma? {
+    val match = findSourcePatternsInOrder(sourcePatterns, ForeignKeysPragmaStatementStart, valueRole) ?: return null
+    return ForeignKeyPragma(value = value, token = match.startToken)
 }

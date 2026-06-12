@@ -1,32 +1,76 @@
 package dev.s7a.sqldelight.check.api
 
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AlterTableStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AutoincrementKeyword
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.BooleanOperator
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CoalesceAlternativeFunction
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnAddOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnAlterOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnChangeOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnConstraintStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnDropOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnModifyOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnRenameOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnSetNotNullOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ColumnTypeChangeOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CommonFunctionName
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ComplexAlterTableOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ConcurrentlyClause
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ConstraintAddOperation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CopyAlgorithmClause
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CreateConcurrentIndexStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CreateIndexStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.CreateTableStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DatabaseFileSettingStatement
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DataTypeName
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DefaultValueClause
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.DoUpdateClause
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ExclusiveLockClause
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ExpressionContinuation
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysOffValue
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysOnValue
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ForeignKeysPragmaStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.GroupByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IndexUnfriendlyFunction
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.IntegerDisplayWidthType
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.InsertOrReplaceStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinConditionBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinModifier
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarget
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.LegacyUtf8CharsetDeclaration
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.MajorClauseStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.NonIntegerRowidPrimaryKeyType
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.NotValidConstraintClause
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OnConflictClause
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OrderByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ParenthesizedExpressionContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PrimaryKeyConstraint
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReindexStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReindexSystemTarget
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ReplaceIntoStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SelectListStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SerialDataTypeName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SetOperator
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightMappableStorageTypeName
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SystemOperationStatement
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableRenameOperation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableConstraintStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceStatement
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceClause
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TextTableSourceBindingStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TransactionEndStatement
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TransactionStartStatement
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.VolatileDefaultFunction
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.WithoutRowidClause
 
 /**
  * Dialect-specific source patterns used by conservative source-text scanners.
@@ -118,6 +162,53 @@ public class SqlDialectSourcePatterns(
                             "WITH SELECT",
                             "WITH UPDATE",
                             roles = setOf(StatementContinuation),
+                        ) +
+                        sourcePatterns(
+                            "ALTER TABLE",
+                            roles = setOf(AlterTableStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "ADD COLUMN",
+                            roles = setOf(ColumnAddOperation),
+                        ) +
+                        sourcePatterns(
+                            "ADD CONSTRAINT",
+                            roles = setOf(ConstraintAddOperation),
+                        ) +
+                        sourcePatterns(
+                            "ALTER COLUMN",
+                            roles = setOf(ColumnAlterOperation),
+                        ) +
+                        sourcePatterns(
+                            "SET NOT NULL",
+                            roles = setOf(ColumnSetNotNullOperation),
+                        ) +
+                        sourcePatterns(
+                            "CREATE INDEX",
+                            "CREATE UNIQUE INDEX",
+                            roles = setOf(CreateIndexStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "CREATE TABLE",
+                            roles = setOf(CreateTableStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "BEGIN",
+                            "START TRANSACTION",
+                            roles = setOf(TransactionStartStatement),
+                        ) +
+                        sourcePatterns(
+                            "COMMIT",
+                            "END",
+                            roles = setOf(TransactionEndStatement),
+                        ) +
+                        sourcePatterns(
+                            "PRIMARY KEY",
+                            roles = setOf(PrimaryKeyConstraint),
+                        ) +
+                        sourcePatterns(
+                            "DEFAULT",
+                            roles = setOf(DefaultValueClause),
                         ) +
                         sourcePatterns(
                             "CASE",
@@ -515,9 +606,37 @@ public class SqlDialectSourcePatterns(
                             roles = setOf(SqlDelightExecutableStatementStart),
                         ) +
                         sourcePatterns(
+                            "REPLACE INTO",
+                            roles = setOf(ReplaceIntoStatementStart),
+                        ) +
+                        sourcePatterns(
                             "INSERT REPLACE",
                             "WITH REPLACE",
                             roles = setOf(StatementContinuation),
+                        ) +
+                        sourcePatterns(
+                            "INSERT OR REPLACE",
+                            roles = setOf(InsertOrReplaceStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "ON CONFLICT",
+                            roles = setOf(OnConflictClause),
+                        ) +
+                        sourcePatterns(
+                            "DO UPDATE",
+                            roles = setOf(DoUpdateClause),
+                        ) +
+                        sourcePatterns(
+                            "PRAGMA FOREIGN_KEYS",
+                            roles = setOf(ForeignKeysPragmaStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "OFF",
+                            roles = setOf(ForeignKeysOffValue),
+                        ) +
+                        sourcePatterns(
+                            "ON",
+                            roles = setOf(ForeignKeysOnValue),
                         ) +
                         sourcePatterns(
                             "CONFLICT",
@@ -528,6 +647,26 @@ public class SqlDialectSourcePatterns(
                             "REPLACE",
                             "ROLLBACK",
                             roles = setOf(KeywordCaseTarget),
+                        ) +
+                        sourcePatterns(
+                            "ALTER COLUMN",
+                            "ADD CONSTRAINT",
+                            "DROP CONSTRAINT",
+                            roles = setOf(ComplexAlterTableOperation),
+                        ) +
+                        sourcePatterns(
+                            "AUTOINCREMENT",
+                            roles = setOf(AutoincrementKeyword),
+                        ) +
+                        sourcePatterns(
+                            "BIGINT",
+                            "INT",
+                            "LONG",
+                            roles = setOf(NonIntegerRowidPrimaryKeyType),
+                        ) +
+                        sourcePatterns(
+                            "WITHOUT ROWID",
+                            roles = setOf(WithoutRowidClause),
                         ) +
                         sourcePatterns(
                             "FTS5",
@@ -561,6 +700,10 @@ public class SqlDialectSourcePatterns(
                             roles = setOf(SqlDelightExecutableStatementStart),
                         ) +
                         sourcePatterns(
+                            "REPLACE INTO",
+                            roles = setOf(ReplaceIntoStatementStart),
+                        ) +
+                        sourcePatterns(
                             "INSERT REPLACE",
                             "WITH REPLACE",
                             roles = setOf(StatementContinuation),
@@ -582,6 +725,40 @@ public class SqlDialectSourcePatterns(
                             "UNSIGNED",
                             "ZEROFILL",
                             roles = setOf(KeywordCaseTarget),
+                        ) +
+                        sourcePatterns(
+                            "ALGORITHM COPY",
+                            roles = setOf(CopyAlgorithmClause),
+                        ) +
+                        sourcePatterns(
+                            "CHANGE COLUMN",
+                            roles = setOf(ColumnChangeOperation),
+                        ) +
+                        sourcePatterns(
+                            "DROP COLUMN",
+                            roles = setOf(ColumnDropOperation),
+                        ) +
+                        sourcePatterns(
+                            "MODIFY COLUMN",
+                            roles = setOf(ColumnModifyOperation),
+                        ) +
+                        sourcePatterns(
+                            "LOCK EXCLUSIVE",
+                            roles = setOf(ExclusiveLockClause),
+                        ) +
+                        sourcePatterns(
+                            "CHARACTER SET UTF8",
+                            "CHARSET UTF8",
+                            roles = setOf(LegacyUtf8CharsetDeclaration),
+                        ) +
+                        sourcePatterns(
+                            "BIGINT",
+                            "INT",
+                            "INTEGER",
+                            "MEDIUMINT",
+                            "SMALLINT",
+                            "TINYINT",
+                            roles = setOf(IntegerDisplayWidthType),
                         ) +
                         sourcePatterns(
                             "BIT",
@@ -712,6 +889,57 @@ public class SqlDialectSourcePatterns(
                             "TEMPORARY",
                             "UNLOGGED",
                             roles = setOf(KeywordCaseTarget),
+                        ) +
+                        sourcePatterns(
+                            "DROP COLUMN",
+                            roles = setOf(ColumnDropOperation),
+                        ) +
+                        sourcePatterns(
+                            "RENAME COLUMN",
+                            roles = setOf(ColumnRenameOperation),
+                        ) +
+                        sourcePatterns(
+                            "RENAME TO",
+                            roles = setOf(TableRenameOperation),
+                        ) +
+                        sourcePatterns(
+                            "CREATE INDEX CONCURRENTLY",
+                            "CREATE UNIQUE INDEX CONCURRENTLY",
+                            roles = setOf(CreateConcurrentIndexStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "CONCURRENTLY",
+                            roles = setOf(ConcurrentlyClause),
+                        ) +
+                        sourcePatterns(
+                            "REINDEX",
+                            roles = setOf(ReindexStatementStart),
+                        ) +
+                        sourcePatterns(
+                            "SYSTEM",
+                            roles = setOf(ReindexSystemTarget),
+                        ) +
+                        sourcePatterns(
+                            "TYPE",
+                            roles = setOf(ColumnTypeChangeOperation),
+                        ) +
+                        sourcePatterns(
+                            "NOT VALID",
+                            roles = setOf(NotValidConstraintClause),
+                        ) +
+                        sourcePatterns(
+                            "BIGSERIAL",
+                            "SERIAL",
+                            "SMALLSERIAL",
+                            roles = setOf(SerialDataTypeName),
+                        ) +
+                        sourcePatterns(
+                            "CURRENT_TIMESTAMP",
+                            "GEN_RANDOM_UUID",
+                            "NOW",
+                            "RANDOM",
+                            "UUID_GENERATE_V4",
+                            roles = setOf(VolatileDefaultFunction),
                         ),
             )
 
@@ -746,6 +974,32 @@ public class SqlDialectSourcePatterns(
                             "WHEN MATCHED",
                             "WHEN NOT MATCHED",
                             roles = setOf(ClauseBoundary),
+                        ) +
+                        sourcePatterns(
+                            "BACKUP DATABASE",
+                            "CHECKPOINT",
+                            "PERFORM EXPORT",
+                            "PERFORM IMPORT",
+                            "SCRIPT",
+                            "SHUTDOWN",
+                            roles = setOf(SystemOperationStatement),
+                        ) +
+                        sourcePatterns(
+                            "SET DATABASE",
+                            "SET FILES",
+                            roles = setOf(DatabaseFileSettingStatement),
+                        ) +
+                        sourcePatterns(
+                            "CREATE TEXT TABLE",
+                            roles = setOf(TextTableSourceStatement),
+                        ) +
+                        sourcePatterns(
+                            "SET TABLE",
+                            roles = setOf(TextTableSourceBindingStart),
+                        ) +
+                        sourcePatterns(
+                            "SOURCE",
+                            roles = setOf(TextTableSourceClause),
                         ) +
                         sourcePatterns(
                             "FETCH",
