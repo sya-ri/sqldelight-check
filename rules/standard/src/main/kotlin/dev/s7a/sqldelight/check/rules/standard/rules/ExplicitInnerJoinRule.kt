@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,9 +27,9 @@ public class ExplicitInnerJoinRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("join")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
             if (tokens.hasJoinTypePrefix(index)) return@forEachIndexed
-            if (!tokens.hasJoinCondition(index, content)) return@forEachIndexed
+            if (!tokens.hasJoinCondition(index, content, context.database.dialect.sourcePatterns)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(
@@ -42,25 +45,27 @@ public class ExplicitInnerJoinRule : Rule {
 }
 
 private fun List<SqlToken>.hasJoinTypePrefix(joinIndex: Int): Boolean {
-    val previous = getOrNull(joinIndex - 1)?.normalizedText ?: return false
-    if (previous in explicitJoinPrefixes) return true
-    if (previous != "outer") return false
-    return getOrNull(joinIndex - 2)?.normalizedText in outerJoinPrefixes
+    val previous = getOrNull(joinIndex - 1) ?: return false
+    if (explicitJoinPrefixTerms.any { term -> previous.isTerm(term) }) return true
+    if (!previous.isTerm(SqlDialectSourceTerm.Outer)) return false
+    val beforeOuter = getOrNull(joinIndex - 2) ?: return false
+    return outerJoinPrefixTerms.any { term -> beforeOuter.isTerm(term) }
 }
 
 private fun List<SqlToken>.hasJoinCondition(
     joinIndex: Int,
     content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Boolean {
     val join = get(joinIndex)
     val joinDepth = content.sqlParenthesisDepthAt(join.startOffset)
     val statementEnd = content.statementEndAfter(join.startOffset)
-    val segmentEnd = conditionedJoinSegmentEnd(joinIndex + 1, statementEnd, joinDepth, content)
+    val segmentEnd = conditionedJoinSegmentEnd(joinIndex + 1, statementEnd, joinDepth, content, sourcePatterns)
     return asSequence()
         .drop(joinIndex + 1)
         .takeWhile { token -> token.startOffset < segmentEnd }
         .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == joinDepth }
-        .any { token -> token.isKeyword("on") || token.isKeyword("using") }
+        .any { token -> token.isTerm(SqlDialectSourceTerm.On) || token.isTerm(SqlDialectSourceTerm.Using) }
 }
 
 private fun List<SqlToken>.conditionedJoinSegmentEnd(
@@ -68,31 +73,34 @@ private fun List<SqlToken>.conditionedJoinSegmentEnd(
     statementEnd: Int,
     joinDepth: Int,
     content: String,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     asSequence()
         .drop(startIndex)
-        .firstOrNull { token ->
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
                 content.sqlParenthesisDepthAt(token.startOffset) == joinDepth &&
-                (token.isKeyword("join") || token.normalizedText in conditionedJoinBoundaryKeywords)
+                (
+                    token.isTerm(SqlDialectSourceTerm.Join) ||
+                        sourcePatterns.matches(
+                            SqlDialectSourcePatternRole.JoinConditionBoundary,
+                            normalizedTextsFrom(startIndex + relativeIndex),
+                        )
+                )
         }
+        ?.value
         ?.startOffset
         ?: statementEnd
 
-private val explicitJoinPrefixes = setOf("cross", "full", "inner", "left", "natural", "right")
-
-private val outerJoinPrefixes = setOf("full", "left", "right")
-
-private val conditionedJoinBoundaryKeywords =
+private val explicitJoinPrefixTerms =
     setOf(
-        "except",
-        "group",
-        "having",
-        "intersect",
-        "limit",
-        "offset",
-        "order",
-        "union",
-        "where",
-        "window",
+        SqlDialectSourceTerm.Cross,
+        SqlDialectSourceTerm.Full,
+        SqlDialectSourceTerm.Inner,
+        SqlDialectSourceTerm.Left,
+        SqlDialectSourceTerm.Natural,
+        SqlDialectSourceTerm.Right,
     )
+
+private val outerJoinPrefixTerms = setOf(SqlDialectSourceTerm.Full, SqlDialectSourceTerm.Left, SqlDialectSourceTerm.Right)

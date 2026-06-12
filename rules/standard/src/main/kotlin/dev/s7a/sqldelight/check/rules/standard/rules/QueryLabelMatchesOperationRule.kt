@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.SourceFileKind
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -42,22 +43,28 @@ public class QueryLabelMatchesOperationRule : Rule {
 }
 
 private data class SqlDelightOperation(
-    val keyword: String,
+    val term: SqlDialectSourceTerm,
     val expectedPrefixes: Set<String>,
 )
 
 private fun String.operationAfter(offset: Int): SqlDelightOperation? =
     sqlTokens()
         .dropWhile { token -> token.startOffset < offset }
-        .firstOrNull { token -> sqlParenthesisDepthAt(token.startOffset) == 0 && token.normalizedText in operationPrefixes }
-        ?.let { token -> SqlDelightOperation(keyword = token.normalizedText, expectedPrefixes = operationPrefixes.getValue(token.normalizedText)) }
+        .firstNotNullOfOrNull { token ->
+            val term = operationPrefixTerms.keys.firstOrNull { term -> token.isTerm(term) }
+            if (term == null || sqlParenthesisDepthAt(token.startOffset) != 0) {
+                null
+            } else {
+                SqlDelightOperation(term = term, expectedPrefixes = operationPrefixTerms.getValue(term))
+            }
+        }
 
 private fun String.startsWithAny(prefixes: Set<String>): Boolean = prefixes.any { prefix -> startsWith(prefix) }
 
-private val operationPrefixes =
+private val operationPrefixTerms =
     mapOf(
-        "select" to setOf("select", "find", "get", "list", "count", "exists"),
-        "insert" to setOf("insert", "add", "create", "upsert"),
-        "update" to setOf("update", "set", "upsert"),
-        "delete" to setOf("delete", "remove"),
+        SqlDialectSourceTerm.Select to setOf("select", "find", "get", "list", "count", "exists"),
+        SqlDialectSourceTerm.Insert to setOf("insert", "add", "create", "upsert"),
+        SqlDialectSourceTerm.Update to setOf("update", "set", "upsert"),
+        SqlDialectSourceTerm.Delete to setOf("delete", "remove"),
     )

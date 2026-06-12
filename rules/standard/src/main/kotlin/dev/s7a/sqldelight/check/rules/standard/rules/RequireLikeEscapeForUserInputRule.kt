@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,13 +26,19 @@ public class RequireLikeEscapeForUserInputRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("like")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Like)) return@forEachIndexed
 
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val predicateEnd = tokens.firstBoundaryOffsetAfter(index + 1, statementEnd, likePredicateBoundaryKeywords)
+            val predicateEnd =
+                tokens.firstBoundaryOffsetAfter(
+                    index + 1,
+                    statementEnd,
+                    context.database.dialect.sourcePatterns,
+                    setOf(SqlDialectSourcePatternRole.BooleanOperator, SqlDialectSourcePatternRole.PredicateBoundary),
+                )
             if (!content.hasNamedParameterBetween(token.endOffset, predicateEnd)) return@forEachIndexed
             if (tokens.any { candidate ->
-                    candidate.startOffset in token.endOffset until predicateEnd && candidate.isKeyword("escape")
+                    candidate.startOffset in token.endOffset until predicateEnd && candidate.isTerm(SqlDialectSourceTerm.Escape)
                 }
             ) {
                 return@forEachIndexed
@@ -62,6 +70,3 @@ private fun String.hasNamedParameterBetween(
         }
 
 private fun Char?.isLikeParameterNameStart(): Boolean = this == '_' || this?.isLetter() == true
-
-private val likePredicateBoundaryKeywords =
-    setOf("and", "except", "group", "having", "intersect", "limit", "offset", "or", "order", "union", "where")

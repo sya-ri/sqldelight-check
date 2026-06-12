@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -35,7 +36,7 @@ public class NoUnnecessaryStatementParenthesesRule : Rule {
                 val select =
                     tokens.firstOrNull { token ->
                             token.startOffset in (openOffset + 1)..<closeOffset &&
-                            token.isKeyword("select")
+                            token.isTerm(SqlDialectSourceTerm.Select)
                     } ?: return@forEach
                 if (content.sqlParenthesisDepthAt(select.startOffset) != 1) return@forEach
                 if (tokens.any { token -> token.startOffset in (openOffset + 1)..<select.startOffset }) return@forEach

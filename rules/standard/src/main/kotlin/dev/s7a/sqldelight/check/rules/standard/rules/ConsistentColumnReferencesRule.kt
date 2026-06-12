@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,17 +26,27 @@ public class ConsistentColumnReferencesRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("group") && !token.isKeyword("order")) return@forEachIndexed
-            val by = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("by") }
+            val clause =
+                when {
+                    token.isTerm(SqlDialectSourceTerm.Group) -> ColumnReferenceClause.GroupBy
+                    token.isTerm(SqlDialectSourceTerm.Order) -> ColumnReferenceClause.OrderBy
+                    else -> return@forEachIndexed
+                }
+            val by = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.By) }
                 ?: return@forEachIndexed
             if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
 
             val clauseName = "${token.text.uppercase()} ${by.text.uppercase()}"
-            val boundaryKeywords =
-                if (token.isKeyword("group")) groupByReferenceBoundaryKeywords else orderByReferenceBoundaryKeywords
+            val boundaryRole =
+                if (clause == ColumnReferenceClause.GroupBy) {
+                    SqlDialectSourcePatternRole.GroupByBoundary
+                } else {
+                    SqlDialectSourcePatternRole.OrderByBoundary
+                }
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val clauseEnd = tokens.firstBoundaryOffsetAfter(index + 2, statementEnd, boundaryKeywords)
-            val references = content.columnReferenceKinds(by.endOffset, clauseEnd, token.normalizedText)
+            val clauseEnd =
+                tokens.firstBoundaryOffsetAfter(index + 2, statementEnd, context.database.dialect.sourcePatterns, boundaryRole)
+            val references = content.columnReferenceKinds(by.endOffset, clauseEnd, clause)
             if (
                 references.size < 2 ||
                 references.all { it == ColumnReferenceKind.Ordinal } ||
@@ -58,6 +70,11 @@ public class ConsistentColumnReferencesRule : Rule {
     }
 }
 
+private enum class ColumnReferenceClause {
+    GroupBy,
+    OrderBy,
+}
+
 private enum class ColumnReferenceKind {
     Ordinal,
     Named,
@@ -71,10 +88,10 @@ private data class ColumnReferenceItem(
 private fun String.columnReferenceKinds(
     startOffset: Int,
     endOffset: Int,
-    clauseKeyword: String,
+    clause: ColumnReferenceClause,
 ): List<ColumnReferenceKind> =
     topLevelColumnReferenceItems(startOffset, endOffset)
-        .mapNotNull { item -> columnReferenceKind(item, clauseKeyword) }
+        .mapNotNull { item -> columnReferenceKind(item, clause) }
 
 private fun String.topLevelColumnReferenceItems(
     startOffset: Int,
@@ -103,12 +120,12 @@ private fun String.topLevelColumnReferenceItems(
 
 private fun String.columnReferenceKind(
     item: ColumnReferenceItem,
-    clauseKeyword: String,
+    clause: ColumnReferenceClause,
 ): ColumnReferenceKind? {
     val text = substring(item.startOffset, item.endOffset).trim()
     if (text.isEmpty()) return null
     val reference =
-        if (clauseKeyword == "order") {
+        if (clause == ColumnReferenceClause.OrderBy) {
             text.withoutOrderBySuffix()
         } else {
             text
@@ -121,7 +138,7 @@ private fun String.withoutOrderBySuffix(): String {
     val words = text.split(' ')
     if (
         words.size >= 3 &&
-        words[words.lastIndex - 1].equals("nulls", ignoreCase = true) &&
+        words[words.lastIndex - 1].equals(SqlDialectSourceTerm.Nulls.normalizedText, ignoreCase = true) &&
         words.last().isNullsPlacement()
     ) {
         text = words.dropLast(2).joinToString(" ")
@@ -133,34 +150,14 @@ private fun String.withoutOrderBySuffix(): String {
     return text.trim()
 }
 
-private fun String.isOrderDirection(): Boolean = equals("asc", ignoreCase = true) || equals("desc", ignoreCase = true)
+private fun String.isOrderDirection(): Boolean =
+    equals(SqlDialectSourceTerm.Asc.normalizedText, ignoreCase = true) ||
+        equals(SqlDialectSourceTerm.Desc.normalizedText, ignoreCase = true)
 
-private fun String.isNullsPlacement(): Boolean = equals("first", ignoreCase = true) || equals("last", ignoreCase = true)
+private fun String.isNullsPlacement(): Boolean =
+    equals(SqlDialectSourceTerm.First.normalizedText, ignoreCase = true) ||
+        equals(SqlDialectSourceTerm.Last.normalizedText, ignoreCase = true)
 
 private val ordinalReferenceRegex = Regex("[0-9]+")
 
 private val horizontalWhitespaceRegex = Regex("[ \\t\\r\\n]+")
-
-private val groupByReferenceBoundaryKeywords =
-    setOf(
-        "except",
-        "having",
-        "intersect",
-        "limit",
-        "offset",
-        "order",
-        "union",
-        "where",
-        "window",
-    )
-
-private val orderByReferenceBoundaryKeywords =
-    setOf(
-        "except",
-        "fetch",
-        "intersect",
-        "limit",
-        "offset",
-        "union",
-        "where",
-    )

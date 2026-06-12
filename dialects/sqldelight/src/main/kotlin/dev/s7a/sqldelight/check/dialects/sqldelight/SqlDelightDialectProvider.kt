@@ -5,7 +5,7 @@ import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
-import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 
 private const val SQLDELIGHT_GROUP = "app.cash.sqldelight"
 private const val DIALECT_SUFFIX = "-dialect"
@@ -34,26 +34,26 @@ private val SQLiteDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.SQLite,
         capabilities = setOf(DialectCapability.SQLite),
-        sourceKeywords = SqlDialectSourceKeywords.SQLite,
+        sourcePatterns = SqlDialectSourcePatterns.SQLite,
     )
 
 private val MySqlDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.MySql,
         capabilities = setOf(DialectCapability.MySql),
-        sourceKeywords = SqlDialectSourceKeywords.MySql,
+        sourcePatterns = SqlDialectSourcePatterns.MySql,
     )
 
 private val PostgreSqlDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.PostgreSql,
         capabilities = setOf(DialectCapability.PostgreSql),
-        sourceKeywords = SqlDialectSourceKeywords.PostgreSql,
+        sourcePatterns = SqlDialectSourcePatterns.PostgreSql,
     )
 
 private val HsqlDialect: SqlDialect =
     SqlDialect(
         family = DialectFamily.Hsql,
         capabilities = setOf(DialectCapability.Hsql),
-        sourceKeywords = SqlDialectSourceKeywords.Hsql,
+        sourcePatterns = SqlDialectSourcePatterns.Hsql,
     )

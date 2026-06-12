@@ -5,7 +5,9 @@ import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
-import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -141,7 +143,7 @@ class SourceSqlFactsExtractorTest {
     }
 
     @Test
-    fun `uses dialect source keywords for table reference boundaries`() {
+    fun `uses dialect source patterns for table reference boundaries`() {
         val content =
             """
             SELECT player.id
@@ -151,9 +153,11 @@ class SourceSqlFactsExtractorTest {
         val dialect =
             SqlDialect(
                 family = DialectFamily.Custom,
-                sourceKeywords =
-                    SqlDialectSourceKeywords.SourceScannerDefault.extend(
-                        addTableReferenceBoundaryKeywords = setOf("sample"),
+                sourcePatterns =
+                    SqlDialectSourcePatterns(
+                        patterns =
+                            SqlDialectSourcePatterns.SourceScannerDefault.patterns +
+                                SqlDialectSourcePattern.parse("SAMPLE", TableReferenceBoundary),
                     ),
             )
 

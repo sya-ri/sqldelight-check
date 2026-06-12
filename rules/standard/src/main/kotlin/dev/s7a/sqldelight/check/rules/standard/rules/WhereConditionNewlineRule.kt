@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,7 +27,7 @@ public class WhereConditionNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("where")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Where)) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             val statementEnd = content.statementEndAfter(token.startOffset)
             val clauseEnd =
@@ -34,7 +36,8 @@ public class WhereConditionNewlineRule : Rule {
                     startIndex = index + 1,
                     statementEnd = statementEnd,
                     depth = depth,
-                    boundaryKeywords = whereConditionBoundaryKeywords,
+                    sourcePatterns = context.database.dialect.sourcePatterns,
+                    role = SqlDialectSourcePatternRole.PredicateBoundary,
                 )
             if (!content.substring(token.endOffset, clauseEnd).contains('\n')) return@forEachIndexed
 
@@ -45,9 +48,9 @@ public class WhereConditionNewlineRule : Rule {
                 .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == depth }
                 .forEach { candidate ->
                     when {
-                        candidate.isKeyword("between") -> pendingBetween = true
-                        candidate.isKeyword("and") && pendingBetween -> pendingBetween = false
-                        candidate.normalizedText in booleanOperatorsForWhere -> {
+                        candidate.isTerm(SqlDialectSourceTerm.Between) -> pendingBetween = true
+                        candidate.isTerm(SqlDialectSourceTerm.And) && pendingBetween -> pendingBetween = false
+                        candidate.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.BooleanOperator) -> {
                             val line = lines.lineContaining(candidate.startOffset) ?: return@forEach
                             if (line.firstNonWhitespaceOffset == candidate.startOffset) return@forEach
                             reporter.report(
@@ -65,15 +68,3 @@ public class WhereConditionNewlineRule : Rule {
         }
     }
 }
-
-private val booleanOperatorsForWhere = setOf("and", "or")
-
-private val whereConditionBoundaryKeywords =
-    setOf(
-        "group",
-        "having",
-        "limit",
-        "offset",
-        "order",
-        "union",
-    )

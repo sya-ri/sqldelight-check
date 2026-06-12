@@ -65,6 +65,7 @@ internal fun Rule.diagnostics(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
     facts: SqlFacts = SqlFacts(),
+    dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
 ): List<Diagnostic> {
     val diagnostics = mutableListOf<Diagnostic>()
     run(
@@ -73,7 +74,7 @@ internal fun Rule.diagnostics(
                 override val database: DatabaseContext =
                     DatabaseContext(
                         name = "Database",
-                        dialect = SqlDialect(family = DialectFamily.SQLite),
+                        dialect = dialect,
                     )
                 override val file: SourceFile = SourceFile(path = path, content = content)
                 override val options: Map<String, String> = options
@@ -104,8 +105,9 @@ internal fun Rule.assertDiagnosticCount(
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
     facts: SqlFacts = SqlFacts(),
+    dialect: SqlDialect = SqlDialect(family = DialectFamily.SQLite),
 ) {
-    assertEquals(expected, diagnostics(content, path, options, facts).size)
+    assertEquals(expected, diagnostics(content, path, options, facts, dialect).size)
 }
 
 internal fun Rule.singleReplacement(

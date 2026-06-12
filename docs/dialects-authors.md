@@ -33,8 +33,11 @@ import dev.s7a.sqldelight.check.api.DialectCapability
 import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
-import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.sourcePatterns
 
 class ExampleDialectProvider : SqlDialectProvider {
     override fun resolve(coordinate: SqlDialectCoordinate): SqlDialect? {
@@ -44,9 +47,16 @@ class ExampleDialectProvider : SqlDialectProvider {
         return SqlDialect(
             family = DialectFamily.Custom,
             capabilities = setOf(DialectCapability("example")),
-            sourceKeywords =
-                SqlDialectSourceKeywords.SourceScannerDefault.extend(
-                    addTableReferenceBoundaryKeywords = setOf("sample"),
+            sourcePatterns =
+                SqlDialectSourcePatterns(
+                    patterns =
+                        SqlDialectSourcePatterns.SourceScannerDefault.patterns +
+                            sourcePatterns("SAMPLE", roles = setOf(TableReferenceBoundary)) +
+                            sourcePatterns(
+                                "QUALIFY",
+                                "MATCH RECOGNIZE",
+                                roles = setOf(ClauseBoundary),
+                            ),
                 ),
         )
     }
@@ -73,19 +83,43 @@ override built-in SQLDelight dialect metadata when needed. Third-party providers
 unrelated coordinates.
 
 When no provider resolves a coordinate, sqldelight-check falls back to `DialectFamily.Custom` with
-`SqlDialectSourceKeywords.SourceScannerDefault`.
+`SqlDialectSourcePatterns.SourceScannerDefault`.
 
-## Source Scanner Keywords
+## Source Scanner Patterns
 
-`SqlDialectSourceKeywords` configures conservative source-text facts used by rules. It is not a parser grammar. Start
-from `SourceScannerDefault` and use `extend(...)` for dialect-specific additions or removals:
+`SqlDialectSourcePatterns` configures conservative source-text facts used by rules. It is not a parser grammar and does
+not validate whether a statement is accepted by a specific engine version. SQLDelight's parser is responsible for
+accepting or rejecting concrete SQL. Built-in presets describe broad dialect-family syntax so source-text rules do not
+misread valid-looking dialect constructs. Each source pattern has one or more roles describing what the syntax means to
+source-text rules. Start from `SourceScannerDefault.patterns` and add dialect-specific patterns:
 
 ```kotlin
-SqlDialectSourceKeywords.SourceScannerDefault.extend(
-    addTableReferenceBoundaryKeywords = setOf("for"),
-    removeJoinModifierKeywords = setOf("right"),
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinModifier
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
+import dev.s7a.sqldelight.check.api.sourcePatterns
+import dev.s7a.sqldelight.check.api.withoutExpressions
+
+SqlDialectSourcePatterns(
+    patterns =
+        SqlDialectSourcePatterns.SourceScannerDefault.patterns
+            .withoutExpressions("RIGHT [OUTER] JOIN") +
+            sourcePatterns("FOR", roles = setOf(TableReferenceBoundary, ClauseBoundary)) +
+            sourcePatterns(
+                "QUALIFY",
+                "MATCH RECOGNIZE",
+                "FETCH {FIRST|NEXT} [ROW|ROWS]",
+                roles = setOf(ClauseBoundary),
+            ) +
+            sourcePatterns("NATURAL", roles = setOf(JoinModifier)),
 )
 ```
 
-Built-in SQLDelight dialect metadata uses dedicated source keyword presets such as `SqlDialectSourceKeywords.MySql` and
-`SqlDialectSourceKeywords.PostgreSql`.
+Source patterns are shared across conservative source-text rules. For example, `TableReferenceBoundary` ends table
+reference scanning, `AliasBoundary` prevents reserved constructs from being treated as implicit aliases, and
+`StatementStart` marks top-level statement boundaries. Patterns support required terms, optional terms with `[TERM]`,
+alternatives with `{A|B}`, and optional alternatives with `[A|B]`. Use `sourcePatterns` when adding patterns with the
+same roles, and use `withoutExpressions` when a dialect removes or changes a default source pattern.
+
+Built-in SQLDelight dialect metadata uses dedicated source pattern presets such as `SqlDialectSourcePatterns.MySql` and
+`SqlDialectSourcePatterns.PostgreSql`.

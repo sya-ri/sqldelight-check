@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -186,7 +187,7 @@ private fun String.isUnarySign(offset: Int): Boolean {
     if (this[offset] !in setOf('+', '-')) return false
     val previous = previousNonHorizontalWhitespace(offset) ?: return true
     return previous in setOf('(', ',', '=', '<', '>', '!', '+', '-', '*', '/', '%', '|') ||
-        previousKeywordBefore(offset) in unarySignPrecedingKeywords
+        previousTermBefore(offset)?.let { term -> term in unarySignPrecedingTerms } == true
 }
 
 private fun String.previousNonHorizontalWhitespace(offset: Int): Char? {
@@ -197,33 +198,26 @@ private fun String.previousNonHorizontalWhitespace(offset: Int): Char? {
     return getOrNull(index)
 }
 
-private fun String.previousKeywordBefore(offset: Int): String? {
-    var index = offset - 1
-    while (index >= 0 && this[index].isHorizontalWhitespace()) {
-        index--
-    }
-    val end = index + 1
-    while (index >= 0 && (this[index] == '_' || this[index].isLetterOrDigit())) {
-        index--
-    }
-    if (index + 1 == end) return null
-    return substring(index + 1, end).lowercase()
-}
+private fun String.previousTermBefore(offset: Int): SqlDialectSourceTerm? =
+    sqlTokens()
+        .takeWhile { token -> token.endOffset <= offset }
+        .lastOrNull()
+        ?.let { token -> unarySignPrecedingTerms.firstOrNull { term -> token.isTerm(term) } }
 
 private fun Char.isHorizontalWhitespace(): Boolean = this == ' ' || this == '\t'
 
 private fun Char.isComparisonOperatorCharacter(): Boolean = this in setOf('<', '>', '!', '=')
 
-private val unarySignPrecedingKeywords =
+private val unarySignPrecedingTerms =
     setOf(
-        "and",
-        "by",
-        "else",
-        "or",
-        "select",
-        "set",
-        "then",
-        "values",
-        "when",
-        "where",
+        SqlDialectSourceTerm.And,
+        SqlDialectSourceTerm.By,
+        SqlDialectSourceTerm.Else,
+        SqlDialectSourceTerm.Or,
+        SqlDialectSourceTerm.Select,
+        SqlDialectSourceTerm.Set,
+        SqlDialectSourceTerm.Then,
+        SqlDialectSourceTerm.Values,
+        SqlDialectSourceTerm.When,
+        SqlDialectSourceTerm.Where,
     )

@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,7 +24,7 @@ public class NoLeadingWildcardLikeRule : Rule {
     ) {
         val content = context.file.content
         content.sqlTokens()
-            .filter { token -> token.isKeyword("like") }
+            .filter { token -> token.isTerm(SqlDialectSourceTerm.Like) }
             .forEach { token ->
                 val literalStart = content.nextNonWhitespaceOffset(token.endOffset)
                 if (content.getOrNull(literalStart) != '\'') return@forEach

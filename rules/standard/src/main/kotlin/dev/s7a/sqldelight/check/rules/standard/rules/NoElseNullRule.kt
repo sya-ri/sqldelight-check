@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -26,11 +27,11 @@ public class NoElseNullRule : Rule {
         var caseDepth = 0
         tokens.forEachIndexed { index, token ->
             when {
-                token.isKeyword("case") -> caseDepth++
-                token.isKeyword("end") && caseDepth > 0 -> caseDepth--
-                token.isKeyword("else") && caseDepth > 0 -> {
+                token.isTerm(SqlDialectSourceTerm.Case) -> caseDepth++
+                token.isTerm(SqlDialectSourceTerm.End) && caseDepth > 0 -> caseDepth--
+                token.isTerm(SqlDialectSourceTerm.Else) && caseDepth > 0 -> {
                     val next = tokens.getOrNull(index + 1)
-                    if (next?.isKeyword("null") != true) return@forEachIndexed
+                    if (next?.isTerm(SqlDialectSourceTerm.Null) != true) return@forEachIndexed
 
                     reporter.report(
                         RuleDiagnostic(

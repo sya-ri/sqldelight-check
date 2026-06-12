@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,10 +26,10 @@ public class SelectModifierLinePositionRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
 
             val modifier = tokens.getOrNull(index + 1) ?: return@forEachIndexed
-            if (modifier.normalizedText !in selectModifiers) return@forEachIndexed
+            if (selectModifierTerms.none { term -> modifier.isTerm(term) }) return@forEachIndexed
 
             val selectLine = lines.lineContaining(token.startOffset) ?: return@forEachIndexed
             val modifierLine = lines.lineContaining(modifier.startOffset) ?: return@forEachIndexed
@@ -47,4 +48,4 @@ public class SelectModifierLinePositionRule : Rule {
     }
 }
 
-private val selectModifiers = setOf("all", "distinct")
+private val selectModifierTerms = setOf(SqlDialectSourceTerm.All, SqlDialectSourceTerm.Distinct)

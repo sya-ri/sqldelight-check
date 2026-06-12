@@ -25,7 +25,7 @@ public class UniqueColumnAliasesRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        content.resultColumnAliases()
+        content.resultColumnAliases(context.database.dialect.sourcePatterns)
             .groupBy { alias -> alias.selectStartOffset }
             .values
             .forEach { aliases ->

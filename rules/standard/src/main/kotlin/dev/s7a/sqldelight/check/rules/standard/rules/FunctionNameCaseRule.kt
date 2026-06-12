@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -27,7 +28,7 @@ public class FunctionNameCaseRule : Rule {
         val content = context.file.content
         content
             .sqlTokens()
-            .filter { token -> token.text.lowercase() in commonSqlFunctions }
+            .filter { token -> token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.CommonFunctionName) }
             .filter { token -> content.nextNonHorizontalWhitespace(token.endOffset) == '(' }
             .filterNot { token -> token.text == token.text.uppercase() }
             .forEach { token ->

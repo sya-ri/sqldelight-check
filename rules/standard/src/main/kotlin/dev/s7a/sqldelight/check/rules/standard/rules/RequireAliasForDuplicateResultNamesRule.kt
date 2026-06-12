@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -46,7 +47,7 @@ private fun String.visibleResultName(target: SourceSelectTarget): String? {
     if (tokens.size >= 2) {
         val previous = tokens[tokens.lastIndex - 1]
         val last = tokens.last()
-        if (previous.isKeyword("as") || previous.endOffset < last.startOffset) return last.text
+        if (previous.isTerm(SqlDialectSourceTerm.As) || previous.endOffset < last.startOffset) return last.text
     }
     return tokens.last().text.takeUnless { name -> name == "*" }
 }

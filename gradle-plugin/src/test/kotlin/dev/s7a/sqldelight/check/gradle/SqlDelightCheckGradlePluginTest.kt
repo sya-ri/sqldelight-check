@@ -1350,7 +1350,7 @@ class SqlDelightCheckGradlePluginTest {
                 import dev.s7a.sqldelight.check.api.SqlDialect;
                 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate;
                 import dev.s7a.sqldelight.check.api.SqlDialectProvider;
-                import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords;
+                import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns;
                 import java.util.Collections;
 
                 public final class ExternalDialectProvider implements SqlDialectProvider {
@@ -1365,7 +1365,7 @@ class SqlDelightCheckGradlePluginTest {
                         return new SqlDialect(
                             DialectFamily.Custom,
                             Collections.singleton(new DialectCapability("external")),
-                            new SqlDialectSourceKeywords()
+                            new SqlDialectSourcePatterns()
                         );
                     }
                 }

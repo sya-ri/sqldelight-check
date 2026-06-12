@@ -5,7 +5,7 @@ import dev.s7a.sqldelight.check.api.DialectFamily
 import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.api.SqlDialectProvider
-import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import java.util.ServiceLoader
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,7 +22,7 @@ class SqlDelightDialectProviderTest {
             SqlDialect(
                 family = DialectFamily.SQLite,
                 capabilities = setOf(DialectCapability.SQLite),
-                sourceKeywords = SqlDialectSourceKeywords.SQLite,
+                sourcePatterns = SqlDialectSourcePatterns.SQLite,
             ),
             SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
@@ -36,7 +36,7 @@ class SqlDelightDialectProviderTest {
             SqlDialect(
                 family = DialectFamily.MySql,
                 capabilities = setOf(DialectCapability.MySql),
-                sourceKeywords = SqlDialectSourceKeywords.MySql,
+                sourcePatterns = SqlDialectSourcePatterns.MySql,
             ),
             SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
@@ -50,7 +50,7 @@ class SqlDelightDialectProviderTest {
             SqlDialect(
                 family = DialectFamily.PostgreSql,
                 capabilities = setOf(DialectCapability.PostgreSql),
-                sourceKeywords = SqlDialectSourceKeywords.PostgreSql,
+                sourcePatterns = SqlDialectSourcePatterns.PostgreSql,
             ),
             SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(
@@ -64,7 +64,7 @@ class SqlDelightDialectProviderTest {
             SqlDialect(
                 family = DialectFamily.Hsql,
                 capabilities = setOf(DialectCapability.Hsql),
-                sourceKeywords = SqlDialectSourceKeywords.Hsql,
+                sourcePatterns = SqlDialectSourcePatterns.Hsql,
             ),
             SqlDelightDialectProvider().resolve(
                 SqlDialectCoordinate(

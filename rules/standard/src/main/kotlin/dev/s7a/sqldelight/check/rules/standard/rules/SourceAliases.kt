@@ -1,6 +1,8 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.api.SqlDialectSourceKeywords
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 
 internal data class TableReference(
     val statementStartOffset: Int,
@@ -20,17 +22,17 @@ internal enum class TableReferenceIntroducer {
 }
 
 internal fun String.tableReferences(
-    sourceKeywords: SqlDialectSourceKeywords = SqlDialectSourceKeywords.SourceScannerDefault,
+    sourcePatterns: SqlDialectSourcePatterns = SqlDialectSourcePatterns.SourceScannerDefault,
 ): List<TableReference> {
     val tokens = sqlTokens().toList()
     val references = mutableListOf<TableReference>()
     tokens.forEachIndexed { index, token ->
-        if (!token.isKeyword("from") && !token.isKeyword("join")) return@forEachIndexed
+        if (!token.isTerm(SqlDialectSourceTerm.From) && !token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
 
         val depth = sqlParenthesisDepthAt(token.startOffset)
         val statementStart = statementStartBefore(token.startOffset)
         val statementEnd = statementEndAfter(token.startOffset)
-        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth, sourceKeywords)
+        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth, sourcePatterns)
         references +=
             tableReferencesAfterKeyword(
                 tokens = tokens,
@@ -38,7 +40,7 @@ internal fun String.tableReferences(
                 boundaryOffset = boundary,
                 depth = depth,
                 statementStart = statementStart,
-                introducedBy = if (token.isKeyword("join")) TableReferenceIntroducer.Join else TableReferenceIntroducer.From,
+                introducedBy = if (token.isTerm(SqlDialectSourceTerm.Join)) TableReferenceIntroducer.Join else TableReferenceIntroducer.From,
             )
     }
     return references
@@ -81,10 +83,10 @@ private fun String.tableReferenceInSegment(
         if (closeOffset >= endOffset) return null
         val select =
             tokens.firstOrNull { token ->
-                token.startOffset > open.offset &&
-                    token.startOffset < closeOffset &&
-                    token.isKeyword("select") &&
-                    sqlParenthesisDepthAt(token.startOffset) == depth + 1
+                    token.startOffset > open.offset &&
+                        token.startOffset < closeOffset &&
+                    token.isTerm(SqlDialectSourceTerm.Select) &&
+                        sqlParenthesisDepthAt(token.startOffset) == depth + 1
             } ?: return null
         if (tokens.any { token -> token.startOffset in (open.offset + 1)..<select.startOffset }) return null
 
@@ -157,7 +159,7 @@ private fun String.aliasAfterSource(
         }
     if (aliasTokens.isEmpty()) return null
     val first = aliasTokens.first()
-    return if (first.isKeyword("as")) {
+    return if (first.isTerm(SqlDialectSourceTerm.As)) {
         aliasTokens.getOrNull(1)?.let { token -> AliasToken(token = token, usesAs = true) }
     } else {
         AliasToken(token = first, usesAs = false)
@@ -169,16 +171,17 @@ private fun String.firstReferenceBoundaryAfter(
     startIndex: Int,
     statementEnd: Int,
     depth: Int,
-    sourceKeywords: SqlDialectSourceKeywords,
+    sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     tokens
         .asSequence()
         .drop(startIndex)
-        .firstOrNull { token ->
+        .withIndex()
+        .firstOrNull { (relativeIndex, token) ->
                 token.startOffset < statementEnd &&
                 sqlParenthesisDepthAt(token.startOffset) == depth &&
-                token.normalizedText in sourceKeywords.tableReferenceBoundaryKeywords
-        }?.startOffset
+                sourcePatterns.matches(TableReferenceBoundary, tokens.normalizedTextsFrom(startIndex + relativeIndex))
+        }?.value?.startOffset
         ?: statementEnd
 
 private fun String.statementStartBefore(offset: Int): Int =

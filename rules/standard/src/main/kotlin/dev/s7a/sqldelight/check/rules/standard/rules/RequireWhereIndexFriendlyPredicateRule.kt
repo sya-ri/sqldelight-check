@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,13 +26,21 @@ public class RequireWhereIndexFriendlyPredicateRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("where")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Where)) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val boundary = tokens.firstBoundaryOffsetAfter(index + 1, statementEnd, wherePredicateBoundaryKeywords)
+            val boundary =
+                tokens.firstBoundaryOffsetAfter(
+                    index + 1,
+                    statementEnd,
+                    context.database.dialect.sourcePatterns,
+                    SqlDialectSourcePatternRole.PredicateBoundary,
+                )
             tokens
                 .drop(index + 1)
                 .takeWhile { candidate -> candidate.startOffset < boundary }
-                .filter { candidate -> candidate.normalizedText in nonSargableFunctionNames }
+                .filter { candidate ->
+                    candidate.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.IndexUnfriendlyFunction)
+                }
                 .filter { candidate -> content.functionCallFeedsComparison(candidate) }
                 .forEach { function ->
                     reporter.report(
@@ -46,10 +56,6 @@ public class RequireWhereIndexFriendlyPredicateRule : Rule {
         }
     }
 }
-
-private val nonSargableFunctionNames = setOf("coalesce", "date", "ifnull", "lower", "substr", "substring", "trim", "upper")
-
-private val wherePredicateBoundaryKeywords = setOf("except", "group", "having", "intersect", "limit", "offset", "order", "union", "window")
 
 private fun String.functionCallFeedsComparison(function: SqlToken): Boolean {
     val open = nextNonHorizontalWhitespaceOffset(function.endOffset) ?: return false

@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,7 +26,7 @@ public class CaseBranchNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("case")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Case)) return@forEachIndexed
             val depth = content.sqlParenthesisDepthAt(token.startOffset)
             val caseEnd = tokens.caseEndOffset(index + 1, depth, content) ?: return@forEachIndexed
             if (!content.substring(token.startOffset, caseEnd).contains('\n')) return@forEachIndexed
@@ -64,9 +65,9 @@ private fun List<SqlToken>.caseEndOffset(
         .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == depth }
         .forEach { token ->
             when {
-                token.isKeyword("case") -> nestedCases++
-                token.isKeyword("end") && nestedCases > 0 -> nestedCases--
-                token.isKeyword("end") -> return token.endOffset
+                token.isTerm(SqlDialectSourceTerm.Case) -> nestedCases++
+                token.isTerm(SqlDialectSourceTerm.End) && nestedCases > 0 -> nestedCases--
+                token.isTerm(SqlDialectSourceTerm.End) -> return token.endOffset
             }
         }
     return null
@@ -77,11 +78,16 @@ private fun Sequence<SqlToken>.branchTokensForOuterCase(): Sequence<SqlToken> =
         var nestedCases = 0
         forEach { token ->
             when {
-                token.isKeyword("case") -> nestedCases++
-                token.isKeyword("end") && nestedCases > 0 -> nestedCases--
-                nestedCases == 0 && token.normalizedText in caseBranchKeywords -> yield(token)
+                token.isTerm(SqlDialectSourceTerm.Case) -> nestedCases++
+                token.isTerm(SqlDialectSourceTerm.End) && nestedCases > 0 -> nestedCases--
+                nestedCases == 0 && caseBranchTerms.any { term -> token.isTerm(term) } -> yield(token)
             }
         }
     }
 
-private val caseBranchKeywords = setOf("when", "then", "else")
+private val caseBranchTerms =
+    setOf(
+        SqlDialectSourceTerm.When,
+        SqlDialectSourceTerm.Then,
+        SqlDialectSourceTerm.Else,
+    )

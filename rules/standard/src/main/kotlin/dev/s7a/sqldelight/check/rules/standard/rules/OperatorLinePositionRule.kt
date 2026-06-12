@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -56,11 +57,11 @@ private fun String.shouldSkipLinePositionOperator(
     val operatorText = substring(operator.startOffset, operator.endOffset)
     val previousToken = tokens.lastOrNull { token -> token.endOffset <= operator.startOffset }
     val previous = previousNonWhitespaceBefore(operator.startOffset)
-    if (operatorText in setOf("+", "-") && previousToken?.normalizedText in unaryLineOperatorPrecedingKeywords) {
+    if (operatorText in setOf("+", "-") && unaryLineOperatorPrecedingTerms.any { term -> previousToken?.isTerm(term) == true }) {
         return true
     }
     if (operatorText in setOf("+", "-") && previous in setOf('(', ',')) return true
-    if (operatorText == "*" && previousToken?.isKeyword("select") == true) return true
+    if (operatorText == "*" && previousToken?.isTerm(SqlDialectSourceTerm.Select) == true) return true
 
     return operatorText == "*" && previous in setOf('(', ',', '.')
 }
@@ -92,16 +93,16 @@ private fun String.previousNonWhitespaceBefore(offset: Int): Char? {
     return getOrNull(index)
 }
 
-private val unaryLineOperatorPrecedingKeywords =
+private val unaryLineOperatorPrecedingTerms =
     setOf(
-        "and",
-        "by",
-        "else",
-        "or",
-        "select",
-        "set",
-        "then",
-        "values",
-        "when",
-        "where",
+        SqlDialectSourceTerm.And,
+        SqlDialectSourceTerm.By,
+        SqlDialectSourceTerm.Else,
+        SqlDialectSourceTerm.Or,
+        SqlDialectSourceTerm.Select,
+        SqlDialectSourceTerm.Set,
+        SqlDialectSourceTerm.Then,
+        SqlDialectSourceTerm.Values,
+        SqlDialectSourceTerm.When,
+        SqlDialectSourceTerm.Where,
     )

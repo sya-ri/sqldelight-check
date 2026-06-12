@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,14 +25,14 @@ public class NoNotInNullableSubqueryRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("not")) return@forEachIndexed
-            val inToken = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("in") } ?: return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Not)) return@forEachIndexed
+            val inToken = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.In) } ?: return@forEachIndexed
             val openOffset = content.nextSqlCharacterAfter(inToken.endOffset)?.offset ?: return@forEachIndexed
             if (content.getOrNull(openOffset) != '(') return@forEachIndexed
             val closeOffset = content.matchingClosingParenthesisOffset(openOffset) ?: return@forEachIndexed
             val innerTokens =
                 tokens.filter { candidate -> candidate.startOffset in (openOffset + 1) until closeOffset }
-            if (innerTokens.none { it.isKeyword("select") }) return@forEachIndexed
+            if (innerTokens.none { it.isTerm(SqlDialectSourceTerm.Select) }) return@forEachIndexed
             if (innerTokens.containsIsNotNullPredicate()) return@forEachIndexed
 
             reporter.report(
@@ -49,4 +50,8 @@ public class NoNotInNullableSubqueryRule : Rule {
 
 private fun List<SqlToken>.containsIsNotNullPredicate(): Boolean =
     windowed(size = 3, step = 1)
-        .any { window -> window[0].isKeyword("is") && window[1].isKeyword("not") && window[2].isKeyword("null") }
+        .any { window ->
+            window[0].isTerm(SqlDialectSourceTerm.Is) &&
+                window[1].isTerm(SqlDialectSourceTerm.Not) &&
+                window[2].isTerm(SqlDialectSourceTerm.Null)
+        }

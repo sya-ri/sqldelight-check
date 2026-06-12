@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.Fix
 import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
@@ -27,7 +28,7 @@ public class LiteralCaseRule : Rule {
         val content = context.file.content
         content
             .sqlTokens()
-            .filter { token -> token.text.lowercase() in literals }
+            .filter { token -> literalTerms.any { term -> token.isTerm(term) } }
             .filterNot { token -> token.text == token.text.uppercase() }
             .forEach { token ->
                 val range = content.rangeAtOffsets(token.startOffset, token.endOffset)
@@ -52,6 +53,6 @@ public class LiteralCaseRule : Rule {
     }
 
     private companion object {
-        val literals = setOf("false", "null", "true")
+        val literalTerms = setOf(SqlDialectSourceTerm.False, SqlDialectSourceTerm.Null, SqlDialectSourceTerm.True)
     }
 }

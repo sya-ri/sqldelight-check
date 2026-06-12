@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,14 +26,14 @@ public class RequireExplicitNullOrderingRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("order")) return@forEachIndexed
-            if (tokens.getOrNull(index + 1)?.isKeyword("by") != true) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Order)) return@forEachIndexed
+            if (tokens.getOrNull(index + 1)?.isTerm(SqlDialectSourceTerm.By) != true) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
-            val boundary = tokens.firstBoundaryOffsetAfter(index + 2, statementEnd, orderByBoundaryKeywords)
+            val boundary = tokens.firstBoundaryOffsetAfter(index + 2, statementEnd, context.database.dialect.sourcePatterns, ClauseBoundary)
             tokens
                 .drop(index + 2)
                 .takeWhile { candidate -> candidate.startOffset < boundary }
-                .filter { candidate -> candidate.isKeyword("asc") || candidate.isKeyword("desc") }
+                .filter { candidate -> candidate.isTerm(SqlDialectSourceTerm.Asc) || candidate.isTerm(SqlDialectSourceTerm.Desc) }
                 .filterNot { direction -> tokens.hasNullOrderingAfter(direction, boundary, content) }
                 .forEach { direction ->
                     reporter.report(
@@ -48,8 +50,6 @@ public class RequireExplicitNullOrderingRule : Rule {
     }
 }
 
-private val orderByBoundaryKeywords = setOf("except", "intersect", "limit", "offset", "union", "window")
-
 private fun List<SqlToken>.hasNullOrderingAfter(
     direction: SqlToken,
     boundary: Int,
@@ -64,7 +64,7 @@ private fun List<SqlToken>.hasNullOrderingAfter(
                 token.startOffset < boundary
         }
         .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == directionDepth }
-        .any { token -> token.isKeyword("nulls") }
+        .any { token -> token.isTerm(SqlDialectSourceTerm.Nulls) }
 }
 
 private fun String.orderByItemEndAfter(

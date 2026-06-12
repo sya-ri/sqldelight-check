@@ -5,6 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,7 +28,7 @@ public class ClauseKeywordNewlineRule : Rule {
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("select")) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
             if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
 
             val statementEnd = content.statementEndAfter(token.startOffset)
@@ -35,7 +38,7 @@ public class ClauseKeywordNewlineRule : Rule {
                 .drop(index + 1)
                 .takeWhile { candidate -> candidate.startOffset < statementEnd }
                 .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == 0 }
-                .majorClauseKeywords()
+                .majorClauseKeywords(context.database.dialect.sourcePatterns)
                 .forEach { clause ->
                     val line = lines.lineContaining(clause.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == clause.startOffset) return@forEach
@@ -60,36 +63,22 @@ private data class ClauseKeyword(
     val endOffset: Int,
 )
 
-private fun List<SqlToken>.majorClauseKeywords(): List<ClauseKeyword> =
+private fun List<SqlToken>.majorClauseKeywords(sourcePatterns: SqlDialectSourcePatterns): List<ClauseKeyword> =
     buildList {
         this@majorClauseKeywords.forEachIndexed { index, token ->
-            when {
-                token.normalizedText in singleClauseKeywords ->
-                    add(
-                        ClauseKeyword(
-                            name = token.text.uppercase(),
-                            startOffset = token.startOffset,
-                            endOffset = token.endOffset,
-                        ),
-                    )
-                token.isKeyword("group") && this@majorClauseKeywords.getOrNull(index + 1)?.isKeyword("by") == true ->
-                    add(
-                        ClauseKeyword(
-                            name = "GROUP BY",
-                            startOffset = token.startOffset,
-                            endOffset = this@majorClauseKeywords[index + 1].endOffset,
-                        ),
-                    )
-                token.isKeyword("order") && this@majorClauseKeywords.getOrNull(index + 1)?.isKeyword("by") == true ->
-                    add(
-                        ClauseKeyword(
-                            name = "ORDER BY",
-                            startOffset = token.startOffset,
-                            endOffset = this@majorClauseKeywords[index + 1].endOffset,
-                        ),
-                    )
-            }
+            val length =
+                sourcePatterns.matchPrefix(SqlDialectSourcePatternRole.MajorClauseStart, normalizedTextsFrom(index))
+                    ?: return@forEachIndexed
+            val endToken = this@majorClauseKeywords.getOrNull(index + length - 1) ?: return@forEachIndexed
+            add(
+                ClauseKeyword(
+                    name =
+                        this@majorClauseKeywords
+                            .subList(index, index + length)
+                            .joinToString(separator = " ") { clausePart -> clausePart.text.uppercase() },
+                    startOffset = token.startOffset,
+                    endOffset = endToken.endOffset,
+                ),
+            )
         }
     }
-
-private val singleClauseKeywords = setOf("from", "where", "having", "limit", "offset")

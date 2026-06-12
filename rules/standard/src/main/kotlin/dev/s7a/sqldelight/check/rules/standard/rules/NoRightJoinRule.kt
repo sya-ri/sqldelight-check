@@ -5,6 +5,7 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,7 +25,7 @@ public class NoRightJoinRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.text.equals("right", ignoreCase = true)) return@forEachIndexed
+            if (!token.isTerm(SqlDialectSourceTerm.Right)) return@forEachIndexed
             val joinToken = tokens.joinTokenAfterRight(index) ?: return@forEachIndexed
 
             reporter.report(
@@ -42,8 +43,8 @@ public class NoRightJoinRule : Rule {
 
 private fun List<SqlToken>.joinTokenAfterRight(rightIndex: Int): SqlToken? {
     val next = getOrNull(rightIndex + 1) ?: return null
-    if (next.text.equals("join", ignoreCase = true)) return next
-    if (!next.text.equals("outer", ignoreCase = true)) return null
+    if (next.isTerm(SqlDialectSourceTerm.Join)) return next
+    if (!next.isTerm(SqlDialectSourceTerm.Outer)) return null
     val afterOuter = getOrNull(rightIndex + 2) ?: return null
-    return if (afterOuter.text.equals("join", ignoreCase = true)) afterOuter else null
+    return if (afterOuter.isTerm(SqlDialectSourceTerm.Join)) afterOuter else null
 }

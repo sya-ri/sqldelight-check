@@ -5,6 +5,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
+import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -24,10 +26,16 @@ public class ConsistentOrderByDirectionRule : Rule {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
-            if (!token.isKeyword("order")) return@forEachIndexed
-            val by = tokens.getOrNull(index + 1)?.takeIf { it.isKeyword("by") }
+            if (!token.isTerm(SqlDialectSourceTerm.Order)) return@forEachIndexed
+            val by = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.By) }
                 ?: return@forEachIndexed
-            val clauseEnd = tokens.firstBoundaryOffsetAfter(index + 2, content.statementEndAfter(token.startOffset), orderByBoundaryKeywords)
+            val clauseEnd =
+                tokens.firstBoundaryOffsetAfter(
+                    index + 2,
+                    content.statementEndAfter(token.startOffset),
+                    context.database.dialect.sourcePatterns,
+                    ClauseBoundary,
+                )
             val itemDirections = content.orderByItemDirections(by.endOffset, clauseEnd)
             if (itemDirections.size < 2 || itemDirections.all { it } || itemDirections.none { it }) {
                 return@forEachIndexed
@@ -67,14 +75,5 @@ private fun String.orderByItemDirections(
     return ranges
         .map { (start, end) -> tokens.filter { token -> token.startOffset >= start && token.endOffset <= end } }
         .filter { itemTokens -> itemTokens.isNotEmpty() }
-        .map { itemTokens -> itemTokens.any { token -> token.normalizedText in setOf("asc", "desc") } }
+        .map { itemTokens -> itemTokens.any { token -> token.isTerm(SqlDialectSourceTerm.Asc) || token.isTerm(SqlDialectSourceTerm.Desc) } }
 }
-
-private val orderByBoundaryKeywords =
-    setOf(
-        "fetch",
-        "limit",
-        "offset",
-        "union",
-        "where",
-    )
