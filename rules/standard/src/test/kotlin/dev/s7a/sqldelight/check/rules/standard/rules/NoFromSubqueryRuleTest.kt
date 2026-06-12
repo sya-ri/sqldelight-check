@@ -106,4 +106,17 @@ class NoFromSubqueryRuleTest {
             1,
         )
     }
+
+    @Test
+    fun `uses dialect subquery block patterns`() {
+        NoFromSubqueryRule().assertDiagnosticCount(
+            """
+            selectPlayers:
+            SELECT ranked.id
+            FROM {SELECT id FROM player} AS ranked;
+            """.asSqlDelightFile(),
+            1,
+            dialect = braceSubqueryDialect,
+        )
+    }
 }

@@ -5,7 +5,9 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+import dev.s7a.sqldelight.check.api.SqlSourceBlock
+import dev.s7a.sqldelight.check.api.SqlSourceBlockKind
+import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -23,36 +25,32 @@ public class NoUnnecessaryStatementParenthesesRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val tokens = content.sqlTokens().toList()
-        content.sqlCharacters()
-            .filter { character -> character.value == '(' && content.sqlParenthesisDepthAt(character.offset) == 0 }
-            .forEach { character ->
-                val openOffset = character.offset
-                if (!content.hasStatementBoundaryBefore(openOffset)) return@forEach
-
-                val closeOffset = content.matchingClosingParenthesisOffset(openOffset) ?: return@forEach
-                if (!content.hasStatementBoundaryAfter(closeOffset + 1)) return@forEach
-
-                val select =
-                    tokens.firstOrNull { token ->
-                            token.startOffset in (openOffset + 1)..<closeOffset &&
-                            token.isTerm(SqlDialectSourceTerm.Select)
-                    } ?: return@forEach
-                if (content.sqlParenthesisDepthAt(select.startOffset) != 1) return@forEach
-                if (tokens.any { token -> token.startOffset in (openOffset + 1)..<select.startOffset }) return@forEach
-
+        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        structure.blocks
+            .filter { block -> block.kind == SqlSourceBlockKind.Subquery }
+            .filter { block -> structure.isRedundantStatementParenthesizedSubquery(content, block) }
+            .forEach { block ->
                 reporter.report(
                     RuleDiagnostic(
                         severity = defaultSeverity,
                         message = "Remove redundant parentheses around the SELECT statement.",
                         file = context.file,
-                        range = content.rangeAtOffsets(openOffset, closeOffset + 1),
+                        range = content.rangeAtOffsets(block.startOffset, block.endOffset),
                         database = context.database,
                     ),
                 )
             }
     }
 }
+
+private fun SqlSourceStructure.isRedundantStatementParenthesizedSubquery(
+    content: String,
+    block: SqlSourceBlock,
+): Boolean =
+    tokens[block.startTokenIndex].parenthesisDepth == 0 &&
+        parentBlock(block)?.kind == SqlSourceBlockKind.Statement &&
+        content.hasStatementBoundaryBefore(block.startOffset) &&
+        content.hasStatementBoundaryAfter(block.endOffset)
 
 private fun String.hasStatementBoundaryBefore(offset: Int): Boolean {
     val previous = previousSqlCharacterBefore(offset) ?: return true
