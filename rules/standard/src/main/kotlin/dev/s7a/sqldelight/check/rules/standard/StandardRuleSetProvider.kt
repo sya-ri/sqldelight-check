@@ -87,6 +87,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.PreferBetweenForInclusiveRa
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferCountStarRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferExistsOverCountForExistenceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferExplicitColumnListInInsertRule
+import dev.s7a.sqldelight.check.rules.standard.rules.PreferImportedMappedTypeRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferNamedParametersRule
 import dev.s7a.sqldelight.check.rules.standard.rules.PreferSimpleBooleanCaseRule
 import dev.s7a.sqldelight.check.rules.standard.rules.QueryLabelMatchesOperationRule
@@ -221,6 +222,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::PreferCountStarRule),
             RuleProvider(::PreferExistsOverCountForExistenceRule),
             RuleProvider(::PreferExplicitColumnListInInsertRule),
+            RuleProvider(::PreferImportedMappedTypeRule),
             RuleProvider(::PreferNamedParametersRule),
             RuleProvider(::PreferSimpleBooleanCaseRule),
             RuleProvider(::QueryNameCaseRule),
