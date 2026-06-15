@@ -84,8 +84,13 @@ private fun SqlSourceTokenContext.expectedIndentationLevel(
     val subqueryBodyIndentation = subqueryBodyDepth(structure)
     val clauseIndentation = if (isClauseContinuation(structure)) 1 else 0
     val continuationIndentation = if (isExpressionContinuation()) 1 else 0
+    val columnConstraintIndentation = if (isColumnConstraintContinuation(structure)) 1 else 0
     val caseIndentation = if (isCaseContinuation(structure)) 1 else 0
-    return blockIndentation + subqueryBodyIndentation + maxOf(clauseIndentation, continuationIndentation) + caseIndentation
+    return blockIndentation +
+        subqueryBodyIndentation +
+        maxOf(clauseIndentation, continuationIndentation) +
+        columnConstraintIndentation +
+        caseIndentation
 }
 
 private fun SqlSourceTokenContext.sourceBlockDepth(structure: SqlSourceStructure): Int =
@@ -115,6 +120,9 @@ private fun SqlSourceTokenContext.isClosingTokenOf(block: SqlSourceBlock): Boole
 private fun SqlSourceTokenContext.isClauseContinuation(structure: SqlSourceStructure): Boolean {
     if (isClauseStart()) return false
     val clause = structure.innermostClauseContaining(this) ?: return false
+    if (clause.startsInsertListClause(structure) && isInsideParenthesizedBlockAfter(structure, clause.startTokenIndex)) {
+        return false
+    }
     return index > clause.startTokenIndex
 }
 
@@ -144,6 +152,33 @@ private fun SqlSourceTokenContext.isExpressionContinuation(): Boolean =
 private fun SqlSourceTokenContext.isClauseStart(): Boolean =
     matches(SqlDialectSourcePatternRole.ClauseBoundary) ||
         matches(SqlDialectSourcePatternRole.MajorClauseStart)
+
+private fun SqlSourceTokenContext.isColumnConstraintContinuation(structure: SqlSourceStructure): Boolean {
+    if (!matches(SqlDialectSourcePatternRole.ColumnConstraintStart)) return false
+    val previous = structure.previousToken(this) ?: return false
+    return previous.token.normalizedText != "," &&
+        previous.token.normalizedText != "(" &&
+        previous.parenthesisDepth == parenthesisDepth
+}
+
+private fun SqlSourceStructure.previousToken(context: SqlSourceTokenContext): SqlSourceTokenContext? =
+    tokens.getOrNull(context.index - 1)
+
+private fun SqlSourceBlock.startsInsertListClause(structure: SqlSourceStructure): Boolean {
+    val start = structure.tokens.getOrNull(startTokenIndex) ?: return false
+    return start.token.normalizedText == "into" || start.token.normalizedText == "values"
+}
+
+private fun SqlSourceTokenContext.isInsideParenthesizedBlockAfter(
+    structure: SqlSourceStructure,
+    startTokenIndex: Int,
+): Boolean =
+    structure.blocks.any { block ->
+        block.kind == SqlSourceBlockKind.ParenthesizedExpression &&
+            block.contains(this) &&
+            block.startTokenIndex > startTokenIndex &&
+            index > block.startTokenIndex
+    }
 
 private fun SqlSourceTokenContext.isCaseContinuation(structure: SqlSourceStructure): Boolean {
     val case = structure.innermostCaseContaining(this) ?: return false
