@@ -142,4 +142,73 @@ class SourceIndentationRuleTest {
 
         assertEquals(expected, SourceIndentationRule().applyAllFixes(input))
     }
+
+    @Test
+    fun `accepts multiline insert column and values lists`() {
+        val input =
+            """
+            insertItem:
+            INSERT INTO items (
+                id,
+                name,
+                description
+            )
+            VALUES (
+                :id,
+                :name,
+                :description
+            );
+            """.asSqlDelightFile()
+
+        SourceIndentationRule().assertDiagnosticCount(input, 0)
+    }
+
+    @Test
+    fun `accepts multiline insert with on conflict`() {
+        val input =
+            """
+            insertItem:
+            INSERT INTO items (
+                id,
+                name,
+                description
+            )
+            VALUES (
+                :id,
+                :name,
+                :description
+            )
+            ON CONFLICT (id) DO NOTHING;
+            """.asSqlDelightFile()
+
+        SourceIndentationRule().assertDiagnosticCount(input, 0)
+    }
+
+    @Test
+    fun `accepts mapped types in create table constraints`() {
+        val input =
+            """
+            CREATE TABLE items (
+                id UUID AS kotlin.uuid.Uuid NOT NULL PRIMARY KEY,
+                name TEXT AS com.example.NonEmptyString NOT NULL,
+                PRIMARY KEY (id, name)
+            );
+            """.asSqlDelightFile()
+
+        SourceIndentationRule().assertDiagnosticCount(input, 0)
+    }
+
+    @Test
+    fun `accepts mapped types with multiline check constraints`() {
+        val input =
+            """
+            CREATE TABLE items (
+                id UUID AS kotlin.uuid.Uuid NOT NULL PRIMARY KEY,
+                name TEXT AS com.example.NonEmptyString NOT NULL
+                    CHECK (name <> '')
+            );
+            """.asSqlDelightFile()
+
+        SourceIndentationRule().assertDiagnosticCount(input, 0)
+    }
 }
