@@ -89,4 +89,24 @@ class ConstraintNewlineRuleTest {
             0,
         )
     }
+
+    @Test
+    fun `accepts mapped type columns before multiline table check constraints`() {
+        ConstraintNewlineRule().assertDiagnosticCount(
+            """
+            CREATE TABLE sample_reports (
+              subject_id BIGINT AS com.example.SubjectId NOT NULL,
+              reporter_code TEXT AS com.example.Code NOT NULL,
+              reason TEXT NOT NULL
+                CHECK (reason IN ('A', 'B', 'OTHER')),
+              detail TEXT AS com.example.NonEmptyString,
+              CHECK (
+                (reason = 'OTHER' AND detail IS NOT NULL AND detail != '')
+                  OR (reason != 'OTHER' AND detail IS NULL)
+              )
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
 }
