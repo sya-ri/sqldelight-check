@@ -185,6 +185,25 @@ class SourceIndentationRuleTest {
     }
 
     @Test
+    fun `accepts indented create index target table line`() {
+        val input =
+            """
+            CREATE TABLE sample_items (
+                id UUID NOT NULL PRIMARY KEY,
+                owner_id TEXT NOT NULL,
+                name TEXT AS com.example.NonEmptyString NOT NULL
+                    CHECK (name != ''),
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+
+            CREATE INDEX sample_items_owner_created_at_idx
+                ON sample_items (owner_id, created_at DESC);
+            """.asSqlDelightFile()
+
+        SourceIndentationRule().assertDiagnosticCount(input, 0)
+    }
+
+    @Test
     fun `accepts mapped types in create table constraints`() {
         val input =
             """
