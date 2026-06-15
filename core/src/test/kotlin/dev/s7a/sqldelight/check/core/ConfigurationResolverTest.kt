@@ -42,6 +42,7 @@ class ConfigurationResolverTest {
 
         assertEquals(Enablement.Disabled, resolved.enablement)
         assertEquals(Severity.Info, resolved.severity)
+        assertEquals(true, resolved.explicitlyConfigured)
     }
 
     @Test
@@ -83,6 +84,17 @@ class ConfigurationResolverTest {
         val resolved = resolver.resolveRule(ruleId, "MainDb")
 
         assertEquals(mapOf("max" to "12", "mode" to "global"), resolved.options)
+        assertEquals(true, resolved.explicitlyConfigured)
+    }
+
+    @Test
+    fun `unconfigured rule records that it was not explicit`() {
+        val ruleId = qualifiedRuleId("standard:max-joins")
+        val resolver = ConfigurationResolver(CheckConfig())
+
+        val resolved = resolver.resolveRule(ruleId, "MainDb")
+
+        assertEquals(false, resolved.explicitlyConfigured)
     }
 
     @Test

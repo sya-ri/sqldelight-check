@@ -15,6 +15,7 @@ import dev.s7a.sqldelight.check.api.SqlDialect
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
@@ -156,6 +157,59 @@ class SqlDelightCheckEngineTest {
             )
 
         assertEquals(1, diagnostics.size)
+    }
+
+    @Test
+    fun `deprecated auto rule is skipped`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput()),
+                ruleSetProviders = listOf(testRuleSet(testRule(deprecation = testDeprecation()))),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `deprecated explicitly enabled rule runs and emits trace warning`() {
+        val trace = DeprecationTrace()
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput()),
+                ruleSetProviders = listOf(testRuleSet(testRule(deprecation = testDeprecation()))),
+                config =
+                    CheckConfig(
+                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                    ),
+                trace = trace,
+            )
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(
+            listOf("Database:standard:test:enabled:standard:replacement"),
+            trace.deprecatedRules,
+        )
+    }
+
+    @Test
+    fun `deprecated explicitly disabled rule is skipped and emits trace warning`() {
+        val trace = DeprecationTrace()
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput()),
+                ruleSetProviders = listOf(testRuleSet(testRule(deprecation = testDeprecation()))),
+                config =
+                    CheckConfig(
+                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Disabled, Severity.Warning)),
+                    ),
+                trace = trace,
+            )
+
+        assertEquals(emptyList(), diagnostics)
+        assertEquals(
+            listOf("Database:standard:test:disabled:standard:replacement"),
+            trace.deprecatedRules,
+        )
     }
 
     @Test
@@ -552,6 +606,7 @@ class SqlDelightCheckEngineTest {
         id: String = "test",
         severity: Severity = Severity.Warning,
         targetDialect: DialectId? = null,
+        deprecation: RuleDeprecation? = null,
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
         rangeLine: Int? = null,
@@ -561,6 +616,7 @@ class SqlDelightCheckEngineTest {
             override val defaultSeverity: Severity = severity
             override val defaultEnable: Boolean = true
             override val targetDialect: DialectId? = targetDialect
+            override val deprecation: RuleDeprecation? = deprecation
 
             override fun isApplicable(context: RuleContext): Boolean = isApplicable.invoke(context)
 
@@ -579,6 +635,12 @@ class SqlDelightCheckEngineTest {
                 )
             }
         }
+
+    private fun testDeprecation(): RuleDeprecation =
+        RuleDeprecation(
+            message = "This rule has moved.",
+            replacement = qualifiedRuleId("standard:replacement"),
+        )
 
     private fun testInput(
         ids: Set<DialectId> = setOf(TargetDialectId),
@@ -599,6 +661,38 @@ class SqlDelightCheckEngineTest {
 
         val SourceDialectId: DialectId = DialectId("source")
         val TargetDialectId: DialectId = DialectId("target")
+    }
+}
+
+private class DeprecationTrace : AnalysisTrace {
+    val deprecatedRules = mutableListOf<String>()
+
+    override fun databaseFiles(
+        database: DatabaseContext,
+        files: List<SourceFile>,
+    ) {
+    }
+
+    override fun fileRules(
+        database: DatabaseContext,
+        file: SourceFile,
+        ruleIds: List<QualifiedRuleId>,
+    ) {
+    }
+
+    override fun deprecatedRule(
+        database: DatabaseContext,
+        ruleId: QualifiedRuleId,
+        deprecation: RuleDeprecation,
+        enabled: Boolean,
+    ) {
+        deprecatedRules +=
+            listOf(
+                database.name,
+                ruleId.value,
+                if (enabled) "enabled" else "disabled",
+                deprecation.replacement?.value.orEmpty(),
+            ).joinToString(":")
     }
 }
 

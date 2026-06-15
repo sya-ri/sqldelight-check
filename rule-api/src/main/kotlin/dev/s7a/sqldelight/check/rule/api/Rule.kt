@@ -48,6 +48,16 @@ public interface Rule {
         get() = null
 
     /**
+     * Deprecation metadata when this rule is kept only for compatibility.
+     *
+     * Deprecated rules do not run under automatic enablement. Explicitly
+     * enabled deprecated rules still run, while explicit enabled or disabled
+     * configuration emits a warning so users can migrate or remove the setting.
+     */
+    public val deprecation: RuleDeprecation?
+        get() = null
+
+    /**
      * Returns whether this rule applies to the current context when enablement is `Auto`.
      *
      * Explicit `Enabled` and `Disabled` configuration bypass this method.
