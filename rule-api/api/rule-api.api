@@ -5,6 +5,7 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticRepo
 public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun getDefaultEnable ()Z
 	public abstract fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public abstract fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -13,6 +14,7 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
 
 public final class dev/s7a/sqldelight/check/rule/api/Rule$DefaultImpls {
 	public static fun getDefaultEnable (Ldev/s7a/sqldelight/check/rule/api/Rule;)Z
+	public static fun getDeprecation (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public static fun getTargetDialect (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/DialectId;
 	public static fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 }
@@ -26,6 +28,16 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleContext {
 
 public final class dev/s7a/sqldelight/check/rule/api/RuleDefaultsKt {
 	public static final fun getDefaultEnablement (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/Enablement;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleDeprecation {
+	public fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;)V
+	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getReplacement ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/RuleOptionsKt {

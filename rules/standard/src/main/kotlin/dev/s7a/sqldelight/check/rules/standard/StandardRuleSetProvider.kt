@@ -37,8 +37,10 @@ import dev.s7a.sqldelight.check.rules.standard.rules.MaxLineLengthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxSubqueryDepthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoConsecutiveSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoBlankLineAfterQueryLabelRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteAllRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDistinctParenthesesRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoDropColumnInMigrationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDropTableInMigrationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDuplicateImportRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDuplicateQueryLabelRule
@@ -53,6 +55,8 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoNotInNullableSubqueryRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoOffsetPaginationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoOrderByOrdinalRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoRedundantSemicolonsRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoRenameColumnInMigrationRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoRenameTableInMigrationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceAfterDotRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceAfterOpeningParenthesisRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoSpaceBeforeClosingParenthesisRule
@@ -72,10 +76,12 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTransactionInMigrationRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoUnboundedSelectRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnknownQualifierRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedCteRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnnecessaryStatementParenthesesRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoUpdateAllRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUpdateWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoWildcardImportRule
 import dev.s7a.sqldelight.check.rules.standard.rules.OperatorLinePositionRule
@@ -172,8 +178,10 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::MaxSubqueryDepthRule),
             RuleProvider(::NoConsecutiveSemicolonsRule),
             RuleProvider(::NoBlankLineAfterQueryLabelRule),
+            RuleProvider(::NoDeleteAllRule),
             RuleProvider(::NoDeleteWithoutWhereRule),
             RuleProvider(::NoDistinctParenthesesRule),
+            RuleProvider(::NoDropColumnInMigrationRule),
             RuleProvider(::NoDropTableInMigrationRule),
             RuleProvider(::NoDuplicateImportRule),
             RuleProvider(::NoDuplicateQueryLabelRule),
@@ -188,6 +196,8 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoOffsetPaginationRule),
             RuleProvider(::NoOrderByOrdinalRule),
             RuleProvider(::NoRedundantSemicolonsRule),
+            RuleProvider(::NoRenameColumnInMigrationRule),
+            RuleProvider(::NoRenameTableInMigrationRule),
             RuleProvider(::NoSpaceAfterDotRule),
             RuleProvider(::NoSpaceAfterOpeningParenthesisRule),
             RuleProvider(::NoSpaceBeforeClosingParenthesisRule),
@@ -207,10 +217,12 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
             RuleProvider(::NoTransactionInMigrationRule),
+            RuleProvider(::NoUnboundedSelectRule),
             RuleProvider(::NoUnknownQualifierRule),
             RuleProvider(::NoUnusedCteRule),
             RuleProvider(::NoUnusedJoinRule),
             RuleProvider(::NoUnnecessaryStatementParenthesesRule),
+            RuleProvider(::NoUpdateAllRule),
             RuleProvider(::NoUpdateWithoutWhereRule),
             RuleProvider(::NoWildcardImportRule),
             RuleProvider(::OperatorLinePositionRule),

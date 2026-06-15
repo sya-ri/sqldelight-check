@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix Existing Bug"
+  short_description: "Reproduce an existing bug with a failing test before fixing it."
+  default_prompt: "Fix the reported bug by first reproducing it with a failing test, then updating the implementation until the test passes."

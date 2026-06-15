@@ -15,6 +15,7 @@ import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
+import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
 import java.io.File
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
@@ -158,6 +159,15 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
             ) {
                 if (!logLevel.logsRules) return
                 traceCollector.record(database.name, file.path, ruleIds)
+            }
+
+            override fun deprecatedRule(
+                database: DatabaseContext,
+                ruleId: QualifiedRuleId,
+                deprecation: RuleDeprecation,
+                enabled: Boolean,
+            ) {
+                logger.warn(deprecatedRuleMessage(database, ruleId, deprecation, enabled))
             }
         }
 
@@ -328,6 +338,31 @@ private fun Severity.logLabel(): String =
         Severity.Info -> "info"
         Severity.Warning -> "warning"
         Severity.Error -> "error"
+    }
+
+private fun deprecatedRuleMessage(
+    database: DatabaseContext,
+    ruleId: QualifiedRuleId,
+    deprecation: RuleDeprecation,
+    enabled: Boolean,
+): String =
+    buildString {
+        append("sqldelight-check deprecated rule ")
+        append(ruleId.value)
+        append(" is explicitly ")
+        append(if (enabled) "enabled" else "disabled")
+        append(" for database ")
+        append(database.name)
+        append(". ")
+        append(deprecation.message)
+        deprecation.replacement?.let { replacement ->
+            append(" Use ")
+            append(replacement.value)
+            append(" instead.")
+        }
+        if (!enabled) {
+            append(" Remove this rule configuration.")
+        }
     }
 
 private fun Diagnostic.locationLabel(): String =

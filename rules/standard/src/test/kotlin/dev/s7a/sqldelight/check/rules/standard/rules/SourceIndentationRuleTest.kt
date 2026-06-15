@@ -185,6 +185,25 @@ class SourceIndentationRuleTest {
     }
 
     @Test
+    fun `accepts indented create index target table line`() {
+        val input =
+            """
+            CREATE TABLE sample_items (
+                id UUID NOT NULL PRIMARY KEY,
+                owner_id TEXT NOT NULL,
+                name TEXT AS com.example.NonEmptyString NOT NULL
+                    CHECK (name != ''),
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+
+            CREATE INDEX sample_items_owner_created_at_idx
+                ON sample_items (owner_id, created_at DESC);
+            """.asSqlDelightFile()
+
+        SourceIndentationRule().assertDiagnosticCount(input, 0)
+    }
+
+    @Test
     fun `accepts mapped types in create table constraints`() {
         val input =
             """
@@ -210,5 +229,26 @@ class SourceIndentationRuleTest {
             """.asSqlDelightFile()
 
         SourceIndentationRule().assertDiagnosticCount(input, 0)
+    }
+
+    @Test
+    fun `accepts composite primary key after cascading reference column`() {
+        val input =
+            """
+            CREATE TABLE sample_parent (
+                id UUID NOT NULL PRIMARY KEY
+            );
+
+            CREATE TABLE sample_children (
+                parent_id UUID NOT NULL REFERENCES sample_parent (id) ON DELETE CASCADE,
+                code TEXT NOT NULL,
+                PRIMARY KEY (parent_id, code)
+            );
+            """.asSqlDelightFile()
+
+        assertEquals(
+            emptyList(),
+            SourceIndentationRule().diagnostics(input).map { diagnostic -> diagnostic.range },
+        )
     }
 }

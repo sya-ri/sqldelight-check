@@ -8,6 +8,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/ExcessiveLocksR
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -18,6 +19,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoAddColumnWith
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -28,6 +30,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoConcurrentInd
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -38,6 +41,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoDropColumnRul
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -48,6 +52,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoRenameColumnR
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -58,6 +63,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoRenameTableRu
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -68,6 +74,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/NoSetNotNullOnE
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -78,6 +85,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/PreferIdentityO
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -88,6 +96,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/ReindexConcurre
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -98,6 +107,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/RequireConcurre
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -108,6 +118,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/RequireNotValid
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
@@ -118,6 +129,7 @@ public final class dev/s7a/sqldelight/check/rules/postgres/rules/RiskyAlterTable
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
