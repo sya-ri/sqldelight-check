@@ -46,6 +46,7 @@ public class SourceIndentationRule : Rule {
         lines.forEach { line ->
             val firstContentOffset = line.firstNonWhitespaceOffset ?: return@forEach
             val tokenContext = structure.contextAtOffset(firstContentOffset) ?: return@forEach
+            if (tokenContext.isCreateIndexOnContinuation(structure)) return@forEach
             val statementBlock = statementBlocks[tokenContext.statementIndex] ?: return@forEach
             if (!content.substring(statementBlock.startOffset, statementBlock.endOffset).contains('\n')) return@forEach
 
@@ -116,6 +117,13 @@ private val SqlSourceBlock.isIndentingBlock: Boolean
 
 private fun SqlSourceTokenContext.isClosingTokenOf(block: SqlSourceBlock): Boolean =
     index == block.endTokenIndex - 1 && token.normalizedText == ")"
+
+private fun SqlSourceTokenContext.isCreateIndexOnContinuation(structure: SqlSourceStructure): Boolean {
+    if (token.normalizedText != "on") return false
+    val statementTokens = structure.tokensInStatement(statementIndex)
+    val first = statementTokens.firstOrNull() ?: return false
+    return first.matches(SqlDialectSourcePatternRole.CreateIndexStatementStart)
+}
 
 private fun SqlSourceTokenContext.isClauseContinuation(structure: SqlSourceStructure): Boolean {
     if (isClauseStart()) return false
