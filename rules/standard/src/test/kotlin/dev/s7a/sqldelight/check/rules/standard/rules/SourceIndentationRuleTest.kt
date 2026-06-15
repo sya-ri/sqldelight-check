@@ -211,4 +211,25 @@ class SourceIndentationRuleTest {
 
         SourceIndentationRule().assertDiagnosticCount(input, 0)
     }
+
+    @Test
+    fun `accepts composite primary key after cascading reference column`() {
+        val input =
+            """
+            CREATE TABLE sample_parent (
+                id UUID NOT NULL PRIMARY KEY
+            );
+
+            CREATE TABLE sample_children (
+                parent_id UUID NOT NULL REFERENCES sample_parent (id) ON DELETE CASCADE,
+                code TEXT NOT NULL,
+                PRIMARY KEY (parent_id, code)
+            );
+            """.asSqlDelightFile()
+
+        assertEquals(
+            emptyList(),
+            SourceIndentationRule().diagnostics(input).map { diagnostic -> diagnostic.range },
+        )
+    }
 }
