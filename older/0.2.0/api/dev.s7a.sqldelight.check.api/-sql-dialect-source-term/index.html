@@ -1,0 +1,1322 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SqlDialectSourceTerm</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    sqldelight-check
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+<dokka-template-command data="{&quot;@class&quot;:&quot;org.jetbrains.dokka.base.templating.ReplaceVersionsCommand&quot;,&quot;location&quot;:&quot;dev.s7a.sqldelight.check.api/-sql-dialect-source-term/index.html&quot;}"><div class="dropdown versions-dropdown" data-role="dropdown">
+  <div class="button button_dropdown versions-dropdown-button" role="combobox" data-role="dropdown-toggle" aria-controls="versions-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select version" tabindex="0" title="0.2.0"><span class="versions-dropdown-button-text">0.2.0</span></div>
+  <div class="dropdown--list dropdown--list_positioned_left versions-dropdown-data" role="listbox" data-role="dropdown-listbox" aria-label="Versions" id="versions-listbox">
+    <div class="dropdown--header" data-remove-style="true" style="display: none"><span>Select version</span><button class="button" data-role="dropdown-toggle" aria-label="Close versions selection"><i class="ui-kit-icon ui-kit-icon_cross"></i></button></div>
+<a href="../../../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-term/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.1</span></a><a href="index.html" class="dropdown--option dropdown--option_active dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.0"><span class="dropdown--option-icon dropdown--option-icon_selected"></span><span class="dropdown--option-text">0.2.0</span></a><a href="../../../../../not-found-version.html?v=0.1.1" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.1</span></a><a href="../../../../../not-found-version.html?v=0.1.0" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.0</span></a></div>
+  <div class="dropdown--overlay"></div>
+</div>
+</dokka-template-command>        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":api/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":api/main" data-filter=":api/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    sqldelight-check
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="sqldelight-check-api::dev.s7a.sqldelight.check.api/SqlDialectSourceTerm///PointingToDeclaration//1081350600">
+  <div class="breadcrumbs"><a href="../../index.html">sqldelight-check-api</a><span class="delimiter">/</span><a href="../index.html">dev.s7a.sqldelight.check.api</a><span class="delimiter">/</span><span class="current">SqlDialectSourceTerm</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Sql</span><wbr><span>Dialect</span><wbr><span>Source</span><wbr><span><span>Term</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">SqlDialectSourceTerm</a></div><p class="paragraph">A SQL source term that source-text rules may need to recognize directly.</p><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-all/index.html">All</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-and/index.html">And</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-as/index.html">As</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-asc/index.html">Asc</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-between/index.html">Between</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-begin/index.html">Begin</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-by/index.html">By</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-case/index.html">Case</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-check/index.html">Check</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-count/index.html">Count</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-collate/index.html">Collate</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-commit/index.html">Commit</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-constraint/index.html">Constraint</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-create/index.html">Create</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-cross/index.html">Cross</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-default/index.html">Default</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-delete/index.html">Delete</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-desc/index.html">Desc</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-distinct/index.html">Distinct</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-do/index.html">Do</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-drop/index.html">Drop</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-else/index.html">Else</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-end/index.html">End</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-escape/index.html">Escape</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-except/index.html">Except</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-exists/index.html">Exists</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-false/index.html">False</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-fetch/index.html">Fetch</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-filter/index.html">Filter</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-first/index.html">First</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-foreign/index.html">Foreign</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-full/index.html">Full</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-generated/index.html">Generated</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-from/index.html">From</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-group/index.html">Group</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-having/index.html">Having</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-in/index.html">In</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-inner/index.html">Inner</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-insert/index.html">Insert</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-intersect/index.html">Intersect</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-into/index.html">Into</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-is/index.html">Is</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-join/index.html">Join</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-last/index.html">Last</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-left/index.html">Left</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-like/index.html">Like</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-limit/index.html">Limit</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-not/index.html">Not</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-natural/index.html">Natural</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-null/index.html">Null</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-nulls/index.html">Nulls</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-offset/index.html">Offset</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-on/index.html">On</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-or/index.html">Or</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-order/index.html">Order</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-over/index.html">Over</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-outer/index.html">Outer</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-primary/index.html">Primary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-references/index.html">References</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-right/index.html">Right</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-rollback/index.html">Rollback</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-select/index.html">Select</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-set/index.html">Set</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-table/index.html">Table</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-then/index.html">Then</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-transaction/index.html">Transaction</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-trigger/index.html">Trigger</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-true/index.html">True</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-union/index.html">Union</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-unique/index.html">Unique</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-update/index.html">Update</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-using/index.html">Using</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-values/index.html">Values</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-view/index.html">View</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-when/index.html">When</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-where/index.html">Where</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-window/index.html">Window</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-with/index.html">With</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-813351321%2FClasslikes%2F1081350600" anchor-label="All" id="-813351321%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-all/index.html"><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-813351321%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-all/index.html">All</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">ALL</code> select modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="861718257%2FClasslikes%2F1081350600" anchor-label="And" id="861718257%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-and/index.html"><span><span>And</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="861718257%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-and/index.html">And</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">AND</code> boolean operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-630761304%2FClasslikes%2F1081350600" anchor-label="As" id="-630761304%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-as/index.html"><span><span>As</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-630761304%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-as/index.html">As</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">AS</code> alias or type mapping marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1343801239%2FClasslikes%2F1081350600" anchor-label="Asc" id="1343801239%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-asc/index.html"><span><span>Asc</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1343801239%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-asc/index.html">Asc</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">ASC</code> ordering direction.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1299572383%2FClasslikes%2F1081350600" anchor-label="Begin" id="1299572383%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-begin/index.html"><span><span>Begin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1299572383%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-begin/index.html">Begin</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">BEGIN</code> transaction statement start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-721761696%2FClasslikes%2F1081350600" anchor-label="Between" id="-721761696%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-between/index.html"><span><span>Between</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-721761696%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-between/index.html">Between</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">BETWEEN</code> range predicate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="516971555%2FClasslikes%2F1081350600" anchor-label="By" id="516971555%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-by/index.html"><span><span>By</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="516971555%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-by/index.html">By</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">BY</code> clause suffix term.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1924780758%2FClasslikes%2F1081350600" anchor-label="Case" id="-1924780758%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-case/index.html"><span><span>Case</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1924780758%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-case/index.html">Case</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">CASE</code> expression start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1963076832%2FClasslikes%2F1081350600" anchor-label="Check" id="-1963076832%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-check/index.html"><span><span>Check</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1963076832%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-check/index.html">Check</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">CHECK</code> constraint start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-364470270%2FClasslikes%2F1081350600" anchor-label="Collate" id="-364470270%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-collate/index.html"><span><span>Collate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-364470270%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-collate/index.html">Collate</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">COLLATE</code> column constraint start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="377495235%2FClasslikes%2F1081350600" anchor-label="Commit" id="377495235%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-commit/index.html"><span><span>Commit</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="377495235%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-commit/index.html">Commit</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">COMMIT</code> transaction statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1180073053%2FClasslikes%2F1081350600" anchor-label="Constraint" id="1180073053%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-constraint/index.html"><span><span>Constraint</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1180073053%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-constraint/index.html">Constraint</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">CONSTRAINT</code> named constraint marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1079848185%2FClasslikes%2F1081350600" anchor-label="Count" id="1079848185%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-count/index.html"><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1079848185%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-count/index.html">Count</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">COUNT</code> aggregate function name.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-554008930%2FClasslikes%2F1081350600" anchor-label="Create" id="-554008930%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-create/index.html"><span><span>Create</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-554008930%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-create/index.html">Create</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">CREATE</code> statement start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="874688232%2FClasslikes%2F1081350600" anchor-label="Cross" id="874688232%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cross/index.html"><span><span>Cross</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="874688232%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-cross/index.html">Cross</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">CROSS</code> join modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-127131065%2FClasslikes%2F1081350600" anchor-label="Default" id="-127131065%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-default/index.html"><span><span>Default</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-127131065%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-default/index.html">Default</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">DEFAULT</code> column constraint start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-812520241%2FClasslikes%2F1081350600" anchor-label="Delete" id="-812520241%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-delete/index.html"><span><span>Delete</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-812520241%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-delete/index.html">Delete</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">DELETE</code> statement start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1982302441%2FClasslikes%2F1081350600" anchor-label="Desc" id="1982302441%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-desc/index.html"><span><span>Desc</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1982302441%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-desc/index.html">Desc</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">DESC</code> ordering direction.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1929435742%2FClasslikes%2F1081350600" anchor-label="Distinct" id="1929435742%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-distinct/index.html"><span><span>Distinct</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1929435742%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-distinct/index.html">Distinct</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">DISTINCT</code> select modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2130001519%2FClasslikes%2F1081350600" anchor-label="Do" id="2130001519%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-do/index.html"><span><span>Do</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2130001519%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-do/index.html">Do</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">DO</code> upsert action introducer.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-477503925%2FClasslikes%2F1081350600" anchor-label="Drop" id="-477503925%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-drop/index.html"><span><span>Drop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-477503925%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-drop/index.html">Drop</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">DROP</code> statement start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="954287937%2FClasslikes%2F1081350600" anchor-label="Else" id="954287937%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-else/index.html"><span><span>Else</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="954287937%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-else/index.html">Else</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">ELSE</code> case branch marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-157227923%2FClasslikes%2F1081350600" anchor-label="End" id="-157227923%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-end/index.html"><span><span>End</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-157227923%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-end/index.html">End</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">END</code> case expression terminator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-778785095%2FClasslikes%2F1081350600" anchor-label="Escape" id="-778785095%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-escape/index.html"><span><span>Escape</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-778785095%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-escape/index.html">Escape</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">ESCAPE</code> LIKE predicate clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1275853535%2FClasslikes%2F1081350600" anchor-label="Except" id="-1275853535%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-except/index.html"><span><span>Except</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1275853535%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-except/index.html">Except</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">EXCEPT</code> set operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1163086018%2FClasslikes%2F1081350600" anchor-label="Exists" id="-1163086018%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-exists/index.html"><span><span>Exists</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1163086018%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-exists/index.html">Exists</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">EXISTS</code> predicate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1954225307%2FClasslikes%2F1081350600" anchor-label="False" id="-1954225307%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-false/index.html"><span><span>False</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1954225307%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-false/index.html">False</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">FALSE</code> literal.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="667393454%2FClasslikes%2F1081350600" anchor-label="Fetch" id="667393454%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-fetch/index.html"><span><span>Fetch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="667393454%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-fetch/index.html">Fetch</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">FETCH</code> row limiting clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-727787614%2FClasslikes%2F1081350600" anchor-label="Filter" id="-727787614%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-filter/index.html"><span><span>Filter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-727787614%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-filter/index.html">Filter</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">FILTER</code> aggregate clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1767501192%2FClasslikes%2F1081350600" anchor-label="First" id="-1767501192%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-first/index.html"><span><span>First</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1767501192%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-first/index.html">First</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">FIRST</code> null placement or fetch direction term.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="331510548%2FClasslikes%2F1081350600" anchor-label="Foreign" id="331510548%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-foreign/index.html"><span><span>Foreign</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="331510548%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-foreign/index.html">Foreign</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">FOREIGN</code> table constraint prefix.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="815640048%2FClasslikes%2F1081350600" anchor-label="From" id="815640048%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-from/index.html"><span><span>From</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="815640048%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-from/index.html">From</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">FROM</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1430535851%2FClasslikes%2F1081350600" anchor-label="Full" id="1430535851%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-full/index.html"><span><span>Full</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1430535851%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-full/index.html">Full</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">FULL</code> join modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="957948153%2FClasslikes%2F1081350600" anchor-label="Generated" id="957948153%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-generated/index.html"><span><span>Generated</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="957948153%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-generated/index.html">Generated</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">GENERATED</code> column constraint start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1544845943%2FClasslikes%2F1081350600" anchor-label="Group" id="-1544845943%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-group/index.html"><span><span>Group</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1544845943%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-group/index.html">Group</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">GROUP</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="749841301%2FClasslikes%2F1081350600" anchor-label="Having" id="749841301%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-having/index.html"><span><span>Having</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="749841301%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-having/index.html">Having</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">HAVING</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1682882795%2FClasslikes%2F1081350600" anchor-label="In" id="-1682882795%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-in/index.html"><span><span>In</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1682882795%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-in/index.html">In</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">IN</code> predicate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2111167890%2FClasslikes%2F1081350600" anchor-label="Inner" id="2111167890%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-inner/index.html"><span><span>Inner</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2111167890%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-inner/index.html">Inner</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">INNER</code> join modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="142138241%2FClasslikes%2F1081350600" anchor-label="Insert" id="142138241%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-insert/index.html"><span><span>Insert</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="142138241%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-insert/index.html">Insert</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">INSERT</code> statement start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-949913751%2FClasslikes%2F1081350600" anchor-label="Intersect" id="-949913751%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-intersect/index.html"><span><span>Intersect</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-949913751%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-intersect/index.html">Intersect</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">INTERSECT</code> set operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="194066426%2FClasslikes%2F1081350600" anchor-label="Into" id="194066426%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-into/index.html"><span><span>Into</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="194066426%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-into/index.html">Into</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">INTO</code> clause marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1527783760%2FClasslikes%2F1081350600" anchor-label="Is" id="-1527783760%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-is/index.html"><span><span>Is</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1527783760%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-is/index.html">Is</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">IS</code> comparison operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1386407824%2FClasslikes%2F1081350600" anchor-label="Join" id="-1386407824%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-join/index.html"><span><span>Join</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1386407824%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-join/index.html">Join</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">JOIN</code> clause marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="483464324%2FClasslikes%2F1081350600" anchor-label="Last" id="483464324%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-last/index.html"><span><span>Last</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="483464324%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-last/index.html">Last</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">LAST</code> null placement term.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-151562189%2FClasslikes%2F1081350600" anchor-label="Left" id="-151562189%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-left/index.html"><span><span>Left</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-151562189%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-left/index.html">Left</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">LEFT</code> join modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1122702685%2FClasslikes%2F1081350600" anchor-label="Like" id="-1122702685%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-like/index.html"><span><span>Like</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1122702685%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-like/index.html">Like</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">LIKE</code> predicate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1452127283%2FClasslikes%2F1081350600" anchor-label="Limit" id="-1452127283%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-limit/index.html"><span><span>Limit</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1452127283%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-limit/index.html">Limit</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">LIMIT</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-492743329%2FClasslikes%2F1081350600" anchor-label="Natural" id="-492743329%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-natural/index.html"><span><span>Natural</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-492743329%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-natural/index.html">Natural</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">NATURAL</code> join modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-991925899%2FClasslikes%2F1081350600" anchor-label="Not" id="-991925899%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-not/index.html"><span><span>Not</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-991925899%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-not/index.html">Not</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">NOT</code> predicate or constraint modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1614585165%2FClasslikes%2F1081350600" anchor-label="Null" id="-1614585165%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-null/index.html"><span><span>Null</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1614585165%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-null/index.html">Null</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">NULL</code> literal or constraint marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1406349532%2FClasslikes%2F1081350600" anchor-label="Nulls" id="1406349532%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-nulls/index.html"><span><span>Nulls</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1406349532%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-nulls/index.html">Nulls</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">NULLS</code> ordering modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1446370585%2FClasslikes%2F1081350600" anchor-label="Offset" id="-1446370585%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-offset/index.html"><span><span>Offset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1446370585%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-offset/index.html">Offset</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">OFFSET</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-208165989%2FClasslikes%2F1081350600" anchor-label="On" id="-208165989%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-on/index.html"><span><span>On</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-208165989%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-on/index.html">On</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">ON</code> join condition marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-84086761%2FClasslikes%2F1081350600" anchor-label="Or" id="-84086761%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-or/index.html"><span><span>Or</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-84086761%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-or/index.html">Or</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">OR</code> boolean operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1091097702%2FClasslikes%2F1081350600" anchor-label="Order" id="-1091097702%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-order/index.html"><span><span>Order</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1091097702%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-order/index.html">Order</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">ORDER</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1207389965%2FClasslikes%2F1081350600" anchor-label="Outer" id="1207389965%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-outer/index.html"><span><span>Outer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1207389965%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-outer/index.html">Outer</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">OUTER</code> join modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="868535302%2FClasslikes%2F1081350600" anchor-label="Over" id="868535302%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-over/index.html"><span><span>Over</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="868535302%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-over/index.html">Over</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">OVER</code> window clause marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-317295194%2FClasslikes%2F1081350600" anchor-label="Primary" id="-317295194%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-primary/index.html"><span><span>Primary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-317295194%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-primary/index.html">Primary</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">PRIMARY</code> constraint prefix.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1001787886%2FClasslikes%2F1081350600" anchor-label="References" id="-1001787886%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-references/index.html"><span><span>References</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1001787886%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-references/index.html">References</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">REFERENCES</code> column constraint start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-817425268%2FClasslikes%2F1081350600" anchor-label="Right" id="-817425268%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-right/index.html"><span><span>Right</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-817425268%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-right/index.html">Right</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">RIGHT</code> join modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2118434954%2FClasslikes%2F1081350600" anchor-label="Rollback" id="-2118434954%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rollback/index.html"><span><span>Rollback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2118434954%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-rollback/index.html">Rollback</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">ROLLBACK</code> transaction statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1452239518%2FClasslikes%2F1081350600" anchor-label="Select" id="1452239518%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-select/index.html"><span><span>Select</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1452239518%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-select/index.html">Select</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">SELECT</code> statement start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1003153094%2FClasslikes%2F1081350600" anchor-label="Set" id="1003153094%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-set/index.html"><span><span>Set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1003153094%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-set/index.html">Set</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">SET</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1684764902%2FClasslikes%2F1081350600" anchor-label="Table" id="-1684764902%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-table/index.html"><span><span>Table</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1684764902%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-table/index.html">Table</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">TABLE</code> object kind.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-813658403%2FClasslikes%2F1081350600" anchor-label="Then" id="-813658403%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-then/index.html"><span><span>Then</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-813658403%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-then/index.html">Then</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">THEN</code> case branch marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-590992182%2FClasslikes%2F1081350600" anchor-label="Transaction" id="-590992182%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-transaction/index.html"><span><span>Transaction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-590992182%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-transaction/index.html">Transaction</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">TRANSACTION</code> statement term.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-993057104%2FClasslikes%2F1081350600" anchor-label="Trigger" id="-993057104%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-trigger/index.html"><span><span>Trigger</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-993057104%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-trigger/index.html">Trigger</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">TRIGGER</code> object kind.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1139279732%2FClasslikes%2F1081350600" anchor-label="True" id="-1139279732%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-true/index.html"><span><span>True</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1139279732%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-true/index.html">True</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">TRUE</code> literal.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="127803193%2FClasslikes%2F1081350600" anchor-label="Union" id="127803193%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-union/index.html"><span><span>Union</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="127803193%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-union/index.html">Union</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">UNION</code> set operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1078394217%2FClasslikes%2F1081350600" anchor-label="Unique" id="1078394217%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-unique/index.html"><span><span>Unique</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1078394217%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-unique/index.html">Unique</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">UNIQUE</code> constraint start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="749688689%2FClasslikes%2F1081350600" anchor-label="Update" id="749688689%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-update/index.html"><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="749688689%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-update/index.html">Update</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">UPDATE</code> statement start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1880408284%2FClasslikes%2F1081350600" anchor-label="Using" id="-1880408284%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-using/index.html"><span><span>Using</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1880408284%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-using/index.html">Using</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">USING</code> join condition marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="275798328%2FClasslikes%2F1081350600" anchor-label="Values" id="275798328%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-values/index.html"><span><span>Values</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="275798328%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-values/index.html">Values</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">VALUES</code> insert clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="596986709%2FClasslikes%2F1081350600" anchor-label="View" id="596986709%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-view/index.html"><span><span>View</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="596986709%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-view/index.html">View</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">VIEW</code> object kind.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1265646688%2FClasslikes%2F1081350600" anchor-label="When" id="1265646688%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-when/index.html"><span><span>When</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1265646688%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-when/index.html">When</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">WHEN</code> case branch marker.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-383564767%2FClasslikes%2F1081350600" anchor-label="Where" id="-383564767%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-where/index.html"><span><span>Where</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-383564767%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-where/index.html">Where</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">WHERE</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1005797846%2FClasslikes%2F1081350600" anchor-label="Window" id="-1005797846%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-window/index.html"><span><span>Window</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1005797846%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-window/index.html">Window</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">WINDOW</code> clause start.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1930867628%2FClasslikes%2F1081350600" anchor-label="With" id="-1930867628%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-with/index.html"><span><span>With</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1930867628%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-with/index.html">With</a> : <a href="index.html">SqlDialectSourceTerm</a></div><div class="brief "><p class="paragraph">The <code class="lang-kotlin">WITH</code> common table expression or statement prefix.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1864092319%2FProperties%2F1081350600" anchor-label="normalizedText" id="-1864092319%2FProperties%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="normalized-text.html"><span>normalized</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1864092319%2FProperties%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="normalized-text.html">normalizedText</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
