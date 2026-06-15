@@ -38,8 +38,10 @@ Built-in rules use `Severity.Error` for high-risk findings and `Severity.Warning
 | [`postgres:require-not-valid-constraint`](#postgresrequire-not-valid-constraint) | 🟢 | ⚠️ |  | Require `NOT VALID` when adding constraints that can validate later. |
 | [`postgres:no-set-not-null-on-existing-column`](#postgresno-set-not-null-on-existing-column) | 🟢 | ⚠️ |  | Disallow `SET NOT NULL` on existing columns without a separate validation step. |
 | [`postgres:no-add-column-with-volatile-default`](#postgresno-add-column-with-volatile-default) | 🟢 | ⚠️ |  | Disallow `ADD COLUMN` defaults that can rewrite or evaluate many existing rows. |
+| [`postgres:no-add-column-with-non-null-without-default`](#postgresno-add-column-with-non-null-without-default) | 🟢 | ⚠️ |  | Disallow adding `NOT NULL` columns without a default in migrations. |
 | [`postgres:prefer-identity-over-serial`](#postgresprefer-identity-over-serial) | 🟢 | ⚠️ |  | Prefer `GENERATED AS IDENTITY` over PostgreSQL serial pseudo-types. |
 | [`postgres:no-drop-column`](#postgresno-drop-column) | 🟢 | ❌ |  | Disallow `DROP COLUMN` migrations that can break live application code. |
+| [`postgres:no-drop-index-non-concurrently`](#postgresno-drop-index-non-concurrently) | 🟢 | ⚠️ |  | Require `DROP INDEX CONCURRENTLY` for live-table index drops. |
 | [`postgres:no-rename-column`](#postgresno-rename-column) | 🟢 | ❌ |  | Disallow `RENAME COLUMN` migrations that can break live application code. |
 | [`postgres:no-rename-table`](#postgresno-rename-table) | 🟢 | ❌ |  | Disallow `RENAME TO` migrations that can break live application code. |
 | [`postgres:reindex-concurrently`](#postgresreindex-concurrently) | 🟢 | ⚠️ |  | Require `REINDEX CONCURRENTLY` for live reindex operations. |

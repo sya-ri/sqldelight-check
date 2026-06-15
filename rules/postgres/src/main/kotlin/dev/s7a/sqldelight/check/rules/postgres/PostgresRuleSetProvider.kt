@@ -4,9 +4,11 @@ import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rules.postgres.rules.ExcessiveLocksRule
+import dev.s7a.sqldelight.check.rules.postgres.rules.NoAddColumnWithNonNullWithoutDefaultRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoAddColumnWithVolatileDefaultRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoConcurrentIndexInTransactionRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoDropColumnRule
+import dev.s7a.sqldelight.check.rules.postgres.rules.NoDropIndexNonConcurrentlyRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoRenameColumnRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoRenameTableRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoSetNotNullOnExistingColumnRule
@@ -33,8 +35,10 @@ public class PostgresRuleSetProvider : RuleSetProvider {
             RuleProvider(::RequireNotValidConstraintRule),
             RuleProvider(::NoSetNotNullOnExistingColumnRule),
             RuleProvider(::NoAddColumnWithVolatileDefaultRule),
+            RuleProvider(::NoAddColumnWithNonNullWithoutDefaultRule),
             RuleProvider(::PreferIdentityOverSerialRule),
             RuleProvider(::NoDropColumnRule),
+            RuleProvider(::NoDropIndexNonConcurrentlyRule),
             RuleProvider(::NoRenameColumnRule),
             RuleProvider(::NoRenameTableRule),
             RuleProvider(::ReindexConcurrentlyRule),
