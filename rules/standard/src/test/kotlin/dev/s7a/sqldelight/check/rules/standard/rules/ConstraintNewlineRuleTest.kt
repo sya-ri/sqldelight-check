@@ -47,4 +47,46 @@ class ConstraintNewlineRuleTest {
             1,
         )
     }
+
+    @Test
+    fun `accepts mapped type column constraints on their own lines`() {
+        ConstraintNewlineRule().assertDiagnosticCount(
+            """
+            CREATE TABLE items (
+              id UUID AS kotlin.uuid.Uuid NOT NULL PRIMARY KEY,
+              name TEXT AS com.example.NonEmptyString NOT NULL
+                CHECK (name <> '')
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
+    fun `accepts mapped type columns before table constraints`() {
+        ConstraintNewlineRule().assertDiagnosticCount(
+            """
+            CREATE TABLE item_labels (
+              item_id UUID AS kotlin.uuid.Uuid NOT NULL REFERENCES items (id) ON DELETE CASCADE,
+              label TEXT AS com.example.NonEmptyString NOT NULL,
+              PRIMARY KEY (item_id, label)
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
+    fun `accepts split check constraints after normal column types`() {
+        ConstraintNewlineRule().assertDiagnosticCount(
+            """
+            CREATE TABLE reports (
+              id UUID AS kotlin.uuid.Uuid NOT NULL PRIMARY KEY,
+              reason TEXT NOT NULL
+                CHECK (reason IN ('A', 'B', 'C'))
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
 }

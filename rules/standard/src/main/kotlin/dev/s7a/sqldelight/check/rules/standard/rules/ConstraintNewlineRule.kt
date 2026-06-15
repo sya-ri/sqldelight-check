@@ -77,13 +77,20 @@ private fun String.createTableConstraintTokens(
         return listOf(first)
     }
     if (!substring(item.startOffset, item.endOffset).contains('\n')) return emptyList()
+    val firstLineEnd =
+        indexOf('\n', item.startOffset).takeIf { offset -> offset in item.startOffset until item.endOffset }
+            ?: return emptyList()
     return buildList {
         var index = 1
         while (index < itemTokens.size) {
             val token = itemTokens[index]
             val length =
                 sourcePatterns.matchPrefix(SqlDialectSourcePatternRole.ColumnConstraintStart, itemTokens.normalizedTextsFrom(index))
-            if (length != null && sqlParenthesisDepthAt(token.startOffset) == itemDepth) {
+            if (
+                length != null &&
+                token.startOffset > firstLineEnd &&
+                sqlParenthesisDepthAt(token.startOffset) == itemDepth
+            ) {
                 add(token)
                 index += length
             } else {
