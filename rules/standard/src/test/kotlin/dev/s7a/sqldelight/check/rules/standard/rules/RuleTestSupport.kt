@@ -45,7 +45,8 @@ internal val cleanPlayerSq: String =
     selectAll:
     SELECT id, name, score
     FROM player
-    ORDER BY name;
+    ORDER BY name
+    LIMIT 100;
 
     selectById:
     SELECT id, name, score
