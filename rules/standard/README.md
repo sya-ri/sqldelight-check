@@ -129,6 +129,7 @@ The standard rule set uses two safety levels:
 | [`standard:no-consecutive-semicolons`](#standardno-consecutive-semicolons) | 🟢 | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
 | [`standard:no-delete-without-where`](#standardno-delete-without-where) | 🟢 | ❌ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
 | [`standard:no-distinct-parentheses`](#standardno-distinct-parentheses) | 🟢 | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
+| [`standard:no-drop-column-in-migration`](#standardno-drop-column-in-migration) | 🟢 | ❌ |  | Disallow destructive `DROP COLUMN` operations in SQLDelight migration files. |
 | [`standard:no-drop-table-in-migration`](#standardno-drop-table-in-migration) | 🟢 | ❌ |  | Disallow destructive `DROP TABLE` statements in SQLDelight migration files. |
 | [`standard:no-duplicate-import`](#standardno-duplicate-import) | 🟢 | ⚠️ | ✅ | Disallow repeated SQLDelight import lines. |
 | [`standard:no-duplicate-query-label`](#standardno-duplicate-query-label) | 🟢 | ⚠️ |  | Disallow duplicate SQLDelight query or grouped statement labels in one file. |
@@ -143,6 +144,8 @@ The standard rule set uses two safety levels:
 | [`standard:no-offset-pagination`](#standardno-offset-pagination) | 🟢 | ℹ️ |  | Prefer keyset pagination over `OFFSET` pagination. |
 | [`standard:no-order-by-ordinal`](#standardno-order-by-ordinal) | 🟢 | ⚠️ |  | Disallow ordinal references in `GROUP BY` and `ORDER BY`. |
 | [`standard:no-redundant-semicolons`](#standardno-redundant-semicolons) | 🟢 | ⚠️ | ✅ | Disallow repeated semicolons separated only by whitespace. |
+| [`standard:no-rename-column-in-migration`](#standardno-rename-column-in-migration) | 🟢 | ❌ |  | Disallow column rename operations in SQLDelight migration files. |
+| [`standard:no-rename-table-in-migration`](#standardno-rename-table-in-migration) | 🟢 | ❌ |  | Disallow table rename operations in SQLDelight migration files. |
 | [`standard:no-space-after-dot`](#standardno-space-after-dot) | 🟢 | ⚠️ | ✅ | Disallow inline whitespace immediately after `.`. |
 | [`standard:no-space-after-opening-parenthesis`](#standardno-space-after-opening-parenthesis) | 🟢 | ⚠️ | ✅ | Disallow inline whitespace immediately after `(`. |
 | [`standard:no-space-before-closing-parenthesis`](#standardno-space-before-closing-parenthesis) | 🟢 | ⚠️ | ✅ | Disallow inline whitespace immediately before `)`. |
