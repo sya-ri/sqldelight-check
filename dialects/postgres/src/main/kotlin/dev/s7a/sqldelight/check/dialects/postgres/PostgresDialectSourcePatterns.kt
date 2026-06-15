@@ -10,6 +10,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.KeywordCaseTarge
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.OrderByBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.PredicateBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
@@ -39,6 +40,7 @@ public val PostgresDialectSourcePatterns: SqlDialectSourcePatterns =
                     "VACUUM",
                     roles = setOf(StatementStart, SqlDelightStatementStart),
                 ) +
+                sourcePatterns("INSERT SET", "UPDATE SET", roles = setOf(StatementContinuation)) +
                 sourcePatterns("FETCH", "FOR", roles = setOf(TableReferenceBoundary, ClauseBoundary)) +
                 sourcePatterns(
                     "DISTINCT ON",
