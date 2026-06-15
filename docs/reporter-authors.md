@@ -9,7 +9,7 @@ Custom reporter projects should compile against the reporter API:
 
 ```kotlin
 dependencies {
-    compileOnly("dev.s7a:sqldelight-check-reporter-api:0.2.0")
+    compileOnly("dev.s7a:sqldelight-check-reporter-api:0.2.1")
 }
 ```
 

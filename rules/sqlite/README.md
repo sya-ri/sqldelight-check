@@ -25,9 +25,6 @@ Rule IDs use the `sqlite:<rule-name>` form.
 - `⚠️` in the Severity column for the built-in default severity.
 - The Fix column is blank when write tasks do not attach a fix.
 
-Built-in rules default to `Severity.Warning` in `v0.2.0`. `Severity.Error`
-and `Severity.Info` are supported through user configuration.
-
 ## Rule Summary
 
 | Rule ID | Enable | Severity | Fix | Purpose |
