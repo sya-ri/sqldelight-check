@@ -56,6 +56,25 @@ public class SqlDelightCheckEngine {
                     RuleCandidate(provider.id, QualifiedRuleId(provider.id, rule.id), rule)
                 }
             }
+        rules.forEach { candidate ->
+            val ruleConfig =
+                resolver.resolveRule(
+                    ruleId = candidate.ruleId,
+                    databaseName = database.name,
+                    defaultEnablement = candidate.rule.defaultEnablement,
+                    defaultSeverity = candidate.rule.defaultSeverity,
+                )
+            candidate.rule.deprecation?.let { deprecation ->
+                if (ruleConfig.explicitlyConfigured && ruleConfig.enablement != Enablement.Auto) {
+                    trace.deprecatedRule(
+                        database = database,
+                        ruleId = candidate.ruleId,
+                        deprecation = deprecation,
+                        enabled = ruleConfig.enablement == Enablement.Enabled,
+                    )
+                }
+            }
+        }
         return files.flatMap { file -> runRulesForFile(database, file, rules, resolver, trace) }
     }
 
@@ -128,7 +147,7 @@ public class SqlDelightCheckEngine {
         when (enablement) {
             Enablement.Enabled -> true
             Enablement.Disabled -> false
-            Enablement.Auto -> hasTargetDialect(context) && isApplicable(context)
+            Enablement.Auto -> deprecation == null && hasTargetDialect(context) && isApplicable(context)
         }
 
     private fun Rule.hasTargetDialect(context: RuleContext): Boolean =

@@ -43,6 +43,7 @@ internal class ConfigurationResolver(
             enablement = database?.enablement ?: global?.enablement ?: defaultEnablement,
             severity = database?.severity ?: global?.severity ?: defaultSeverity,
             options = global.optionsOrEmpty() + database.optionsOrEmpty(),
+            explicitlyConfigured = global != null || database != null,
         )
     }
 
