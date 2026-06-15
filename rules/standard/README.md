@@ -177,6 +177,7 @@ The standard rule set uses two safety levels:
 | [`standard:prefer-count-star`](#standardprefer-count-star) | 🟢 | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
 | [`standard:prefer-exists-over-count-for-existence`](#standardprefer-exists-over-count-for-existence) | 🟢 | ⚠️ |  | Prefer `EXISTS` over `COUNT(*) > 0` when only existence is needed. |
 | [`standard:prefer-explicit-column-list-in-insert`](#standardprefer-explicit-column-list-in-insert) | 🟢 | ⚠️ |  | Require explicit target columns in `INSERT` statements. |
+| [`standard:prefer-imported-mapped-type`](#standardprefer-imported-mapped-type) | 🟢 | ℹ️ | ✅ | Prefer SQLDelight imports over fully qualified mapped type names. |
 | [`standard:prefer-named-parameters`](#standardprefer-named-parameters) | 🟢 | ⚠️ |  | Prefer named SQLDelight parameters over anonymous `?` parameters. |
 | [`standard:prefer-simple-boolean-case`](#standardprefer-simple-boolean-case) | 🟢 | ⚠️ |  | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
 | [`standard:query-name-case`](#standardquery-name-case) | 🟢 | ⚠️ |  | Require SQLDelight query labels to use lower camel case. |
@@ -3004,6 +3005,39 @@ Fix behavior:
 
 - No automatic fix is provided.
 - Accepts named references and expressions.
+
+## `standard:prefer-imported-mapped-type`
+
+Reports fully qualified SQLDelight mapped type names in `.sq` files.
+
+Importing mapped Kotlin types keeps SQL type declarations short while still making dependencies explicit at the top of
+the file.
+
+Invalid:
+
+```sql
+CREATE TABLE user (
+  id TEXT AS com.example.UserId NOT NULL
+);
+```
+
+Valid:
+
+```sql
+import com.example.UserId;
+
+CREATE TABLE user (
+  id TEXT AS UserId NOT NULL
+);
+```
+
+Fix behavior:
+
+- Adds the fully qualified type to the SQLDelight import block and replaces matching mapped type usages with the simple
+  name.
+- Leaves already imported types, wildcard-imported packages, and conflicting simple names alone.
+- Applies only to `.sq` files.
+- Defaults to `Severity.Info`.
 
 ## `standard:prefer-named-parameters`
 

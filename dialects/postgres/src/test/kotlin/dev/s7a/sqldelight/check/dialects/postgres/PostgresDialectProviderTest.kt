@@ -58,5 +58,7 @@ class PostgresDialectProviderTest {
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.CommonFunctionName, listOf("json_agg")))
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.AliasBoundary, listOf("lateral")))
         assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.OrderByBoundary, listOf("returning")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementContinuation, listOf("update", "set")))
+        assertTrue(sourcePatterns.matches(SqlDialectSourcePatternRole.StatementContinuation, listOf("insert", "set")))
     }
 }
