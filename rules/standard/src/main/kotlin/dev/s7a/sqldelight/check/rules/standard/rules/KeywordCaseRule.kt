@@ -19,7 +19,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 public class KeywordCaseRule : Rule {
     override val id: RuleId = RuleId("keyword-case")
     override val defaultSeverity: Severity = Severity.Warning
-    override val defaultEnable: Boolean = true
+    override val defaultEnable: Boolean = false
 
     override fun run(
         context: RuleContext,

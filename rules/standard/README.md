@@ -116,7 +116,7 @@ The standard rule set uses two safety levels:
 | [`standard:import-order`](#standardimport-order) | 🟢 | ⚠️ | ✅ | Require SQLDelight imports to be sorted by package group and name. |
 | [`standard:insert-values-newline`](#standardinsert-values-newline) | 🟢 | ⚠️ |  | Require multiline `INSERT` column and `VALUES` lists to use one item per line. |
 | [`standard:join-newline`](#standardjoin-newline) | 🟢 | ⚠️ |  | Require top-level `JOIN` clauses to start their own line in multiline statements. |
-| [`standard:keyword-case`](#standardkeyword-case) | 🟢 | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
+| [`standard:keyword-case`](#standardkeyword-case) |  | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
 | [`standard:line-ending-lf`](#standardline-ending-lf) | 🟢 | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
 | [`standard:literal-case`](#standardliteral-case) | 🟢 | ⚠️ | 🛠️ | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
 | [`standard:mapped-type-name-case`](#standardmapped-type-name-case) | 🟢 | ℹ️ |  | Require SQLDelight mapped type names to look like Kotlin type names. |
@@ -2371,6 +2371,9 @@ Fix behavior:
 ## `standard:keyword-case`
 
 Reports common SQL keywords that are not uppercase.
+
+This rule is disabled by default. Enable `standard:keyword-case` explicitly when a project wants to enforce uppercase
+SQL keywords.
 
 This rule uses a conservative token scanner over SQLDelight source text and intentionally skips comments, string
 literals, double-quoted identifiers, backtick identifiers, and bracket identifiers.
