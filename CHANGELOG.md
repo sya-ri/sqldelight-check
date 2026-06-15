@@ -29,7 +29,6 @@ Source-structure and dialect metadata release for the `0.x` line.
 ### Fixed
 
 - Fixed clause newline handling for SQLDelight named parameters.
-- Fixed `standard:constraint-newline` false positives for split column constraints after SQLDelight mapped types.
 - Fixed self column alias detection for function expressions.
 - Fixed Renovate configuration to target the `release/0.x` branch.
 
