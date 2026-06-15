@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.2.2
+
+### Added
+
+- Added rule deprecation metadata and warning traces for deprecated rules.
+- Added standard migration safety rules for dropping and renaming tables or columns in migrations.
+- Added standard query safety rules for unbounded selects, unconditional deletes, unconditional updates, and always-true
+  where clauses.
+- Added shared agent skill links for repository maintenance workflows.
+
+### Changed
+
+- Marked PostgreSQL drop and rename rules as deprecated in favor of the standard migration safety rules.
+
+### Fixed
+
+- Fixed `standard:source-indentation` for composite primary keys.
+- Fixed `standard:source-indentation` for multiline `CREATE INDEX` statements.
+- Fixed `standard:keyword-case` documentation rendering for `IN` keyword examples.
+
 ## v0.2.1
 
 ### Added
