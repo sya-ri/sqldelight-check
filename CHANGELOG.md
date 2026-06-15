@@ -1,8 +1,25 @@
 # Changelog
 
-## v0.2.0
+## v0.2.1
 
-Source-structure and dialect metadata release for the `0.x` line.
+### Added
+
+- Added `standard:prefer-imported-mapped-type` to prefer SQLDelight imports for fully qualified mapped type names.
+- Added shared SQL quoted-range skipping helpers for source text scanning.
+
+### Changed
+
+- Updated Gradle wrapper to 9.5.1.
+- Improved PostgreSQL create-index checks to allow non-concurrent indexes for tables created earlier in the same migration.
+
+### Fixed
+
+- Fixed false positives for `standard:constraint-newline` on split column constraints.
+- Fixed false positives for `standard:source-indentation` around nested source layout.
+- Fixed PostgreSQL statement terminator false positives.
+- Fixed source text scanning around comments and quoted SQL identifiers.
+
+## v0.2.0
 
 ### Breaking Changes
 
