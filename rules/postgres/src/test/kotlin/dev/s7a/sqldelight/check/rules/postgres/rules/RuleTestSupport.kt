@@ -70,3 +70,15 @@ private fun RuleDiagnostic.withRuleSetPrefix(
 internal fun Rule.assertOne(content: String) {
     assertEquals(1, diagnostics(content).size)
 }
+
+internal val migrationLocalCreateTableAndIndex: String =
+    """
+    CREATE TABLE items (
+        id UUID NOT NULL PRIMARY KEY,
+        name TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL
+    );
+
+    CREATE INDEX items_name_created_at_idx
+        ON items (name, created_at DESC);
+    """

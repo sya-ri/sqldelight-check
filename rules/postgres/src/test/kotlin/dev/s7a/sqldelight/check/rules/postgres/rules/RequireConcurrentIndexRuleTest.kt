@@ -29,6 +29,32 @@ class RequireConcurrentIndexRuleTest {
             ),
         )
     }
+
+    @Test
+    fun `does not report non concurrent index for table created earlier in same migration`() {
+        val diagnostics =
+            RequireConcurrentIndexRule().diagnostics(
+                migrationLocalCreateTableAndIndex,
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `reports non concurrent index when table may already exist`() {
+        val diagnostics =
+            RequireConcurrentIndexRule().diagnostics(
+                """
+                CREATE TABLE IF NOT EXISTS items (
+                    id UUID NOT NULL PRIMARY KEY
+                );
+
+                CREATE INDEX items_id_idx ON items (id);
+                """,
+            )
+
+        assertEquals(1, diagnostics.size)
+    }
 }
 
 private fun qualifiedRuleId(value: String): QualifiedRuleId {

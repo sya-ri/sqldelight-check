@@ -56,6 +56,16 @@ class ExcessiveLocksRuleTest {
     }
 
     @Test
+    fun `does not report create index for table created earlier in same migration`() {
+        val diagnostics =
+            ExcessiveLocksRule().diagnostics(
+                migrationLocalCreateTableAndIndex,
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
     fun `ignores comments and quoted strings`() {
         val diagnostics =
             ExcessiveLocksRule().diagnostics(
