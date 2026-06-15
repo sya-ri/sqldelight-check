@@ -37,6 +37,7 @@ import dev.s7a.sqldelight.check.rules.standard.rules.MaxLineLengthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxSubqueryDepthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoConsecutiveSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoBlankLineAfterQueryLabelRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteAllRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDistinctParenthesesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDropColumnInMigrationRule
@@ -75,10 +76,12 @@ import dev.s7a.sqldelight.check.rules.standard.rules.NoTabIndentationRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingBlankLinesRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTrailingWhitespaceRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoTransactionInMigrationRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoUnboundedSelectRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnknownQualifierRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedCteRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnusedJoinRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUnnecessaryStatementParenthesesRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoUpdateAllRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoUpdateWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoWildcardImportRule
 import dev.s7a.sqldelight.check.rules.standard.rules.OperatorLinePositionRule
@@ -175,6 +178,7 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::MaxSubqueryDepthRule),
             RuleProvider(::NoConsecutiveSemicolonsRule),
             RuleProvider(::NoBlankLineAfterQueryLabelRule),
+            RuleProvider(::NoDeleteAllRule),
             RuleProvider(::NoDeleteWithoutWhereRule),
             RuleProvider(::NoDistinctParenthesesRule),
             RuleProvider(::NoDropColumnInMigrationRule),
@@ -213,10 +217,12 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoTrailingBlankLinesRule),
             RuleProvider(::NoTrailingWhitespaceRule),
             RuleProvider(::NoTransactionInMigrationRule),
+            RuleProvider(::NoUnboundedSelectRule),
             RuleProvider(::NoUnknownQualifierRule),
             RuleProvider(::NoUnusedCteRule),
             RuleProvider(::NoUnusedJoinRule),
             RuleProvider(::NoUnnecessaryStatementParenthesesRule),
+            RuleProvider(::NoUpdateAllRule),
             RuleProvider(::NoUpdateWithoutWhereRule),
             RuleProvider(::NoWildcardImportRule),
             RuleProvider(::OperatorLinePositionRule),

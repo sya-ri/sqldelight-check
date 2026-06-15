@@ -127,6 +127,7 @@ The standard rule set uses two safety levels:
 | [`standard:max-subquery-depth`](#standardmax-subquery-depth) | 🟢 | ⚠️ |  | Disallow nested `SELECT` statements deeper than `maxDepth`. |
 | [`standard:no-blank-line-after-query-label`](#standardno-blank-line-after-query-label) | 🟢 | ⚠️ | ✅ | Disallow blank lines between a SQLDelight query label and its statement body. |
 | [`standard:no-consecutive-semicolons`](#standardno-consecutive-semicolons) | 🟢 | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
+| [`standard:no-delete-all`](#standardno-delete-all) | 🟢 | ❌ |  | Disallow `DELETE` statements with obviously always-true `WHERE` predicates. |
 | [`standard:no-delete-without-where`](#standardno-delete-without-where) | 🟢 | ❌ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
 | [`standard:no-distinct-parentheses`](#standardno-distinct-parentheses) | 🟢 | ⚠️ | ✅ | Disallow parentheses immediately after `SELECT DISTINCT`. |
 | [`standard:no-drop-column-in-migration`](#standardno-drop-column-in-migration) | 🟢 | ❌ |  | Disallow destructive `DROP COLUMN` operations in SQLDelight migration files. |
@@ -165,10 +166,12 @@ The standard rule set uses two safety levels:
 | [`standard:no-trailing-blank-lines`](#standardno-trailing-blank-lines) | 🟢 | ⚠️ | ✅ | Disallow blank lines after the last content line. |
 | [`standard:no-trailing-whitespace`](#standardno-trailing-whitespace) | 🟢 | ⚠️ | ✅ | Remove spaces or tabs at line ends. |
 | [`standard:no-transaction-in-migration`](#standardno-transaction-in-migration) | 🟢 | ⚠️ |  | Disallow explicit transaction statements in SQLDelight migration files. |
+| [`standard:no-unbounded-select`](#standardno-unbounded-select) | 🟢 | ℹ️ |  | Warn on SQLDelight query `SELECT`s without a top-level `WHERE` or `LIMIT`. |
 | [`standard:no-unknown-qualifier`](#standardno-unknown-qualifier) | 🟢 | ⚠️ |  | Disallow qualified column references whose qualifier is not visible in `FROM`. |
 | [`standard:no-unused-cte`](#standardno-unused-cte) | 🟢 | ⚠️ |  | Disallow CTEs that are not referenced by the main query. |
 | [`standard:no-unused-join`](#standardno-unused-join) | 🟢 | ⚠️ |  | Disallow JOIN sources that are not referenced by later qualified column reads. |
 | [`standard:no-unnecessary-statement-parentheses`](#standardno-unnecessary-statement-parentheses) | 🟢 | ⚠️ |  | Disallow redundant parentheses around whole top-level `SELECT` statements. |
+| [`standard:no-update-all`](#standardno-update-all) | 🟢 | ❌ |  | Disallow `UPDATE` statements with obviously always-true `WHERE` predicates. |
 | [`standard:no-update-without-where`](#standardno-update-without-where) | 🟢 | ❌ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
 | [`standard:no-wildcard-import`](#standardno-wildcard-import) | 🟢 | ⚠️ |  | Disallow wildcard SQLDelight imports. |
 | [`standard:operator-line-position`](#standardoperator-line-position) | 🟢 | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
