@@ -864,6 +864,16 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/PreferExplicitC
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
+public final class dev/s7a/sqldelight/check/rules/standard/rules/PreferImportedMappedTypeRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
 public final class dev/s7a/sqldelight/check/rules/standard/rules/PreferNamedParametersRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z

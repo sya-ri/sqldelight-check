@@ -109,6 +109,7 @@ class StandardRuleSetProviderTest {
                 qualifiedRuleId("standard:prefer-count-star"),
                 qualifiedRuleId("standard:prefer-exists-over-count-for-existence"),
                 qualifiedRuleId("standard:prefer-explicit-column-list-in-insert"),
+                qualifiedRuleId("standard:prefer-imported-mapped-type"),
                 qualifiedRuleId("standard:prefer-named-parameters"),
                 qualifiedRuleId("standard:prefer-simple-boolean-case"),
                 qualifiedRuleId("standard:query-name-case"),

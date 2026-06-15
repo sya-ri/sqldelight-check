@@ -65,3 +65,6 @@ private fun String.importGroupRank(): Int =
         startsWith("kotlinx.") -> 3
         else -> 4
     }
+
+internal val importComparator: Comparator<String> =
+    compareBy<String> { import -> import.importGroupRank() }.thenBy { import -> import }
