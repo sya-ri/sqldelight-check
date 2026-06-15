@@ -119,6 +119,8 @@ private fun SqlSourceTokenContext.isClosingTokenOf(block: SqlSourceBlock): Boole
 
 private fun SqlSourceTokenContext.isClauseContinuation(structure: SqlSourceStructure): Boolean {
     if (isClauseStart()) return false
+    if (isCreateTableItemStart(structure)) return false
+    if (isCreateTableClosingParenthesis(structure)) return false
     val clause = structure.innermostClauseContaining(this) ?: return false
     if (clause.startsInsertListClause(structure) && isInsideParenthesizedBlockAfter(structure, clause.startTokenIndex)) {
         return false
@@ -152,6 +154,34 @@ private fun SqlSourceTokenContext.isExpressionContinuation(): Boolean =
 private fun SqlSourceTokenContext.isClauseStart(): Boolean =
     matches(SqlDialectSourcePatternRole.ClauseBoundary) ||
         matches(SqlDialectSourcePatternRole.MajorClauseStart)
+
+private fun SqlSourceTokenContext.isCreateTableItemStart(structure: SqlSourceStructure): Boolean {
+    val previous = structure.previousToken(this) ?: return false
+    if (previous.token.normalizedText != "," || previous.parenthesisDepth != parenthesisDepth) return false
+
+    val statementTokens = structure.tokensInStatement(statementIndex)
+    val first = statementTokens.firstOrNull() ?: return false
+    if (!first.matches(SqlDialectSourcePatternRole.CreateTableStatementStart)) return false
+
+    return parenthesisDepth == statementTokens.dropWhile { context -> context.index <= first.index }
+        .firstOrNull { context -> context.token.normalizedText == "(" }
+        ?.let { open -> open.parenthesisDepth + 1 }
+}
+
+private fun SqlSourceTokenContext.isCreateTableClosingParenthesis(structure: SqlSourceStructure): Boolean {
+    if (token.normalizedText != ")") return false
+
+    val statementTokens = structure.tokensInStatement(statementIndex)
+    val first = statementTokens.firstOrNull() ?: return false
+    if (!first.matches(SqlDialectSourcePatternRole.CreateTableStatementStart)) return false
+
+    val open =
+        statementTokens
+            .dropWhile { context -> context.index <= first.index }
+            .firstOrNull { context -> context.token.normalizedText == "(" }
+            ?: return false
+    return parenthesisDepth == open.parenthesisDepth + 1
+}
 
 private fun SqlSourceTokenContext.isColumnConstraintContinuation(structure: SqlSourceStructure): Boolean {
     if (!matches(SqlDialectSourcePatternRole.ColumnConstraintStart)) return false
