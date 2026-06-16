@@ -40,6 +40,7 @@ public class NoElseNullRule : Rule {
                             file = context.file,
                             range = content.rangeAtOffsets(token.startOffset, next.endOffset),
                             database = context.database,
+                            fixes = listOf(content.deleteElseNullFix(token.startOffset, next.endOffset)),
                         ),
                     )
                 }
@@ -47,3 +48,15 @@ public class NoElseNullRule : Rule {
         }
     }
 }
+
+private fun String.deleteElseNullFix(
+    elseStartOffset: Int,
+    nullEndOffset: Int,
+) = linesWithRanges()
+    .lineContaining(elseStartOffset)
+    ?.takeIf { line ->
+        substring(line.startOffset, elseStartOffset).isBlank() &&
+            substring(nullEndOffset, line.endOffset).isBlank()
+    }
+    ?.let { line -> deleteTokenFix(line.startOffset, line.newlineEndOffset, "Remove ELSE NULL") }
+    ?: deleteTokenFix(elseStartOffset, nullEndOffset, "Remove ELSE NULL")

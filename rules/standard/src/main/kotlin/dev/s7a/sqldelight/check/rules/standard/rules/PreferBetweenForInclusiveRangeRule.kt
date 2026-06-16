@@ -38,9 +38,12 @@ public class PreferBetweenForInclusiveRangeRule : Rule {
             val segment = content.substring(token.endOffset, boundary)
             inclusiveRangePattern.findAll(segment).forEach { match ->
                 val column = match.groupValues[1]
+                val lower = match.groupValues[2]
                 val repeated = match.groupValues[3]
+                val upper = match.groupValues[4]
                 if (!column.equals(repeated, ignoreCase = true)) return@forEach
                 val startOffset = token.endOffset + match.range.first
+                val endOffset = token.endOffset + match.range.last + 1
                 reporter.report(
                     RuleDiagnostic(
                         severity = defaultSeverity,
@@ -48,6 +51,15 @@ public class PreferBetweenForInclusiveRangeRule : Rule {
                         file = context.file,
                         range = content.rangeAtOffsets(startOffset, startOffset + column.length),
                         database = context.database,
+                        fixes =
+                            listOf(
+                                content.replaceTokenFix(
+                                    startOffset,
+                                    endOffset,
+                                    "$column BETWEEN $lower AND $upper",
+                                    "Replace inclusive range with BETWEEN",
+                                ),
+                            ),
                     ),
                 )
             }
@@ -57,6 +69,6 @@ public class PreferBetweenForInclusiveRangeRule : Rule {
 
 private val inclusiveRangePattern =
     Regex(
-        """\b([A-Za-z_][A-Za-z0-9_.]*)\s*>=\s*(:[A-Za-z_][A-Za-z0-9_]*|\?|-?\d+(?:\.\d+)?)\s+${SqlDialectSourceTerm.And.normalizedText}\s+([A-Za-z_][A-Za-z0-9_.]*)\s*<=""",
+        """\b([A-Za-z_][A-Za-z0-9_.]*)\s*>=\s*(:[A-Za-z_][A-Za-z0-9_]*|\?|-?\d+(?:\.\d+)?)\s+${SqlDialectSourceTerm.And.normalizedText}\s+([A-Za-z_][A-Za-z0-9_.]*)\s*<=\s*(:[A-Za-z_][A-Za-z0-9_]*|\?|-?\d+(?:\.\d+)?)""",
         RegexOption.IGNORE_CASE,
     )

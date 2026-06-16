@@ -1,26 +1,37 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoElseNullRuleTest {
     @Test
     fun `reports else null in case expressions`() {
-        val diagnostics =
-            NoElseNullRule().diagnostics(
-                """
-                selectPlayerStatus:
-                SELECT
-                  CASE
-                    WHEN score > 10 THEN 'starter'
-                    ELSE NULL
-                  END AS status
-                FROM player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayerStatus:
+            SELECT
+              CASE
+                WHEN score > 10 THEN 'starter'
+                ELSE NULL
+              END AS status
+            FROM player;
+            """.asSqlDelightFile()
+        val diagnostics = NoElseNullRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        NoElseNullRule().assertAllFixes(
+            content,
+            """
+            selectPlayerStatus:
+            SELECT
+              CASE
+                WHEN score > 10 THEN 'starter'
+              END AS status
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

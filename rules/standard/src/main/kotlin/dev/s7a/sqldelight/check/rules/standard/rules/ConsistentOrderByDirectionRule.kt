@@ -2,11 +2,14 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
+import dev.s7a.sqldelight.check.api.Fix
+import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.ClauseBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -36,8 +39,8 @@ public class ConsistentOrderByDirectionRule : Rule {
                     context.database.dialect.sourcePatterns,
                     ClauseBoundary,
                 )
-            val itemDirections = content.orderByItemDirections(by.endOffset, clauseEnd)
-            if (itemDirections.size < 2 || itemDirections.all { it } || itemDirections.none { it }) {
+            val items = content.orderByItems(by.endOffset, clauseEnd)
+            if (items.size < 2 || items.all { it.hasDirection } || items.none { it.hasDirection }) {
                 return@forEachIndexed
             }
 
@@ -48,16 +51,23 @@ public class ConsistentOrderByDirectionRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(token.startOffset, by.endOffset),
                     database = context.database,
+                    fixes = listOf(content.addImplicitAscFix(items)),
                 ),
             )
         }
     }
 }
 
-private fun String.orderByItemDirections(
+private data class OrderByItem(
+    val startOffset: Int,
+    val endOffset: Int,
+    val hasDirection: Boolean,
+)
+
+private fun String.orderByItems(
     startOffset: Int,
     endOffset: Int,
-): List<Boolean> {
+): List<OrderByItem> {
     val commaOffsets =
         sqlCharacters()
             .filter { character -> character.offset in startOffset until endOffset && character.value == ',' }
@@ -73,7 +83,23 @@ private fun String.orderByItemDirections(
     }
     val tokens = sqlTokens().toList()
     return ranges
-        .map { (start, end) -> tokens.filter { token -> token.startOffset >= start && token.endOffset <= end } }
-        .filter { itemTokens -> itemTokens.isNotEmpty() }
-        .map { itemTokens -> itemTokens.any { token -> token.isTerm(SqlDialectSourceTerm.Asc) || token.isTerm(SqlDialectSourceTerm.Desc) } }
+        .map { (start, end) -> start to tokens.filter { token -> token.startOffset >= start && token.endOffset <= end } }
+        .filter { (_, itemTokens) -> itemTokens.isNotEmpty() }
+        .map { (start, itemTokens) ->
+            OrderByItem(
+                startOffset = start,
+                endOffset = itemTokens.last().endOffset,
+                hasDirection = itemTokens.any { token -> token.isTerm(SqlDialectSourceTerm.Asc) || token.isTerm(SqlDialectSourceTerm.Desc) },
+            )
+        }
 }
+
+private fun String.addImplicitAscFix(items: List<OrderByItem>): Fix =
+    Fix(
+        title = "Add ASC to implicit ORDER BY directions",
+        safety = FixSafety.Safe,
+        edits =
+            items
+                .filterNot { item -> item.hasDirection }
+                .map { item -> TextEdit(range = rangeAtOffsets(item.endOffset, item.endOffset), replacement = " ASC") },
+    )

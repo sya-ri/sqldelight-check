@@ -18,6 +18,7 @@ class NoOrderByOrdinalRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals("ORDER BY should reference columns by name instead of ordinal.", diagnostics.single().message)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

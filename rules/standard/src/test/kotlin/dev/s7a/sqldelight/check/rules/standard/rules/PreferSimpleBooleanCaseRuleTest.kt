@@ -6,13 +6,15 @@ import kotlin.test.assertEquals
 class PreferSimpleBooleanCaseRuleTest {
     @Test
     fun `reports case expressions that return predicate truth`() {
+        val content =
+            """
+            selectActive:
+            SELECT CASE WHEN score > 10 THEN TRUE ELSE FALSE END AS active
+            FROM player;
+            """.asSqlDelightFile()
         val diagnostics =
             PreferSimpleBooleanCaseRule().diagnostics(
-                """
-                selectActive:
-                SELECT CASE WHEN score > 10 THEN TRUE ELSE FALSE END AS active
-                FROM player;
-                """.asSqlDelightFile(),
+                content,
             )
 
         assertEquals(1, diagnostics.size)
@@ -21,14 +23,16 @@ class PreferSimpleBooleanCaseRuleTest {
 
     @Test
     fun `reports inverse case expressions`() {
-        PreferSimpleBooleanCaseRule().assertDiagnosticCount(
+        val content =
             """
             updateActive:
             UPDATE player
             SET active = CASE WHEN deleted_at IS NULL THEN FALSE ELSE TRUE END;
-            """.asSqlDelightFile(),
-            1,
-        )
+            """.asSqlDelightFile()
+        val diagnostics = PreferSimpleBooleanCaseRule().diagnostics(content)
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

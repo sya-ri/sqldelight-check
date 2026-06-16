@@ -43,6 +43,7 @@ public class GroupByTargetNewlineRule : Rule {
             val items = content.commaSeparatedClauseItems(by.endOffset, clauseEnd, depth)
             if (!content.isMultilineItemList(items)) return@forEachIndexed
             if (lines.itemStartsAreOnOwnLines(items)) return@forEachIndexed
+            val misplacedItemStarts = lines.misplacedItemStarts(items)
 
             reporter.report(
                 RuleDiagnostic(
@@ -51,6 +52,7 @@ public class GroupByTargetNewlineRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(token.startOffset, clauseEnd),
                     database = context.database,
+                    fixes = listOf(content.startOwnLineFix(misplacedItemStarts, "Move GROUP BY targets to their own lines")),
                 ),
             )
         }

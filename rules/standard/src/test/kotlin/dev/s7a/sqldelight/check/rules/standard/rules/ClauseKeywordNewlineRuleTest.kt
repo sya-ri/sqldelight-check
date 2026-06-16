@@ -1,23 +1,39 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ClauseKeywordNewlineRuleTest {
     @Test
     fun `reports top-level clause keywords after other code on multiline select statements`() {
-        val diagnostics =
-            ClauseKeywordNewlineRule().diagnostics(
-                """
-                selectNames:
-                SELECT name FROM player WHERE score > 0
-                AND active = 1 GROUP BY name HAVING count(*) > 1
-                AND archived = 0 ORDER BY name LIMIT 10 OFFSET 5;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectNames:
+            SELECT name FROM player WHERE score > 0
+            AND active = 1 GROUP BY name HAVING count(*) > 1
+            AND archived = 0 ORDER BY name LIMIT 10 OFFSET 5;
+            """.asSqlDelightFile()
+        val diagnostics = ClauseKeywordNewlineRule().diagnostics(content)
 
         assertEquals(7, diagnostics.size)
-        assertEquals(0, diagnostics.first().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.first().fixes.single().safety)
+        ClauseKeywordNewlineRule().assertAllFixes(
+            content,
+            """
+            selectNames:
+            SELECT name
+            FROM player
+            WHERE score > 0
+            AND active = 1
+            GROUP BY name
+            HAVING count(*) > 1
+            AND archived = 0
+            ORDER BY name
+            LIMIT 10
+            OFFSET 5;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

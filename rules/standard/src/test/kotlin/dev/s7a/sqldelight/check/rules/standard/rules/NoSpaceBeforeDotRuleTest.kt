@@ -19,6 +19,18 @@ class NoSpaceBeforeDotRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoSpaceBeforeDotRule().assertAllFixes(
+            """
+            selectPlayer:
+            SELECT player .id
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectPlayer:
+            SELECT player.id
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

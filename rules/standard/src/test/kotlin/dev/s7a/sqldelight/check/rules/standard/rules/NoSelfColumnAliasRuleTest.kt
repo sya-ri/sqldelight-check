@@ -1,22 +1,31 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoSelfColumnAliasRuleTest {
     @Test
     fun `reports aliases that repeat simple column names`() {
-        val diagnostics =
-            NoSelfColumnAliasRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT name AS name
-                FROM player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT name AS name
+            FROM player;
+            """.asSqlDelightFile()
+        val diagnostics = NoSelfColumnAliasRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
         assertEquals("Column aliases should not repeat the source column name.", diagnostics.single().message)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        NoSelfColumnAliasRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

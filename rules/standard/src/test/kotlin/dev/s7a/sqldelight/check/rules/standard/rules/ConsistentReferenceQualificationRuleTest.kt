@@ -31,6 +31,7 @@ class ConsistentReferenceQualificationRuleTest {
             "Single-table SELECT result columns should use qualification consistently.",
             diagnostics.single().message,
         )
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

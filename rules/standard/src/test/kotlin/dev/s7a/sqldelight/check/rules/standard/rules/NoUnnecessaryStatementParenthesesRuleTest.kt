@@ -1,22 +1,30 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoUnnecessaryStatementParenthesesRuleTest {
     @Test
     fun `reports parenthesized top level select statements`() {
-        val diagnostics =
-            NoUnnecessaryStatementParenthesesRule().diagnostics(
-                """
-                selectPlayers:
-                (SELECT id, name
-                FROM player);
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            (SELECT id, name
+            FROM player);
+            """.asSqlDelightFile()
+        val diagnostics = NoUnnecessaryStatementParenthesesRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        NoUnnecessaryStatementParenthesesRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT id, name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

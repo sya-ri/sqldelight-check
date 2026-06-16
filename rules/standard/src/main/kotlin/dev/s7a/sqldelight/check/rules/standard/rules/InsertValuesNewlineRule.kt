@@ -61,6 +61,7 @@ public class InsertValuesNewlineRule : Rule {
         val items = commaSeparatedClauseItems(list.openOffset + 1, list.closeOffset, itemDepth)
         if (!isMultilineItemList(items)) return
         if (lines.itemStartsAreOnOwnLines(items)) return
+        val misplacedItemStarts = lines.misplacedItemStarts(items)
         reporter.report(
             RuleDiagnostic(
                 severity = defaultSeverity,
@@ -68,6 +69,7 @@ public class InsertValuesNewlineRule : Rule {
                 file = context.file,
                 range = rangeAtOffsets(list.openOffset, list.closeOffset + 1),
                 database = context.database,
+                fixes = listOf(startOwnLineFix(misplacedItemStarts, "Move INSERT list items to their own lines")),
             ),
         )
     }

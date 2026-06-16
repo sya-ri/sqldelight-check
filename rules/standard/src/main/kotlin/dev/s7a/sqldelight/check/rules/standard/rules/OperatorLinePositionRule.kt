@@ -44,6 +44,15 @@ public class OperatorLinePositionRule : Rule {
                         file = context.file,
                         range = content.rangeAtOffsets(operator.startOffset, operator.endOffset),
                         database = context.database,
+                        fixes =
+                            listOf(
+                                content.moveLeadingTokenToPreviousLineFix(
+                                    startOffset = operator.startOffset,
+                                    endOffset = operator.endOffset,
+                                    title = "Move operator to previous line",
+                                    prefix = " ",
+                                ),
+                            ),
                     ),
                 )
             }

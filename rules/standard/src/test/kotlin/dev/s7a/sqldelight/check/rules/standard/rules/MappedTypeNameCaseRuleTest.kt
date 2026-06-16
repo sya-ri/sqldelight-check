@@ -7,17 +7,20 @@ import kotlin.test.assertEquals
 class MappedTypeNameCaseRuleTest {
     @Test
     fun `reports mapped type names that are not upper camel`() {
+        val content =
+            """
+            CREATE TABLE user (
+              enabled INTEGER AS boolean NOT NULL
+            );
+            """.asSqlDelightFile()
         val diagnostics =
             MappedTypeNameCaseRule().diagnostics(
-                """
-                CREATE TABLE user (
-                  enabled INTEGER AS boolean NOT NULL
-                );
-                """.asSqlDelightFile(),
+                content,
             )
 
         assertEquals(1, diagnostics.size)
         assertEquals(Severity.Info, diagnostics.single().severity)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

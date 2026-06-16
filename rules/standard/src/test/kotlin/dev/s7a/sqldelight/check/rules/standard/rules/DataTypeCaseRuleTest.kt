@@ -21,6 +21,22 @@ class DataTypeCaseRuleTest {
         assertEquals(3, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
         assertEquals("INTEGER", diagnostics.first().fixes.single().edits.single().replacement)
+        DataTypeCaseRule().assertAllFixes(
+            """
+            CREATE TABLE player (
+              id integer NOT NULL PRIMARY KEY,
+              name text NOT NULL,
+              rating real
+            );
+            """.asSqlDelightFile(),
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY,
+              name TEXT NOT NULL,
+              rating REAL
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

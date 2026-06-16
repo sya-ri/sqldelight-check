@@ -19,6 +19,18 @@ class SpaceAroundBinaryOperatorsRuleTest {
         assertEquals(5, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
         assertEquals(" + ", diagnostics.first().fixes.single().edits.single().replacement)
+        SpaceAroundBinaryOperatorsRule().assertAllFixes(
+            """
+            selectAdjustedScore:
+            SELECT score+1, score-1, score*2, score/2, score%2
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectAdjustedScore:
+            SELECT score + 1, score - 1, score * 2, score / 2, score % 2
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -34,6 +46,18 @@ class SpaceAroundBinaryOperatorsRuleTest {
 
         assertEquals(2, diagnostics.size)
         assertEquals(" || ", diagnostics.first().fixes.single().edits.single().replacement)
+        SpaceAroundBinaryOperatorsRule().assertAllFixes(
+            """
+            selectDisplayName:
+            SELECT first_name||' '||last_name
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectDisplayName:
+            SELECT first_name || ' ' || last_name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

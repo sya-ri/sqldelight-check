@@ -19,6 +19,18 @@ class NoSpaceBeforeFunctionParenthesisRuleTest {
         assertEquals(2, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.first().fixes.single().safety)
         assertEquals("", diagnostics.first().fixes.single().edits.single().replacement)
+        NoSpaceBeforeFunctionParenthesisRule().assertAllFixes(
+            """
+            selectPlayerStats:
+            SELECT COUNT (*), COALESCE (MAX(score), 0)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectPlayerStats:
+            SELECT COUNT(*), COALESCE(MAX(score), 0)
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

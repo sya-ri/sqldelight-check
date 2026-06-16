@@ -1,32 +1,40 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.api.DialectId
+import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.SqlDialect
-import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePattern
+import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class StatementTerminatorRuleTest {
     @Test
     fun `reports missing terminator at end of sqm statement`() {
-        val diagnostics =
-            StatementTerminatorRule().diagnostics(
-                """
-                CREATE TABLE player (
-                  id INTEGER NOT NULL PRIMARY KEY,
-                  name TEXT NOT NULL
-                )
-                """.asSqlDelightFile(),
-                path = MIGRATION_SQM_PATH,
+        val content =
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY,
+              name TEXT NOT NULL
             )
+            """.asSqlDelightFile()
+        val diagnostics = StatementTerminatorRule().diagnostics(content, path = MIGRATION_SQM_PATH)
 
         assertEquals(1, diagnostics.size)
-        assertTrue(diagnostics.single().fixes.isEmpty())
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        StatementTerminatorRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY,
+              name TEXT NOT NULL
+            );
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
+        )
     }
 
     @Test
@@ -84,18 +92,26 @@ class StatementTerminatorRuleTest {
 
     @Test
     fun `reports missing terminator at end of sq named query`() {
-        val diagnostics =
-            StatementTerminatorRule().diagnostics(
-                """
-                selectAll:
-                SELECT id, name
-                FROM player
-                ORDER BY name
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectAll:
+            SELECT id, name
+            FROM player
+            ORDER BY name
+            """.asSqlDelightFile()
+        val diagnostics = StatementTerminatorRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertTrue(diagnostics.single().fixes.isEmpty())
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        StatementTerminatorRule().assertAllFixes(
+            content,
+            """
+            selectAll:
+            SELECT id, name
+            FROM player
+            ORDER BY name;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

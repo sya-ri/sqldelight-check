@@ -48,6 +48,7 @@ public class JoinNewlineRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(clauseStart, token.endOffset),
                     database = context.database,
+                    fixes = listOf(content.startOwnLineFix(clauseStart, "Move JOIN clause to its own line")),
                 ),
             )
         }

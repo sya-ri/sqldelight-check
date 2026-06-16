@@ -19,6 +19,18 @@ class NoSpaceAfterDotRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoSpaceAfterDotRule().assertAllFixes(
+            """
+            selectPlayer:
+            SELECT player. id
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectPlayer:
+            SELECT player.id
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -31,6 +43,14 @@ class NoSpaceAfterDotRuleTest {
             """.asSqlDelightFile().withTabs()
 
         assertEquals("", NoSpaceAfterDotRule().singleReplacement(content))
+        NoSpaceAfterDotRule().assertAllFixes(
+            content,
+            """
+            selectPlayer:
+            SELECT player.id
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

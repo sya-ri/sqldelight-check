@@ -1,24 +1,36 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CaseBranchNewlineRuleTest {
     @Test
     fun `reports multiline case branches sharing a line`() {
-        val diagnostics =
-            CaseBranchNewlineRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT CASE WHEN active = 1 THEN 'active'
-                  ELSE 'inactive'
-                END AS status
-                FROM player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT CASE WHEN active = 1 THEN 'active'
+              ELSE 'inactive'
+            END AS status
+            FROM player;
+            """.asSqlDelightFile()
+        val diagnostics = CaseBranchNewlineRule().diagnostics(content)
 
         assertEquals(2, diagnostics.size)
-        assertEquals(0, diagnostics.first().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.first().fixes.single().safety)
+        CaseBranchNewlineRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT CASE
+            WHEN active = 1
+            THEN 'active'
+              ELSE 'inactive'
+            END AS status
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

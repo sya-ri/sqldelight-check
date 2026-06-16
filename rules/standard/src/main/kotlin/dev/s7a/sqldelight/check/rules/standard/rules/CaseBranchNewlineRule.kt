@@ -49,6 +49,7 @@ public class CaseBranchNewlineRule : Rule {
                                 file = context.file,
                                 range = content.rangeAtOffsets(branch.token.startOffset, branch.token.endOffset),
                                 database = context.database,
+                                fixes = listOf(content.startOwnLineFix(branch.token.startOffset, "Move CASE branch keyword to its own line")),
                             ),
                         )
                     }

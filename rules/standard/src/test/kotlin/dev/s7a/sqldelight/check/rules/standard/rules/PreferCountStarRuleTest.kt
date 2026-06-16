@@ -19,6 +19,18 @@ class PreferCountStarRuleTest {
         assertEquals(2, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
         assertEquals("*", diagnostics.first().fixes.single().edits.single().replacement)
+        PreferCountStarRule().assertAllFixes(
+            """
+            selectPlayerCounts:
+            SELECT COUNT(1), COUNT(0)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectPlayerCounts:
+            SELECT COUNT(*), COUNT(*)
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

@@ -45,6 +45,11 @@ internal fun String.isMultilineItemList(items: List<ClauseItem>): Boolean =
 internal fun List<LineInfo>.itemStartsAreOnOwnLines(items: List<ClauseItem>): Boolean =
     items.all { item -> lineContaining(item.startOffset)?.firstNonWhitespaceOffset == item.startOffset }
 
+internal fun List<LineInfo>.misplacedItemStarts(items: List<ClauseItem>): List<Int> =
+    items
+        .filter { item -> lineContaining(item.startOffset)?.firstNonWhitespaceOffset != item.startOffset }
+        .map { item -> item.startOffset }
+
 internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
     content: String,
     startIndex: Int,

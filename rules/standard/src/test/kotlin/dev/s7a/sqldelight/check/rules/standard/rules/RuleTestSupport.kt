@@ -188,12 +188,27 @@ internal fun Rule.applyAllFixes(
     content: String,
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
+    facts: SqlFacts = SqlFacts(),
+    dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
 ): String {
     val edits =
-        diagnostics(content, path, options)
+        diagnostics(content, path, options, facts, dialect)
             .flatMap { diagnostic -> diagnostic.fixes.single().edits }
             .sortedByDescending { edit -> content.offsetAt(edit.range.start) }
     return edits.fold(content) { current, edit -> current.applyEdit(edit) }
+}
+
+internal fun Rule.assertAllFixes(
+    content: String,
+    expected: String,
+    path: String = PLAYER_SQ_PATH,
+    options: Map<String, String> = emptyMap(),
+    facts: SqlFacts = SqlFacts(),
+    dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
+) {
+    val fixed = applyAllFixes(content, path, options, facts, dialect)
+    assertEquals(expected, fixed)
+    assertDiagnosticCount(fixed, 0, path, options, facts, dialect)
 }
 
 private fun String.applyEdit(edit: TextEdit): String {

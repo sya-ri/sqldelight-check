@@ -20,6 +20,20 @@ class SpaceAfterLineCommentMarkerRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals(" ", diagnostics.single().fixes.single().edits.single().replacement)
+        SpaceAfterLineCommentMarkerRule().assertAllFixes(
+            """
+            --Player lookup queries.
+            selectAll:
+            SELECT id, name
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            -- Player lookup queries.
+            selectAll:
+            SELECT id, name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

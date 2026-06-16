@@ -19,6 +19,18 @@ class NoDistinctParenthesesRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals(" ", diagnostics.single().fixes.single().edits.first().replacement)
+        NoDistinctParenthesesRule().assertAllFixes(
+            """
+            selectNames:
+            SELECT DISTINCT(name)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectNames:
+            SELECT DISTINCT name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -36,6 +48,19 @@ class NoDistinctParenthesesRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals(" ", diagnostics.single().fixes.single().edits.first().replacement)
+        NoDistinctParenthesesRule().assertAllFixes(
+            """
+            INSERT INTO player_name_snapshot(name)
+            SELECT DISTINCT(player.name)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            INSERT INTO player_name_snapshot(name)
+            SELECT DISTINCT player.name
+            FROM player;
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
+        )
     }
 
     @Test
@@ -52,6 +77,18 @@ class NoDistinctParenthesesRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals(" ", diagnostics.single().fixes.single().edits.first().replacement)
+        NoDistinctParenthesesRule().assertAllFixes(
+            """
+            selectRows:
+            SELECT DISTINCT(*)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectRows:
+            SELECT DISTINCT *
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -67,6 +104,18 @@ class NoDistinctParenthesesRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals("", diagnostics.single().fixes.single().edits.first().replacement)
+        NoDistinctParenthesesRule().assertAllFixes(
+            """
+            selectNames:
+            SELECT DISTINCT (name)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectNames:
+            SELECT DISTINCT name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

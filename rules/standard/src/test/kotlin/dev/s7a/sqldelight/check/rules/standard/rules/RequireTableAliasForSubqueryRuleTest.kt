@@ -17,6 +17,7 @@ class RequireTableAliasForSubqueryRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals("FROM and JOIN subqueries should have a table alias.", diagnostics.single().message)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

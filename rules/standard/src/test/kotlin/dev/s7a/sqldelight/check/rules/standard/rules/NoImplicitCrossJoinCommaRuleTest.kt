@@ -1,22 +1,30 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoImplicitCrossJoinCommaRuleTest {
     @Test
     fun `reports comma-separated from sources`() {
-        val diagnostics =
-            NoImplicitCrossJoinCommaRule().diagnostics(
-                """
-                selectPlayerTeams:
-                SELECT player.id, team.name
-                FROM player, team;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayerTeams:
+            SELECT player.id, team.name
+            FROM player, team;
+            """.asSqlDelightFile()
+        val diagnostics = NoImplicitCrossJoinCommaRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        NoImplicitCrossJoinCommaRule().assertAllFixes(
+            content,
+            """
+            selectPlayerTeams:
+            SELECT player.id, team.name
+            FROM player CROSS JOIN team;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

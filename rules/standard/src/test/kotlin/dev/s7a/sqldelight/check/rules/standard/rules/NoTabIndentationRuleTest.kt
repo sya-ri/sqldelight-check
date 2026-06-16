@@ -19,6 +19,18 @@ class NoTabIndentationRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("    ", diagnostics.single().fixes.single().edits.single().replacement)
+        NoTabIndentationRule().assertAllFixes(
+            """
+            CREATE TABLE player (
+            <TAB>id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile().withTabs(),
+            """
+            CREATE TABLE player (
+                id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -31,6 +43,14 @@ class NoTabIndentationRuleTest {
             """.asSqlDelightFile().withTabs()
 
         assertEquals("        ", NoTabIndentationRule().singleReplacement(content))
+        NoTabIndentationRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+                    name TEXT NOT NULL
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
