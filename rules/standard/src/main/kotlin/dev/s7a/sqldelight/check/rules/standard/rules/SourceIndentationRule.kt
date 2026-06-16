@@ -87,11 +87,13 @@ private fun SqlSourceTokenContext.expectedIndentationLevel(
     val continuationIndentation = if (isExpressionContinuation()) 1 else 0
     val columnConstraintIndentation = if (isColumnConstraintContinuation(structure)) 1 else 0
     val caseIndentation = if (isCaseContinuation(structure)) 1 else 0
+    val standaloneSubqueryAdjustment = if (isStandaloneSubqueryBody(structure)) -1 else 0
     return blockIndentation +
         subqueryBodyIndentation +
         maxOf(clauseIndentation, continuationIndentation) +
         columnConstraintIndentation +
-        caseIndentation
+        caseIndentation +
+        standaloneSubqueryAdjustment
 }
 
 private fun SqlSourceTokenContext.sourceBlockDepth(structure: SqlSourceStructure): Int =
@@ -118,6 +120,10 @@ private val SqlSourceBlock.isIndentingBlock: Boolean
 private fun SqlSourceTokenContext.isClosingTokenOf(block: SqlSourceBlock): Boolean =
     index == block.endTokenIndex - 1 && token.normalizedText == ")"
 
+private fun SqlSourceTokenContext.isClosingTokenOfSubquery(structure: SqlSourceStructure): Boolean =
+    token.normalizedText == ")" &&
+        structure.blocks.any { block -> block.kind == SqlSourceBlockKind.Subquery && isClosingTokenOf(block) }
+
 private fun SqlSourceTokenContext.isCreateIndexOnContinuation(structure: SqlSourceStructure): Boolean {
     if (token.normalizedText != "on") return false
     val statementTokens = structure.tokensInStatement(statementIndex)
@@ -127,6 +133,7 @@ private fun SqlSourceTokenContext.isCreateIndexOnContinuation(structure: SqlSour
 
 private fun SqlSourceTokenContext.isClauseContinuation(structure: SqlSourceStructure): Boolean {
     if (isClauseStart()) return false
+    if (isClosingTokenOfSubquery(structure) && !isInsideCaseExpression(structure)) return false
     if (isCreateTableItemStart(structure)) return false
     if (isCreateTableClosingParenthesis(structure)) return false
     val clause = structure.innermostClauseContaining(this) ?: return false
@@ -150,6 +157,18 @@ private fun SqlSourceStructure.innermostClauseContaining(context: SqlSourceToken
     }
     return result
 }
+
+private fun SqlSourceTokenContext.isStandaloneSubqueryBody(structure: SqlSourceStructure): Boolean =
+    !isInsideCaseExpression(structure) &&
+        structure.blocks.any { block ->
+            block.kind == SqlSourceBlockKind.Subquery &&
+                block.contains(this) &&
+                index > block.startTokenIndex &&
+                !isClosingTokenOf(block)
+        }
+
+private fun SqlSourceTokenContext.isInsideCaseExpression(structure: SqlSourceStructure): Boolean =
+    structure.innermostCaseContaining(this) != null
 
 private fun SqlSourceTokenContext.isExpressionContinuation(): Boolean =
     !isClauseStart() &&
