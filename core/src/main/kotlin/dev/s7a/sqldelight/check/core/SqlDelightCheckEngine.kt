@@ -4,7 +4,6 @@ package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleId
@@ -16,7 +15,6 @@ import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
-import dev.s7a.sqldelight.check.rule.api.defaultEnablement
 
 /**
  * Runs sqldelight-check rules for resolved database inputs.
@@ -61,16 +59,16 @@ public class SqlDelightCheckEngine {
                 resolver.resolveRule(
                     ruleId = candidate.ruleId,
                     databaseName = database.name,
-                    defaultEnablement = candidate.rule.defaultEnablement,
+                    defaultEnabled = candidate.rule.defaultEnabled,
                     defaultSeverity = candidate.rule.defaultSeverity,
                 )
             candidate.rule.deprecation?.let { deprecation ->
-                if (ruleConfig.explicitlyConfigured && ruleConfig.enablement != Enablement.Auto) {
+                if (ruleConfig.explicitlyConfigured && ruleConfig.enablement != null) {
                     trace.deprecatedRule(
                         database = database,
                         ruleId = candidate.ruleId,
                         deprecation = deprecation,
-                        enabled = ruleConfig.enablement == Enablement.Enabled,
+                        enabled = ruleConfig.enablement,
                     )
                 }
             }
@@ -95,7 +93,7 @@ public class SqlDelightCheckEngine {
                     resolver.resolveRule(
                         ruleId = candidate.ruleId,
                         databaseName = database.name,
-                        defaultEnablement = candidate.rule.defaultEnablement,
+                        defaultEnabled = candidate.rule.defaultEnabled,
                         defaultSeverity = candidate.rule.defaultSeverity,
                     )
                 val context =
@@ -106,11 +104,7 @@ public class SqlDelightCheckEngine {
                         override val facts: SqlFacts = facts
                     }
                 val enablement =
-                    if (ruleConfig.enablement == Enablement.Auto) {
-                        ruleSetConfig.enablement
-                    } else {
-                        ruleConfig.enablement
-                    }
+                    ruleConfig.enablement ?: ruleSetConfig.enablement
                 if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
 
                 executedRuleIds += candidate.ruleId
@@ -142,12 +136,12 @@ public class SqlDelightCheckEngine {
 
     private fun Rule.shouldRun(
         context: RuleContext,
-        enablement: Enablement,
+        enablement: Boolean?,
     ): Boolean =
         when (enablement) {
-            Enablement.Enabled -> true
-            Enablement.Disabled -> false
-            Enablement.Auto -> deprecation == null && hasTargetDialect(context) && isApplicable(context)
+            true -> true
+            false -> false
+            null -> deprecation == null && hasTargetDialect(context) && isApplicable(context)
         }
 
     private fun Rule.hasTargetDialect(context: RuleContext): Boolean =
@@ -179,22 +173,20 @@ private fun coreRuleSeverity(
     databaseName: String,
     ruleId: QualifiedRuleId,
 ): Severity? {
-    val ruleSetConfig = resolver.resolveRuleSet(coreRuleSetId, databaseName, defaultEnablement = Enablement.Enabled)
+    val ruleSetConfig = resolver.resolveRuleSet(coreRuleSetId, databaseName, defaultEnabled = true)
     val ruleConfig =
         resolver.resolveRule(
             ruleId = ruleId,
             databaseName = databaseName,
-            defaultEnablement = Enablement.Enabled,
+            defaultEnabled = true,
             defaultSeverity = Severity.Warning,
         )
-    val enablement =
-        if (ruleConfig.enablement == Enablement.Auto) {
-            ruleSetConfig.enablement
-        } else {
-            ruleConfig.enablement
-        }
-    return if (enablement == Enablement.Disabled) null else ruleConfig.severity
+    val enablement = ruleConfig.enablement ?: ruleSetConfig.enablement
+    return if (enablement == false) null else ruleConfig.severity
 }
+
+private val Rule.defaultEnabled: Boolean?
+    get() = if (defaultEnable) null else false
 
 private inline fun Severity?.orEmptyDiagnostics(block: (Severity) -> List<Diagnostic>): List<Diagnostic> =
     this?.let(block).orEmpty()

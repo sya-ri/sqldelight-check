@@ -60,8 +60,6 @@ Rules implement `Rule` and report diagnostics through `DiagnosticReporter`.
 
 ```kotlin
 package com.example.sqldelight.rules
-
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -137,7 +135,7 @@ rule ID into the configured `rule-set:rule-name` ID:
 sqldelightCheck {
     ruleSets {
         ruleSet("example") {
-            enabled.set(Enablement.Auto)
+            enabled.set(true)
         }
     }
     rules {

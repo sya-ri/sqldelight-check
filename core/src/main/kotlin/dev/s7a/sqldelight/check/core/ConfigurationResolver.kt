@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
@@ -17,13 +16,18 @@ internal class ConfigurationResolver(
     fun resolveRuleSet(
         ruleSetId: RuleSetId,
         databaseName: String,
-        defaultEnablement: Enablement = Enablement.Auto,
+        defaultEnabled: Boolean? = null,
     ): ResolvedRuleSetConfig {
         val global = config.ruleSets[ruleSetId]
         val database = config.databases[databaseName]?.ruleSets?.get(ruleSetId)
         return ResolvedRuleSetConfig(
             ruleSetId = ruleSetId,
-            enablement = database?.enablement ?: global?.enablement ?: defaultEnablement,
+            enablement =
+                when {
+                    database != null -> database.enablement
+                    global != null -> global.enablement
+                    else -> defaultEnabled
+                },
         )
     }
 
@@ -33,14 +37,19 @@ internal class ConfigurationResolver(
     fun resolveRule(
         ruleId: QualifiedRuleId,
         databaseName: String,
-        defaultEnablement: Enablement = Enablement.Auto,
+        defaultEnabled: Boolean? = null,
         defaultSeverity: Severity = Severity.Warning,
     ): ResolvedRuleConfig {
         val global = config.rules[ruleId]
         val database = config.databases[databaseName]?.rules?.get(ruleId)
         return ResolvedRuleConfig(
             ruleId = ruleId,
-            enablement = database?.enablement ?: global?.enablement ?: defaultEnablement,
+            enablement =
+                when {
+                    database != null -> database.enablement
+                    global != null -> global.enablement
+                    else -> defaultEnabled
+                },
             severity = database?.severity ?: global?.severity ?: defaultSeverity,
             options = global.optionsOrEmpty() + database.optionsOrEmpty(),
             explicitlyConfigured = global != null || database != null,

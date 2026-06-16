@@ -13,7 +13,7 @@ compiler internals.
 sqldelightCheck {
     ruleSets {
         standard {
-            enabled.set(Enablement.Enabled)
+            enabled.set(false)
         }
     }
 }
@@ -34,13 +34,12 @@ Built-in rules use `Severity.Error` for high-risk findings, `Severity.Warning` f
 Users can override enablement and severity in `build.gradle.kts`:
 
 ```kotlin
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.Severity
 
 sqldelightCheck {
     rules {
         rule("standard:keyword-case") {
-            enabled.set(Enablement.Enabled)
+            enabled.set(true)
             severity.set(Severity.Info)
         }
     }

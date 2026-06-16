@@ -11,7 +11,7 @@ and migration patterns that are important for live PostgreSQL databases.
 sqldelightCheck {
     ruleSets {
         postgres {
-            enabled.set(Enablement.Auto)
+            enabled.set(false)
         }
     }
 }

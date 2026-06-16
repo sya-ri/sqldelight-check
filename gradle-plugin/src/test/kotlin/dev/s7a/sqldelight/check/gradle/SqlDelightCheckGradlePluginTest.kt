@@ -109,7 +109,6 @@ class SqlDelightCheckGradlePluginTest {
                 sqlDelightBuildScript(
                     extraImports =
                         """
-                        import dev.s7a.sqldelight.check.api.Enablement
                         import dev.s7a.sqldelight.check.api.Severity
                         """.trimIndent(),
                     extraConfiguration =
@@ -117,7 +116,7 @@ class SqlDelightCheckGradlePluginTest {
                         sqldelightCheck {
                             rules {
                                 rule("sqlite:prefer-integer-primary-key") {
-                                    enabled.set(Enablement.Enabled)
+                                    enabled.set(true)
                                     severity.set(Severity.Error)
                                 }
                             }
@@ -190,7 +189,6 @@ class SqlDelightCheckGradlePluginTest {
         val project =
             testProject(
                 """
-                import dev.s7a.sqldelight.check.api.Enablement
                 import dev.s7a.sqldelight.check.api.Severity
 
                 plugins {
@@ -199,17 +197,14 @@ class SqlDelightCheckGradlePluginTest {
 
                 sqldelightCheck {
                     ruleSets {
-                        standard {
-                            enabled.set(Enablement.Auto)
-                        }
                         postgres {
-                            enabled.set(Enablement.Disabled)
+                            enabled.set(false)
                         }
                     }
 
                     rules {
                         rule("standard:final-newline") {
-                            enabled.set(Enablement.Enabled)
+                            enabled.set(true)
                             severity.set(Severity.Error)
                         }
                     }
@@ -218,7 +213,7 @@ class SqlDelightCheckGradlePluginTest {
                         database("Database") {
                             ruleSets {
                                 standard {
-                                    enabled.set(Enablement.Disabled)
+                                    enabled.set(false)
                                 }
                             }
                             rules {
@@ -317,7 +312,6 @@ class SqlDelightCheckGradlePluginTest {
                 sqlDelightBuildScript(
                     extraImports =
                         """
-                        import dev.s7a.sqldelight.check.api.Enablement
                         import dev.s7a.sqldelight.check.api.LogLevel
                         """.trimIndent(),
                     extraConfiguration =
@@ -326,12 +320,12 @@ class SqlDelightCheckGradlePluginTest {
                             logLevel.set(LogLevel.Debug)
                             ruleSets {
                                 standard {
-                                    enabled.set(Enablement.Disabled)
+                                    enabled.set(false)
                                 }
                             }
                             rules {
                                 rule("standard:final-newline") {
-                                    enabled.set(Enablement.Enabled)
+                                    enabled.set(true)
                                 }
                             }
                         }
@@ -515,7 +509,6 @@ class SqlDelightCheckGradlePluginTest {
         project.write(
             "app/build.gradle.kts",
             """
-            import dev.s7a.sqldelight.check.api.Enablement
             import dev.s7a.sqldelight.check.api.Severity
 
             plugins {
@@ -541,12 +534,12 @@ class SqlDelightCheckGradlePluginTest {
             sqldelightCheck {
                 ruleSets {
                     standard {
-                        enabled.set(Enablement.Disabled)
+                        enabled.set(false)
                     }
                 }
                 rules {
                     rule("standard:final-newline") {
-                        enabled.set(Enablement.Enabled)
+                        enabled.set(true)
                         severity.set(Severity.Error)
                     }
                 }
@@ -582,7 +575,6 @@ class SqlDelightCheckGradlePluginTest {
         workspace.write(
             "app/build.gradle.kts",
             """
-            import dev.s7a.sqldelight.check.api.Enablement
             import dev.s7a.sqldelight.check.api.Severity
 
             plugins {
@@ -608,12 +600,12 @@ class SqlDelightCheckGradlePluginTest {
             sqldelightCheck {
                 ruleSets {
                     standard {
-                        enabled.set(Enablement.Disabled)
+                        enabled.set(false)
                     }
                 }
                 rules {
                     rule("standard:final-newline") {
-                        enabled.set(Enablement.Enabled)
+                        enabled.set(true)
                         severity.set(Severity.Warning)
                     }
                 }
@@ -651,7 +643,6 @@ class SqlDelightCheckGradlePluginTest {
         workspace.write(
             "app/build.gradle.kts",
             """
-            import dev.s7a.sqldelight.check.api.Enablement
 
             plugins {
                 kotlin("jvm") version "2.4.0"
@@ -676,12 +667,12 @@ class SqlDelightCheckGradlePluginTest {
             sqldelightCheck {
                 ruleSets {
                     standard {
-                        enabled.set(Enablement.Disabled)
+                        enabled.set(false)
                     }
                 }
                 rules {
                     rule("standard:final-newline") {
-                        enabled.set(Enablement.Enabled)
+                        enabled.set(true)
                     }
                 }
             }
@@ -786,7 +777,6 @@ class SqlDelightCheckGradlePluginTest {
         val project =
             testProject(
                 """
-                import dev.s7a.sqldelight.check.api.Enablement
                 import dev.s7a.sqldelight.check.api.Severity
 
                 plugins {
@@ -812,12 +802,12 @@ class SqlDelightCheckGradlePluginTest {
                 sqldelightCheck {
                     ruleSets {
                         standard {
-                            enabled.set(Enablement.Disabled)
+                            enabled.set(false)
                         }
                     }
                     rules {
                         rule("standard:final-newline") {
-                            enabled.set(Enablement.Enabled)
+                            enabled.set(true)
                             severity.set(Severity.Error)
                         }
                     }
@@ -892,14 +882,13 @@ class SqlDelightCheckGradlePluginTest {
                 sqlDelightBuildScript(
                     extraImports =
                         """
-                        import dev.s7a.sqldelight.check.api.Enablement
                         """.trimIndent(),
                     extraConfiguration =
                         """
                         sqldelightCheck {
                             rules {
                                 rule("standard:prefer-named-parameters") {
-                                    enabled.set(Enablement.Disabled)
+                                    enabled.set(false)
                                 }
                             }
                         }
@@ -934,14 +923,13 @@ class SqlDelightCheckGradlePluginTest {
                 sqlDelightBuildScript(
                     extraImports =
                         """
-                        import dev.s7a.sqldelight.check.api.Enablement
                         """.trimIndent(),
                     extraConfiguration =
                         """
                     sqldelightCheck {
                         rules {
                             rule("standard:prefer-named-parameters") {
-                                enabled.set(Enablement.Disabled)
+                                enabled.set(false)
                             }
                         }
                         fix {
@@ -1027,7 +1015,6 @@ class SqlDelightCheckGradlePluginTest {
                 sqlDelightBuildScript(
                     extraImports =
                         """
-                        import dev.s7a.sqldelight.check.api.Enablement
                         import dev.s7a.sqldelight.check.api.Severity
                         """.trimIndent(),
                     extraConfiguration =
@@ -1039,12 +1026,12 @@ class SqlDelightCheckGradlePluginTest {
                         sqldelightCheck {
                             ruleSets {
                                 standard {
-                                    enabled.set(Enablement.Disabled)
+                                    enabled.set(false)
                                 }
                             }
                             rules {
                                 rule("standard:final-newline") {
-                                    enabled.set(Enablement.Enabled)
+                                    enabled.set(true)
                                     severity.set(Severity.Error)
                                 }
                             }
@@ -1110,7 +1097,6 @@ class SqlDelightCheckGradlePluginTest {
         sqlDelightBuildScript(
             extraImports =
                 """
-                import dev.s7a.sqldelight.check.api.Enablement
                 import dev.s7a.sqldelight.check.api.Severity
                 """.trimIndent(),
             extraConfiguration =
@@ -1118,12 +1104,12 @@ class SqlDelightCheckGradlePluginTest {
                 sqldelightCheck {
                     ruleSets {
                         standard {
-                            enabled.set(Enablement.Disabled)
+                            enabled.set(false)
                         }
                     }
                     rules {
                         rule("standard:final-newline") {
-                            enabled.set(Enablement.Enabled)
+                            enabled.set(true)
                             severity.set(Severity.$severity)
                         }
                     }
