@@ -105,25 +105,51 @@ stable fact type to `rule-api` over reaching into SQLDelight internals.
 `rule-api` also provides small source-text helpers for rules that only need
 offset-stable text checks:
 
-- `RegexRule` reports regex matches in source text after masking comments and quoted text.
 - `String.rangeAtOffsets(startOffset, endOffset)` converts offsets to a `SourceRange`.
 - `String.sqlTokens()` scans SQL-like identifiers outside comments and quoted text.
+- `List<SqlToken>.findSourcePattern(...)` matches dialect-provided source patterns against token streams.
+- `Rule.reportSqlStatementMatches(...)` tokenizes source text, splits it into statements, and reports matched ranges.
 - `String.maskSqlCommentsAndQuotedText()` masks comments and quoted text while preserving offsets.
 - `Map<String, String>.booleanOption(...)`, `positiveIntOption(...)`, and `commaSeparatedOption(...)` parse common rule options.
 
-Use `RegexRule` for simple source-text policies before writing the same masking
-and range mapping by hand:
+Use the token helpers for simple source-text policies before writing the same
+masking, statement splitting, and range mapping by hand:
 
 ```kotlin
-import dev.s7a.sqldelight.check.rule.api.RegexRule
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.dialects.sqlite.ForeignKeysOffValue
+import dev.s7a.sqldelight.check.dialects.sqlite.ForeignKeysPragmaStatementStart
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.findSourcePatternsInOrder
+import dev.s7a.sqldelight.check.rule.api.reportSqlStatementMatches
 
-class NoUnsafePragmaRule : RegexRule(
-    ruleName = "no-unsafe-pragma",
-    pattern = """\bPRAGMA\s+writable_schema\s*=\s*ON\b""",
-    message = "Avoid enabling writable_schema in checked SQLDelight sources.",
-    defaultSeverity = Severity.Error,
-    targetDialect = DialectId("example"),
-)
+class NoForeignKeysOffRule : Rule {
+    override val id: RuleId = RuleId("no-foreign-keys-off")
+    override val defaultSeverity: Severity = Severity.Error
+    override val defaultEnable: Boolean = true
+    override val targetDialect = SQLiteDialectId
+
+    override fun run(
+        context: RuleContext,
+        reporter: DiagnosticReporter,
+    ) {
+        reportSqlStatementMatches(
+            context = context,
+            reporter = reporter,
+            message = "Avoid disabling SQLite foreign key enforcement.",
+        ) { statement ->
+            statement.findSourcePatternsInOrder(
+                context.database.dialect.sourcePatterns,
+                ForeignKeysPragmaStatementStart,
+                ForeignKeysOffValue,
+            )
+        }
+    }
+}
 ```
 
 ## IDs And Configuration
