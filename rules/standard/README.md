@@ -126,6 +126,7 @@ The standard rule set uses two safety levels:
 | [`standard:max-line-length`](#standardmax-line-length) | 🟢 | ⚠️ |  | Report non-blank lines longer than 120 characters. |
 | [`standard:max-subquery-depth`](#standardmax-subquery-depth) | 🟢 | ⚠️ |  | Disallow nested `SELECT` statements deeper than `maxDepth`. |
 | [`standard:no-blank-line-after-query-label`](#standardno-blank-line-after-query-label) | 🟢 | ⚠️ | ✅ | Disallow blank lines between a SQLDelight query label and its statement body. |
+| [`standard:no-blank-lines-in-statement`](#standardno-blank-lines-in-statement) | 🟢 | ⚠️ | ✅ | Disallow blank lines inside a SQL statement. |
 | [`standard:no-consecutive-semicolons`](#standardno-consecutive-semicolons) | 🟢 | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
 | [`standard:no-delete-all`](#standardno-delete-all) | 🟢 | ❌ |  | Disallow `DELETE` statements with obviously always-true `WHERE` predicates. |
 | [`standard:no-delete-without-where`](#standardno-delete-without-where) | 🟢 | ❌ |  | Disallow `DELETE` statements without a top-level `WHERE`. |
@@ -835,6 +836,39 @@ Fix behavior:
 - Removes blank lines after SQLDelight `name:` labels and grouped `name {`
   labels.
 - Applies only to `.sq` files.
+- Applied automatically in write tasks.
+
+## `standard:no-blank-lines-in-statement`
+
+Reports blank lines inside a SQL statement.
+
+Statement bodies should stay visually contiguous. Blank lines between statements
+are still allowed and are governed by `standard:blank-line-between-statements`.
+
+Invalid:
+
+```sql
+selectById:
+SELECT id, name
+FROM player
+
+WHERE id = :id;
+```
+
+Valid:
+
+```sql
+selectById:
+SELECT id, name
+FROM player
+WHERE id = :id;
+```
+
+Fix behavior:
+
+- Removes blank lines between the first and last content line of a statement.
+- Treats whitespace-only lines as blank.
+- Does not report the required blank line between adjacent statements.
 - Applied automatically in write tasks.
 
 ## `standard:no-trailing-blank-lines`
