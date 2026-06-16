@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleSetId
 
 /**
@@ -14,7 +13,7 @@ internal class ResolvedRuleSetConfig(
     /**
      * Final enablement before rule-level overrides are applied.
      */
-    val enablement: Enablement,
+    val enablement: Boolean?,
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||

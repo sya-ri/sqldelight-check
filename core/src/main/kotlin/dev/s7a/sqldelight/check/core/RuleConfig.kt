@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 
@@ -13,9 +12,9 @@ public class RuleConfig(
      */
     public val id: QualifiedRuleId,
     /**
-     * Configured rule enablement.
+     * Configured rule enablement. `null` lets sqldelight-check decide automatically.
      */
-    public val enablement: Enablement,
+    public val enablement: Boolean? = null,
     /**
      * Configured rule severity.
      */

@@ -14,7 +14,7 @@ rule-set diagnostics:
 sqldelightCheck {
     rules {
         rule("core:no-redundant-suppression") {
-            enabled.set(Enablement.Disabled)
+            enabled.set(false)
         }
     }
 }

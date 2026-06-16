@@ -2,7 +2,6 @@ package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.DialectId
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
@@ -34,7 +33,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet()),
                 config =
                     CheckConfig(
-                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, Enablement.Disabled)),
+                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, false)),
                     ),
             )
 
@@ -49,8 +48,8 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet()),
                 config =
                     CheckConfig(
-                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, Enablement.Disabled)),
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Error)),
+                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, false)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Error)),
                     ),
             )
 
@@ -66,7 +65,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule(severity = Severity.Info))),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Auto, Severity.Error)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, null, Severity.Error)),
                     ),
             )
 
@@ -127,7 +126,7 @@ class SqlDelightCheckEngineTest {
                     ),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Warning)),
                     ),
             )
 
@@ -152,7 +151,7 @@ class SqlDelightCheckEngineTest {
                     ),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Warning)),
                     ),
             )
 
@@ -179,7 +178,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule(deprecation = testDeprecation()))),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Warning)),
                     ),
                 trace = trace,
             )
@@ -200,7 +199,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule(deprecation = testDeprecation()))),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Disabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, false, Severity.Warning)),
                     ),
                 trace = trace,
             )
@@ -232,7 +231,7 @@ class SqlDelightCheckEngineTest {
                                 ruleId to
                                     RuleConfig(
                                         ruleId,
-                                        Enablement.Enabled,
+                                        true,
                                         Severity.Warning,
                                         options = mapOf("max" to "8", "mode" to "global"),
                                     ),
@@ -247,7 +246,7 @@ class SqlDelightCheckEngineTest {
                                                 ruleId to
                                                     RuleConfig(
                                                         ruleId,
-                                                        Enablement.Auto,
+                                                        null,
                                                         Severity.Warning,
                                                         options = mapOf("max" to "12"),
                                                     ),
@@ -459,7 +458,7 @@ class SqlDelightCheckEngineTest {
                                 qualifiedRuleId("core:require-suppression-reason") to
                                     RuleConfig(
                                         qualifiedRuleId("core:require-suppression-reason"),
-                                        Enablement.Disabled,
+                                        false,
                                         Severity.Warning,
                                     ),
                             ),
@@ -538,7 +537,7 @@ class SqlDelightCheckEngineTest {
                                 qualifiedRuleId("core:no-redundant-suppression") to
                                     RuleConfig(
                                         qualifiedRuleId("core:no-redundant-suppression"),
-                                        Enablement.Disabled,
+                                        false,
                                         Severity.Warning,
                                     ),
                             ),

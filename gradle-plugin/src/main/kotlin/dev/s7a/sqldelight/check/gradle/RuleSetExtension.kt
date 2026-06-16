@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.gradle
 
-import dev.s7a.sqldelight.check.api.Enablement
 import org.gradle.api.Named
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -16,10 +15,10 @@ public open class RuleSetExtension
         objects: ObjectFactory,
     ) : Named {
         /**
-         * Rule set enablement.
+         * Rule set enablement. Leave unset to let sqldelight-check decide automatically.
          */
-        public val enabled: Property<Enablement> =
-            objects.property(Enablement::class.java).convention(Enablement.Auto)
+        public val enabled: Property<Boolean> =
+            objects.property(Boolean::class.java)
 
         override fun getName(): String = name
     }

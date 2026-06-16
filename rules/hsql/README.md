@@ -11,7 +11,7 @@ operations that are better kept out of versioned SQLDelight schema files.
 sqldelightCheck {
     ruleSets {
         hsql {
-            enabled.set(Enablement.Auto)
+            enabled.set(false)
         }
     }
 }

@@ -49,23 +49,19 @@ are added.
 Configure rule sets, rules, reports, fix safety, and database-specific overrides in `build.gradle.kts`:
 
 ```kotlin
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.Severity
 
 sqldelightCheck {
     ruleSets {
-        standard {
-            enabled.set(Enablement.Auto)
-        }
         postgres {
-            enabled.set(Enablement.Auto)
+            enabled.set(false)
         }
     }
 
     rules {
         rule("standard:final-newline") {
-            enabled.set(Enablement.Enabled)
+            enabled.set(true)
             severity.set(Severity.Warning)
         }
         rule("standard:no-trailing-whitespace") {
@@ -124,11 +120,11 @@ sqldelightCheck {
 }
 ```
 
-Enablement values:
+Enabled values:
 
-- `Auto`: let sqldelight-check decide from the rule default and applicability.
-- `Enabled`: run the rule or rule set.
-- `Disabled`: do not run the rule or rule set.
+- unset: let sqldelight-check decide from the rule default and applicability.
+- `true`: run the rule or rule set.
+- `false`: do not run the rule or rule set.
 
 Rule-level explicit enablement overrides a rule set default. Severity values are `Info`, `Warning`, and `Error`; error
 diagnostics fail check tasks after reports are written.

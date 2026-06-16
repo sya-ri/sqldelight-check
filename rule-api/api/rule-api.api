@@ -26,10 +26,6 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleContext {
 	public abstract fun getOptions ()Ljava/util/Map;
 }
 
-public final class dev/s7a/sqldelight/check/rule/api/RuleDefaultsKt {
-	public static final fun getDefaultEnablement (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/Enablement;
-}
-
 public final class dev/s7a/sqldelight/check/rule/api/RuleDeprecation {
 	public fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;)V
 	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
