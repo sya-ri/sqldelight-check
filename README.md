@@ -181,9 +181,9 @@ See [Core diagnostics](core/README.md) for core diagnostic behavior and configur
 
 Built-in rule set artifacts are installed with the Gradle plugin and are also published separately for custom setups:
 
-The built-in rule sets currently include 153 rules:
+The built-in rule sets currently include 154 rules:
 
-- `sqldelight-check-rules-standard`: 124 dialect-independent rules for `.sq` and `.sqm` files.
+- `sqldelight-check-rules-standard`: 125 dialect-independent rules for `.sq` and `.sqm` files.
 - `sqldelight-check-rules-postgres`: 12 PostgreSQL-specific rules gated by `DialectCapability.PostgreSql`.
 - `sqldelight-check-rules-mysql`: 8 MySQL-specific rules gated by `DialectCapability.MySql`.
 - `sqldelight-check-rules-sqlite`: 6 SQLite-specific rules gated by `DialectCapability.SQLite`.

@@ -35,8 +35,9 @@ import dev.s7a.sqldelight.check.rules.standard.rules.MaxCaseDepthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxJoinsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxLineLengthRule
 import dev.s7a.sqldelight.check.rules.standard.rules.MaxSubqueryDepthRule
-import dev.s7a.sqldelight.check.rules.standard.rules.NoConsecutiveSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoBlankLineAfterQueryLabelRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoBlankLinesInStatementRule
+import dev.s7a.sqldelight.check.rules.standard.rules.NoConsecutiveSemicolonsRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteAllRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDeleteWithoutWhereRule
 import dev.s7a.sqldelight.check.rules.standard.rules.NoDistinctParenthesesRule
@@ -176,8 +177,9 @@ public class StandardRuleSetProvider : RuleSetProvider {
             RuleProvider(::MaxJoinsRule),
             RuleProvider(::MaxLineLengthRule),
             RuleProvider(::MaxSubqueryDepthRule),
-            RuleProvider(::NoConsecutiveSemicolonsRule),
             RuleProvider(::NoBlankLineAfterQueryLabelRule),
+            RuleProvider(::NoBlankLinesInStatementRule),
+            RuleProvider(::NoConsecutiveSemicolonsRule),
             RuleProvider(::NoDeleteAllRule),
             RuleProvider(::NoDeleteWithoutWhereRule),
             RuleProvider(::NoDistinctParenthesesRule),
