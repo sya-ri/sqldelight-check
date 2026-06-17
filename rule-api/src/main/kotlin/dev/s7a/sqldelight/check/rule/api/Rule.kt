@@ -58,6 +58,16 @@ public interface Rule {
         get() = null
 
     /**
+     * Typed options supported by this rule.
+     *
+     * Core emits a warning when user configuration contains option names that
+     * are not declared here. Declare options with rule option delegate helpers
+     * when a rule accepts configuration.
+     */
+    public val options: Set<RuleOption<*>>
+        get() = declaredRuleOptions(this)
+
+    /**
      * Returns whether this rule applies to the current context when enablement is `Auto`.
      *
      * Explicit `Enabled` and `Disabled` configuration bypass this method.

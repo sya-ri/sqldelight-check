@@ -16,6 +16,7 @@ import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
 import dev.s7a.sqldelight.check.reporter.api.ReportOutput
 import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
+import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import java.io.File
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
@@ -168,6 +169,24 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 enabled: Boolean,
             ) {
                 logger.warn(deprecatedRuleMessage(database, ruleId, deprecation, enabled))
+            }
+
+            override fun unknownRuleOption(
+                database: DatabaseContext,
+                ruleId: QualifiedRuleId,
+                optionName: String,
+                knownOptionNames: Set<String>,
+            ) {
+                logger.warn(unknownRuleOptionMessage(database, ruleId, optionName, knownOptionNames))
+            }
+
+            override fun deprecatedRuleOption(
+                database: DatabaseContext,
+                ruleId: QualifiedRuleId,
+                optionName: String,
+                deprecation: RuleOptionDeprecation,
+            ) {
+                logger.warn(deprecatedRuleOptionMessage(database, ruleId, optionName, deprecation))
             }
         }
 
@@ -362,6 +381,49 @@ private fun deprecatedRuleMessage(
         }
         if (!enabled) {
             append(" Remove this rule configuration.")
+        }
+    }
+
+private fun unknownRuleOptionMessage(
+    database: DatabaseContext,
+    ruleId: QualifiedRuleId,
+    optionName: String,
+    knownOptionNames: Set<String>,
+): String =
+    buildString {
+        append("sqldelight-check unknown option ")
+        append(optionName)
+        append(" for rule ")
+        append(ruleId.value)
+        append(" in database ")
+        append(database.name)
+        append(".")
+        if (knownOptionNames.isNotEmpty()) {
+            append(" Known options: ")
+            append(knownOptionNames.sorted().joinToString(", "))
+            append(".")
+        }
+    }
+
+private fun deprecatedRuleOptionMessage(
+    database: DatabaseContext,
+    ruleId: QualifiedRuleId,
+    optionName: String,
+    deprecation: RuleOptionDeprecation,
+): String =
+    buildString {
+        append("sqldelight-check deprecated option ")
+        append(optionName)
+        append(" for rule ")
+        append(ruleId.value)
+        append(" is configured for database ")
+        append(database.name)
+        append(". ")
+        append(deprecation.message)
+        deprecation.replacement?.let { replacement ->
+            append(" Use ")
+            append(replacement)
+            append(" instead.")
         }
     }
 

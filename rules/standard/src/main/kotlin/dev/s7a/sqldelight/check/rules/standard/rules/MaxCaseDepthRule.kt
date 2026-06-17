@@ -2,8 +2,6 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
-import dev.s7a.sqldelight.check.rule.api.positiveIntOption
-
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -12,6 +10,7 @@ import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
 private const val DEFAULT_MAX_CASE_DEPTH = 2
 
@@ -19,6 +18,8 @@ private const val DEFAULT_MAX_CASE_DEPTH = 2
  * Reports CASE expressions nested deeper than the configured limit.
  */
 public class MaxCaseDepthRule : Rule {
+    private val maxCaseDepthOption by positiveIntOption("maxDepth", DEFAULT_MAX_CASE_DEPTH)
+
     override val id: RuleId = RuleId("max-case-depth")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
@@ -27,7 +28,7 @@ public class MaxCaseDepthRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        val maxDepth = context.options.positiveIntOption("maxDepth", DEFAULT_MAX_CASE_DEPTH)
+        val maxDepth = context.options[maxCaseDepthOption]
         val content = context.file.content
         val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
         structure.blocks

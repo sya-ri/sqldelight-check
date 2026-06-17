@@ -17,6 +17,8 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
+private const val DEFAULT_INDENT_SIZE = 4
+
 /**
  * Reports SQL lines whose indentation does not match their source structure.
  *
@@ -26,6 +28,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
  * parenthesized source block.
  */
 public class SourceIndentationRule : Rule {
+    private val indentSizeOption by positiveIntOption("indentSize", DEFAULT_INDENT_SIZE)
+
     override val id: RuleId = RuleId("source-indentation")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
@@ -35,7 +39,7 @@ public class SourceIndentationRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val indentSize = context.options.positiveIntOption("indentSize", DEFAULT_INDENT_SIZE)
+        val indentSize = context.options[indentSizeOption]
         val lines = content.linesWithRanges()
         val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
         val statementBlocks =
@@ -75,8 +79,6 @@ public class SourceIndentationRule : Rule {
         }
     }
 }
-
-private const val DEFAULT_INDENT_SIZE = 4
 
 private fun SqlSourceTokenContext.expectedIndentationLevel(
     structure: SqlSourceStructure,
