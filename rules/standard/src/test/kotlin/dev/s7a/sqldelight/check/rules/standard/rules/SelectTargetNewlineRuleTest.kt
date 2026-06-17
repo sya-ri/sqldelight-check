@@ -1,23 +1,34 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SelectTargetNewlineRuleTest {
     @Test
     fun `reports multiline select list with multiple targets on the select line`() {
-        val diagnostics =
-            SelectTargetNewlineRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT id, name,
-                  age
-                FROM player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT id, name,
+              age
+            FROM player;
+            """.asSqlDelightFile()
+        val diagnostics = SelectTargetNewlineRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        SelectTargetNewlineRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT
+            id,
+            name,
+              age
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

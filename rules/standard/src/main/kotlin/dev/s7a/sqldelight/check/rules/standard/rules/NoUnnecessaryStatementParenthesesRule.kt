@@ -37,6 +37,16 @@ public class NoUnnecessaryStatementParenthesesRule : Rule {
                         file = context.file,
                         range = content.rangeAtOffsets(block.startOffset, block.endOffset),
                         database = context.database,
+                        fixes =
+                            listOf(
+                                content.deletePairFix(
+                                    firstStartOffset = block.startOffset,
+                                    firstEndOffset = block.startOffset + 1,
+                                    secondStartOffset = block.endOffset - 1,
+                                    secondEndOffset = block.endOffset,
+                                    title = "Remove redundant statement parentheses",
+                                ),
+                            ),
                     ),
                 )
             }

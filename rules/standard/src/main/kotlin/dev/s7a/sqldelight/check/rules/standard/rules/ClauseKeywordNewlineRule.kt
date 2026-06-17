@@ -52,6 +52,7 @@ public class ClauseKeywordNewlineRule : Rule {
                             file = context.file,
                             range = content.rangeAtOffsets(clause.startOffset, clause.endOffset),
                             database = context.database,
+                            fixes = listOf(content.startOwnLineFix(clause.startOffset, "Move clause keyword to its own line")),
                         ),
                     )
                 }

@@ -20,6 +20,18 @@ class NoSpaceBeforeClosingParenthesisRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoSpaceBeforeClosingParenthesisRule().assertAllFixes(
+            """
+            insertPlayer:
+            INSERT INTO player(id, name, score )
+            VALUES (?, ?, ?);
+            """.asSqlDelightFile(),
+            """
+            insertPlayer:
+            INSERT INTO player(id, name, score)
+            VALUES (?, ?, ?);
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -31,6 +43,14 @@ class NoSpaceBeforeClosingParenthesisRuleTest {
             """.asSqlDelightFile().withTabs()
 
         assertEquals("", NoSpaceBeforeClosingParenthesisRule().singleReplacement(content, path = MIGRATION_SQM_PATH))
+        NoSpaceBeforeClosingParenthesisRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY);
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
+        )
     }
 
     @Test

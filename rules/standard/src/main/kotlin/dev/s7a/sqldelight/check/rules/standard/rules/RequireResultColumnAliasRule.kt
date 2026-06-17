@@ -25,21 +25,8 @@ public class RequireResultColumnAliasRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val tokens = content.sqlTokens().toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
-            val selectDepth = content.sqlParenthesisDepthAt(token.startOffset)
-            val statementEnd = content.statementEndAfter(token.startOffset)
-            val fromToken =
-                tokens
-                    .drop(index + 1)
-                    .firstOrNull { candidate ->
-                        candidate.startOffset < statementEnd &&
-                            content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
-                            candidate.isTerm(SqlDialectSourceTerm.From)
-                    } ?: return@forEachIndexed
-
-            content.selectTargets(token.endOffset, fromToken.startOffset, selectDepth).forEach { target ->
+        content.sourceSelectClauseTargets().forEach { clause ->
+            clause.targets.forEach { target ->
                 if (!target.requiresAlias(content)) return@forEach
                 if (target.hasAlias(content, context.database.dialect.sourcePatterns)) return@forEach
 
@@ -57,40 +44,7 @@ public class RequireResultColumnAliasRule : Rule {
     }
 }
 
-private data class SelectTarget(
-    val startOffset: Int,
-    val endOffset: Int,
-)
-
-private fun String.selectTargets(
-    startOffset: Int,
-    endOffset: Int,
-    depth: Int,
-): List<SelectTarget> {
-    val targets = mutableListOf<SelectTarget>()
-    var targetStart = startOffset
-    sqlCharacters()
-        .dropWhile { character -> character.offset < startOffset }
-        .takeWhile { character -> character.offset < endOffset }
-        .forEach { character ->
-            if (character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth) {
-                targets += SelectTarget(targetStart, character.offset).trimmedIn(this)
-                targetStart = character.offset + 1
-            }
-        }
-    targets += SelectTarget(targetStart, endOffset).trimmedIn(this)
-    return targets.filter { target -> target.startOffset < target.endOffset }
-}
-
-private fun SelectTarget.trimmedIn(content: String): SelectTarget {
-    var start = startOffset
-    var end = endOffset
-    while (start < end && content[start].isWhitespace()) start++
-    while (end > start && content[end - 1].isWhitespace()) end--
-    return SelectTarget(start, end)
-}
-
-private fun SelectTarget.requiresAlias(content: String): Boolean {
+private fun SourceSelectTarget.requiresAlias(content: String): Boolean {
     val text = content.substring(startOffset, endOffset)
     if (text == "*") return false
     val tokens = text.sqlTokens().toList()
@@ -98,7 +52,7 @@ private fun SelectTarget.requiresAlias(content: String): Boolean {
     return text.any { character -> character in "()+-*/|<>= " } || tokens.any { token -> token.isTerm(SqlDialectSourceTerm.Case) }
 }
 
-private fun SelectTarget.hasAlias(
+private fun SourceSelectTarget.hasAlias(
     content: String,
     sourcePatterns: SqlDialectSourcePatterns,
 ): Boolean {
@@ -107,9 +61,22 @@ private fun SelectTarget.hasAlias(
     if (tokens.any { token -> token.isTerm(SqlDialectSourceTerm.As) }) return true
     if (tokens.size < 2) return false
     val last = tokens.last()
-    val previous = tokens[tokens.lastIndex - 1]
-    return !sourcePatterns.matches(AliasBoundary, listOf(last.normalizedText)) && previous.endOffset < last.startOffset
+    val aliasOffset = startOffset + last.startOffset
+    val previousSqlCharacter = content.sqlCharacters().takeWhile { character -> character.offset < aliasOffset }.lastOrNull()
+    return last.text.isIdentifierLike() &&
+        content.sqlParenthesisDepthAt(aliasOffset) == content.sqlParenthesisDepthAt(startOffset) &&
+        previousSqlCharacter?.value?.isWhitespace() == true &&
+        previousSqlCharacter.previousNonWhitespaceIn(content)?.value !in setOf('+', '-', '*', '/', '|', '<', '>', '=') &&
+        !sourcePatterns.matches(AliasBoundary, listOf(last.normalizedText))
 }
 
 private fun String.isSimpleColumnReference(): Boolean =
     all { character -> character.isLetterOrDigit() || character == '_' || character == '.' || character == '"' || character == '`' }
+
+private fun String.isIdentifierLike(): Boolean =
+    firstOrNull()?.let { character -> character == '_' || character.isLetter() } == true
+
+private fun SqlCharacter.previousNonWhitespaceIn(content: String): SqlCharacter? =
+    content.sqlCharacters()
+        .takeWhile { character -> character.offset < offset }
+        .lastOrNull { character -> !character.value.isWhitespace() }

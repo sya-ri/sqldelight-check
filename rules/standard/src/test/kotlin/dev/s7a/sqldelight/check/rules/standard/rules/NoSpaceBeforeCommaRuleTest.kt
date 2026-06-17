@@ -19,6 +19,18 @@ class NoSpaceBeforeCommaRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoSpaceBeforeCommaRule().assertAllFixes(
+            """
+            selectAll:
+            SELECT id , name
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectAll:
+            SELECT id, name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -31,6 +43,14 @@ class NoSpaceBeforeCommaRuleTest {
             """.asSqlDelightFile().withTabs()
 
         assertEquals("", NoSpaceBeforeCommaRule().singleReplacement(content))
+        NoSpaceBeforeCommaRule().assertAllFixes(
+            content,
+            """
+            insertPlayer:
+            INSERT INTO player(id, name, score)
+            VALUES (?, ?, ?);
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

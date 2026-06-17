@@ -20,6 +20,20 @@ class LiteralCaseRuleTest {
         assertEquals(2, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
         assertEquals("NULL", diagnostics.first().fixes.single().edits.single().replacement)
+        LiteralCaseRule().assertAllFixes(
+            """
+            selectActive:
+            SELECT id, name
+            FROM player
+            WHERE deleted_at IS null AND active = true;
+            """.asSqlDelightFile(),
+            """
+            selectActive:
+            SELECT id, name
+            FROM player
+            WHERE deleted_at IS NULL AND active = TRUE;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

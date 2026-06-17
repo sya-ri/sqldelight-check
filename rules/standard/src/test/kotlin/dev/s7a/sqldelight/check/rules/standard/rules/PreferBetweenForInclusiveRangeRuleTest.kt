@@ -1,5 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.Severity
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,6 +20,21 @@ class PreferBetweenForInclusiveRangeRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals(Severity.Info, diagnostics.single().severity)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        PreferBetweenForInclusiveRangeRule().assertAllFixes(
+            """
+            selectByScore:
+            SELECT id, name
+            FROM player
+            WHERE score >= :minimumScore AND score <= :maximumScore;
+            """.asSqlDelightFile(),
+            """
+            selectByScore:
+            SELECT id, name
+            FROM player
+            WHERE score BETWEEN :minimumScore AND :maximumScore;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

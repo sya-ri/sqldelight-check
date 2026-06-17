@@ -1,22 +1,31 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoSelfAliasRuleTest {
     @Test
     fun `reports table aliases that repeat table names`() {
-        val diagnostics =
-            NoSelfAliasRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT player.id
-                FROM player AS player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT player.id
+            FROM player AS player;
+            """.asSqlDelightFile()
+        val diagnostics = NoSelfAliasRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
         assertEquals("Table aliases should not repeat the table name.", diagnostics.single().message)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        NoSelfAliasRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT player.id
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

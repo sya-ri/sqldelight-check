@@ -37,6 +37,7 @@ public class NoSelfColumnAliasRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(alias.token.startOffset, alias.token.endOffset),
                     database = context.database,
+                    fixes = listOf(content.deleteAliasFix(alias.token.startOffset, alias.token.endOffset, "Remove self column alias")),
                 ),
             )
         }

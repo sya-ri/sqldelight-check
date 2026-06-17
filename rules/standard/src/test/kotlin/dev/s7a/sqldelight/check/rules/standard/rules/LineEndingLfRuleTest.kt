@@ -22,6 +22,18 @@ class LineEndingLfRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("\n", diagnostics.single().fixes.single().edits.single().replacement)
+        LineEndingLfRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+
+            selectAll:
+            SELECT id
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -36,6 +48,15 @@ class LineEndingLfRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals("\n", diagnostics.single().fixes.single().edits.single().replacement)
+        LineEndingLfRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
+        )
     }
 
     @Test

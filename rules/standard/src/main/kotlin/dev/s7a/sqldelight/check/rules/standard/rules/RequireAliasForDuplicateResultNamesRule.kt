@@ -41,7 +41,7 @@ public class RequireAliasForDuplicateResultNamesRule : Rule {
     }
 }
 
-private fun String.visibleResultName(target: SourceSelectTarget): String? {
+internal fun String.visibleResultName(target: SourceSelectTarget): String? {
     val tokens = substring(target.startOffset, target.endOffset).sqlTokens().toList()
     if (tokens.isEmpty()) return null
     if (tokens.size >= 2) {

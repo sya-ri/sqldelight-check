@@ -21,6 +21,20 @@ class NoLeadingWhitespaceRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoLeadingWhitespaceRule().assertAllFixes(
+            """
+
+
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -33,6 +47,14 @@ class NoLeadingWhitespaceRuleTest {
             """.asSqlDelightFile().withSpaces()
 
         assertEquals("", NoLeadingWhitespaceRule().singleReplacement(content))
+        NoLeadingWhitespaceRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -47,6 +69,15 @@ class NoLeadingWhitespaceRuleTest {
         assertEquals(
             "",
             NoLeadingWhitespaceRule().singleReplacement(content, path = MIGRATION_SQM_PATH),
+        )
+        NoLeadingWhitespaceRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
         )
     }
 

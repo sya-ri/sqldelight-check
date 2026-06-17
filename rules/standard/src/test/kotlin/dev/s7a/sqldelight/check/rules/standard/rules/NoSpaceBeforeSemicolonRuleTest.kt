@@ -20,6 +20,20 @@ class NoSpaceBeforeSemicolonRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoSpaceBeforeSemicolonRule().assertAllFixes(
+            """
+            selectAll:
+            SELECT id, name
+            FROM player
+            ORDER BY name ;
+            """.asSqlDelightFile(),
+            """
+            selectAll:
+            SELECT id, name
+            FROM player
+            ORDER BY name;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -32,6 +46,15 @@ class NoSpaceBeforeSemicolonRuleTest {
             """.asSqlDelightFile().withTabs()
 
         assertEquals("", NoSpaceBeforeSemicolonRule().singleReplacement(content, path = MIGRATION_SQM_PATH))
+        NoSpaceBeforeSemicolonRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
+        )
     }
 
     @Test

@@ -39,6 +39,7 @@ public class NoImplicitCrossJoinCommaRule : Rule {
                 .takeWhile { character -> character.offset < segmentEnd }
                 .filter { character -> character.value == ',' && content.sqlParenthesisDepthAt(character.offset) == fromDepth }
                 .forEach { comma ->
+                    val replacementEnd = content.inlineWhitespaceEndAfter(comma.offset + 1)
                     reporter.report(
                         RuleDiagnostic(
                             severity = defaultSeverity,
@@ -46,6 +47,7 @@ public class NoImplicitCrossJoinCommaRule : Rule {
                             file = context.file,
                             range = content.rangeAtOffsets(comma.offset, comma.offset + 1),
                             database = context.database,
+                            fixes = listOf(content.replaceTokenFix(comma.offset, replacementEnd, " CROSS JOIN ", "Use CROSS JOIN")),
                         ),
                     )
                 }

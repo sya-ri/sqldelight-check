@@ -21,6 +21,7 @@ class NoUnusedCteRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals("CTE 'ranked' is not referenced by the main query.", diagnostics.single().message)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

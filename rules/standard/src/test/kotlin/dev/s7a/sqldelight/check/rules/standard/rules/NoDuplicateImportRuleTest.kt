@@ -22,5 +22,22 @@ class NoDuplicateImportRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoDuplicateImportRule().assertAllFixes(
+            """
+            import com.example.UserType;
+            import com.example.UserType;
+
+            CREATE TABLE user (
+              type TEXT AS UserType NOT NULL
+            );
+            """.asSqlDelightFile(),
+            """
+            import com.example.UserType;
+
+            CREATE TABLE user (
+              type TEXT AS UserType NOT NULL
+            );
+            """.asSqlDelightFile(),
+        )
     }
 }

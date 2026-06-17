@@ -28,6 +28,15 @@ class NoRedundantSemicolonsRuleTest {
             """.asSqlDelightFile(),
             NoRedundantSemicolonsRule().applySingleFix(content),
         )
+        NoRedundantSemicolonsRule().assertAllFixes(
+            content,
+            """
+            selectAll:
+            SELECT id
+            FROM player
+            ORDER BY name;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -49,6 +58,15 @@ class NoRedundantSemicolonsRuleTest {
             ORDER BY name;
             """.asSqlDelightFile(),
             NoRedundantSemicolonsRule().applySingleFix(content),
+        )
+        NoRedundantSemicolonsRule().assertAllFixes(
+            content,
+            """
+            selectAll:
+            SELECT id
+            FROM player
+            ORDER BY name;
+            """.asSqlDelightFile(),
         )
     }
 

@@ -20,6 +20,20 @@ class NoConsecutiveSemicolonsRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoConsecutiveSemicolonsRule().assertAllFixes(
+            """
+            selectAll:
+            SELECT id
+            FROM player
+            ORDER BY name;;
+            """.asSqlDelightFile(),
+            """
+            selectAll:
+            SELECT id
+            FROM player
+            ORDER BY name;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

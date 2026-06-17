@@ -19,6 +19,18 @@ class NoSelectTrailingCommaRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoSelectTrailingCommaRule().assertAllFixes(
+            """
+            selectPlayers:
+            SELECT id, name,
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectPlayers:
+            SELECT id, name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

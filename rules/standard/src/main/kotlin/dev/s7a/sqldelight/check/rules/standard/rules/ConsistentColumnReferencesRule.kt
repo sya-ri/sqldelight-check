@@ -1,7 +1,5 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
-
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -10,6 +8,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
 /**
  * Reports `GROUP BY` and `ORDER BY` clauses that mix ordinal and named references.
@@ -54,7 +53,6 @@ public class ConsistentColumnReferencesRule : Rule {
             ) {
                 return@forEachIndexed
             }
-
             reporter.report(
                 RuleDiagnostic(
                     severity = defaultSeverity,

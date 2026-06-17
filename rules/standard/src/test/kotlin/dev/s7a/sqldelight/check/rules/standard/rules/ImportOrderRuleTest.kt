@@ -30,6 +30,26 @@ class ImportOrderRuleTest {
             """.trimIndent() + "\n",
             diagnostics.single().fixes.single().edits.single().replacement,
         )
+        ImportOrderRule().assertAllFixes(
+            """
+            import com.example.UserType;
+            import kotlin.time.Instant;
+            import java.math.BigDecimal;
+
+            CREATE TABLE event (
+              id INTEGER NOT NULL
+            );
+            """.asSqlDelightFile(),
+            """
+            import kotlin.time.Instant;
+            import java.math.BigDecimal;
+            import com.example.UserType;
+
+            CREATE TABLE event (
+              id INTEGER NOT NULL
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

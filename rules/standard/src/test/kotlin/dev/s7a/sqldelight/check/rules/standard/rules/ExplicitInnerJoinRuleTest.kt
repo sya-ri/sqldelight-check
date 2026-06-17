@@ -1,24 +1,34 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ExplicitInnerJoinRuleTest {
     @Test
     fun `reports bare join with on or using`() {
-        val diagnostics =
-            ExplicitInnerJoinRule().diagnostics(
-                """
-                selectPlayerTeams:
-                SELECT player.id, team.name
-                FROM player
-                JOIN team ON team.id = player.team_id
-                JOIN league USING (league_id);
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayerTeams:
+            SELECT player.id, team.name
+            FROM player
+            JOIN team ON team.id = player.team_id
+            JOIN league USING (league_id);
+            """.asSqlDelightFile()
+        val diagnostics = ExplicitInnerJoinRule().diagnostics(content)
 
         assertEquals(2, diagnostics.size)
-        assertEquals(0, diagnostics.first().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
+        ExplicitInnerJoinRule().assertAllFixes(
+            content,
+            """
+            selectPlayerTeams:
+            SELECT player.id, team.name
+            FROM player
+            INNER JOIN team ON team.id = player.team_id
+            INNER JOIN league USING (league_id);
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

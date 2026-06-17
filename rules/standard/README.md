@@ -93,28 +93,28 @@ The standard rule set uses two safety levels:
 | [`standard:blank-line-between-statements`](#standardblank-line-between-statements) | 🟢 | ⚠️ | ✅ | Require a blank line between adjacent top-level SQLDelight statements. |
 | [`standard:blocked-words`](#standardblocked-words) | 🟢 | ⚠️ |  | Report configured blocked words outside comments and quoted text by default. |
 | [`standard:avoid-model-bound-insert-for-public-api`](#standardavoid-model-bound-insert-for-public-api) | 🟢 | ℹ️ |  | Discourage SQLDelight model-bound `INSERT ... VALUES ?` APIs. |
-| [`standard:case-branch-newline`](#standardcase-branch-newline) | 🟢 | ⚠️ |  | Require multiline `CASE` branch keywords to start their own line. |
-| [`standard:clause-keyword-newline`](#standardclause-keyword-newline) | 🟢 | ⚠️ |  | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
+| [`standard:case-branch-newline`](#standardcase-branch-newline) | 🟢 | ⚠️ | ✅ | Require multiline `CASE` branch keywords to start their own line. |
+| [`standard:clause-keyword-newline`](#standardclause-keyword-newline) | 🟢 | ⚠️ | ✅ | Require major top-level `SELECT` clause keywords to start their own line in multiline statements. |
 | [`standard:consistent-column-references`](#standardconsistent-column-references) | 🟢 | ⚠️ |  | Disallow mixing ordinal and named references in `GROUP BY` and `ORDER BY`. |
 | [`standard:consistent-not-equal-operator`](#standardconsistent-not-equal-operator) | 🟢 | ⚠️ | 🛠️ | Keep `!=` and `<>` not-equal operators consistent within a file. |
-| [`standard:consistent-order-by-direction`](#standardconsistent-order-by-direction) | 🟢 | ⚠️ |  | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
+| [`standard:consistent-order-by-direction`](#standardconsistent-order-by-direction) | 🟢 | ⚠️ | ✅ | Require all or none of the `ORDER BY` items to specify `ASC` or `DESC`. |
 | [`standard:consistent-parameter-names`](#standardconsistent-parameter-names) | 🟢 | ⚠️ |  | Require repeated predicates on the same column to reuse the same named parameter. |
 | [`standard:consistent-reference-qualification`](#standardconsistent-reference-qualification) | 🟢 | ⚠️ |  | Require single-table SELECT result columns to qualify references consistently. |
 | [`standard:consistent-set-operation-column-count`](#standardconsistent-set-operation-column-count) | 🟢 | ⚠️ |  | Require adjacent set-operation SELECT lists to return the same number of columns. |
-| [`standard:constraint-newline`](#standardconstraint-newline) | 🟢 | ⚠️ |  | Require multiline `CREATE TABLE` constraints to start their own line. |
-| [`standard:cte-newline`](#standardcte-newline) | 🟢 | ⚠️ |  | Require each CTE definition in a multiline `WITH` clause to start its own line. |
+| [`standard:constraint-newline`](#standardconstraint-newline) | 🟢 | ⚠️ | ✅ | Require multiline `CREATE TABLE` constraints to start their own line. |
+| [`standard:cte-newline`](#standardcte-newline) | 🟢 | ⚠️ | ✅ | Require each CTE definition in a multiline `WITH` clause to start its own line. |
 | [`standard:data-type-case`](#standarddata-type-case) | 🟢 | ⚠️ | 🛠️ | Prefer uppercase common SQL data type names outside comments and quoted text. |
-| [`standard:explicit-cross-join`](#standardexplicit-cross-join) | 🟢 | ⚠️ |  | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
-| [`standard:explicit-inner-join`](#standardexplicit-inner-join) | 🟢 | ⚠️ |  | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
-| [`standard:explicit-union-operator`](#standardexplicit-union-operator) | 🟢 | ⚠️ |  | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
+| [`standard:explicit-cross-join`](#standardexplicit-cross-join) | 🟢 | ⚠️ | 🛠️ | Require `CROSS JOIN` when a join has no `ON` or `USING` condition. |
+| [`standard:explicit-inner-join`](#standardexplicit-inner-join) | 🟢 | ⚠️ | 🛠️ | Require `INNER JOIN` instead of bare `JOIN` when `ON` or `USING` is present. |
+| [`standard:explicit-union-operator`](#standardexplicit-union-operator) | 🟢 | ⚠️ | 🛠️ | Require `UNION ALL` or `UNION DISTINCT` instead of bare `UNION`. |
 | [`standard:final-newline`](#standardfinal-newline) | 🟢 | ⚠️ | ✅ | Require files to end with one LF newline. |
 | [`standard:function-name-case`](#standardfunction-name-case) | 🟢 | ⚠️ | 🛠️ | Prefer uppercase common SQL function names outside comments and quoted text. |
-| [`standard:group-by-target-newline`](#standardgroup-by-target-newline) | 🟢 | ⚠️ |  | Require one grouping expression per line in multiline `GROUP BY` clauses. |
+| [`standard:group-by-target-newline`](#standardgroup-by-target-newline) | 🟢 | ⚠️ | ✅ | Require one grouping expression per line in multiline `GROUP BY` clauses. |
 | [`standard:group-statement-count-limit`](#standardgroup-statement-count-limit) | 🟢 | ℹ️ |  | Limit the number of statements in a SQLDelight grouped statement block. |
 | [`standard:grouped-statement-has-single-purpose`](#standardgrouped-statement-has-single-purpose) | 🟢 | ℹ️ |  | Discourage SQLDelight grouped statements that mix reads and writes. |
 | [`standard:import-order`](#standardimport-order) | 🟢 | ⚠️ | ✅ | Require SQLDelight imports to be sorted by package group and name. |
-| [`standard:insert-values-newline`](#standardinsert-values-newline) | 🟢 | ⚠️ |  | Require multiline `INSERT` column and `VALUES` lists to use one item per line. |
-| [`standard:join-newline`](#standardjoin-newline) | 🟢 | ⚠️ |  | Require top-level `JOIN` clauses to start their own line in multiline statements. |
+| [`standard:insert-values-newline`](#standardinsert-values-newline) | 🟢 | ⚠️ | ✅ | Require multiline `INSERT` column and `VALUES` lists to use one item per line. |
+| [`standard:join-newline`](#standardjoin-newline) | 🟢 | ⚠️ | ✅ | Require top-level `JOIN` clauses to start their own line in multiline statements. |
 | [`standard:keyword-case`](#standardkeyword-case) |  | ⚠️ | 🛠️ | Prefer uppercase common SQL keywords outside comments and quoted text. |
 | [`standard:line-ending-lf`](#standardline-ending-lf) | 🟢 | ⚠️ | ✅ | Replace CRLF or CR line endings with LF. |
 | [`standard:literal-case`](#standardliteral-case) | 🟢 | ⚠️ | 🛠️ | Prefer uppercase `NULL`, `TRUE`, and `FALSE` literals. |
@@ -133,11 +133,11 @@ The standard rule set uses two safety levels:
 | [`standard:no-drop-table-in-migration`](#standardno-drop-table-in-migration) | 🟢 | ❌ |  | Disallow destructive `DROP TABLE` statements in SQLDelight migration files. |
 | [`standard:no-duplicate-import`](#standardno-duplicate-import) | 🟢 | ⚠️ | ✅ | Disallow repeated SQLDelight import lines. |
 | [`standard:no-duplicate-query-label`](#standardno-duplicate-query-label) | 🟢 | ⚠️ |  | Disallow duplicate SQLDelight query or grouped statement labels in one file. |
-| [`standard:no-else-null`](#standardno-else-null) | 🟢 | ⚠️ |  | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
+| [`standard:no-else-null`](#standardno-else-null) | 🟢 | ⚠️ | 🛠️ | Disallow redundant `ELSE NULL` branches in `CASE` expressions. |
 | [`standard:no-from-subquery`](#standardno-from-subquery) | 🟢 | ⚠️ |  | Prefer CTEs over top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
-| [`standard:no-implicit-cross-join-comma`](#standardno-implicit-cross-join-comma) | 🟢 | ⚠️ |  | Disallow comma-separated `FROM` sources that imply a cross join. |
+| [`standard:no-implicit-cross-join-comma`](#standardno-implicit-cross-join-comma) | 🟢 | ⚠️ | 🛠️ | Disallow comma-separated `FROM` sources that imply a cross join. |
 | [`standard:no-leading-blank-lines`](#standardno-leading-blank-lines) | 🟢 | ⚠️ | ✅ | Disallow blank lines before the first content line. |
-| [`standard:no-leading-comma`](#standardno-leading-comma) | 🟢 | ⚠️ |  | Disallow comma tokens as the first non-whitespace character on a line. |
+| [`standard:no-leading-comma`](#standardno-leading-comma) | 🟢 | ⚠️ | 🛠️ | Disallow comma tokens as the first non-whitespace character on a line. |
 | [`standard:no-leading-whitespace`](#standardno-leading-whitespace) | 🟢 | ⚠️ | ✅ | Disallow any whitespace before the first file content. |
 | [`standard:no-leading-wildcard-like`](#standardno-leading-wildcard-like) | 🟢 | ⚠️ |  | Disallow `LIKE` patterns that start with `%` or `_`. |
 | [`standard:no-not-in-nullable-subquery`](#standardno-not-in-nullable-subquery) | 🟢 | ⚠️ |  | Require `NOT IN` subqueries to exclude `NULL` values or use `NOT EXISTS`. |
@@ -154,30 +154,30 @@ The standard rule set uses two safety levels:
 | [`standard:no-space-before-function-parenthesis`](#standardno-space-before-function-parenthesis) | 🟢 | ⚠️ | ✅ | Disallow inline whitespace between common SQL function names and `(`. |
 | [`standard:no-space-before-semicolon`](#standardno-space-before-semicolon) | 🟢 | ⚠️ | ✅ | Disallow inline whitespace before `;`. |
 | [`standard:no-right-join`](#standardno-right-join) | 🟢 | ⚠️ |  | Prefer writing joins as `LEFT JOIN` instead of `RIGHT JOIN`. |
-| [`standard:no-select-distinct-with-group-by`](#standardno-select-distinct-with-group-by) | 🟢 | ⚠️ |  | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
+| [`standard:no-select-distinct-with-group-by`](#standardno-select-distinct-with-group-by) | 🟢 | ⚠️ | 🛠️ | Disallow `SELECT DISTINCT` and `GROUP BY` in the same statement. |
 | [`standard:no-select-star`](#standardno-select-star) | 🟢 | ⚠️ |  | Disallow `SELECT *` result columns. |
 | [`standard:no-select-trailing-comma`](#standardno-select-trailing-comma) | 🟢 | ⚠️ | 🛠️ | Disallow trailing commas at the end of `SELECT` clauses. |
 | [`standard:no-select-star-in-view`](#standardno-select-star-in-view) | 🟢 | ⚠️ |  | Disallow `SELECT *` in `CREATE VIEW` definitions. |
-| [`standard:no-self-column-alias`](#standardno-self-column-alias) | 🟢 | ⚠️ |  | Disallow SELECT result aliases that repeat the source column name. |
-| [`standard:no-self-alias`](#standardno-self-alias) | 🟢 | ⚠️ |  | Disallow table aliases that repeat the table name they alias. |
+| [`standard:no-self-column-alias`](#standardno-self-column-alias) | 🟢 | ⚠️ | 🛠️ | Disallow SELECT result aliases that repeat the source column name. |
+| [`standard:no-self-alias`](#standardno-self-alias) | 🟢 | ⚠️ | 🛠️ | Disallow table aliases that repeat the table name they alias. |
 | [`standard:no-special-character-identifiers`](#standardno-special-character-identifiers) | 🟢 | ⚠️ |  | Disallow quoted identifiers that need non-portable special characters. |
 | [`standard:no-tab-indentation`](#standardno-tab-indentation) | 🟢 | ⚠️ | ✅ | Replace leading indentation tabs with spaces. |
 | [`standard:no-trailing-blank-lines`](#standardno-trailing-blank-lines) | 🟢 | ⚠️ | ✅ | Disallow blank lines after the last content line. |
 | [`standard:no-trailing-whitespace`](#standardno-trailing-whitespace) | 🟢 | ⚠️ | ✅ | Remove spaces or tabs at line ends. |
-| [`standard:no-transaction-in-migration`](#standardno-transaction-in-migration) | 🟢 | ⚠️ |  | Disallow explicit transaction statements in SQLDelight migration files. |
+| [`standard:no-transaction-in-migration`](#standardno-transaction-in-migration) | 🟢 | ⚠️ | 🛠️ | Disallow explicit transaction statements in SQLDelight migration files. |
 | [`standard:no-unbounded-select`](#standardno-unbounded-select) | 🟢 | ℹ️ |  | Warn on SQLDelight query `SELECT`s without a top-level `WHERE` or `LIMIT`. |
 | [`standard:no-unknown-qualifier`](#standardno-unknown-qualifier) | 🟢 | ⚠️ |  | Disallow qualified column references whose qualifier is not visible in `FROM`. |
 | [`standard:no-unused-cte`](#standardno-unused-cte) | 🟢 | ⚠️ |  | Disallow CTEs that are not referenced by the main query. |
 | [`standard:no-unused-join`](#standardno-unused-join) | 🟢 | ⚠️ |  | Disallow JOIN sources that are not referenced by later qualified column reads. |
-| [`standard:no-unnecessary-statement-parentheses`](#standardno-unnecessary-statement-parentheses) | 🟢 | ⚠️ |  | Disallow redundant parentheses around whole top-level `SELECT` statements. |
+| [`standard:no-unnecessary-statement-parentheses`](#standardno-unnecessary-statement-parentheses) | 🟢 | ⚠️ | 🛠️ | Disallow redundant parentheses around whole top-level `SELECT` statements. |
 | [`standard:no-update-all`](#standardno-update-all) | 🟢 | ❌ |  | Disallow `UPDATE` statements with obviously always-true `WHERE` predicates. |
 | [`standard:no-update-without-where`](#standardno-update-without-where) | 🟢 | ❌ |  | Disallow `UPDATE` statements without a top-level `WHERE`. |
 | [`standard:no-wildcard-import`](#standardno-wildcard-import) | 🟢 | ⚠️ |  | Disallow wildcard SQLDelight imports. |
-| [`standard:operator-line-position`](#standardoperator-line-position) | 🟢 | ⚠️ |  | Require multiline comparison and binary operators to trail the previous line. |
-| [`standard:order-by-target-newline`](#standardorder-by-target-newline) | 🟢 | ⚠️ |  | Require one ordering expression per line in multiline `ORDER BY` clauses. |
+| [`standard:operator-line-position`](#standardoperator-line-position) | 🟢 | ⚠️ | 🛠️ | Require multiline comparison and binary operators to trail the previous line. |
+| [`standard:order-by-target-newline`](#standardorder-by-target-newline) | 🟢 | ⚠️ | ✅ | Require one ordering expression per line in multiline `ORDER BY` clauses. |
 | [`standard:parameter-name-case`](#standardparameter-name-case) | 🟢 | ⚠️ |  | Require SQLDelight named parameters to use lower camel case. |
 | [`standard:parameter-name-matches-column`](#standardparameter-name-matches-column) | 🟢 | ℹ️ |  | Prefer parameter names that match simple equality predicate column names. |
-| [`standard:prefer-between-for-inclusive-range`](#standardprefer-between-for-inclusive-range) | 🟢 | ℹ️ |  | Prefer `BETWEEN` for simple inclusive ranges on the same expression. |
+| [`standard:prefer-between-for-inclusive-range`](#standardprefer-between-for-inclusive-range) | 🟢 | ℹ️ | 🛠️ | Prefer `BETWEEN` for simple inclusive ranges on the same expression. |
 | [`standard:prefer-coalesce`](#standardprefer-coalesce) | 🟢 | ⚠️ | 🛠️ | Prefer `COALESCE` over `IFNULL` and `NVL`. |
 | [`standard:prefer-count-star`](#standardprefer-count-star) | 🟢 | ⚠️ | 🛠️ | Prefer `COUNT(*)` for row counts instead of `COUNT(1)` or `COUNT(0)`. |
 | [`standard:prefer-exists-over-count-for-existence`](#standardprefer-exists-over-count-for-existence) | 🟢 | ⚠️ |  | Prefer `EXISTS` over `COUNT(*) > 0` when only existence is needed. |
@@ -187,7 +187,7 @@ The standard rule set uses two safety levels:
 | [`standard:prefer-simple-boolean-case`](#standardprefer-simple-boolean-case) | 🟢 | ⚠️ |  | Prefer direct boolean predicates over simple `CASE` expressions returning `TRUE` and `FALSE`. |
 | [`standard:query-name-case`](#standardquery-name-case) | 🟢 | ⚠️ |  | Require SQLDelight query labels to use lower camel case. |
 | [`standard:query-label-matches-operation`](#standardquery-label-matches-operation) | 🟢 | ℹ️ |  | Prefer SQLDelight query labels whose leading verb matches the statement operation. |
-| [`standard:require-column-alias-as`](#standardrequire-column-alias-as) | 🟢 | ⚠️ |  | Require `AS` for SELECT result column aliases. |
+| [`standard:require-column-alias-as`](#standardrequire-column-alias-as) | 🟢 | ⚠️ | 🛠️ | Require `AS` for SELECT result column aliases. |
 | [`standard:require-explicit-null-ordering`](#standardrequire-explicit-null-ordering) | 🟢 | ℹ️ |  | Require `NULLS FIRST` or `NULLS LAST` with explicit `ORDER BY` directions. |
 | [`standard:require-order-by-with-limit`](#standardrequire-order-by-with-limit) | 🟢 | ⚠️ |  | Require `ORDER BY` when top-level `SELECT` statements use `LIMIT` or `OFFSET`. |
 | [`standard:require-alias-for-duplicate-result-names`](#standardrequire-alias-for-duplicate-result-names) | 🟢 | ⚠️ |  | Require aliases when a SELECT list exposes duplicate result names. |
@@ -195,14 +195,14 @@ The standard rule set uses two safety levels:
 | [`standard:require-parentheses-for-mixed-boolean-operators`](#standardrequire-parentheses-for-mixed-boolean-operators) | 🟢 | ⚠️ |  | Require parentheses when `AND` and `OR` are mixed at the same predicate level. |
 | [`standard:require-query-label`](#standardrequire-query-label) | 🟢 | ⚠️ |  | Require executable statements in `.sq` files to have SQLDelight query labels. |
 | [`standard:require-result-column-alias`](#standardrequire-result-column-alias) | 🟢 | ⚠️ |  | Require aliases for computed `SELECT` result columns. |
-| [`standard:require-table-alias-as`](#standardrequire-table-alias-as) | 🟢 | ⚠️ |  | Require `AS` for table aliases. |
+| [`standard:require-table-alias-as`](#standardrequire-table-alias-as) | 🟢 | ⚠️ | 🛠️ | Require `AS` for table aliases. |
 | [`standard:require-table-alias-for-subquery`](#standardrequire-table-alias-for-subquery) | 🟢 | ⚠️ |  | Require aliases for top-level `FROM (SELECT ...)` and `JOIN (SELECT ...)` subqueries. |
 | [`standard:require-where-index-friendly-predicate`](#standardrequire-where-index-friendly-predicate) | 🟢 | ℹ️ |  | Flag common function-wrapped `WHERE` predicates that can be hard to use with indexes. |
 | [`standard:result-alias-name-case`](#standardresult-alias-name-case) | 🟢 | ℹ️ |  | Require SELECT result aliases to use snake case. |
-| [`standard:select-comma-line-position`](#standardselect-comma-line-position) | 🟢 | ⚠️ |  | Require multiline `SELECT` list commas to trail the previous result expression. |
-| [`standard:select-modifier-line-position`](#standardselect-modifier-line-position) | 🟢 | ⚠️ |  | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
-| [`standard:select-target-newline`](#standardselect-target-newline) | 🟢 | ⚠️ |  | Require one result expression per line in multiline `SELECT` lists. |
-| [`standard:set-operator-line-position`](#standardset-operator-line-position) | 🟢 | ⚠️ |  | Require multiline set operators to begin their own line after indentation. |
+| [`standard:select-comma-line-position`](#standardselect-comma-line-position) | 🟢 | ⚠️ | 🛠️ | Require multiline `SELECT` list commas to trail the previous result expression. |
+| [`standard:select-modifier-line-position`](#standardselect-modifier-line-position) | 🟢 | ⚠️ | 🛠️ | Require `SELECT DISTINCT` and `SELECT ALL` modifiers to stay on the `SELECT` line. |
+| [`standard:select-target-newline`](#standardselect-target-newline) | 🟢 | ⚠️ | ✅ | Require one result expression per line in multiline `SELECT` lists. |
+| [`standard:set-operator-line-position`](#standardset-operator-line-position) | 🟢 | ⚠️ | ✅ | Require multiline set operators to begin their own line after indentation. |
 | [`standard:space-after-block-comment-start`](#standardspace-after-block-comment-start) | 🟢 | ⚠️ | ✅ | Require one space after a block comment opening marker. |
 | [`standard:space-after-comma`](#standardspace-after-comma) | 🟢 | ⚠️ | ✅ | Require one inline space after `,` when another token follows. |
 | [`standard:space-after-line-comment-marker`](#standardspace-after-line-comment-marker) | 🟢 | ⚠️ | ✅ | Require one space after `--` when comment text follows. |
@@ -210,12 +210,12 @@ The standard rule set uses two safety levels:
 | [`standard:space-around-comparison-operators`](#standardspace-around-comparison-operators) | 🟢 | ⚠️ | 🛠️ | Prefer one inline space around comparison operators. |
 | [`standard:space-before-block-comment-end`](#standardspace-before-block-comment-end) | 🟢 | ⚠️ | ✅ | Require one space before a block comment closing marker. |
 | [`standard:source-indentation`](#standardsource-indentation) | 🟢 | ⚠️ | ✅ | Align multiline SQL indentation from dialect-aware source blocks. |
-| [`standard:statement-terminator`](#standardstatement-terminator) | 🟢 | ⚠️ |  | Require statement blocks to end with semicolons. |
+| [`standard:statement-terminator`](#standardstatement-terminator) | 🟢 | ⚠️ | 🛠️ | Require statement blocks to end with semicolons. |
 | [`standard:unique-column-aliases`](#standardunique-column-aliases) | 🟢 | ⚠️ |  | Require SELECT result column aliases to be unique within a SELECT list. |
 | [`standard:unique-table-aliases`](#standardunique-table-aliases) | 🟢 | ⚠️ |  | Require top-level table aliases to be unique within a statement. |
 | [`standard:use-is-null`](#standarduse-is-null) | 🟢 | ⚠️ | 🛠️ | Prefer `IS NULL` and `IS NOT NULL` over equality comparisons to `NULL`. |
 | [`standard:view-name-case`](#standardview-name-case) | 🟢 | ℹ️ |  | Require `CREATE VIEW` names to use snake case. |
-| [`standard:where-condition-newline`](#standardwhere-condition-newline) | 🟢 | ⚠️ |  | Require same-level boolean operators to start their own lines in multiline `WHERE` clauses. |
+| [`standard:where-condition-newline`](#standardwhere-condition-newline) | 🟢 | ⚠️ | ✅ | Require same-level boolean operators to start their own lines in multiline `WHERE` clauses. |
 
 ## `standard:blocked-words`
 
@@ -423,8 +423,7 @@ FROM ranked;
 
 Fix behavior:
 
-- No fix is provided.
-- Recursive or ambiguous CTE layouts are left to future SQLDelight-derived facts.
+- No automatic fix is provided.
 
 ## `standard:no-unknown-qualifier`
 
@@ -525,7 +524,7 @@ FROM (SELECT id FROM player) AS ranked;
 
 Fix behavior:
 
-- No fix is provided.
+- No automatic fix is provided.
 - Nested subqueries are ignored until SQLDelight-derived parse facts are available.
 
 ## `standard:unique-table-aliases`
@@ -555,6 +554,30 @@ Fix behavior:
 - No fix is provided.
 - Nested aliases are not compared with outer statement aliases.
 
+## `standard:require-result-column-alias`
+
+Reports computed SELECT targets that do not have a result column alias.
+
+Invalid:
+
+```sql
+selectStats:
+SELECT count(*)
+FROM player;
+```
+
+Valid:
+
+```sql
+selectStats:
+SELECT count(*) AS result
+FROM player;
+```
+
+Fix behavior:
+
+- No automatic fix is provided.
+
 ## `standard:unique-column-aliases`
 
 Reports duplicate aliases within the same SELECT list.
@@ -577,7 +600,7 @@ FROM player;
 
 Fix behavior:
 
-- No fix is provided.
+- No automatic fix is provided.
 - Nested SELECT lists are checked independently from outer SELECT lists.
 
 Rules that need full parse-tree knowledge, alias policy, join qualification, column ordering, indentation reflow, or
@@ -924,7 +947,7 @@ FROM player;
 
 Fix behavior:
 
-- No automatic fix is provided.
+- Provides an unsafe fix that moves the leading comma to the previous line.
 - Single-line SQL is accepted.
 - Skips comments, string literals, and quoted identifiers.
 
@@ -958,7 +981,7 @@ FROM player;
 
 Fix behavior:
 
-- No automatic fix is provided.
+- Provides an unsafe fix that moves leading SELECT list commas to the previous line.
 - Single-line `SELECT` lists are accepted.
 - Skips comments, string literals, and quoted identifiers.
 
@@ -1326,7 +1349,7 @@ WHERE score >=
 
 Fix behavior:
 
-- No automatic fix is provided.
+- Provides an unsafe fix that moves leading operators to the previous line.
 - Single-line SQL is accepted.
 - Skips comments, string literals, and quoted identifiers.
 
@@ -1796,7 +1819,7 @@ SELECT name FROM archived_player;
 
 Fix behavior:
 
-- No automatic fix is provided.
+- A safe fix moves the set operator to its own line.
 - Single-line SQL is accepted.
 - Skips comments, string literals, and quoted identifiers.
 
@@ -1939,7 +1962,7 @@ FROM player;
 
 Fix behavior:
 
-- No fix is provided.
+- No automatic fix is provided.
 - Multi-table statements, expressions, and wildcard targets are ignored until name resolution can prove column origin.
 
 ## `standard:no-select-trailing-comma`
@@ -2299,7 +2322,7 @@ CREATE TABLE player (
 
 Fix behavior:
 
-- No automatic fix is provided.
+- A safe fix moves the constraint to its own line using the current `CREATE TABLE` item indentation.
 - Single-line `CREATE TABLE` definitions are accepted.
 - Skips commas in nested expressions.
 
@@ -2547,8 +2570,7 @@ Fix behavior:
 
 Reports `GROUP BY` and `ORDER BY` clauses that mix ordinal references with named or expression references.
 
-Ordinal references such as `GROUP BY 1` are concise but become hard to read when mixed with names. The rule reports the
-clause header and leaves the rewrite to the user.
+Ordinal references such as `GROUP BY 1` are concise but become hard to read when mixed with names.
 
 Invalid:
 
@@ -3395,7 +3417,7 @@ WHERE score BETWEEN :minimumScore AND :maximumScore;
 
 Fix behavior:
 
-- No automatic fix is provided.
+- Provides an unsafe fix that rewrites `column >= lower AND column <= upper` as `column BETWEEN lower AND upper`.
 - Defaults to `Severity.Info`.
 - Reports only simple inclusive ranges on the same expression.
 
@@ -3594,7 +3616,6 @@ Fix behavior:
 
 - No automatic fix is provided.
 - Defaults to `Severity.Info`.
-- Defaults to `Severity.Info`.
 
 ## `standard:require-alias-for-duplicate-result-names`
 
@@ -3656,6 +3677,7 @@ SELECT id FROM users;
 Fix behavior:
 
 - No automatic fix is provided.
+- Defaults to `Severity.Info`.
 
 ## `standard:no-select-star-in-view`
 

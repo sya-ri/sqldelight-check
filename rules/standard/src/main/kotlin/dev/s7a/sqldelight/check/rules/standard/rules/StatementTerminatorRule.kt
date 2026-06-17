@@ -58,7 +58,7 @@ public class StatementTerminatorRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(lastSqlCharacter.offset, lastSqlCharacter.offset + 1),
                     database = context.database,
-                    fixes = emptyList(),
+                    fixes = listOf(content.insertTokenFix(lastSqlCharacter.offset + 1, ";", "Insert statement terminator")),
                 ),
             )
         }

@@ -12,6 +12,7 @@ class FinalNewlineRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("\n", diagnostics.single().fixes.single().edits.single().replacement)
+        FinalNewlineRule().assertAllFixes(cleanPlayerSq.removeSuffix("\n"), cleanPlayerSq, path = PLAYER_SQ_PATH)
     }
 
     @Test

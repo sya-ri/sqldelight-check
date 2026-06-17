@@ -1,22 +1,32 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class InsertValuesNewlineRuleTest {
     @Test
     fun `reports multiline insert column list with multiple items on one line`() {
-        val diagnostics =
-            InsertValuesNewlineRule().diagnostics(
-                """
-                INSERT INTO player (id, name,
-                  age)
-                VALUES (1, 'Ada', 42);
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            INSERT INTO player (id, name,
+              age)
+            VALUES (1, 'Ada', 42);
+            """.asSqlDelightFile()
+        val diagnostics = InsertValuesNewlineRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        InsertValuesNewlineRule().assertAllFixes(
+            content,
+            """
+            INSERT INTO player (
+            id,
+            name,
+              age)
+            VALUES (1, 'Ada', 42);
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

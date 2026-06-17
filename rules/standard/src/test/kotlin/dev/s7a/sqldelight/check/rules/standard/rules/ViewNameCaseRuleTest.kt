@@ -7,16 +7,19 @@ import kotlin.test.assertEquals
 class ViewNameCaseRuleTest {
     @Test
     fun `reports view names that are not snake case`() {
+        val content =
+            """
+            CREATE VIEW ActiveUsers AS
+            SELECT id FROM users;
+            """.asSqlDelightFile()
         val diagnostics =
             ViewNameCaseRule().diagnostics(
-                """
-                CREATE VIEW ActiveUsers AS
-                SELECT id FROM users;
-                """.asSqlDelightFile(),
+                content,
             )
 
         assertEquals(1, diagnostics.size)
         assertEquals(Severity.Info, diagnostics.single().severity)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

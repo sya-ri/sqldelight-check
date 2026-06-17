@@ -50,6 +50,7 @@ class ConsistentColumnReferencesRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test
@@ -112,6 +113,7 @@ class ConsistentColumnReferencesRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

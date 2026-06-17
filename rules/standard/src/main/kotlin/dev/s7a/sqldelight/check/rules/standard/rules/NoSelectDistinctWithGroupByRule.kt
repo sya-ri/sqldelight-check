@@ -41,6 +41,14 @@ public class NoSelectDistinctWithGroupByRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(distinct.startOffset, distinct.endOffset),
                     database = context.database,
+                    fixes =
+                        listOf(
+                            content.deleteTokenFix(
+                                distinct.startOffset,
+                                content.inlineWhitespaceEndAfter(distinct.endOffset),
+                                "Remove DISTINCT",
+                            ),
+                        ),
                 ),
             )
         }

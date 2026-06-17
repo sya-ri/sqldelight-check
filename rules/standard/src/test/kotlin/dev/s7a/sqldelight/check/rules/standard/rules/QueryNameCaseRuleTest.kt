@@ -6,17 +6,19 @@ import kotlin.test.assertEquals
 class QueryNameCaseRuleTest {
     @Test
     fun `reports non lower camel query labels`() {
+        val content =
+            """
+            Select_All:
+            SELECT id, name
+            FROM player;
+
+            _insertPlayer:
+            INSERT INTO player(id, name)
+            VALUES (:id, :name);
+            """.asSqlDelightFile()
         val diagnostics =
             QueryNameCaseRule().diagnostics(
-                """
-                Select_All:
-                SELECT id, name
-                FROM player;
-
-                _insertPlayer:
-                INSERT INTO player(id, name)
-                VALUES (:id, :name);
-                """.asSqlDelightFile(),
+                content,
             )
 
         assertEquals(2, diagnostics.size)

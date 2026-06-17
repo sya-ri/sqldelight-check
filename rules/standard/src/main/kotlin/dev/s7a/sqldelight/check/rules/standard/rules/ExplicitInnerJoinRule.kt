@@ -2,12 +2,15 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
+import dev.s7a.sqldelight.check.api.Fix
+import dev.s7a.sqldelight.check.api.FixSafety
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
+import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -38,6 +41,20 @@ public class ExplicitInnerJoinRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(token.startOffset, token.endOffset),
                     database = context.database,
+                    fixes =
+                        listOf(
+                            Fix(
+                                title = "Use INNER JOIN",
+                                safety = FixSafety.Unsafe,
+                                edits =
+                                    listOf(
+                                        TextEdit(
+                                            range = content.rangeAtOffsets(token.startOffset, token.startOffset),
+                                            replacement = "INNER ",
+                                        ),
+                                    ),
+                            ),
+                        ),
                 ),
             )
         }

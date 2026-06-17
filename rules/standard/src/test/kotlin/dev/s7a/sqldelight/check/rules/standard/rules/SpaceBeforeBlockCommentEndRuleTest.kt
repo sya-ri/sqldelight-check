@@ -20,6 +20,20 @@ class SpaceBeforeBlockCommentEndRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals(" ", diagnostics.single().fixes.single().edits.single().replacement)
+        SpaceBeforeBlockCommentEndRule().assertAllFixes(
+            """
+            /* Player table.*/
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+            """
+            /* Player table. */
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

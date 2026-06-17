@@ -42,9 +42,10 @@ public class ConstraintNewlineRule : Rule {
             val items = content.commaSeparatedClauseItems(open.offset + 1, close, itemDepth)
             if (!content.isMultilineItemList(items)) return@forEachIndexed
 
-            items
-                .flatMap { item -> content.createTableConstraintTokens(item, itemDepth, context.database.dialect.sourcePatterns) }
-                .forEach { constraint ->
+            items.forEach { item ->
+                val itemLine = lines.lineContaining(item.startOffset) ?: return@forEach
+                val indentation = itemLine.text.takeWhile { character -> character == ' ' || character == '\t' }
+                content.createTableConstraintTokens(item, itemDepth, context.database.dialect.sourcePatterns).forEach { constraint ->
                     val line = lines.lineContaining(constraint.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == constraint.startOffset) return@forEach
                     reporter.report(
@@ -54,9 +55,18 @@ public class ConstraintNewlineRule : Rule {
                             file = context.file,
                             range = content.rangeAtOffsets(constraint.startOffset, constraint.endOffset),
                             database = context.database,
+                            fixes =
+                                listOf(
+                                    content.startOwnLineFix(
+                                        constraint.startOffset,
+                                        "Move constraint to its own line",
+                                        indentation,
+                                    ),
+                                ),
                         ),
                     )
                 }
+            }
         }
     }
 }

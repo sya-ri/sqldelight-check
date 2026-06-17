@@ -30,6 +30,20 @@ class KeywordCaseRuleTest {
         assertEquals(3, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
         assertEquals("SELECT", diagnostics.first().fixes.single().edits.single().replacement)
+        KeywordCaseRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY,
+              name TEXT NOT NULL
+            );
+
+            selectById:
+            SELECT id, name
+            FROM player
+            WHERE id = ?;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

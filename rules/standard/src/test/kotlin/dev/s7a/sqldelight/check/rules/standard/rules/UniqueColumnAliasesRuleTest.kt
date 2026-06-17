@@ -17,6 +17,7 @@ class UniqueColumnAliasesRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals("Column aliases should be unique within a SELECT list.", diagnostics.single().message)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

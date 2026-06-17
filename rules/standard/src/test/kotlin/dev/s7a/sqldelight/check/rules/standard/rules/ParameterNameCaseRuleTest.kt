@@ -19,6 +19,7 @@ class ParameterNameCaseRuleTest {
 
         assertEquals(2, diagnostics.size)
         assertEquals("SQLDelight parameter ':PlayerName' should be lower camel case.", diagnostics.first().message)
+        assertEquals(0, diagnostics.first().fixes.size)
     }
 
     @Test

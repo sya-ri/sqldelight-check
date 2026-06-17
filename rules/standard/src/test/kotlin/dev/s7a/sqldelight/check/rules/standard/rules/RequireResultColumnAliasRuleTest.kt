@@ -17,6 +17,7 @@ class RequireResultColumnAliasRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals(2, diagnostics.single().range?.start?.line)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

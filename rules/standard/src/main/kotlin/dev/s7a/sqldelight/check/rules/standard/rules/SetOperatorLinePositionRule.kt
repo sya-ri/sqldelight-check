@@ -41,6 +41,7 @@ public class SetOperatorLinePositionRule : Rule {
                         file = context.file,
                         range = content.rangeAtOffsets(token.startOffset, token.endOffset),
                         database = context.database,
+                        fixes = listOf(content.startOwnLineFix(token.startOffset, "Move set operator to its own line")),
                     ),
                 )
             }
