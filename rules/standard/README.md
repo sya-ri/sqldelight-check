@@ -126,6 +126,7 @@ The standard rule set uses two safety levels:
 | [`standard:max-subquery-depth`](#standardmax-subquery-depth) | 🟢 | ⚠️ |  | Disallow nested `SELECT` statements deeper than `maxDepth`. |
 | [`standard:no-blank-line-after-query-label`](#standardno-blank-line-after-query-label) | 🟢 | ⚠️ | ✅ | Disallow blank lines between a SQLDelight query label and its statement body. |
 | [`standard:no-blank-lines-in-statement`](#standardno-blank-lines-in-statement) | 🟢 | ⚠️ | ✅ | Disallow blank lines inside a SQL statement. |
+| [`standard:no-composite-primary-key`](#standardno-composite-primary-key) |  | ⚠️ |  | Disallow composite primary key table constraints. |
 | [`standard:no-consecutive-semicolons`](#standardno-consecutive-semicolons) | 🟢 | ⚠️ | ✅ | Disallow directly repeated semicolon tokens. |
 | [`standard:no-delete-all`](#standardno-delete-all) | 🟢 | ❌ |  | Disallow `DELETE` statements with obviously always-true `WHERE` predicates. |
 | [`standard:no-delete-without-where`](#standardno-delete-without-where) | 🟢 | ❌ |  | Disallow `DELETE` statements without a top-level `WHERE`. |

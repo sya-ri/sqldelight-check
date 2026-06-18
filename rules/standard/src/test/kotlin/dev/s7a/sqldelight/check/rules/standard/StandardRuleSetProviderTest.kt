@@ -56,6 +56,7 @@ class StandardRuleSetProviderTest {
                 qualifiedRuleId("standard:max-subquery-depth"),
                 qualifiedRuleId("standard:no-blank-line-after-query-label"),
                 qualifiedRuleId("standard:no-blank-lines-in-statement"),
+                qualifiedRuleId("standard:no-composite-primary-key"),
                 qualifiedRuleId("standard:no-consecutive-semicolons"),
                 qualifiedRuleId("standard:no-delete-all"),
                 qualifiedRuleId("standard:no-delete-without-where"),
