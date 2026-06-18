@@ -31,6 +31,7 @@ class MySqlRuleSetProviderTest {
                 qualifiedRuleId("mysql:no-utf8-charset"),
                 qualifiedRuleId("mysql:no-copy-algorithm"),
                 qualifiedRuleId("mysql:no-exclusive-lock"),
+                qualifiedRuleId("mysql:no-rename-table-in-migration"),
                 qualifiedRuleId("mysql:no-replace-into"),
                 qualifiedRuleId("mysql:no-zero-date-default"),
                 qualifiedRuleId("mysql:no-display-width-integer"),

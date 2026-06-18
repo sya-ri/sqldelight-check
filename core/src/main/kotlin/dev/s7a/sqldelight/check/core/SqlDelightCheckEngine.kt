@@ -11,6 +11,7 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
@@ -54,6 +55,11 @@ public class SqlDelightCheckEngine {
                     RuleCandidate(provider.id, QualifiedRuleId(provider.id, rule.id), rule)
                 }
             }
+        val refinementsByRuleId =
+            ruleSetProviders
+                .flatMap { provider -> provider.diagnosticRefinementProviders() }
+                .map { refinementProvider -> refinementProvider.create() }
+                .groupBy { refinement -> refinement.targetRuleId }
         rules.forEach { candidate ->
             val ruleConfig =
                 resolver.resolveRule(
@@ -73,13 +79,14 @@ public class SqlDelightCheckEngine {
                 }
             }
         }
-        return files.flatMap { file -> runRulesForFile(database, file, rules, resolver, trace) }
+        return files.flatMap { file -> runRulesForFile(database, file, rules, refinementsByRuleId, resolver, trace) }
     }
 
     private fun runRulesForFile(
         database: DatabaseContext,
         file: SourceFile,
         rules: List<RuleCandidate>,
+        refinementsByRuleId: Map<QualifiedRuleId, List<DiagnosticRefinement>>,
         resolver: ConfigurationResolver,
         trace: AnalysisTrace,
     ): List<Diagnostic> {
@@ -110,7 +117,10 @@ public class SqlDelightCheckEngine {
                 executedRuleIds += candidate.ruleId
                 val diagnostics = mutableListOf<Diagnostic>()
                 candidate.rule.run(context) { diagnostic ->
-                    diagnostics += diagnostic.withRuleIdentity(candidate.ruleId, ruleConfig.severity)
+                    diagnostic
+                        .withRuleIdentity(candidate.ruleId, ruleConfig.severity)
+                        .applyRefinements(context, refinementsByRuleId[candidate.ruleId].orEmpty())
+                        ?.let(diagnostics::add)
                 }
                 diagnostics
             }.filterNot(disableDirectives::suppresses)
@@ -161,6 +171,14 @@ private fun RuleDiagnostic.withRuleIdentity(
         database = database,
         fixes = fixes,
     )
+
+private fun Diagnostic.applyRefinements(
+    context: RuleContext,
+    refinements: List<DiagnosticRefinement>,
+): Diagnostic? =
+    refinements.fold(this as Diagnostic?) { current, refinement ->
+        current?.let { diagnostic -> refinement.refine(context, diagnostic) }
+    }
 
 private data class RuleCandidate(
     val ruleSetId: RuleSetId,

@@ -42,7 +42,7 @@ class SpaceAfterBlockCommentStartRuleTest {
             """
             /* Player table. */
             /**/
-            /*+ sqlite hint-like comment */
+            /*+ planner hint-like comment */
             CREATE TABLE player (
               id INTEGER NOT NULL PRIMARY KEY
             );

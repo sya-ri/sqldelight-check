@@ -94,19 +94,6 @@ private fun List<LineInfo>.reportBlankLineRuns(
     }
 }
 
-private fun String.topLevelSemicolonOffsets(): List<Int> {
-    var depth = 0
-    val offsets = mutableListOf<Int>()
-    sqlCharacters().forEach { character ->
-        when (character.value) {
-            '(' -> depth++
-            ')' -> depth = (depth - 1).coerceAtLeast(0)
-            ';' -> if (depth == 0) offsets += character.offset
-        }
-    }
-    return offsets
-}
-
 private fun LineInfo.isSqlDelightLabel(): Boolean = sqlDelightLabelRegex.matches(text)
 
 private fun LineInfo.hasContentAtOrAfter(offset: Int): Boolean {

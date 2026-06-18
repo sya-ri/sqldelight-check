@@ -1,3 +1,12 @@
+public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticRefinement {
+	public abstract fun getTargetRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public abstract fun refine (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/api/Diagnostic;)Ldev/s7a/sqldelight/check/api/Diagnostic;
+}
+
+public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticRefinementProvider {
+	public abstract fun create ()Ldev/s7a/sqldelight/check/rule/api/DiagnosticRefinement;
+}
+
 public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticReporter {
 	public abstract fun report (Ldev/s7a/sqldelight/check/api/RuleDiagnostic;)V
 }
@@ -47,8 +56,13 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleProvider {
 }
 
 public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
+	public fun diagnosticRefinementProviders ()Ljava/util/Set;
 	public abstract fun getId-wigqPlY ()Ljava/lang/String;
 	public abstract fun ruleProviders ()Ljava/util/Set;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleSetProvider$DefaultImpls {
+	public static fun diagnosticRefinementProviders (Ldev/s7a/sqldelight/check/rule/api/RuleSetProvider;)Ljava/util/Set;
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/SourceMaskingKt {

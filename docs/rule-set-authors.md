@@ -179,6 +179,52 @@ applicability: `Rule.targetDialect` and `Rule.isApplicable(context)` decide
 whether the rule runs for a database/file. Explicit `Enabled` and `Disabled`
 settings remain user overrides.
 
+## Diagnostic Refinements
+
+Rule sets can inspect diagnostics emitted by any rule and either keep or suppress them. Use a diagnostic refinement when
+your rule set has contextual knowledge that narrows another rule without making that rule depend on your dialect or
+integration.
+
+```kotlin
+package com.example.sqldelight.rules
+
+import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinementProvider
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleProvider
+import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+
+class ExampleRuleSetProvider : RuleSetProvider {
+    override val id = RuleSetId("example")
+
+    override fun ruleProviders(): Set<RuleProvider> = emptySet()
+
+    override fun diagnosticRefinementProviders(): Set<DiagnosticRefinementProvider> =
+        setOf(DiagnosticRefinementProvider(::ExampleSelectRefinement))
+}
+
+class ExampleSelectRefinement : DiagnosticRefinement {
+    override val targetRuleId =
+        QualifiedRuleId("standard:no-unbounded-select")
+
+    override fun refine(
+        context: RuleContext,
+        diagnostic: Diagnostic,
+    ): Diagnostic? =
+        if (context.file.content.contains("EXAMPLE DIALECT LIMIT")) {
+            null
+        } else {
+            diagnostic
+        }
+}
+```
+
+Refinements run after rule IDs and configured severities are resolved and before source-level disable directives are
+applied. Returning the original diagnostic keeps it; returning `null` suppresses it.
+
 ## Fixes
 
 Rules may attach fixes to diagnostics. Use safe fixes only for edits that should preserve SQL behavior, such as

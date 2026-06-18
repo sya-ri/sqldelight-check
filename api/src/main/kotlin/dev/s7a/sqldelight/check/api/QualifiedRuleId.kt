@@ -31,4 +31,20 @@ public class QualifiedRuleId(
         result = 31 * result + ruleId.hashCode()
         return result
     }
+
+    public companion object {
+        /**
+         * Creates a qualified rule ID from a `rule-set:rule-name` value.
+         */
+        public operator fun invoke(value: String): QualifiedRuleId {
+            val delimiter = value.indexOf(':')
+            require(delimiter > 0 && delimiter < value.lastIndex) {
+                "Qualified rule ID must use the rule-set:rule-name form."
+            }
+            return QualifiedRuleId(
+                ruleSetId = RuleSetId(value.substring(0, delimiter)),
+                ruleId = RuleId(value.substring(delimiter + 1)),
+            )
+        }
+    }
 }

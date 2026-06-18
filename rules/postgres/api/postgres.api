@@ -1,7 +1,26 @@
 public final class dev/s7a/sqldelight/check/rules/postgres/PostgresRuleSetProvider : dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
 	public fun <init> ()V
+	public fun diagnosticRefinementProviders ()Ljava/util/Set;
 	public fun getId-wigqPlY ()Ljava/lang/String;
 	public fun ruleProviders ()Ljava/util/Set;
+}
+
+public final class dev/s7a/sqldelight/check/rules/postgres/refinements/PostgresTriggerSourceIndentationRefinement : dev/s7a/sqldelight/check/rule/api/DiagnosticRefinement {
+	public fun <init> ()V
+	public fun getTargetRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public fun refine (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/api/Diagnostic;)Ldev/s7a/sqldelight/check/api/Diagnostic;
+}
+
+public final class dev/s7a/sqldelight/check/rules/postgres/refinements/PostgresTriggerStatementTerminatorRefinement : dev/s7a/sqldelight/check/rule/api/DiagnosticRefinement {
+	public fun <init> ()V
+	public fun getTargetRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public fun refine (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/api/Diagnostic;)Ldev/s7a/sqldelight/check/api/Diagnostic;
+}
+
+public final class dev/s7a/sqldelight/check/rules/postgres/refinements/PostgresTriggerUpdateEventRefinement : dev/s7a/sqldelight/check/rule/api/DiagnosticRefinement {
+	public fun <init> ()V
+	public fun getTargetRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public fun refine (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/api/Diagnostic;)Ldev/s7a/sqldelight/check/api/Diagnostic;
 }
 
 public final class dev/s7a/sqldelight/check/rules/postgres/rules/ExcessiveLocksRule : dev/s7a/sqldelight/check/rule/api/Rule {

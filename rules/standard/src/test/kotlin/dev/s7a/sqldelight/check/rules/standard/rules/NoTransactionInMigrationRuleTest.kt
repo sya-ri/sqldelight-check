@@ -66,21 +66,6 @@ class NoTransactionInMigrationRuleTest {
     }
 
     @Test
-    fun `accepts begin and end inside trigger bodies`() {
-        NoTransactionInMigrationRule().assertDiagnosticCount(
-            """
-            CREATE TRIGGER player_updated
-            AFTER UPDATE ON player
-            BEGIN
-              INSERT INTO player_log(player_id) VALUES (new.id);
-            END;
-            """.asSqlDelightFile(),
-            expected = 0,
-            path = MIGRATION_SQM_PATH,
-        )
-    }
-
-    @Test
     fun `ignores sq files`() {
         NoTransactionInMigrationRule().assertDiagnosticCount(
             """

@@ -34,6 +34,19 @@ internal fun String.statementEndAfter(offset: Int): Int =
         ?.offset
         ?: length
 
+internal fun String.topLevelSemicolonOffsets(): List<Int> {
+    var depth = 0
+    val offsets = mutableListOf<Int>()
+    sqlCharacters().forEach { character ->
+        when (character.value) {
+            '(' -> depth++
+            ')' -> depth = (depth - 1).coerceAtLeast(0)
+            ';' -> if (depth == 0) offsets += character.offset
+        }
+    }
+    return offsets
+}
+
 internal fun String.sqlParenthesisDepthAt(offset: Int): Int {
     var depth = 0
     sqlCharacters()
