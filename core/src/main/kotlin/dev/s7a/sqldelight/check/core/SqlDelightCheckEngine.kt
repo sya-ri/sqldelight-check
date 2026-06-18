@@ -14,6 +14,7 @@ import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleOptions
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 
@@ -78,6 +79,7 @@ public class SqlDelightCheckEngine {
                     )
                 }
             }
+            traceRuleOptionConfiguration(database, candidate.ruleId, candidate.rule, ruleConfig, trace)
         }
         return files.flatMap { file -> runRulesForFile(database, file, rules, refinementsByRuleId, resolver, trace) }
     }
@@ -107,7 +109,7 @@ public class SqlDelightCheckEngine {
                     object : RuleContext {
                         override val database: DatabaseContext = database
                         override val file: SourceFile = file
-                        override val options: Map<String, String> = ruleConfig.options
+                        override val options: RuleOptions = RuleOptions(ruleConfig.options)
                         override val facts: SqlFacts = facts
                     }
                 val enablement =
@@ -156,6 +158,39 @@ public class SqlDelightCheckEngine {
 
     private fun Rule.hasTargetDialect(context: RuleContext): Boolean =
         targetDialect?.let { id -> id in context.database.dialect.ids } ?: true
+}
+
+private fun traceRuleOptionConfiguration(
+    database: DatabaseContext,
+    ruleId: QualifiedRuleId,
+    rule: Rule,
+    ruleConfig: ResolvedRuleConfig,
+    trace: AnalysisTrace,
+) {
+    if (ruleConfig.options.isEmpty()) return
+
+    val declaredOptions = rule.options.associateBy { option -> option.name }
+    val declaredOptionNames = declaredOptions.keys
+    ruleConfig.options.keys.forEach { optionName ->
+        val option = declaredOptions[optionName]
+        if (option == null) {
+            trace.unknownRuleOption(
+                database = database,
+                ruleId = ruleId,
+                optionName = optionName,
+                knownOptionNames = declaredOptionNames,
+            )
+            return@forEach
+        }
+        option.deprecation?.let { deprecation ->
+            trace.deprecatedRuleOption(
+                database = database,
+                ruleId = ruleId,
+                optionName = optionName,
+                deprecation = deprecation,
+            )
+        }
+    }
 }
 
 private fun RuleDiagnostic.withRuleIdentity(

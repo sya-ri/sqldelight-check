@@ -2,8 +2,6 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
-import dev.s7a.sqldelight.check.rule.api.positiveIntOption
-
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -13,6 +11,7 @@ import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
 private const val DEFAULT_MAX_SUBQUERY_DEPTH = 3
 
@@ -20,6 +19,8 @@ private const val DEFAULT_MAX_SUBQUERY_DEPTH = 3
  * Reports SELECT statements nested deeper than the configured subquery block depth.
  */
 public class MaxSubqueryDepthRule : Rule {
+    private val maxSubqueryDepthOption by positiveIntOption("maxDepth", DEFAULT_MAX_SUBQUERY_DEPTH)
+
     override val id: RuleId = RuleId("max-subquery-depth")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
@@ -28,7 +29,7 @@ public class MaxSubqueryDepthRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        val maxDepth = context.options.positiveIntOption("maxDepth", DEFAULT_MAX_SUBQUERY_DEPTH)
+        val maxDepth = context.options[maxSubqueryDepthOption]
         val content = context.file.content
         val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
         structure.blocks

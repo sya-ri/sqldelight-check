@@ -16,6 +16,7 @@ import dev.s7a.sqldelight.check.dialects.postgres.PostgresDialectSourcePatterns
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleOptions
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import kotlin.test.assertEquals
 
@@ -45,7 +46,7 @@ internal fun Rule.diagnostics(
                         path = "src/main/sqldelight/com/example/1.sqm",
                         content = content.trimIndent() + "\n",
                     )
-                override val options: Map<String, String> = options
+                override val options: RuleOptions = RuleOptions(options)
                 override val facts: SqlFacts = SqlFacts()
             },
         reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic.withRuleSetPrefix("postgres", id) },

@@ -2,15 +2,14 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
-import dev.s7a.sqldelight.check.rule.api.booleanOption
-import dev.s7a.sqldelight.check.rule.api.positiveIntOption
-
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.booleanOption
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
 private const val DEFAULT_MAX_LINE_LENGTH = 120
 
@@ -18,6 +17,9 @@ private const val DEFAULT_MAX_LINE_LENGTH = 120
  * Reports non-blank lines that exceed the maximum line length.
  */
 public class MaxLineLengthRule : Rule {
+    private val maxLineLengthOption by positiveIntOption("max", DEFAULT_MAX_LINE_LENGTH)
+    private val maxLineLengthIgnoreCommentsOption by booleanOption("ignoreComments", false)
+
     override val id: RuleId = RuleId("max-line-length")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
@@ -27,8 +29,8 @@ public class MaxLineLengthRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val maxLineLength = context.options.positiveIntOption("max", DEFAULT_MAX_LINE_LENGTH)
-        val ignoreComments = context.options.booleanOption("ignoreComments", false)
+        val maxLineLength = context.options[maxLineLengthOption]
+        val ignoreComments = context.options[maxLineLengthIgnoreCommentsOption]
         content
             .linesWithRanges()
             .filter { line ->

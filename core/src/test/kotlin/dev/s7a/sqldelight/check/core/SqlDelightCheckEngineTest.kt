@@ -18,6 +18,8 @@ import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
+import dev.s7a.sqldelight.check.rule.api.RuleOption
+import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
@@ -293,6 +295,79 @@ class SqlDelightCheckEngineTest {
             )
 
         assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `unknown configured rule option emits trace warning`() {
+        val trace = RuleOptionTrace()
+        SqlDelightCheckEngine().run(
+            inputs = listOf(testInput()),
+            ruleSetProviders =
+                listOf(
+                    testRuleSet(
+                        testRule(options = setOf(testRuleOption("max", 120))),
+                    ),
+                ),
+            config =
+                CheckConfig(
+                    rules =
+                        mapOf(
+                            ruleId to
+                                RuleConfig(
+                                    ruleId,
+                                    true,
+                                    Severity.Warning,
+                                    options = mapOf("max" to "80", "width" to "120"),
+                                ),
+                        ),
+                ),
+            trace = trace,
+        )
+
+        assertEquals(listOf("Database:standard:test:width:max"), trace.unknownOptions)
+    }
+
+    @Test
+    fun `deprecated configured rule option emits trace warning`() {
+        val trace = RuleOptionTrace()
+        SqlDelightCheckEngine().run(
+            inputs = listOf(testInput()),
+            ruleSetProviders =
+                listOf(
+                    testRuleSet(
+                        testRule(
+                            options =
+                                setOf(
+                                    testRuleOption(
+                                        "max",
+                                        120,
+                                        deprecation =
+                                            RuleOptionDeprecation(
+                                                message = "Use lineLength.",
+                                                replacement = "lineLength",
+                                            ),
+                                    ),
+                                ),
+                        ),
+                    ),
+                ),
+            config =
+                CheckConfig(
+                    rules =
+                        mapOf(
+                            ruleId to
+                                RuleConfig(
+                                    ruleId,
+                                    true,
+                                    Severity.Warning,
+                                    options = mapOf("max" to "80"),
+                                ),
+                        ),
+                ),
+            trace = trace,
+        )
+
+        assertEquals(listOf("Database:standard:test:max:lineLength"), trace.deprecatedOptions)
     }
 
     @Test
@@ -642,6 +717,7 @@ class SqlDelightCheckEngineTest {
         severity: Severity = Severity.Warning,
         targetDialect: DialectId? = null,
         deprecation: RuleDeprecation? = null,
+        options: Set<RuleOption<*>> = emptySet(),
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
         rangeLine: Int? = null,
@@ -652,6 +728,7 @@ class SqlDelightCheckEngineTest {
             override val defaultEnable: Boolean = true
             override val targetDialect: DialectId? = targetDialect
             override val deprecation: RuleDeprecation? = deprecation
+            override val options: Set<RuleOption<*>> = options
 
             override fun isApplicable(context: RuleContext): Boolean = isApplicable.invoke(context)
 
@@ -731,11 +808,71 @@ private class DeprecationTrace : AnalysisTrace {
     }
 }
 
+private class RuleOptionTrace : AnalysisTrace {
+    val unknownOptions = mutableListOf<String>()
+    val deprecatedOptions = mutableListOf<String>()
+
+    override fun databaseFiles(
+        database: DatabaseContext,
+        files: List<SourceFile>,
+    ) {
+    }
+
+    override fun fileRules(
+        database: DatabaseContext,
+        file: SourceFile,
+        ruleIds: List<QualifiedRuleId>,
+    ) {
+    }
+
+    override fun unknownRuleOption(
+        database: DatabaseContext,
+        ruleId: QualifiedRuleId,
+        optionName: String,
+        knownOptionNames: Set<String>,
+    ) {
+        unknownOptions +=
+            listOf(
+                database.name,
+                ruleId.value,
+                optionName,
+                knownOptionNames.sorted().joinToString(","),
+            ).joinToString(":")
+    }
+
+    override fun deprecatedRuleOption(
+        database: DatabaseContext,
+        ruleId: QualifiedRuleId,
+        optionName: String,
+        deprecation: RuleOptionDeprecation,
+    ) {
+        deprecatedOptions +=
+            listOf(
+                database.name,
+                ruleId.value,
+                optionName,
+                deprecation.replacement.orEmpty(),
+            ).joinToString(":")
+    }
+}
+
 private fun singleCharacterRange(line: Int): SourceRange =
     SourceRange(
         start = SourcePosition(line = line, column = 1),
         end = SourcePosition(line = line, column = 2),
     )
+
+private fun <T> testRuleOption(
+    name: String,
+    defaultValue: T,
+    deprecation: RuleOptionDeprecation? = null,
+): RuleOption<T> =
+    object : RuleOption<T> {
+        override val name: String = name
+        override val deprecation: RuleOptionDeprecation? = deprecation
+
+        override fun read(values: Map<String, String>): T = defaultValue
+    }
 
 private fun qualifiedRuleId(value: String): QualifiedRuleId {
     return QualifiedRuleId(value)

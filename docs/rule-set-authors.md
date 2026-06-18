@@ -110,7 +110,23 @@ offset-stable text checks:
 - `List<SqlToken>.findSourcePattern(...)` matches dialect-provided source patterns against token streams.
 - `Rule.reportSqlStatementMatches(...)` tokenizes source text, splits it into statements, and reports matched ranges.
 - `String.maskSqlCommentsAndQuotedText()` masks comments and quoted text while preserving offsets.
-- `Map<String, String>.booleanOption(...)`, `positiveIntOption(...)`, and `commaSeparatedOption(...)` parse common rule options.
+- `option(...)` declares custom typed rule options that sqldelight-check can validate.
+
+Helpers that omit `defaultValue` produce nullable options. Helpers that include
+`defaultValue` produce non-null options.
+
+| Value | Single option | List option |
+| --- | --- | --- |
+| Custom parser | `option(...)` / `option(..., defaultValue)` | `listOption(...)` / `listOption(..., defaultValue)` |
+| Raw string | `stringOption(...)` | `stringListOption(...)` |
+| Non-blank string | `nonBlankStringOption(...)` |  |
+| Boolean | `booleanOption(...)` |  |
+| Integer | `intOption(...)` | `intListOption(...)` |
+| Long integer | `longOption(...)` | `longListOption(...)` |
+| Positive integer | `positiveIntOption(...)` | `positiveIntListOption(...)` |
+| Non-negative integer | `nonNegativeIntOption(...)` | `nonNegativeIntListOption(...)` |
+| Enum name, case-insensitive | `enumOption(...)` | `enumListOption(...)` |
+| `KeyedEnum.key`, case-insensitive | `keyedEnumOption(...)` | `keyedEnumListOption(...)` |
 
 Use the token helpers for simple source-text policies before writing the same
 masking, statement splitting, and range mapping by hand:
@@ -148,6 +164,84 @@ class NoForeignKeysOffRule : Rule {
                 ForeignKeysOffValue,
             )
         }
+    }
+}
+```
+
+Declare configurable rule options inside the rule with delegate helpers.
+sqldelight-check warns when build configuration contains an option that the
+rule did not declare, and also warns when a configured option is marked
+deprecated:
+
+```kotlin
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.KeyedEnum
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.intListOption
+import dev.s7a.sqldelight.check.rule.api.keyedEnumOption
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
+
+class MaxExampleRule : Rule {
+    private val maxOption by positiveIntOption("max", 10)
+    private val idsOption by intListOption("ids")
+    private val modeOption by keyedEnumOption("mode", Mode.Strict)
+
+    override val id = RuleId("max-example")
+    override val defaultSeverity = Severity.Warning
+
+    override fun run(context: RuleContext, reporter: DiagnosticReporter) {
+        val max = context.options[maxOption]
+        val ids = context.options[idsOption].orEmpty()
+        val mode = context.options[modeOption]
+        // ...
+    }
+
+    private enum class Mode(
+        override val key: String,
+    ) : KeyedEnum {
+        Strict("strict"),
+        Relaxed("relaxed"),
+    }
+}
+```
+
+When a rule set needs the same custom parsing in multiple rules, wrap
+`option(...)` or `listOption(...)` in a small rule-set-local delegate function
+instead of repeating parser logic inside each rule:
+
+```kotlin
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleOption
+import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
+import dev.s7a.sqldelight.check.rule.api.option
+import kotlin.properties.ReadOnlyProperty
+
+private fun patternOption(
+    name: String,
+    defaultValue: Regex,
+    deprecation: RuleOptionDeprecation? = null,
+): ReadOnlyProperty<Rule, RuleOption<Regex>> =
+    option(name, defaultValue, deprecation) { value -> Regex(value) }
+
+class ForbiddenNameRule : Rule {
+    private val forbiddenNamePatternOption by patternOption(
+        name = "forbiddenNamePattern",
+        defaultValue = Regex("""\btmp_"""),
+    )
+
+    override val id = RuleId("forbidden-name")
+    override val defaultSeverity = Severity.Warning
+
+    override fun run(context: RuleContext, reporter: DiagnosticReporter) {
+        val forbiddenNamePattern = context.options[forbiddenNamePatternOption]
+        // ...
     }
 }
 ```

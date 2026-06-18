@@ -1,16 +1,14 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
-import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
-
-import dev.s7a.sqldelight.check.rule.api.booleanOption
-import dev.s7a.sqldelight.check.rule.api.commaSeparatedOption
-
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.booleanOption
+import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
+import dev.s7a.sqldelight.check.rule.api.stringListOption
 
 /**
  * Reports configured words that should not appear in SQL source.
@@ -18,6 +16,10 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
  * Configure blocked words with the comma-separated `words` option.
  */
 public class BlockedWordsRule : Rule {
+    private val blockedWordsOption by stringListOption("words", emptyList())
+    private val matchCaseOption by booleanOption("matchCase", false)
+    private val blockedWordsIgnoreCommentsOption by booleanOption("ignoreComments", true)
+
     override val id: RuleId = RuleId("blocked-words")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
@@ -26,11 +28,11 @@ public class BlockedWordsRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        val words = context.options.commaSeparatedOption("words")
+        val words = context.options[blockedWordsOption]
         if (words.isEmpty()) return
 
-        val matchCase = context.options.booleanOption("matchCase", defaultValue = false)
-        val ignoreComments = context.options.booleanOption("ignoreComments", defaultValue = true)
+        val matchCase = context.options[matchCaseOption]
+        val ignoreComments = context.options[blockedWordsIgnoreCommentsOption]
         val content = context.file.content
         val blockedWords =
             if (matchCase) {

@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
+import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 
 /**
  * Receives analysis trace events for optional task-level logging.
@@ -37,6 +38,28 @@ public interface AnalysisTrace {
         ruleId: QualifiedRuleId,
         deprecation: RuleDeprecation,
         enabled: Boolean,
+    ) {
+    }
+
+    /**
+     * Signals that user configuration contains an option not declared by the rule.
+     */
+    public fun unknownRuleOption(
+        database: DatabaseContext,
+        ruleId: QualifiedRuleId,
+        optionName: String,
+        knownOptionNames: Set<String>,
+    ) {
+    }
+
+    /**
+     * Signals that user configuration explicitly mentions a deprecated rule option.
+     */
+    public fun deprecatedRuleOption(
+        database: DatabaseContext,
+        ruleId: QualifiedRuleId,
+        optionName: String,
+        deprecation: RuleOptionDeprecation,
     ) {
     }
 
