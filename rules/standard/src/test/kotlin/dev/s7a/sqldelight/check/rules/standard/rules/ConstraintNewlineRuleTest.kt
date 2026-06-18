@@ -86,6 +86,20 @@ class ConstraintNewlineRuleTest {
     }
 
     @Test
+    fun `accepts named column constraints on their own lines after mapped type`() {
+        ConstraintNewlineRule().assertDiagnosticCount(
+            """
+            CREATE TABLE first_come_page_layout_file_references (
+                file_id UUID AS kotlin.uuid.Uuid
+                    CONSTRAINT fclfr_file_id_nn NOT NULL
+                    CONSTRAINT fclfr_file_id_fk REFERENCES files (id)
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
     fun `accepts mapped type columns before table constraints`() {
         ConstraintNewlineRule().assertDiagnosticCount(
             """
