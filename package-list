@@ -37,6 +37,7 @@ dev.s7a.sqldelight.check.rules.mysql
 dev.s7a.sqldelight.check.rules.mysql.rules
 module:sqldelight-check-rules-postgres
 dev.s7a.sqldelight.check.rules.postgres
+dev.s7a.sqldelight.check.rules.postgres.refinements
 dev.s7a.sqldelight.check.rules.postgres.rules
 module:sqldelight-check-rules-sqlite
 dev.s7a.sqldelight.check.rules.sqlite
