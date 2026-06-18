@@ -73,7 +73,7 @@ class SpaceAfterCommaRuleTest {
     }
 
     @Test
-    fun `accepts trailing comma before closing parenthesis in sqlite sq`() {
+    fun `accepts trailing comma before closing parenthesis`() {
         val content =
             """
             insertPlayer:

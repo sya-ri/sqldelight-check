@@ -297,6 +297,9 @@ Authoring guides:
 - [Reporter Author Guide](docs/reporter-authors.md)
 - [Dialects Author Guide](docs/dialects-authors.md)
 
+Rule sets can also refine diagnostics emitted by other rule sets. Dialect rule sets use this to suppress false positives
+when a general rule sees dialect-specific syntax that only that dialect should interpret.
+
 ## SQLDelight And Dialects
 
 sqldelight-check reads SQLDelight database tasks from Gradle and supports multiple SQLDelight databases in one project.

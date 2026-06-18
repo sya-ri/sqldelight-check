@@ -15,4 +15,9 @@ public interface RuleSetProvider {
      * Providers for rules in this set.
      */
     public fun ruleProviders(): Set<RuleProvider>
+
+    /**
+     * Optional providers for refinements that inspect diagnostics emitted by rules in any set.
+     */
+    public fun diagnosticRefinementProviders(): Set<DiagnosticRefinementProvider> = emptySet()
 }

@@ -10,7 +10,6 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.SqlDelightStatementStart
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementContinuation
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.StatementStart
-import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -80,7 +79,6 @@ private fun String.statementStarts(
         .filter { token -> sourcePatterns.matches(role, listOf(token.normalizedText)) }
         .filter { token -> depths[token.startOffset] == 0 }
         .filter { token -> isFirstSqlTokenOnLine(token.startOffset) }
-        .filterNot { token -> token.isTerm(SqlDialectSourceTerm.Create) && isCreateTrigger(tokens, token) }
         .map { token -> DetectedStatementStart(keyword = token.normalizedText, offset = token.startOffset) }
         .toList()
 }
@@ -111,15 +109,6 @@ private fun String.isFirstSqlTokenOnLine(offset: Int): Boolean {
         index--
     }
     return true
-}
-
-private fun isCreateTrigger(
-    tokens: List<SqlToken>,
-    createToken: SqlToken,
-): Boolean {
-    val createIndex = tokens.indexOf(createToken)
-    val nextToken = tokens.getOrNull(createIndex + 1) ?: return false
-    return nextToken.isTerm(SqlDialectSourceTerm.Trigger)
 }
 
 private fun List<DetectedStatementStart>.nextBoundaryOffset(

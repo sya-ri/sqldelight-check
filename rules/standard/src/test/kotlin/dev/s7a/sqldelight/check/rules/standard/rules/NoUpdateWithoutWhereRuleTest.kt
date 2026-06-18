@@ -50,19 +50,6 @@ class NoUpdateWithoutWhereRuleTest {
     }
 
     @Test
-    fun `accepts trigger update event`() {
-        NoUpdateWithoutWhereRule().assertDiagnosticCount(
-            """
-            CREATE TRIGGER trigger_set_updated_at_on_files
-            BEFORE UPDATE ON files
-            FOR EACH ROW
-            EXECUTE FUNCTION set_updated_at();
-            """.asSqlDelightFile(),
-            0,
-        )
-    }
-
-    @Test
     fun `does not use nested where clause for update statement`() {
         NoUpdateWithoutWhereRule().assertDiagnosticCount(
             """

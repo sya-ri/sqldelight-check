@@ -1,5 +1,6 @@
 public final class dev/s7a/sqldelight/check/rules/standard/StandardRuleSetProvider : dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
 	public fun <init> ()V
+	public fun diagnosticRefinementProviders ()Ljava/util/Set;
 	public fun getId-wigqPlY ()Ljava/lang/String;
 	public fun ruleProviders ()Ljava/util/Set;
 }

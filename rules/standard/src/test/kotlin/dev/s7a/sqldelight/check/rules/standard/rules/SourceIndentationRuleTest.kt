@@ -227,19 +227,6 @@ class SourceIndentationRuleTest {
     }
 
     @Test
-    fun `accepts trigger clauses on separate lines`() {
-        val input =
-            """
-            CREATE TRIGGER trigger_set_updated_at_on_files
-            BEFORE UPDATE ON files
-            FOR EACH ROW
-            EXECUTE FUNCTION set_updated_at();
-            """.asSqlDelightFile()
-
-        SourceIndentationRule().assertDiagnosticCount(input, 0)
-    }
-
-    @Test
     fun `accepts mapped types in create table constraints`() {
         val input =
             """

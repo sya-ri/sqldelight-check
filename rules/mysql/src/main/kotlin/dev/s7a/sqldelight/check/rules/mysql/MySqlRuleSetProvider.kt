@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rules.mysql.rules.NoCopyAlgorithmRule
 import dev.s7a.sqldelight.check.rules.mysql.rules.NoDisplayWidthIntegerRule
 import dev.s7a.sqldelight.check.rules.mysql.rules.NoExclusiveLockRule
+import dev.s7a.sqldelight.check.rules.mysql.rules.NoRenameTableInMigrationRule
 import dev.s7a.sqldelight.check.rules.mysql.rules.NoReplaceIntoRule
 import dev.s7a.sqldelight.check.rules.mysql.rules.NoUtf8CharsetRule
 import dev.s7a.sqldelight.check.rules.mysql.rules.NoZeroDateDefaultRule
@@ -26,6 +27,7 @@ public class MySqlRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoUtf8CharsetRule),
             RuleProvider(::NoCopyAlgorithmRule),
             RuleProvider(::NoExclusiveLockRule),
+            RuleProvider(::NoRenameTableInMigrationRule),
             RuleProvider(::NoReplaceIntoRule),
             RuleProvider(::NoZeroDateDefaultRule),
             RuleProvider(::NoDisplayWidthIntegerRule),
