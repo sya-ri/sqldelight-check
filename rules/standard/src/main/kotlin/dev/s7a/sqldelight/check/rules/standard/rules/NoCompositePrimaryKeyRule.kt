@@ -23,21 +23,9 @@ public class NoCompositePrimaryKeyRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isTerm(SqlDialectSourceTerm.Create)) return@forEachIndexed
-            val table = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.Table) } ?: return@forEachIndexed
-            val statementEnd = content.statementEndAfter(token.startOffset)
-            val open =
-                content.sqlCharacters()
-                    .dropWhile { character -> character.offset < table.endOffset }
-                    .takeWhile { character -> character.offset < statementEnd }
-                    .firstOrNull { character -> character.value == '(' }
-                    ?: return@forEachIndexed
-            val close = content.matchingClosingParenthesisOffset(open.offset) ?: return@forEachIndexed
-            val itemDepth = content.sqlParenthesisDepthAt(open.offset) + 1
-
-            content.commaSeparatedClauseItems(open.offset + 1, close, itemDepth)
-                .mapNotNull { item -> content.compositePrimaryKeyToken(item, itemDepth) }
+        content.createTableBodies(tokens).forEach { body ->
+            content.commaSeparatedClauseItems(body.openOffset + 1, body.closeOffset, body.itemDepth)
+                .mapNotNull { item -> content.compositePrimaryKeyToken(item, body.itemDepth) }
                 .forEach { primary ->
                     reporter.report(
                         RuleDiagnostic(
