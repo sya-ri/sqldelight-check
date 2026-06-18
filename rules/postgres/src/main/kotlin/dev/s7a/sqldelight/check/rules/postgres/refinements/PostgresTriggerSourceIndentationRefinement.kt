@@ -1,3 +1,5 @@
+@file:Suppress("DuplicatedCode")
+
 package dev.s7a.sqldelight.check.rules.postgres.refinements
 
 import dev.s7a.sqldelight.check.api.Diagnostic
