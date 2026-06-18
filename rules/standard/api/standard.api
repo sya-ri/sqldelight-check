@@ -400,6 +400,17 @@ public final class dev/s7a/sqldelight/check/rules/standard/rules/NoBlankLinesInS
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
 }
 
+public final class dev/s7a/sqldelight/check/rules/standard/rules/NoCompositePrimaryKeyRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
 public final class dev/s7a/sqldelight/check/rules/standard/rules/NoConsecutiveSemicolonsRule : dev/s7a/sqldelight/check/rule/api/Rule {
 	public fun <init> ()V
 	public fun getDefaultEnable ()Z
