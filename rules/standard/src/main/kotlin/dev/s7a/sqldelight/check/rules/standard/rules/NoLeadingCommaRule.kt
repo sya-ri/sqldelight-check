@@ -39,6 +39,7 @@ public class NoLeadingCommaRule : Rule {
                         file = context.file,
                         range = content.rangeAtOffsets(comma.offset, comma.offset + 1),
                         database = context.database,
+                        fixes = listOf(content.moveLeadingTokenToPreviousLineFix(comma.offset, comma.offset + 1, "Move comma to previous line")),
                     ),
                 )
             }

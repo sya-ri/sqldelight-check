@@ -63,6 +63,29 @@ class SourceIndentationRuleTest {
     }
 
     @Test
+    fun `fixes multiline exists predicate subquery indentation`() {
+        val input =
+            """
+            SELECT EXISTS(
+            SELECT 1
+            FROM accounts
+            WHERE email = :email
+            );
+            """.asSqlDelightFile()
+
+        val expected =
+            """
+            SELECT EXISTS(
+                SELECT 1
+                FROM accounts
+                WHERE email = :email
+            );
+            """.asSqlDelightFile()
+
+        assertEquals(expected, SourceIndentationRule().applyAllFixes(input))
+    }
+
+    @Test
     fun `uses configured indentation size`() {
         val input =
             """

@@ -6,17 +6,19 @@ import kotlin.test.assertEquals
 class NoNotInNullableSubqueryRuleTest {
     @Test
     fun `reports not in subqueries without null exclusion`() {
+        val content =
+            """
+            selectTeams:
+            SELECT id
+            FROM team
+            WHERE id NOT IN (
+              SELECT team_id
+              FROM player
+            );
+            """.asSqlDelightFile()
         val diagnostics =
             NoNotInNullableSubqueryRule().diagnostics(
-                """
-                selectTeams:
-                SELECT id
-                FROM team
-                WHERE id NOT IN (
-                  SELECT team_id
-                  FROM player
-                );
-                """.asSqlDelightFile(),
+                content,
             )
 
         assertEquals(1, diagnostics.size)

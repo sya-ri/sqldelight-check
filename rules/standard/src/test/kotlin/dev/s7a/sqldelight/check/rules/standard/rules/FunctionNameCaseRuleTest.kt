@@ -19,6 +19,18 @@ class FunctionNameCaseRuleTest {
         assertEquals(3, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
         assertEquals("COUNT", diagnostics.first().fixes.single().edits.single().replacement)
+        FunctionNameCaseRule().assertAllFixes(
+            """
+            selectPlayerStats:
+            SELECT count(*), coalesce(max(score), 0)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectPlayerStats:
+            SELECT COUNT(*), COALESCE(MAX(score), 0)
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

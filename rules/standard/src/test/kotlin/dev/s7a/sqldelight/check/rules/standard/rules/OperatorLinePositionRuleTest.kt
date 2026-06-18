@@ -1,28 +1,42 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class OperatorLinePositionRuleTest {
     @Test
     fun `reports line-leading comparison and binary operators in sq queries`() {
-        val diagnostics =
-            OperatorLinePositionRule().diagnostics(
-                """
-                selectMatches:
-                SELECT id, name
-                FROM player
-                WHERE id
-                  = ?
-                  AND score
-                  + bonus > 10
-                  AND name
-                  || suffix = ?;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectMatches:
+            SELECT id, name
+            FROM player
+            WHERE id
+              = ?
+              AND score
+              + bonus > 10
+              AND name
+              || suffix = ?;
+            """.asSqlDelightFile()
+        val diagnostics = OperatorLinePositionRule().diagnostics(content)
 
         assertEquals(3, diagnostics.size)
-        assertEquals(0, diagnostics.first().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
+        OperatorLinePositionRule().assertAllFixes(
+            content,
+            """
+            selectMatches:
+            SELECT id, name
+            FROM player
+            WHERE id =
+               ?
+              AND score +
+               bonus > 10
+              AND name ||
+               suffix = ?;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

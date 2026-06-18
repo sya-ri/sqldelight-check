@@ -7,7 +7,6 @@ import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
-import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -27,24 +26,14 @@ public class ConstraintNewlineRule : Rule {
         val content = context.file.content
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
-        tokens.forEachIndexed { index, token ->
-            if (!token.isTerm(SqlDialectSourceTerm.Create)) return@forEachIndexed
-            val table = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.Table) } ?: return@forEachIndexed
-            val statementEnd = content.statementEndAfter(token.startOffset)
-            val open =
-                content.sqlCharacters()
-                    .dropWhile { character -> character.offset < table.endOffset }
-                    .takeWhile { character -> character.offset < statementEnd }
-                    .firstOrNull { character -> character.value == '(' }
-                    ?: return@forEachIndexed
-            val close = content.matchingClosingParenthesisOffset(open.offset) ?: return@forEachIndexed
-            val itemDepth = content.sqlParenthesisDepthAt(open.offset) + 1
-            val items = content.commaSeparatedClauseItems(open.offset + 1, close, itemDepth)
-            if (!content.isMultilineItemList(items)) return@forEachIndexed
+        content.createTableBodies(tokens).forEach bodyLoop@{ body ->
+            val items = content.commaSeparatedClauseItems(body.openOffset + 1, body.closeOffset, body.itemDepth)
+            if (!content.isMultilineItemList(items)) return@bodyLoop
 
-            items
-                .flatMap { item -> content.createTableConstraintTokens(item, itemDepth, context.database.dialect.sourcePatterns) }
-                .forEach { constraint ->
+            items.forEach { item ->
+                val itemLine = lines.lineContaining(item.startOffset) ?: return@forEach
+                val indentation = itemLine.text.takeWhile { character -> character == ' ' || character == '\t' }
+                content.createTableConstraintTokens(item, body.itemDepth, context.database.dialect.sourcePatterns).forEach { constraint ->
                     val line = lines.lineContaining(constraint.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == constraint.startOffset) return@forEach
                     reporter.report(
@@ -54,9 +43,18 @@ public class ConstraintNewlineRule : Rule {
                             file = context.file,
                             range = content.rangeAtOffsets(constraint.startOffset, constraint.endOffset),
                             database = context.database,
+                            fixes =
+                                listOf(
+                                    content.startOwnLineFix(
+                                        constraint.startOffset,
+                                        "Move constraint to its own line",
+                                        indentation,
+                                    ),
+                                ),
                         ),
                     )
                 }
+            }
         }
     }
 }

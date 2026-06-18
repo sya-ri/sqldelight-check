@@ -17,6 +17,8 @@ import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
+private const val DEFAULT_INDENT_SIZE = 4
+
 /**
  * Reports SQL lines whose indentation does not match their source structure.
  *
@@ -26,6 +28,8 @@ import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
  * parenthesized source block.
  */
 public class SourceIndentationRule : Rule {
+    private val indentSizeOption by positiveIntOption("indentSize", DEFAULT_INDENT_SIZE)
+
     override val id: RuleId = RuleId("source-indentation")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
@@ -35,7 +39,7 @@ public class SourceIndentationRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val indentSize = context.options.positiveIntOption("indentSize", DEFAULT_INDENT_SIZE)
+        val indentSize = context.options[indentSizeOption]
         val lines = content.linesWithRanges()
         val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
         val statementBlocks =
@@ -76,8 +80,6 @@ public class SourceIndentationRule : Rule {
     }
 }
 
-private const val DEFAULT_INDENT_SIZE = 4
-
 private fun SqlSourceTokenContext.expectedIndentationLevel(
     structure: SqlSourceStructure,
 ): Int {
@@ -87,11 +89,13 @@ private fun SqlSourceTokenContext.expectedIndentationLevel(
     val continuationIndentation = if (isExpressionContinuation()) 1 else 0
     val columnConstraintIndentation = if (isColumnConstraintContinuation(structure)) 1 else 0
     val caseIndentation = if (isCaseContinuation(structure)) 1 else 0
+    val standaloneSubqueryAdjustment = if (isStandaloneSubqueryBody(structure)) -1 else 0
     return blockIndentation +
         subqueryBodyIndentation +
         maxOf(clauseIndentation, continuationIndentation) +
         columnConstraintIndentation +
-        caseIndentation
+        caseIndentation +
+        standaloneSubqueryAdjustment
 }
 
 private fun SqlSourceTokenContext.sourceBlockDepth(structure: SqlSourceStructure): Int =
@@ -118,6 +122,10 @@ private val SqlSourceBlock.isIndentingBlock: Boolean
 private fun SqlSourceTokenContext.isClosingTokenOf(block: SqlSourceBlock): Boolean =
     index == block.endTokenIndex - 1 && token.normalizedText == ")"
 
+private fun SqlSourceTokenContext.isClosingTokenOfSubquery(structure: SqlSourceStructure): Boolean =
+    token.normalizedText == ")" &&
+        structure.blocks.any { block -> block.kind == SqlSourceBlockKind.Subquery && isClosingTokenOf(block) }
+
 private fun SqlSourceTokenContext.isCreateIndexOnContinuation(structure: SqlSourceStructure): Boolean {
     if (token.normalizedText != "on") return false
     val statementTokens = structure.tokensInStatement(statementIndex)
@@ -127,6 +135,7 @@ private fun SqlSourceTokenContext.isCreateIndexOnContinuation(structure: SqlSour
 
 private fun SqlSourceTokenContext.isClauseContinuation(structure: SqlSourceStructure): Boolean {
     if (isClauseStart()) return false
+    if (isClosingTokenOfSubquery(structure) && !isInsideCaseExpression(structure)) return false
     if (isCreateTableItemStart(structure)) return false
     if (isCreateTableClosingParenthesis(structure)) return false
     val clause = structure.innermostClauseContaining(this) ?: return false
@@ -150,6 +159,18 @@ private fun SqlSourceStructure.innermostClauseContaining(context: SqlSourceToken
     }
     return result
 }
+
+private fun SqlSourceTokenContext.isStandaloneSubqueryBody(structure: SqlSourceStructure): Boolean =
+    !isInsideCaseExpression(structure) &&
+        structure.blocks.any { block ->
+            block.kind == SqlSourceBlockKind.Subquery &&
+                block.contains(this) &&
+                index > block.startTokenIndex &&
+                !isClosingTokenOf(block)
+        }
+
+private fun SqlSourceTokenContext.isInsideCaseExpression(structure: SqlSourceStructure): Boolean =
+    structure.innermostCaseContaining(this) != null
 
 private fun SqlSourceTokenContext.isExpressionContinuation(): Boolean =
     !isClauseStart() &&

@@ -60,6 +60,7 @@ public class WhereConditionNewlineRule : Rule {
                                     file = context.file,
                                     range = content.rangeAtOffsets(candidate.startOffset, candidate.endOffset),
                                     database = context.database,
+                                    fixes = listOf(content.startOwnLineFix(candidate.startOffset, "Move boolean operator to its own line")),
                                 ),
                             )
                         }

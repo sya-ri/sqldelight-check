@@ -18,6 +18,7 @@ class NoDuplicateQueryLabelRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

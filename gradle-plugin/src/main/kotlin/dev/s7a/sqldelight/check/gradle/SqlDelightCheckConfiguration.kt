@@ -33,7 +33,7 @@ internal fun SqlDelightCheckExtension.toCheckConfig(logLevel: LogLevel = this.lo
 private fun Iterable<RuleSetExtension>.toRuleSetConfigs(): Map<RuleSetId, RuleSetConfig> =
     associate { ruleSet ->
         val id = RuleSetId(ruleSet.name)
-        id to RuleSetConfig(id = id, enablement = ruleSet.enabled.get())
+        id to RuleSetConfig(id = id, enablement = ruleSet.enabled.orNull)
     }
 
 private fun Iterable<RuleExtension>.toRuleConfigs(): Map<QualifiedRuleId, RuleConfig> =
@@ -42,7 +42,7 @@ private fun Iterable<RuleExtension>.toRuleConfigs(): Map<QualifiedRuleId, RuleCo
         id to
             RuleConfig(
                 id = id,
-                enablement = rule.enabled.get(),
+                enablement = rule.enabled.orNull,
                 severity = rule.severity.get(),
                 options = rule.options.get(),
             )

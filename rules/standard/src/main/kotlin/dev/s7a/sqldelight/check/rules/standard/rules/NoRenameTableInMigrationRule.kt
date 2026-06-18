@@ -46,6 +46,5 @@ public class NoRenameTableInMigrationRule : Rule {
 }
 
 private fun List<SqlToken>.findRenameTableOperation(): Pair<SqlToken, SqlToken>? {
-    if (startsWithKeywords("rename", "table")) return get(0) to get(1)
     return findAlterTableOperation("rename", "to")
 }

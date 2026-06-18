@@ -69,19 +69,6 @@ public class BlankLineBetweenStatementsRule : Rule {
     }
 }
 
-private fun String.topLevelSemicolonOffsets(): List<Int> {
-    var depth = 0
-    val offsets = mutableListOf<Int>()
-    sqlCharacters().forEach { character ->
-        when (character.value) {
-            '(' -> depth++
-            ')' -> depth = (depth - 1).coerceAtLeast(0)
-            ';' -> if (depth == 0) offsets += character.offset
-        }
-    }
-    return offsets
-}
-
 private fun List<LineInfo>.indexOfLineContaining(offset: Int): Int? =
     indexOfLast { line -> line.startOffset <= offset }
         .takeIf { index -> index >= 0 }

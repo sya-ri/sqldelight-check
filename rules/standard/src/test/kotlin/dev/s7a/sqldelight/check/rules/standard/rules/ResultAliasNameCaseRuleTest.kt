@@ -7,17 +7,20 @@ import kotlin.test.assertEquals
 class ResultAliasNameCaseRuleTest {
     @Test
     fun `reports result aliases that are not snake case`() {
+        val content =
+            """
+            selectPlayer:
+            SELECT player.name AS playerName
+            FROM player;
+            """.asSqlDelightFile()
         val diagnostics =
             ResultAliasNameCaseRule().diagnostics(
-                """
-                selectPlayer:
-                SELECT player.name AS playerName
-                FROM player;
-                """.asSqlDelightFile(),
+                content,
             )
 
         assertEquals(1, diagnostics.size)
         assertEquals(Severity.Info, diagnostics.single().severity)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

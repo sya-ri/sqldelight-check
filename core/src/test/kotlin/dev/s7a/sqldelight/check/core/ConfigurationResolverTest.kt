@@ -1,9 +1,6 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
-
-
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
@@ -22,7 +19,7 @@ class ConfigurationResolverTest {
                 CheckConfig(
                     rules =
                         mapOf(
-                            ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Error),
+                            ruleId to RuleConfig(ruleId, true, Severity.Error),
                         ),
                     databases =
                         mapOf(
@@ -31,7 +28,7 @@ class ConfigurationResolverTest {
                                     name = "MainDb",
                                     rules =
                                         mapOf(
-                                            ruleId to RuleConfig(ruleId, Enablement.Disabled, Severity.Info),
+                                            ruleId to RuleConfig(ruleId, false, Severity.Info),
                                         ),
                                 ),
                         ),
@@ -40,7 +37,7 @@ class ConfigurationResolverTest {
 
         val resolved = resolver.resolveRule(ruleId, "MainDb")
 
-        assertEquals(Enablement.Disabled, resolved.enablement)
+        assertEquals(false, resolved.enablement)
         assertEquals(Severity.Info, resolved.severity)
         assertEquals(true, resolved.explicitlyConfigured)
     }
@@ -56,7 +53,7 @@ class ConfigurationResolverTest {
                             ruleId to
                                 RuleConfig(
                                     ruleId,
-                                    Enablement.Auto,
+                                    null,
                                     Severity.Warning,
                                     options = mapOf("max" to "8", "mode" to "global"),
                                 ),
@@ -71,7 +68,7 @@ class ConfigurationResolverTest {
                                             ruleId to
                                                 RuleConfig(
                                                     ruleId,
-                                                    Enablement.Auto,
+                                                    null,
                                                     Severity.Warning,
                                                     options = mapOf("max" to "12"),
                                                 ),
@@ -83,6 +80,7 @@ class ConfigurationResolverTest {
 
         val resolved = resolver.resolveRule(ruleId, "MainDb")
 
+        assertEquals(null, resolved.enablement)
         assertEquals(mapOf("max" to "12", "mode" to "global"), resolved.options)
         assertEquals(true, resolved.explicitlyConfigured)
     }
@@ -105,7 +103,7 @@ class ConfigurationResolverTest {
                 CheckConfig(
                     ruleSets =
                         mapOf(
-                            ruleSetId to RuleSetConfig(ruleSetId, Enablement.Disabled),
+                            ruleSetId to RuleSetConfig(ruleSetId, false),
                         ),
                     databases =
                         mapOf(
@@ -114,7 +112,7 @@ class ConfigurationResolverTest {
                                     name = "MainDb",
                                     ruleSets =
                                         mapOf(
-                                            ruleSetId to RuleSetConfig(ruleSetId, Enablement.Enabled),
+                                            ruleSetId to RuleSetConfig(ruleSetId, true),
                                         ),
                                 ),
                         ),
@@ -123,7 +121,7 @@ class ConfigurationResolverTest {
 
         val resolved = resolver.resolveRuleSet(ruleSetId, "MainDb")
 
-        assertEquals(Enablement.Enabled, resolved.enablement)
+        assertEquals(true, resolved.enablement)
     }
 }
 

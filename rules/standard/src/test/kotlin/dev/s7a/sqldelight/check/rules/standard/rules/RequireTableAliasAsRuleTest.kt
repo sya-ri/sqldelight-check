@@ -1,23 +1,33 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RequireTableAliasAsRuleTest {
     @Test
     fun `reports implicit table aliases`() {
-        val diagnostics =
-            RequireTableAliasAsRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT p.id
-                FROM player p
-                JOIN team t ON t.id = p.team_id;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT p.id
+            FROM player p
+            JOIN team t ON t.id = p.team_id;
+            """.asSqlDelightFile()
+        val diagnostics = RequireTableAliasAsRule().diagnostics(content)
 
         assertEquals(2, diagnostics.size)
         assertEquals("Table aliases should use AS.", diagnostics.first().message)
+        assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
+        RequireTableAliasAsRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT p.id
+            FROM player AS p
+            JOIN team AS t ON t.id = p.team_id;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

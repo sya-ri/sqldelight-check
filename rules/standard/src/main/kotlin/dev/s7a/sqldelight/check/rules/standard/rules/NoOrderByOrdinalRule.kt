@@ -33,8 +33,7 @@ public class NoOrderByOrdinalRule : Rule {
                     else -> return@forEachIndexed
                 }
             val by = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.By) } ?: return@forEachIndexed
-            val clauseDepth = content.sqlParenthesisDepthAt(token.startOffset)
-            if (clauseDepth != 0) return@forEachIndexed
+            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
 
             val boundaryRole =
                 if (clause == OrdinalClause.GroupBy) {
@@ -69,6 +68,7 @@ private enum class OrdinalClause {
 private data class OrdinalReference(
     val startOffset: Int,
     val endOffset: Int,
+    val number: Int,
 )
 
 private fun String.topLevelOrdinalReferenceOffsets(
@@ -86,7 +86,11 @@ private fun String.topLevelOrdinalReferenceOffsets(
                 }
             val leadingWhitespace = substring(item.startOffset, item.endOffset).takeWhile { it.isWhitespace() }.length
             if (reference.matches(ordinalReferenceRegex)) {
-                OrdinalReference(item.startOffset + leadingWhitespace, item.startOffset + leadingWhitespace + reference.length)
+                OrdinalReference(
+                    startOffset = item.startOffset + leadingWhitespace,
+                    endOffset = item.startOffset + leadingWhitespace + reference.length,
+                    number = reference.toInt(),
+                )
             } else {
                 null
             }

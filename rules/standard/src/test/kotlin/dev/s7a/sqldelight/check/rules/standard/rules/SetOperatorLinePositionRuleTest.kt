@@ -1,24 +1,37 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SetOperatorLinePositionRuleTest {
     @Test
     fun `reports set operators after other code on multiline queries`() {
-        val diagnostics =
-            SetOperatorLinePositionRule().diagnostics(
-                """
-                selectNames:
-                SELECT name FROM player UNION
-                SELECT name FROM coach EXCEPT
-                SELECT name FROM archived_player INTERSECT
-                SELECT name FROM sponsor;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectNames:
+            SELECT name FROM player UNION
+            SELECT name FROM coach EXCEPT
+            SELECT name FROM archived_player INTERSECT
+            SELECT name FROM sponsor;
+            """.asSqlDelightFile()
+        val diagnostics = SetOperatorLinePositionRule().diagnostics(content)
 
         assertEquals(3, diagnostics.size)
-        assertEquals(0, diagnostics.first().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.first().fixes.single().safety)
+        SetOperatorLinePositionRule().assertAllFixes(
+            content,
+            """
+            selectNames:
+            SELECT name FROM player
+            UNION
+            SELECT name FROM coach
+            EXCEPT
+            SELECT name FROM archived_player
+            INTERSECT
+            SELECT name FROM sponsor;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

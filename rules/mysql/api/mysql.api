@@ -1,5 +1,6 @@
 public final class dev/s7a/sqldelight/check/rules/mysql/MySqlRuleSetProvider : dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
 	public fun <init> ()V
+	public fun diagnosticRefinementProviders ()Ljava/util/Set;
 	public fun getId-wigqPlY ()Ljava/lang/String;
 	public fun ruleProviders ()Ljava/util/Set;
 }
@@ -10,6 +11,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoCopyAlgorithmRul
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -21,6 +23,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoDisplayWidthInte
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -32,6 +35,19 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoExclusiveLockRul
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
+	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
+	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
+	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
+}
+
+public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoRenameTableInMigrationRule : dev/s7a/sqldelight/check/rule/api/Rule {
+	public fun <init> ()V
+	public fun getDefaultEnable ()Z
+	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
+	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -43,6 +59,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoReplaceIntoRule 
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -54,6 +71,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoUtf8CharsetRule 
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -65,6 +83,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/NoZeroDateDefaultR
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -76,6 +95,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/RequireIndexPrefix
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -87,6 +107,7 @@ public final class dev/s7a/sqldelight/check/rules/mysql/rules/RiskyAlterTableRul
 	public fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V

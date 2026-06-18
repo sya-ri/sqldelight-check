@@ -19,6 +19,18 @@ class SpaceAfterCommaRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals(" ", diagnostics.single().fixes.single().edits.single().replacement)
+        SpaceAfterCommaRule().assertAllFixes(
+            """
+            selectAll:
+            SELECT id,name
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectAll:
+            SELECT id, name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -31,6 +43,14 @@ class SpaceAfterCommaRuleTest {
             """.asSqlDelightFile()
 
         assertEquals(" ", SpaceAfterCommaRule().singleReplacement(content))
+        SpaceAfterCommaRule().assertAllFixes(
+            content,
+            """
+            insertPlayer:
+            INSERT INTO player(id, name, score)
+            VALUES (?, ?, ?);
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -53,7 +73,7 @@ class SpaceAfterCommaRuleTest {
     }
 
     @Test
-    fun `accepts trailing comma before closing parenthesis in sqlite sq`() {
+    fun `accepts trailing comma before closing parenthesis`() {
         val content =
             """
             insertPlayer:

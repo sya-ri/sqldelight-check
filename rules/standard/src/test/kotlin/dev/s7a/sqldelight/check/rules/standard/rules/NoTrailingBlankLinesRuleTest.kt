@@ -23,6 +23,26 @@ class NoTrailingBlankLinesRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoTrailingBlankLinesRule().assertAllFixes(
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+
+            selectAll:
+            SELECT id
+            FROM player;
+            """.asSqlDelightFile() + "\n",
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+
+            selectAll:
+            SELECT id
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

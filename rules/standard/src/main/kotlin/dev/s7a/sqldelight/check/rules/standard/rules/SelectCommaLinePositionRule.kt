@@ -40,6 +40,7 @@ public class SelectCommaLinePositionRule : Rule {
                         file = context.file,
                         range = content.rangeAtOffsets(commaOffset, commaOffset + 1),
                         database = context.database,
+                        fixes = listOf(content.moveLeadingTokenToPreviousLineFix(commaOffset, commaOffset + 1, "Move comma to previous line")),
                     ),
                 )
             }

@@ -24,17 +24,6 @@ class NoRenameTableInMigrationRuleTest {
     }
 
     @Test
-    fun `reports mysql rename table in migration files`() {
-        NoRenameTableInMigrationRule().assertDiagnosticCount(
-            """
-            RENAME TABLE player TO user_player;
-            """.asSqlDelightFile(),
-            expected = 1,
-            path = MIGRATION_SQM_PATH,
-        )
-    }
-
-    @Test
     fun `ignores sq files`() {
         NoRenameTableInMigrationRule().assertDiagnosticCount(
             """
@@ -50,7 +39,7 @@ class NoRenameTableInMigrationRuleTest {
         NoRenameTableInMigrationRule().assertDiagnosticCount(
             """
             -- ALTER TABLE player RENAME TO user_player;
-            SELECT 'RENAME TABLE', "rename", `table`, [table];
+            SELECT 'ALTER TABLE player RENAME TO user_player', "rename", `table`, [table];
             """.asSqlDelightFile(),
             expected = 0,
             path = MIGRATION_SQM_PATH,

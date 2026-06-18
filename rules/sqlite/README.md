@@ -11,7 +11,7 @@ migration patterns that matter for SQLite rowid behavior and table rebuilds.
 sqldelightCheck {
     ruleSets {
         sqlite {
-            enabled.set(Enablement.Auto)
+            enabled.set(false)
         }
     }
 }

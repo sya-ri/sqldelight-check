@@ -1,6 +1,5 @@
 package dev.s7a.sqldelight.check.core
 
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 
@@ -13,9 +12,9 @@ internal class ResolvedRuleConfig(
      */
     val ruleId: QualifiedRuleId,
     /**
-     * Final enablement before `Auto` applicability is evaluated.
+     * Final enablement before automatic applicability is evaluated.
      */
-    val enablement: Enablement,
+    val enablement: Boolean?,
     /**
      * Final severity assigned to diagnostics from this rule.
      */

@@ -16,6 +16,8 @@ private const val DEFAULT_MAX_GROUP_STATEMENTS = 3
  * Reports SQLDelight grouped statement blocks that contain too many statements.
  */
 public class GroupStatementCountLimitRule : Rule {
+    private val maxStatementsOption by positiveIntOption("max", DEFAULT_MAX_GROUP_STATEMENTS)
+
     override val id: RuleId = RuleId("group-statement-count-limit")
     override val defaultSeverity: Severity = Severity.Info
     override val defaultEnable: Boolean = true
@@ -27,7 +29,7 @@ public class GroupStatementCountLimitRule : Rule {
         if (context.file.kind != SourceFileKind.Query) return
 
         val content = context.file.content
-        val max = context.options.positiveIntOption("max", DEFAULT_MAX_GROUP_STATEMENTS)
+        val max = context.options[maxStatementsOption]
         content.groupedStatementBlocks().forEach { block ->
             val count = content.statementCountIn(block)
             if (count <= max) return@forEach

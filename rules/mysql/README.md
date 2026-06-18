@@ -11,7 +11,7 @@ migration patterns that matter for live MySQL databases.
 sqldelightCheck {
     ruleSets {
         mysql {
-            enabled.set(Enablement.Auto)
+            enabled.set(false)
         }
     }
 }

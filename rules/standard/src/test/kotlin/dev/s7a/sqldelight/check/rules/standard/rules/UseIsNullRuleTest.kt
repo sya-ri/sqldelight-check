@@ -20,6 +20,20 @@ class UseIsNullRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
         assertEquals("IS", diagnostics.single().fixes.single().edits.single().replacement)
+        UseIsNullRule().assertAllFixes(
+            """
+            selectMissingName:
+            SELECT id, name
+            FROM player
+            WHERE name = NULL;
+            """.asSqlDelightFile(),
+            """
+            selectMissingName:
+            SELECT id, name
+            FROM player
+            WHERE name IS NULL;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -36,6 +50,20 @@ class UseIsNullRuleTest {
 
         assertEquals(2, diagnostics.size)
         assertEquals("IS NOT", diagnostics.first().fixes.single().edits.single().replacement)
+        UseIsNullRule().assertAllFixes(
+            """
+            selectNamedPlayers:
+            SELECT id, name
+            FROM player
+            WHERE name != NULL OR nickname <> NULL;
+            """.asSqlDelightFile(),
+            """
+            selectNamedPlayers:
+            SELECT id, name
+            FROM player
+            WHERE name IS NOT NULL OR nickname IS NOT NULL;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

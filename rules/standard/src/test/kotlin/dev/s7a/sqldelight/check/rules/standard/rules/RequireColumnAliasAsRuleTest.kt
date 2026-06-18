@@ -1,22 +1,31 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RequireColumnAliasAsRuleTest {
     @Test
     fun `reports implicit result aliases`() {
-        val diagnostics =
-            RequireColumnAliasAsRule().diagnostics(
-                """
-                selectStats:
-                SELECT count(*) total, score + 1 next_score
-                FROM player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectStats:
+            SELECT count(*) total, score + 1 next_score
+            FROM player;
+            """.asSqlDelightFile()
+        val diagnostics = RequireColumnAliasAsRule().diagnostics(content)
 
         assertEquals(2, diagnostics.size)
         assertEquals("Column aliases should use AS.", diagnostics.first().message)
+        assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
+        RequireColumnAliasAsRule().assertAllFixes(
+            content,
+            """
+            selectStats:
+            SELECT count(*) AS total, score + 1 AS next_score
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

@@ -20,6 +20,20 @@ class SpaceAfterBlockCommentStartRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals(" ", diagnostics.single().fixes.single().edits.single().replacement)
+        SpaceAfterBlockCommentStartRule().assertAllFixes(
+            """
+            /*Player table.*/
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+            """
+            /* Player table.*/
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -28,7 +42,7 @@ class SpaceAfterBlockCommentStartRuleTest {
             """
             /* Player table. */
             /**/
-            /*+ sqlite hint-like comment */
+            /*+ planner hint-like comment */
             CREATE TABLE player (
               id INTEGER NOT NULL PRIMARY KEY
             );

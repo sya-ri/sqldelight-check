@@ -1,23 +1,32 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoSelectDistinctWithGroupByRuleTest {
     @Test
     fun `reports select distinct with group by`() {
-        val diagnostics =
-            NoSelectDistinctWithGroupByRule().diagnostics(
-                """
-                selectDistinctNames:
-                SELECT DISTINCT name
-                FROM player
-                GROUP BY name;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectDistinctNames:
+            SELECT DISTINCT name
+            FROM player
+            GROUP BY name;
+            """.asSqlDelightFile()
+        val diagnostics = NoSelectDistinctWithGroupByRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        NoSelectDistinctWithGroupByRule().assertAllFixes(
+            content,
+            """
+            selectDistinctNames:
+            SELECT name
+            FROM player
+            GROUP BY name;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

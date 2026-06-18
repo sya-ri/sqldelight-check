@@ -1,5 +1,18 @@
+public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticRefinement {
+	public abstract fun getTargetRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public abstract fun refine (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/api/Diagnostic;)Ldev/s7a/sqldelight/check/api/Diagnostic;
+}
+
+public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticRefinementProvider {
+	public abstract fun create ()Ldev/s7a/sqldelight/check/rule/api/DiagnosticRefinement;
+}
+
 public abstract interface class dev/s7a/sqldelight/check/rule/api/DiagnosticReporter {
 	public abstract fun report (Ldev/s7a/sqldelight/check/api/RuleDiagnostic;)V
+}
+
+public abstract interface class dev/s7a/sqldelight/check/rule/api/KeyedEnum {
+	public abstract fun getKey ()Ljava/lang/String;
 }
 
 public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
@@ -7,6 +20,7 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
 	public abstract fun getDefaultSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
 	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
 	public abstract fun getId-cwxIa2A ()Ljava/lang/String;
+	public fun getOptions ()Ljava/util/Set;
 	public fun getTargetDialect ()Ldev/s7a/sqldelight/check/api/DialectId;
 	public fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 	public abstract fun run (Ldev/s7a/sqldelight/check/rule/api/RuleContext;Ldev/s7a/sqldelight/check/rule/api/DiagnosticReporter;)V
@@ -15,6 +29,7 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/Rule {
 public final class dev/s7a/sqldelight/check/rule/api/Rule$DefaultImpls {
 	public static fun getDefaultEnable (Ldev/s7a/sqldelight/check/rule/api/Rule;)Z
 	public static fun getDeprecation (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;
+	public static fun getOptions (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ljava/util/Set;
 	public static fun getTargetDialect (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/DialectId;
 	public static fun isApplicable (Ldev/s7a/sqldelight/check/rule/api/Rule;Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Z
 }
@@ -23,11 +38,7 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleContext {
 	public abstract fun getDatabase ()Ldev/s7a/sqldelight/check/api/DatabaseContext;
 	public abstract fun getFacts ()Ldev/s7a/sqldelight/check/rule/api/SqlFacts;
 	public abstract fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
-	public abstract fun getOptions ()Ljava/util/Map;
-}
-
-public final class dev/s7a/sqldelight/check/rule/api/RuleDefaultsKt {
-	public static final fun getDefaultEnablement (Ldev/s7a/sqldelight/check/rule/api/Rule;)Ldev/s7a/sqldelight/check/api/Enablement;
+	public abstract fun getOptions ()Ldev/s7a/sqldelight/check/rule/api/RuleOptions;
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/RuleDeprecation {
@@ -40,10 +51,97 @@ public final class dev/s7a/sqldelight/check/rule/api/RuleDeprecation {
 	public fun toString ()Ljava/lang/String;
 }
 
+public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleOption {
+	public fun getDeprecation ()Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;
+	public abstract fun getName ()Ljava/lang/String;
+	public abstract fun read (Ljava/util/Map;)Ljava/lang/Object;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleOption$DefaultImpls {
+	public static fun getDeprecation (Ldev/s7a/sqldelight/check/rule/api/RuleOption;)Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getReplacement ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleOptions {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun contains (Ljava/lang/String;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun get (Ldev/s7a/sqldelight/check/rule/api/RuleOption;)Ljava/lang/Object;
+	public final fun get (Ljava/lang/String;)Ljava/lang/String;
+	public final fun getNames ()Ljava/util/Set;
+	public final fun getValue (Ljava/lang/String;)Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/s7a/sqldelight/check/rule/api/RuleOptionsKt {
-	public static final fun booleanOption (Ljava/util/Map;Ljava/lang/String;Z)Z
-	public static final fun commaSeparatedOption (Ljava/util/Map;Ljava/lang/String;)Ljava/util/List;
-	public static final fun positiveIntOption (Ljava/util/Map;Ljava/lang/String;I)I
+	public static final fun booleanOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun booleanOption (Ljava/lang/String;ZLdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun booleanOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun booleanOption$default (Ljava/lang/String;ZLdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun intListOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun intListOption (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun intListOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun intListOption$default (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun intOption (Ljava/lang/String;ILdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun intOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun intOption$default (Ljava/lang/String;ILdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun intOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun listOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun listOption (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun listOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun listOption$default (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun longListOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun longListOption (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun longListOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun longListOption$default (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun longOption (Ljava/lang/String;JLdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun longOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun longOption$default (Ljava/lang/String;JLdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun longOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun nonBlankStringOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun nonBlankStringOption (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun nonBlankStringOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun nonBlankStringOption$default (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun nonNegativeIntListOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun nonNegativeIntListOption (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun nonNegativeIntListOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun nonNegativeIntListOption$default (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun nonNegativeIntOption (Ljava/lang/String;ILdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun nonNegativeIntOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun nonNegativeIntOption$default (Ljava/lang/String;ILdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun nonNegativeIntOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun option (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun option (Ljava/lang/String;Ljava/lang/Object;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun option$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun option$default (Ljava/lang/String;Ljava/lang/Object;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun positiveIntListOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun positiveIntListOption (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun positiveIntListOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun positiveIntListOption$default (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun positiveIntOption (Ljava/lang/String;ILdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun positiveIntOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun positiveIntOption$default (Ljava/lang/String;ILdev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun positiveIntOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun stringListOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun stringListOption (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun stringListOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun stringListOption$default (Ljava/lang/String;Ljava/util/List;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun stringOption (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static final fun stringOption (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun stringOption$default (Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
+	public static synthetic fun stringOption$default (Ljava/lang/String;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;ILjava/lang/Object;)Lkotlin/properties/ReadOnlyProperty;
 }
 
 public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleProvider {
@@ -51,8 +149,13 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleProvider {
 }
 
 public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleSetProvider {
+	public fun diagnosticRefinementProviders ()Ljava/util/Set;
 	public abstract fun getId-wigqPlY ()Ljava/lang/String;
 	public abstract fun ruleProviders ()Ljava/util/Set;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleSetProvider$DefaultImpls {
+	public static fun diagnosticRefinementProviders (Ldev/s7a/sqldelight/check/rule/api/RuleSetProvider;)Ljava/util/Set;
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/SourceMaskingKt {

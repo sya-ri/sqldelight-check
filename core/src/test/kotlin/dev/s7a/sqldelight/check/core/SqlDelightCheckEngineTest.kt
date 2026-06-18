@@ -1,8 +1,8 @@
 package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
+import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DialectId
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
@@ -12,10 +12,14 @@ import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SourcePosition
 import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.api.SqlDialect
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinementProvider
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
 import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
+import dev.s7a.sqldelight.check.rule.api.RuleOption
+import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
@@ -34,7 +38,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet()),
                 config =
                     CheckConfig(
-                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, Enablement.Disabled)),
+                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, false)),
                     ),
             )
 
@@ -49,8 +53,8 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet()),
                 config =
                     CheckConfig(
-                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, Enablement.Disabled)),
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Error)),
+                        ruleSets = mapOf(ruleSetId to RuleSetConfig(ruleSetId, false)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Error)),
                     ),
             )
 
@@ -66,7 +70,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule(severity = Severity.Info))),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Auto, Severity.Error)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, null, Severity.Error)),
                     ),
             )
 
@@ -127,7 +131,7 @@ class SqlDelightCheckEngineTest {
                     ),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Warning)),
                     ),
             )
 
@@ -152,7 +156,7 @@ class SqlDelightCheckEngineTest {
                     ),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Warning)),
                     ),
             )
 
@@ -179,7 +183,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule(deprecation = testDeprecation()))),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Enabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, true, Severity.Warning)),
                     ),
                 trace = trace,
             )
@@ -200,7 +204,7 @@ class SqlDelightCheckEngineTest {
                 ruleSetProviders = listOf(testRuleSet(testRule(deprecation = testDeprecation()))),
                 config =
                     CheckConfig(
-                        rules = mapOf(ruleId to RuleConfig(ruleId, Enablement.Disabled, Severity.Warning)),
+                        rules = mapOf(ruleId to RuleConfig(ruleId, false, Severity.Warning)),
                     ),
                 trace = trace,
             )
@@ -232,7 +236,7 @@ class SqlDelightCheckEngineTest {
                                 ruleId to
                                     RuleConfig(
                                         ruleId,
-                                        Enablement.Enabled,
+                                        true,
                                         Severity.Warning,
                                         options = mapOf("max" to "8", "mode" to "global"),
                                     ),
@@ -247,7 +251,7 @@ class SqlDelightCheckEngineTest {
                                                 ruleId to
                                                     RuleConfig(
                                                         ruleId,
-                                                        Enablement.Auto,
+                                                        null,
                                                         Severity.Warning,
                                                         options = mapOf("max" to "12"),
                                                     ),
@@ -258,6 +262,112 @@ class SqlDelightCheckEngineTest {
             )
 
         assertEquals("12:global", diagnostics.single().message)
+    }
+
+    @Test
+    fun `diagnostic refinement can suppress diagnostics from another rule set`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput(content = "SELECT 1;")),
+                ruleSetProviders =
+                    listOf(
+                        testRuleSet(testRule(rangeLine = 1)),
+                        object : RuleSetProvider {
+                            override val id: RuleSetId = RuleSetId("dialect")
+
+                            override fun ruleProviders(): Set<RuleProvider> = emptySet()
+
+                            override fun diagnosticRefinementProviders(): Set<DiagnosticRefinementProvider> =
+                                setOf(
+                                    DiagnosticRefinementProvider {
+                                        object : DiagnosticRefinement {
+                                            override val targetRuleId: QualifiedRuleId = ruleId
+
+                                            override fun refine(
+                                                context: RuleContext,
+                                                diagnostic: Diagnostic,
+                                            ): Diagnostic? = null
+                                        }
+                                    },
+                                )
+                        },
+                    ),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `unknown configured rule option emits trace warning`() {
+        val trace = RuleOptionTrace()
+        SqlDelightCheckEngine().run(
+            inputs = listOf(testInput()),
+            ruleSetProviders =
+                listOf(
+                    testRuleSet(
+                        testRule(options = setOf(testRuleOption("max", 120))),
+                    ),
+                ),
+            config =
+                CheckConfig(
+                    rules =
+                        mapOf(
+                            ruleId to
+                                RuleConfig(
+                                    ruleId,
+                                    true,
+                                    Severity.Warning,
+                                    options = mapOf("max" to "80", "width" to "120"),
+                                ),
+                        ),
+                ),
+            trace = trace,
+        )
+
+        assertEquals(listOf("Database:standard:test:width:max"), trace.unknownOptions)
+    }
+
+    @Test
+    fun `deprecated configured rule option emits trace warning`() {
+        val trace = RuleOptionTrace()
+        SqlDelightCheckEngine().run(
+            inputs = listOf(testInput()),
+            ruleSetProviders =
+                listOf(
+                    testRuleSet(
+                        testRule(
+                            options =
+                                setOf(
+                                    testRuleOption(
+                                        "max",
+                                        120,
+                                        deprecation =
+                                            RuleOptionDeprecation(
+                                                message = "Use lineLength.",
+                                                replacement = "lineLength",
+                                            ),
+                                    ),
+                                ),
+                        ),
+                    ),
+                ),
+            config =
+                CheckConfig(
+                    rules =
+                        mapOf(
+                            ruleId to
+                                RuleConfig(
+                                    ruleId,
+                                    true,
+                                    Severity.Warning,
+                                    options = mapOf("max" to "80"),
+                                ),
+                        ),
+                ),
+            trace = trace,
+        )
+
+        assertEquals(listOf("Database:standard:test:max:lineLength"), trace.deprecatedOptions)
     }
 
     @Test
@@ -459,7 +569,7 @@ class SqlDelightCheckEngineTest {
                                 qualifiedRuleId("core:require-suppression-reason") to
                                     RuleConfig(
                                         qualifiedRuleId("core:require-suppression-reason"),
-                                        Enablement.Disabled,
+                                        false,
                                         Severity.Warning,
                                     ),
                             ),
@@ -538,7 +648,7 @@ class SqlDelightCheckEngineTest {
                                 qualifiedRuleId("core:no-redundant-suppression") to
                                     RuleConfig(
                                         qualifiedRuleId("core:no-redundant-suppression"),
-                                        Enablement.Disabled,
+                                        false,
                                         Severity.Warning,
                                     ),
                             ),
@@ -607,6 +717,7 @@ class SqlDelightCheckEngineTest {
         severity: Severity = Severity.Warning,
         targetDialect: DialectId? = null,
         deprecation: RuleDeprecation? = null,
+        options: Set<RuleOption<*>> = emptySet(),
         isApplicable: (RuleContext) -> Boolean = { true },
         message: (RuleContext) -> String = { "test diagnostic" },
         rangeLine: Int? = null,
@@ -617,6 +728,7 @@ class SqlDelightCheckEngineTest {
             override val defaultEnable: Boolean = true
             override val targetDialect: DialectId? = targetDialect
             override val deprecation: RuleDeprecation? = deprecation
+            override val options: Set<RuleOption<*>> = options
 
             override fun isApplicable(context: RuleContext): Boolean = isApplicable.invoke(context)
 
@@ -696,17 +808,72 @@ private class DeprecationTrace : AnalysisTrace {
     }
 }
 
+private class RuleOptionTrace : AnalysisTrace {
+    val unknownOptions = mutableListOf<String>()
+    val deprecatedOptions = mutableListOf<String>()
+
+    override fun databaseFiles(
+        database: DatabaseContext,
+        files: List<SourceFile>,
+    ) {
+    }
+
+    override fun fileRules(
+        database: DatabaseContext,
+        file: SourceFile,
+        ruleIds: List<QualifiedRuleId>,
+    ) {
+    }
+
+    override fun unknownRuleOption(
+        database: DatabaseContext,
+        ruleId: QualifiedRuleId,
+        optionName: String,
+        knownOptionNames: Set<String>,
+    ) {
+        unknownOptions +=
+            listOf(
+                database.name,
+                ruleId.value,
+                optionName,
+                knownOptionNames.sorted().joinToString(","),
+            ).joinToString(":")
+    }
+
+    override fun deprecatedRuleOption(
+        database: DatabaseContext,
+        ruleId: QualifiedRuleId,
+        optionName: String,
+        deprecation: RuleOptionDeprecation,
+    ) {
+        deprecatedOptions +=
+            listOf(
+                database.name,
+                ruleId.value,
+                optionName,
+                deprecation.replacement.orEmpty(),
+            ).joinToString(":")
+    }
+}
+
 private fun singleCharacterRange(line: Int): SourceRange =
     SourceRange(
         start = SourcePosition(line = line, column = 1),
         end = SourcePosition(line = line, column = 2),
     )
 
+private fun <T> testRuleOption(
+    name: String,
+    defaultValue: T,
+    deprecation: RuleOptionDeprecation? = null,
+): RuleOption<T> =
+    object : RuleOption<T> {
+        override val name: String = name
+        override val deprecation: RuleOptionDeprecation? = deprecation
+
+        override fun read(values: Map<String, String>): T = defaultValue
+    }
+
 private fun qualifiedRuleId(value: String): QualifiedRuleId {
-    val delimiter = value.indexOf(':')
-    require(delimiter > 0 && delimiter < value.lastIndex)
-    return QualifiedRuleId(
-        ruleSetId = RuleSetId(value.substring(0, delimiter)),
-        ruleId = RuleId(value.substring(delimiter + 1)),
-    )
+    return QualifiedRuleId(value)
 }

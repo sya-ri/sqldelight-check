@@ -1,24 +1,36 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GroupByTargetNewlineRuleTest {
     @Test
     fun `reports multiline group by list with multiple targets on one line`() {
-        val diagnostics =
-            GroupByTargetNewlineRule().diagnostics(
-                """
-                selectScores:
-                SELECT team_id, age, COUNT(*)
-                FROM player
-                GROUP BY team_id, age,
-                  active;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectScores:
+            SELECT team_id, age, COUNT(*)
+            FROM player
+            GROUP BY team_id, age,
+              active;
+            """.asSqlDelightFile()
+        val diagnostics = GroupByTargetNewlineRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        GroupByTargetNewlineRule().assertAllFixes(
+            content,
+            """
+            selectScores:
+            SELECT team_id, age, COUNT(*)
+            FROM player
+            GROUP BY
+            team_id,
+            age,
+              active;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

@@ -4,7 +4,6 @@ package dev.s7a.sqldelight.check.core
 
 import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.Diagnostic
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.InternalSqldelightCheckApi
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleId
@@ -12,11 +11,12 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleOptions
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
-import dev.s7a.sqldelight.check.rule.api.defaultEnablement
 
 /**
  * Runs sqldelight-check rules for resolved database inputs.
@@ -56,32 +56,39 @@ public class SqlDelightCheckEngine {
                     RuleCandidate(provider.id, QualifiedRuleId(provider.id, rule.id), rule)
                 }
             }
+        val refinementsByRuleId =
+            ruleSetProviders
+                .flatMap { provider -> provider.diagnosticRefinementProviders() }
+                .map { refinementProvider -> refinementProvider.create() }
+                .groupBy { refinement -> refinement.targetRuleId }
         rules.forEach { candidate ->
             val ruleConfig =
                 resolver.resolveRule(
                     ruleId = candidate.ruleId,
                     databaseName = database.name,
-                    defaultEnablement = candidate.rule.defaultEnablement,
+                    defaultEnabled = candidate.rule.defaultEnabled,
                     defaultSeverity = candidate.rule.defaultSeverity,
                 )
             candidate.rule.deprecation?.let { deprecation ->
-                if (ruleConfig.explicitlyConfigured && ruleConfig.enablement != Enablement.Auto) {
+                if (ruleConfig.explicitlyConfigured && ruleConfig.enablement != null) {
                     trace.deprecatedRule(
                         database = database,
                         ruleId = candidate.ruleId,
                         deprecation = deprecation,
-                        enabled = ruleConfig.enablement == Enablement.Enabled,
+                        enabled = ruleConfig.enablement,
                     )
                 }
             }
+            traceRuleOptionConfiguration(database, candidate.ruleId, candidate.rule, ruleConfig, trace)
         }
-        return files.flatMap { file -> runRulesForFile(database, file, rules, resolver, trace) }
+        return files.flatMap { file -> runRulesForFile(database, file, rules, refinementsByRuleId, resolver, trace) }
     }
 
     private fun runRulesForFile(
         database: DatabaseContext,
         file: SourceFile,
         rules: List<RuleCandidate>,
+        refinementsByRuleId: Map<QualifiedRuleId, List<DiagnosticRefinement>>,
         resolver: ConfigurationResolver,
         trace: AnalysisTrace,
     ): List<Diagnostic> {
@@ -95,28 +102,27 @@ public class SqlDelightCheckEngine {
                     resolver.resolveRule(
                         ruleId = candidate.ruleId,
                         databaseName = database.name,
-                        defaultEnablement = candidate.rule.defaultEnablement,
+                        defaultEnabled = candidate.rule.defaultEnabled,
                         defaultSeverity = candidate.rule.defaultSeverity,
                     )
                 val context =
                     object : RuleContext {
                         override val database: DatabaseContext = database
                         override val file: SourceFile = file
-                        override val options: Map<String, String> = ruleConfig.options
+                        override val options: RuleOptions = RuleOptions(ruleConfig.options)
                         override val facts: SqlFacts = facts
                     }
                 val enablement =
-                    if (ruleConfig.enablement == Enablement.Auto) {
-                        ruleSetConfig.enablement
-                    } else {
-                        ruleConfig.enablement
-                    }
+                    ruleConfig.enablement ?: ruleSetConfig.enablement
                 if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
 
                 executedRuleIds += candidate.ruleId
                 val diagnostics = mutableListOf<Diagnostic>()
                 candidate.rule.run(context) { diagnostic ->
-                    diagnostics += diagnostic.withRuleIdentity(candidate.ruleId, ruleConfig.severity)
+                    diagnostic
+                        .withRuleIdentity(candidate.ruleId, ruleConfig.severity)
+                        .applyRefinements(context, refinementsByRuleId[candidate.ruleId].orEmpty())
+                        ?.let(diagnostics::add)
                 }
                 diagnostics
             }.filterNot(disableDirectives::suppresses)
@@ -142,16 +148,49 @@ public class SqlDelightCheckEngine {
 
     private fun Rule.shouldRun(
         context: RuleContext,
-        enablement: Enablement,
+        enablement: Boolean?,
     ): Boolean =
         when (enablement) {
-            Enablement.Enabled -> true
-            Enablement.Disabled -> false
-            Enablement.Auto -> deprecation == null && hasTargetDialect(context) && isApplicable(context)
+            true -> true
+            false -> false
+            null -> deprecation == null && hasTargetDialect(context) && isApplicable(context)
         }
 
     private fun Rule.hasTargetDialect(context: RuleContext): Boolean =
         targetDialect?.let { id -> id in context.database.dialect.ids } ?: true
+}
+
+private fun traceRuleOptionConfiguration(
+    database: DatabaseContext,
+    ruleId: QualifiedRuleId,
+    rule: Rule,
+    ruleConfig: ResolvedRuleConfig,
+    trace: AnalysisTrace,
+) {
+    if (ruleConfig.options.isEmpty()) return
+
+    val declaredOptions = rule.options.associateBy { option -> option.name }
+    val declaredOptionNames = declaredOptions.keys
+    ruleConfig.options.keys.forEach { optionName ->
+        val option = declaredOptions[optionName]
+        if (option == null) {
+            trace.unknownRuleOption(
+                database = database,
+                ruleId = ruleId,
+                optionName = optionName,
+                knownOptionNames = declaredOptionNames,
+            )
+            return@forEach
+        }
+        option.deprecation?.let { deprecation ->
+            trace.deprecatedRuleOption(
+                database = database,
+                ruleId = ruleId,
+                optionName = optionName,
+                deprecation = deprecation,
+            )
+        }
+    }
 }
 
 private fun RuleDiagnostic.withRuleIdentity(
@@ -168,6 +207,14 @@ private fun RuleDiagnostic.withRuleIdentity(
         fixes = fixes,
     )
 
+private fun Diagnostic.applyRefinements(
+    context: RuleContext,
+    refinements: List<DiagnosticRefinement>,
+): Diagnostic? =
+    refinements.fold(this as Diagnostic?) { current, refinement ->
+        current?.let { diagnostic -> refinement.refine(context, diagnostic) }
+    }
+
 private data class RuleCandidate(
     val ruleSetId: RuleSetId,
     val ruleId: QualifiedRuleId,
@@ -179,22 +226,20 @@ private fun coreRuleSeverity(
     databaseName: String,
     ruleId: QualifiedRuleId,
 ): Severity? {
-    val ruleSetConfig = resolver.resolveRuleSet(coreRuleSetId, databaseName, defaultEnablement = Enablement.Enabled)
+    val ruleSetConfig = resolver.resolveRuleSet(coreRuleSetId, databaseName, defaultEnabled = true)
     val ruleConfig =
         resolver.resolveRule(
             ruleId = ruleId,
             databaseName = databaseName,
-            defaultEnablement = Enablement.Enabled,
+            defaultEnabled = true,
             defaultSeverity = Severity.Warning,
         )
-    val enablement =
-        if (ruleConfig.enablement == Enablement.Auto) {
-            ruleSetConfig.enablement
-        } else {
-            ruleConfig.enablement
-        }
-    return if (enablement == Enablement.Disabled) null else ruleConfig.severity
+    val enablement = ruleConfig.enablement ?: ruleSetConfig.enablement
+    return if (enablement == false) null else ruleConfig.severity
 }
+
+private val Rule.defaultEnabled: Boolean?
+    get() = if (defaultEnable) null else false
 
 private inline fun Severity?.orEmptyDiagnostics(block: (Severity) -> List<Diagnostic>): List<Diagnostic> =
     this?.let(block).orEmpty()

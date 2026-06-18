@@ -42,6 +42,15 @@ public class SelectModifierLinePositionRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(modifier.startOffset, modifier.endOffset),
                     database = context.database,
+                    fixes =
+                        listOf(
+                            content.moveTokenAfterFix(
+                                sourceStartOffset = modifier.startOffset,
+                                sourceEndOffset = modifier.endOffset,
+                                targetEndOffset = token.endOffset,
+                                title = "Move SELECT modifier to SELECT line",
+                            ),
+                        ),
                 ),
             )
         }

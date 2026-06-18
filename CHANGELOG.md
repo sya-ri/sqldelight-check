@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.3.0
+
+### Breaking Changes
+
+- Replaced raw rule option lookup patterns with typed `RuleOption` delegates declared on each `Rule`.
+- Added option metadata to `Rule`, so custom rule implementations now expose declared options through the rule API.
+
+### Added
+
+- Added typed rule option helpers for strings, booleans, integers, longs, comma-separated lists, enums, and keyed enums.
+- Added warning traces for unknown configured rule options and deprecated rule options.
+- Added `standard:no-composite-primary-key` to discourage composite primary keys.
+- Added `standard:no-blank-lines-in-statement` to detect blank lines inside SQL statements.
+- Added automatic fixes for supported standard formatting rules.
+- Added dialect diagnostic refinements so dialect extensions can suppress or adjust matching diagnostics.
+
+### Changed
+
+- Simplified the Gradle `enabled` DSL for rule and rule-set configuration.
+- Expanded rule-set author documentation for typed options and extension helper patterns.
+- Updated release and maintenance documentation for the release branch workflow.
+
+### Fixed
+
+- Fixed trigger diagnostics.
+- Fixed `standard:source-indentation` for `EXISTS` subqueries.
+
+### Maintenance
+
+- Updated GitHub Actions and Qodana workflow dependencies.
+
 ## v0.2.2
 
 ### Added

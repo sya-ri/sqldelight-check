@@ -1,39 +1,43 @@
 package dev.s7a.sqldelight.check.rule.api
 
 /**
- * Reads a strict boolean option from rule configuration.
+ * Resolved options for the rule currently being executed.
  */
-public fun Map<String, String>.booleanOption(
-    name: String,
-    defaultValue: Boolean,
-): Boolean {
-    val value = this[name] ?: return defaultValue
-    return requireNotNull(value.toBooleanStrictOrNull()) {
-        "Option '$name' must be true or false."
-    }
-}
+public class RuleOptions(
+    private val values: Map<String, String> = emptyMap(),
+) {
+    /**
+     * Reads an option through a typed rule option declaration.
+     */
+    public operator fun <T> get(option: RuleOption<T>): T = option.read(values)
 
-/**
- * Reads a comma-separated string list from rule configuration.
- */
-public fun Map<String, String>.commaSeparatedOption(name: String): List<String> =
-    get(name)
-        ?.split(',')
-        ?.map { value -> value.trim() }
-        ?.filter { value -> value.isNotEmpty() }
-        ?: emptyList()
+    /**
+     * Reads the raw string value for compatibility with custom rules.
+     */
+    public operator fun get(name: String): String? = values[name]
 
-/**
- * Reads a positive integer option from rule configuration.
- */
-public fun Map<String, String>.positiveIntOption(
-    name: String,
-    defaultValue: Int,
-): Int {
-    val value = this[name] ?: return defaultValue
-    val parsed = value.toIntOrNull()
-    require(parsed != null && parsed > 0) {
-        "Option '$name' must be a positive integer."
-    }
-    return parsed
+    /**
+     * Reads the raw string value or fails when the option is missing.
+     */
+    public fun getValue(name: String): String = values.getValue(name)
+
+    /**
+     * Returns whether a raw option value is present.
+     */
+    public operator fun contains(name: String): Boolean = name in values
+
+    /**
+     * Returns the configured option names.
+     */
+    public val names: Set<String>
+        get() = values.keys
+
+    override fun equals(other: Any?): Boolean =
+        this === other ||
+            other is RuleOptions &&
+            values == other.values
+
+    override fun hashCode(): Int = values.hashCode()
+
+    override fun toString(): String = "RuleOptions(values=$values)"
 }

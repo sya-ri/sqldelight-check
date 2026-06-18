@@ -1,24 +1,36 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class OrderByTargetNewlineRuleTest {
     @Test
     fun `reports multiline order by list with multiple targets on one line`() {
-        val diagnostics =
-            OrderByTargetNewlineRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT id, name, age
-                FROM player
-                ORDER BY name, age,
-                  id;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT id, name, age
+            FROM player
+            ORDER BY name, age,
+              id;
+            """.asSqlDelightFile()
+        val diagnostics = OrderByTargetNewlineRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        OrderByTargetNewlineRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT id, name, age
+            FROM player
+            ORDER BY
+            name,
+            age,
+              id;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

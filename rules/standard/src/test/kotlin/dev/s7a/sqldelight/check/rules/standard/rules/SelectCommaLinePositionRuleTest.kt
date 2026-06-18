@@ -1,24 +1,34 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SelectCommaLinePositionRuleTest {
     @Test
     fun `reports leading commas in multiline select lists`() {
-        val diagnostics =
-            SelectCommaLinePositionRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT
-                  id
-                  , name
-                FROM player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT
+              id
+              , name
+            FROM player;
+            """.asSqlDelightFile()
+        val diagnostics = SelectCommaLinePositionRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        SelectCommaLinePositionRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT
+              id,
+               name
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

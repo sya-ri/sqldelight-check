@@ -35,6 +35,7 @@ public class NoSelfAliasRule : Rule {
                     file = context.file,
                     range = context.file.content.rangeAtOffsets(alias.startOffset, alias.endOffset),
                     database = context.database,
+                    fixes = listOf(context.file.content.deleteAliasFix(alias.startOffset, alias.endOffset, "Remove self alias")),
                 ),
             )
         }

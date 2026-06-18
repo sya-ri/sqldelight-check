@@ -50,6 +50,10 @@ public class CteNewlineRule : Rule {
             ) {
                 return@forEachIndexed
             }
+            val misplacedCteStarts =
+                cteStarts
+                    .filter { cte -> lines.lineContaining(cte.startOffset)?.firstNonWhitespaceOffset != cte.startOffset }
+                    .map { cte -> cte.startOffset }
 
             reporter.report(
                 RuleDiagnostic(
@@ -58,6 +62,7 @@ public class CteNewlineRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(token.startOffset, tokens[mainStatementIndex].startOffset),
                     database = context.database,
+                    fixes = listOf(content.startOwnLineFix(misplacedCteStarts, "Move CTE definitions to their own lines")),
                 ),
             )
         }

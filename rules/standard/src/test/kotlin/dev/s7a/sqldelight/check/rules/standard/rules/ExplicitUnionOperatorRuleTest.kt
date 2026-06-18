@@ -1,23 +1,36 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ExplicitUnionOperatorRuleTest {
     @Test
     fun `reports union without all or distinct`() {
+        val content =
+            """
+            selectAllNames:
+            SELECT name FROM active_player
+            UNION
+            SELECT name FROM archived_player;
+            """.asSqlDelightFile()
         val diagnostics =
             ExplicitUnionOperatorRule().diagnostics(
-                """
-                selectAllNames:
-                SELECT name FROM active_player
-                UNION
-                SELECT name FROM archived_player;
-                """.asSqlDelightFile(),
+                content,
             )
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        assertEquals(" DISTINCT", diagnostics.single().fixes.single().edits.single().replacement)
+        ExplicitUnionOperatorRule().assertAllFixes(
+            content,
+            """
+            selectAllNames:
+            SELECT name FROM active_player
+            UNION DISTINCT
+            SELECT name FROM archived_player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

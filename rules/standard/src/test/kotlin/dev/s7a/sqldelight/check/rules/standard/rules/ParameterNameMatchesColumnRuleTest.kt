@@ -19,6 +19,7 @@ class ParameterNameMatchesColumnRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals(Severity.Info, diagnostics.single().severity)
+        assertEquals(0, diagnostics.single().fixes.size)
     }
 
     @Test

@@ -43,6 +43,7 @@ public class NoTransactionInMigrationRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(token.startOffset, token.endOffset),
                     database = context.database,
+                    fixes = listOf(content.deleteTransactionStatementFix(token.startOffset)),
                 ),
             )
         }
@@ -60,3 +61,18 @@ private fun String.isStatementStart(offset: Int): Boolean {
     val previous = previousSqlCharacterBefore(offset) ?: return true
     return previous.value == ';'
 }
+
+private fun String.deleteTransactionStatementFix(statementStartOffset: Int) =
+    deleteTokenFix(
+        transactionStatementDeleteStart(statementStartOffset),
+        transactionStatementDeleteEnd(statementEndAfter(statementStartOffset) + 1),
+        "Remove explicit transaction statement",
+    )
+
+private fun String.transactionStatementDeleteStart(statementStartOffset: Int): Int {
+    val lineStart = lastIndexOf('\n', startIndex = statementStartOffset - 1).let { index -> if (index == -1) 0 else index + 1 }
+    return if (substring(lineStart, statementStartOffset).isBlank()) lineStart else statementStartOffset
+}
+
+private fun String.transactionStatementDeleteEnd(statementEndOffset: Int): Int =
+    if (getOrNull(statementEndOffset) == '\n') statementEndOffset + 1 else statementEndOffset

@@ -1,23 +1,32 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ExplicitCrossJoinRuleTest {
     @Test
     fun `reports bare join without on or using`() {
-        val diagnostics =
-            ExplicitCrossJoinRule().diagnostics(
-                """
-                selectPlayerTeams:
-                SELECT player.id, team.name
-                FROM player
-                JOIN team;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayerTeams:
+            SELECT player.id, team.name
+            FROM player
+            JOIN team;
+            """.asSqlDelightFile()
+        val diagnostics = ExplicitCrossJoinRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
+        ExplicitCrossJoinRule().assertAllFixes(
+            content,
+            """
+            selectPlayerTeams:
+            SELECT player.id, team.name
+            FROM player
+            CROSS JOIN team;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -34,6 +43,28 @@ class ExplicitCrossJoinRuleTest {
             )
 
         assertEquals(1, diagnostics.size)
+    }
+
+    @Test
+    fun `fixes typed joins without conditions as cross joins`() {
+        val content =
+            """
+            INSERT INTO player_team_snapshot(player_id, team_name)
+            SELECT player.id, team.name
+            FROM player
+            INNER JOIN team;
+            """.asSqlDelightFile()
+
+        ExplicitCrossJoinRule().assertAllFixes(
+            content,
+            """
+            INSERT INTO player_team_snapshot(player_id, team_name)
+            SELECT player.id, team.name
+            FROM player
+            CROSS JOIN team;
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
+        )
     }
 
     @Test

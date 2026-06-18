@@ -23,6 +23,7 @@ import dev.s7a.sqldelight.check.api.TextEdit
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleOptions
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import kotlin.test.assertEquals
 
@@ -132,7 +133,7 @@ internal fun Rule.diagnostics(
                         dialect = dialect,
                     )
                 override val file: SourceFile = SourceFile(path = path, content = content)
-                override val options: Map<String, String> = options
+                override val options: RuleOptions = RuleOptions(options)
                 override val facts: SqlFacts = facts
             },
         reporter = DiagnosticReporter { diagnostic -> diagnostics += diagnostic.withRuleSetPrefix("standard", id) },
@@ -188,12 +189,27 @@ internal fun Rule.applyAllFixes(
     content: String,
     path: String = PLAYER_SQ_PATH,
     options: Map<String, String> = emptyMap(),
+    facts: SqlFacts = SqlFacts(),
+    dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
 ): String {
     val edits =
-        diagnostics(content, path, options)
+        diagnostics(content, path, options, facts, dialect)
             .flatMap { diagnostic -> diagnostic.fixes.single().edits }
             .sortedByDescending { edit -> content.offsetAt(edit.range.start) }
     return edits.fold(content) { current, edit -> current.applyEdit(edit) }
+}
+
+internal fun Rule.assertAllFixes(
+    content: String,
+    expected: String,
+    path: String = PLAYER_SQ_PATH,
+    options: Map<String, String> = emptyMap(),
+    facts: SqlFacts = SqlFacts(),
+    dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
+) {
+    val fixed = applyAllFixes(content, path, options, facts, dialect)
+    assertEquals(expected, fixed)
+    assertDiagnosticCount(fixed, 0, path, options, facts, dialect)
 }
 
 private fun String.applyEdit(edit: TextEdit): String {

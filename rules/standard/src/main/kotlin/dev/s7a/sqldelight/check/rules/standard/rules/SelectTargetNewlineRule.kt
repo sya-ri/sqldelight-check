@@ -29,6 +29,10 @@ public class SelectTargetNewlineRule : Rule {
             if (clause.targets.all { target -> lines.lineContaining(target.startOffset)?.firstNonWhitespaceOffset == target.startOffset }) {
                 return@forEach
             }
+            val misplacedTargetStarts =
+                clause.targets
+                    .filter { target -> lines.lineContaining(target.startOffset)?.firstNonWhitespaceOffset != target.startOffset }
+                    .map { target -> target.startOffset }
 
             reporter.report(
                 RuleDiagnostic(
@@ -37,6 +41,7 @@ public class SelectTargetNewlineRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(clause.select.startOffset, clause.listEndOffset),
                     database = context.database,
+                    fixes = listOf(content.startOwnLineFix(misplacedTargetStarts, "Move SELECT targets to their own lines")),
                 ),
             )
         }

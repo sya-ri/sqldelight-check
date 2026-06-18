@@ -1,23 +1,33 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ConstraintNewlineRuleTest {
     @Test
     fun `reports multiline table constraints sharing a line`() {
-        val diagnostics =
-            ConstraintNewlineRule().diagnostics(
-                """
-                CREATE TABLE player (
-                  id INTEGER PRIMARY KEY,
-                  name TEXT, UNIQUE (name)
-                );
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            CREATE TABLE player (
+              id INTEGER PRIMARY KEY,
+              name TEXT, UNIQUE (name)
+            );
+            """.asSqlDelightFile()
+        val diagnostics = ConstraintNewlineRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        ConstraintNewlineRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER PRIMARY KEY,
+              name TEXT,
+              UNIQUE (name)
+            );
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -36,15 +46,28 @@ class ConstraintNewlineRuleTest {
 
     @Test
     fun `reports multiline column constraints sharing a line`() {
-        ConstraintNewlineRule().assertDiagnosticCount(
+        val content =
             """
             CREATE TABLE player (
               id INTEGER
                 PRIMARY KEY NOT NULL,
               name TEXT
             );
+            """.asSqlDelightFile()
+        val diagnostics = ConstraintNewlineRule().diagnostics(content)
+
+        assertEquals(1, diagnostics.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        ConstraintNewlineRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER
+                PRIMARY KEY
+              NOT NULL,
+              name TEXT
+            );
             """.asSqlDelightFile(),
-            1,
         )
     }
 
@@ -56,6 +79,20 @@ class ConstraintNewlineRuleTest {
               id UUID AS kotlin.uuid.Uuid NOT NULL PRIMARY KEY,
               name TEXT AS com.example.NonEmptyString NOT NULL
                 CHECK (name <> '')
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
+
+    @Test
+    fun `accepts named column constraints on their own lines after mapped type`() {
+        ConstraintNewlineRule().assertDiagnosticCount(
+            """
+            CREATE TABLE first_come_page_layout_file_references (
+                file_id UUID AS kotlin.uuid.Uuid
+                    CONSTRAINT fclfr_file_id_nn NOT NULL
+                    CONSTRAINT fclfr_file_id_fk REFERENCES files (id)
             );
             """.asSqlDelightFile(),
             0,

@@ -11,7 +11,7 @@ resolves database source files and dialect metadata, then runs sqldelight-check 
 
 ## Status
 
-sqldelight-check is pre-release. The latest release is `v0.2.2`.
+sqldelight-check is pre-release. The latest release is `v0.3.0`.
 
 The initial release focuses on Gradle plugin usage. There is no standalone CLI.
 
@@ -21,7 +21,7 @@ Apply the sqldelight-check Gradle plugin to the Gradle project that already appl
 
 ```kotlin
 plugins {
-    id("dev.s7a.sqldelight.check") version "0.2.2"
+    id("dev.s7a.sqldelight.check") version "0.3.0"
 }
 ```
 
@@ -49,23 +49,19 @@ are added.
 Configure rule sets, rules, reports, fix safety, and database-specific overrides in `build.gradle.kts`:
 
 ```kotlin
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.Severity
 
 sqldelightCheck {
     ruleSets {
-        standard {
-            enabled.set(Enablement.Auto)
-        }
         postgres {
-            enabled.set(Enablement.Auto)
+            enabled.set(false)
         }
     }
 
     rules {
         rule("standard:final-newline") {
-            enabled.set(Enablement.Enabled)
+            enabled.set(true)
             severity.set(Severity.Warning)
         }
         rule("standard:no-trailing-whitespace") {
@@ -124,11 +120,11 @@ sqldelightCheck {
 }
 ```
 
-Enablement values:
+Enabled values:
 
-- `Auto`: let sqldelight-check decide from the rule default and applicability.
-- `Enabled`: run the rule or rule set.
-- `Disabled`: do not run the rule or rule set.
+- unset: let sqldelight-check decide from the rule default and applicability.
+- `true`: run the rule or rule set.
+- `false`: do not run the rule or rule set.
 
 Rule-level explicit enablement overrides a rule set default. Severity values are `Info`, `Warning`, and `Error`; error
 diagnostics fail check tasks after reports are written.
@@ -185,9 +181,9 @@ See [Core diagnostics](core/README.md) for core diagnostic behavior and configur
 
 Built-in rule set artifacts are installed with the Gradle plugin and are also published separately for custom setups:
 
-The built-in rule sets currently include 153 rules:
+The built-in rule sets currently include 154 rules:
 
-- `sqldelight-check-rules-standard`: 124 dialect-independent rules for `.sq` and `.sqm` files.
+- `sqldelight-check-rules-standard`: 125 dialect-independent rules for `.sq` and `.sqm` files.
 - `sqldelight-check-rules-postgres`: 12 PostgreSQL-specific rules gated by `DialectCapability.PostgreSql`.
 - `sqldelight-check-rules-mysql`: 8 MySQL-specific rules gated by `DialectCapability.MySql`.
 - `sqldelight-check-rules-sqlite`: 6 SQLite-specific rules gated by `DialectCapability.SQLite`.
@@ -300,6 +296,9 @@ Authoring guides:
 - [Rule Set Author Guide](docs/rule-set-authors.md)
 - [Reporter Author Guide](docs/reporter-authors.md)
 - [Dialects Author Guide](docs/dialects-authors.md)
+
+Rule sets can also refine diagnostics emitted by other rule sets. Dialect rule sets use this to suppress false positives
+when a general rule sees dialect-specific syntax that only that dialect should interpret.
 
 ## SQLDelight And Dialects
 

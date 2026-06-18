@@ -35,15 +35,6 @@ public final class dev/s7a/sqldelight/check/api/DialectId$Companion {
 	public final fun getUnknown ()Ldev/s7a/sqldelight/check/api/DialectId;
 }
 
-public final class dev/s7a/sqldelight/check/api/Enablement : java/lang/Enum {
-	public static final field Auto Ldev/s7a/sqldelight/check/api/Enablement;
-	public static final field Disabled Ldev/s7a/sqldelight/check/api/Enablement;
-	public static final field Enabled Ldev/s7a/sqldelight/check/api/Enablement;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/Enablement;
-	public static fun values ()[Ldev/s7a/sqldelight/check/api/Enablement;
-}
-
 public final class dev/s7a/sqldelight/check/api/Fix {
 	public fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/FixSafety;Ljava/util/List;)V
 	public fun equals (Ljava/lang/Object;)Z
@@ -77,6 +68,7 @@ public final class dev/s7a/sqldelight/check/api/LogLevel : java/lang/Enum {
 }
 
 public final class dev/s7a/sqldelight/check/api/QualifiedRuleId {
+	public static final field Companion Ldev/s7a/sqldelight/check/api/QualifiedRuleId$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getRuleId-cwxIa2A ()Ljava/lang/String;
@@ -84,6 +76,10 @@ public final class dev/s7a/sqldelight/check/api/QualifiedRuleId {
 	public final fun getValue ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/api/QualifiedRuleId$Companion {
+	public final fun invoke (Ljava/lang/String;)Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
 }
 
 public final class dev/s7a/sqldelight/check/api/RuleDiagnostic {

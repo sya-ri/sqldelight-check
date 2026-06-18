@@ -1,23 +1,32 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ConsistentOrderByDirectionRuleTest {
     @Test
     fun `reports mixed explicit and implicit order by directions`() {
-        val diagnostics =
-            ConsistentOrderByDirectionRule().diagnostics(
-                """
-                selectPlayers:
-                SELECT id, name, score
-                FROM player
-                ORDER BY name, score DESC;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectPlayers:
+            SELECT id, name, score
+            FROM player
+            ORDER BY name, score DESC;
+            """.asSqlDelightFile()
+        val diagnostics = ConsistentOrderByDirectionRule().diagnostics(content)
 
         assertEquals(1, diagnostics.size)
-        assertEquals(0, diagnostics.single().fixes.size)
+        assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
+        ConsistentOrderByDirectionRule().assertAllFixes(
+            content,
+            """
+            selectPlayers:
+            SELECT id, name, score
+            FROM player
+            ORDER BY name ASC, score DESC;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

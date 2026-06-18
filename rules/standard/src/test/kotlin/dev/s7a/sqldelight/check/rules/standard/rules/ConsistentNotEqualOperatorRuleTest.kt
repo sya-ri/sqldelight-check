@@ -20,6 +20,20 @@ class ConsistentNotEqualOperatorRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
         assertEquals("!=", diagnostics.single().fixes.single().edits.single().replacement)
+        ConsistentNotEqualOperatorRule().assertAllFixes(
+            """
+            selectMismatchedPlayers:
+            SELECT id, name
+            FROM player
+            WHERE name != 'admin' AND status <> 'deleted';
+            """.asSqlDelightFile(),
+            """
+            selectMismatchedPlayers:
+            SELECT id, name
+            FROM player
+            WHERE name != 'admin' AND status != 'deleted';
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -36,6 +50,20 @@ class ConsistentNotEqualOperatorRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals("<>", diagnostics.single().fixes.single().edits.single().replacement)
+        ConsistentNotEqualOperatorRule().assertAllFixes(
+            """
+            selectMismatchedPlayers:
+            SELECT id, name
+            FROM player
+            WHERE name <> 'admin' AND status != 'deleted';
+            """.asSqlDelightFile(),
+            """
+            selectMismatchedPlayers:
+            SELECT id, name
+            FROM player
+            WHERE name <> 'admin' AND status <> 'deleted';
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

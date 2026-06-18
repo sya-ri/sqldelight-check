@@ -60,8 +60,6 @@ Rules implement `Rule` and report diagnostics through `DiagnosticReporter`.
 
 ```kotlin
 package com.example.sqldelight.rules
-
-import dev.s7a.sqldelight.check.api.Enablement
 import dev.s7a.sqldelight.check.api.DialectId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -107,25 +105,145 @@ stable fact type to `rule-api` over reaching into SQLDelight internals.
 `rule-api` also provides small source-text helpers for rules that only need
 offset-stable text checks:
 
-- `RegexRule` reports regex matches in source text after masking comments and quoted text.
 - `String.rangeAtOffsets(startOffset, endOffset)` converts offsets to a `SourceRange`.
 - `String.sqlTokens()` scans SQL-like identifiers outside comments and quoted text.
+- `List<SqlToken>.findSourcePattern(...)` matches dialect-provided source patterns against token streams.
+- `Rule.reportSqlStatementMatches(...)` tokenizes source text, splits it into statements, and reports matched ranges.
 - `String.maskSqlCommentsAndQuotedText()` masks comments and quoted text while preserving offsets.
-- `Map<String, String>.booleanOption(...)`, `positiveIntOption(...)`, and `commaSeparatedOption(...)` parse common rule options.
+- `option(...)` declares custom typed rule options that sqldelight-check can validate.
 
-Use `RegexRule` for simple source-text policies before writing the same masking
-and range mapping by hand:
+Helpers that omit `defaultValue` produce nullable options. Helpers that include
+`defaultValue` produce non-null options.
+
+| Value | Single option | List option |
+| --- | --- | --- |
+| Custom parser | `option(...)` / `option(..., defaultValue)` | `listOption(...)` / `listOption(..., defaultValue)` |
+| Raw string | `stringOption(...)` | `stringListOption(...)` |
+| Non-blank string | `nonBlankStringOption(...)` |  |
+| Boolean | `booleanOption(...)` |  |
+| Integer | `intOption(...)` | `intListOption(...)` |
+| Long integer | `longOption(...)` | `longListOption(...)` |
+| Positive integer | `positiveIntOption(...)` | `positiveIntListOption(...)` |
+| Non-negative integer | `nonNegativeIntOption(...)` | `nonNegativeIntListOption(...)` |
+| Enum name, case-insensitive | `enumOption(...)` | `enumListOption(...)` |
+| `KeyedEnum.key`, case-insensitive | `keyedEnumOption(...)` | `keyedEnumListOption(...)` |
+
+Use the token helpers for simple source-text policies before writing the same
+masking, statement splitting, and range mapping by hand:
 
 ```kotlin
-import dev.s7a.sqldelight.check.rule.api.RegexRule
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.dialects.sqlite.ForeignKeysOffValue
+import dev.s7a.sqldelight.check.dialects.sqlite.ForeignKeysPragmaStatementStart
+import dev.s7a.sqldelight.check.dialects.sqlite.SQLiteDialectId
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.findSourcePatternsInOrder
+import dev.s7a.sqldelight.check.rule.api.reportSqlStatementMatches
 
-class NoUnsafePragmaRule : RegexRule(
-    ruleName = "no-unsafe-pragma",
-    pattern = """\bPRAGMA\s+writable_schema\s*=\s*ON\b""",
-    message = "Avoid enabling writable_schema in checked SQLDelight sources.",
-    defaultSeverity = Severity.Error,
-    targetDialect = DialectId("example"),
-)
+class NoForeignKeysOffRule : Rule {
+    override val id: RuleId = RuleId("no-foreign-keys-off")
+    override val defaultSeverity: Severity = Severity.Error
+    override val defaultEnable: Boolean = true
+    override val targetDialect = SQLiteDialectId
+
+    override fun run(
+        context: RuleContext,
+        reporter: DiagnosticReporter,
+    ) {
+        reportSqlStatementMatches(
+            context = context,
+            reporter = reporter,
+            message = "Avoid disabling SQLite foreign key enforcement.",
+        ) { statement ->
+            statement.findSourcePatternsInOrder(
+                context.database.dialect.sourcePatterns,
+                ForeignKeysPragmaStatementStart,
+                ForeignKeysOffValue,
+            )
+        }
+    }
+}
+```
+
+Declare configurable rule options inside the rule with delegate helpers.
+sqldelight-check warns when build configuration contains an option that the
+rule did not declare, and also warns when a configured option is marked
+deprecated:
+
+```kotlin
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.KeyedEnum
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.intListOption
+import dev.s7a.sqldelight.check.rule.api.keyedEnumOption
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
+
+class MaxExampleRule : Rule {
+    private val maxOption by positiveIntOption("max", 10)
+    private val idsOption by intListOption("ids")
+    private val modeOption by keyedEnumOption("mode", Mode.Strict)
+
+    override val id = RuleId("max-example")
+    override val defaultSeverity = Severity.Warning
+
+    override fun run(context: RuleContext, reporter: DiagnosticReporter) {
+        val max = context.options[maxOption]
+        val ids = context.options[idsOption].orEmpty()
+        val mode = context.options[modeOption]
+        // ...
+    }
+
+    private enum class Mode(
+        override val key: String,
+    ) : KeyedEnum {
+        Strict("strict"),
+        Relaxed("relaxed"),
+    }
+}
+```
+
+When a rule set needs the same custom parsing in multiple rules, wrap
+`option(...)` or `listOption(...)` in a small rule-set-local delegate function
+instead of repeating parser logic inside each rule:
+
+```kotlin
+import dev.s7a.sqldelight.check.api.RuleId
+import dev.s7a.sqldelight.check.api.Severity
+import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
+import dev.s7a.sqldelight.check.rule.api.Rule
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleOption
+import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
+import dev.s7a.sqldelight.check.rule.api.option
+import kotlin.properties.ReadOnlyProperty
+
+private fun patternOption(
+    name: String,
+    defaultValue: Regex,
+    deprecation: RuleOptionDeprecation? = null,
+): ReadOnlyProperty<Rule, RuleOption<Regex>> =
+    option(name, defaultValue, deprecation) { value -> Regex(value) }
+
+class ForbiddenNameRule : Rule {
+    private val forbiddenNamePatternOption by patternOption(
+        name = "forbiddenNamePattern",
+        defaultValue = Regex("""\btmp_"""),
+    )
+
+    override val id = RuleId("forbidden-name")
+    override val defaultSeverity = Severity.Warning
+
+    override fun run(context: RuleContext, reporter: DiagnosticReporter) {
+        val forbiddenNamePattern = context.options[forbiddenNamePatternOption]
+        // ...
+    }
+}
 ```
 
 ## IDs And Configuration
@@ -137,7 +255,7 @@ rule ID into the configured `rule-set:rule-name` ID:
 sqldelightCheck {
     ruleSets {
         ruleSet("example") {
-            enabled.set(Enablement.Auto)
+            enabled.set(true)
         }
     }
     rules {
@@ -154,6 +272,52 @@ explicitly enable them. When `defaultEnable = true`, rules use automatic
 applicability: `Rule.targetDialect` and `Rule.isApplicable(context)` decide
 whether the rule runs for a database/file. Explicit `Enabled` and `Disabled`
 settings remain user overrides.
+
+## Diagnostic Refinements
+
+Rule sets can inspect diagnostics emitted by any rule and either keep or suppress them. Use a diagnostic refinement when
+your rule set has contextual knowledge that narrows another rule without making that rule depend on your dialect or
+integration.
+
+```kotlin
+package com.example.sqldelight.rules
+
+import dev.s7a.sqldelight.check.api.Diagnostic
+import dev.s7a.sqldelight.check.api.QualifiedRuleId
+import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinementProvider
+import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleProvider
+import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+
+class ExampleRuleSetProvider : RuleSetProvider {
+    override val id = RuleSetId("example")
+
+    override fun ruleProviders(): Set<RuleProvider> = emptySet()
+
+    override fun diagnosticRefinementProviders(): Set<DiagnosticRefinementProvider> =
+        setOf(DiagnosticRefinementProvider(::ExampleSelectRefinement))
+}
+
+class ExampleSelectRefinement : DiagnosticRefinement {
+    override val targetRuleId =
+        QualifiedRuleId("standard:no-unbounded-select")
+
+    override fun refine(
+        context: RuleContext,
+        diagnostic: Diagnostic,
+    ): Diagnostic? =
+        if (context.file.content.contains("EXAMPLE DIALECT LIMIT")) {
+            null
+        } else {
+            diagnostic
+        }
+}
+```
+
+Refinements run after rule IDs and configured severities are resolved and before source-level disable directives are
+applied. Returning the original diagnostic keeps it; returning `null` suppresses it.
 
 ## Fixes
 

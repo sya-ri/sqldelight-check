@@ -2,8 +2,6 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.rule.api.rangeAtOffsets
 
-import dev.s7a.sqldelight.check.rule.api.positiveIntOption
-
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
@@ -11,6 +9,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.positiveIntOption
 
 private const val DEFAULT_MAX_JOINS = 8
 
@@ -18,6 +17,8 @@ private const val DEFAULT_MAX_JOINS = 8
  * Reports statements with too many JOIN clauses.
  */
 public class MaxJoinsRule : Rule {
+    private val maxJoinsOption by positiveIntOption("max", DEFAULT_MAX_JOINS)
+
     override val id: RuleId = RuleId("max-joins")
     override val defaultSeverity: Severity = Severity.Warning
     override val defaultEnable: Boolean = true
@@ -26,7 +27,7 @@ public class MaxJoinsRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
-        val max = context.options.positiveIntOption("max", DEFAULT_MAX_JOINS)
+        val max = context.options[maxJoinsOption]
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->

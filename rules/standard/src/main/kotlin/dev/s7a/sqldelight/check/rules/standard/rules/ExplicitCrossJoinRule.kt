@@ -50,16 +50,42 @@ public class ExplicitCrossJoinRule : Rule {
                     file = context.file,
                     range = content.rangeAtOffsets(token.startOffset, token.endOffset),
                     database = context.database,
+                    fixes = listOf(content.crossJoinFix(tokens, index)),
                 ),
             )
         }
     }
 }
 
+private fun String.crossJoinFix(
+    tokens: List<SqlToken>,
+    joinIndex: Int,
+) = tokens.conditionlessJoinStartOffset(joinIndex)?.let { startOffset ->
+    replaceTokenFix(startOffset, tokens[joinIndex].endOffset, "CROSS JOIN", "Use CROSS JOIN")
+} ?: insertTokenFix(tokens[joinIndex].startOffset, "CROSS ", "Use CROSS JOIN")
+
+private fun List<SqlToken>.conditionlessJoinStartOffset(joinIndex: Int): Int? {
+    val previous = getOrNull(joinIndex - 1) ?: return null
+    if (conditionlessJoinPrefixTerms.any { term -> previous.isTerm(term) }) return previous.startOffset
+    if (!previous.isTerm(SqlDialectSourceTerm.Outer)) return null
+    val beforeOuter = getOrNull(joinIndex - 2) ?: return null
+    return if (outerConditionlessJoinPrefixTerms.any { term -> beforeOuter.isTerm(term) }) beforeOuter.startOffset else null
+}
+
 private fun List<SqlToken>.isExplicitConditionlessJoin(joinIndex: Int): Boolean {
     val previous = getOrNull(joinIndex - 1) ?: return false
     return previous.isTerm(SqlDialectSourceTerm.Cross) || previous.isTerm(SqlDialectSourceTerm.Natural)
 }
+
+private val conditionlessJoinPrefixTerms =
+    setOf(
+        SqlDialectSourceTerm.Full,
+        SqlDialectSourceTerm.Inner,
+        SqlDialectSourceTerm.Left,
+        SqlDialectSourceTerm.Right,
+    )
+
+private val outerConditionlessJoinPrefixTerms = setOf(SqlDialectSourceTerm.Full, SqlDialectSourceTerm.Left, SqlDialectSourceTerm.Right)
 
 private fun List<SqlToken>.joinSegmentEnd(
     startIndex: Int,

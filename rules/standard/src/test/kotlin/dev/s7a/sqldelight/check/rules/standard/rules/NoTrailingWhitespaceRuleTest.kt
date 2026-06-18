@@ -20,6 +20,20 @@ class NoTrailingWhitespaceRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Safe, diagnostics.single().fixes.single().safety)
         assertEquals("", diagnostics.single().fixes.single().edits.single().replacement)
+        NoTrailingWhitespaceRule().assertAllFixes(
+            """
+            selectAll:
+            SELECT id, name
+            FROM player
+            ORDER BY name;<SP><SP>
+            """.asSqlDelightFile().withSpaces(),
+            """
+            selectAll:
+            SELECT id, name
+            FROM player
+            ORDER BY name;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -32,6 +46,15 @@ class NoTrailingWhitespaceRuleTest {
             """.asSqlDelightFile().withTabs().withSpaces()
 
         assertEquals("", NoTrailingWhitespaceRule().singleReplacement(content, path = MIGRATION_SQM_PATH))
+        NoTrailingWhitespaceRule().assertAllFixes(
+            content,
+            """
+            CREATE TABLE player (
+              id INTEGER NOT NULL PRIMARY KEY
+            );
+            """.asSqlDelightFile(),
+            path = MIGRATION_SQM_PATH,
+        )
     }
 
     @Test

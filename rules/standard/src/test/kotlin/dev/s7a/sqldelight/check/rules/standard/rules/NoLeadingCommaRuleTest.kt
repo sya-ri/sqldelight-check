@@ -1,24 +1,34 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import dev.s7a.sqldelight.check.api.FixSafety
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NoLeadingCommaRuleTest {
     @Test
     fun `reports line-leading commas in sq queries`() {
-        val diagnostics =
-            NoLeadingCommaRule().diagnostics(
-                """
-                selectNames:
-                SELECT id
-                  , name
-                  , score
-                FROM player;
-                """.asSqlDelightFile(),
-            )
+        val content =
+            """
+            selectNames:
+            SELECT id
+              , name
+              , score
+            FROM player;
+            """.asSqlDelightFile()
+        val diagnostics = NoLeadingCommaRule().diagnostics(content)
 
         assertEquals(2, diagnostics.size)
-        assertEquals(0, diagnostics.first().fixes.size)
+        assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
+        NoLeadingCommaRule().assertAllFixes(
+            content,
+            """
+            selectNames:
+            SELECT id,
+               name,
+               score
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

@@ -129,3 +129,17 @@ additional role or block-kind implementations when it needs a meaning that the b
 
 Built-in SQLDelight dialect metadata lives in dedicated dialect modules, with source pattern presets such as
 `MySqlDialectSourcePatterns` and `PostgresDialectSourcePatterns`.
+
+## Dialect-Specific Diagnostic Refinements
+
+Dialect metadata should describe shared source structure, not exceptions for one specific rule. When a standard rule
+reports a false positive because a token has dialect-specific meaning, put that logic in a dialect rule set as a
+`DiagnosticRefinement` registered by a `DiagnosticRefinementProvider`.
+
+For example, PostgreSQL trigger events can contain `BEFORE UPDATE ON ...`. The `UPDATE` token is not an `UPDATE`
+statement, but that fact is PostgreSQL trigger knowledge. The PostgreSQL rule set refines
+`standard:no-update-without-where` diagnostics for that syntax instead of teaching the standard rule about PostgreSQL
+triggers.
+
+Projects that publish a custom dialect and also need these refinements should publish a rule set artifact through
+`sqldelightCheckRuleSet` in addition to the dialect artifact through `sqldelightCheckDialects`.

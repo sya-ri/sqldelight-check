@@ -20,6 +20,20 @@ class SpaceAroundComparisonOperatorsRuleTest {
         assertEquals(1, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.single().fixes.single().safety)
         assertEquals(" = ", diagnostics.single().fixes.single().edits.single().replacement)
+        SpaceAroundComparisonOperatorsRule().assertAllFixes(
+            """
+            selectById:
+            SELECT id, name
+            FROM player
+            WHERE id=?;
+            """.asSqlDelightFile(),
+            """
+            selectById:
+            SELECT id, name
+            FROM player
+            WHERE id = ?;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -37,6 +51,20 @@ class SpaceAroundComparisonOperatorsRuleTest {
 
         assertEquals(1, diagnostics.size)
         assertEquals(" >= ", diagnostics.single().fixes.single().edits.single().replacement)
+        SpaceAroundComparisonOperatorsRule().assertAllFixes(
+            """
+            selectByMinScore:
+            SELECT id, name
+            FROM player
+            WHERE score>=?;
+            """.asSqlDelightFile(),
+            """
+            selectByMinScore:
+            SELECT id, name
+            FROM player
+            WHERE score >= ?;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test
@@ -55,6 +83,20 @@ class SpaceAroundComparisonOperatorsRuleTest {
         assertEquals(2, diagnostics.size)
         assertEquals(" != ", diagnostics[0].fixes.single().edits.single().replacement)
         assertEquals(" <> ", diagnostics[1].fixes.single().edits.single().replacement)
+        SpaceAroundComparisonOperatorsRule().assertAllFixes(
+            """
+            selectFiltered:
+            SELECT id, name
+            FROM player
+            WHERE score!=? OR name<>'';
+            """.asSqlDelightFile(),
+            """
+            selectFiltered:
+            SELECT id, name
+            FROM player
+            WHERE score != ? OR name <> '';
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

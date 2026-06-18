@@ -19,6 +19,18 @@ class PreferCoalesceRuleTest {
         assertEquals(2, diagnostics.size)
         assertEquals(FixSafety.Unsafe, diagnostics.first().fixes.single().safety)
         assertEquals("COALESCE", diagnostics.first().fixes.single().edits.single().replacement)
+        PreferCoalesceRule().assertAllFixes(
+            """
+            selectDisplayName:
+            SELECT IFNULL(nickname, name), NVL(display_name, name)
+            FROM player;
+            """.asSqlDelightFile(),
+            """
+            selectDisplayName:
+            SELECT COALESCE(nickname, name), COALESCE(display_name, name)
+            FROM player;
+            """.asSqlDelightFile(),
+        )
     }
 
     @Test

@@ -1,9 +1,6 @@
 package dev.s7a.sqldelight.check.rules.standard
 
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
-
-
-
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
 import kotlin.test.Test
@@ -58,6 +55,8 @@ class StandardRuleSetProviderTest {
                 qualifiedRuleId("standard:max-line-length"),
                 qualifiedRuleId("standard:max-subquery-depth"),
                 qualifiedRuleId("standard:no-blank-line-after-query-label"),
+                qualifiedRuleId("standard:no-blank-lines-in-statement"),
+                qualifiedRuleId("standard:no-composite-primary-key"),
                 qualifiedRuleId("standard:no-consecutive-semicolons"),
                 qualifiedRuleId("standard:no-delete-all"),
                 qualifiedRuleId("standard:no-delete-without-where"),

@@ -1,8 +1,12 @@
 package dev.s7a.sqldelight.check.rules.postgres
 
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinementProvider
 import dev.s7a.sqldelight.check.rule.api.RuleProvider
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
+import dev.s7a.sqldelight.check.rules.postgres.refinements.PostgresTriggerSourceIndentationRefinement
+import dev.s7a.sqldelight.check.rules.postgres.refinements.PostgresTriggerStatementTerminatorRefinement
+import dev.s7a.sqldelight.check.rules.postgres.refinements.PostgresTriggerUpdateEventRefinement
 import dev.s7a.sqldelight.check.rules.postgres.rules.ExcessiveLocksRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoAddColumnWithVolatileDefaultRule
 import dev.s7a.sqldelight.check.rules.postgres.rules.NoConcurrentIndexInTransactionRule
@@ -39,5 +43,12 @@ public class PostgresRuleSetProvider : RuleSetProvider {
             RuleProvider(::NoRenameTableRule),
             RuleProvider(::ReindexConcurrentlyRule),
             RuleProvider(::RiskyAlterTableRule),
+        )
+
+    override fun diagnosticRefinementProviders(): Set<DiagnosticRefinementProvider> =
+        setOf(
+            DiagnosticRefinementProvider(::PostgresTriggerUpdateEventRefinement),
+            DiagnosticRefinementProvider(::PostgresTriggerSourceIndentationRefinement),
+            DiagnosticRefinementProvider(::PostgresTriggerStatementTerminatorRefinement),
         )
 }

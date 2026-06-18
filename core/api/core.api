@@ -10,21 +10,27 @@ public final class dev/s7a/sqldelight/check/core/AnalysisInput {
 public abstract interface class dev/s7a/sqldelight/check/core/AnalysisTrace {
 	public abstract fun databaseFiles (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)V
 	public fun deprecatedRule (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;Z)V
+	public fun deprecatedRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)V
 	public abstract fun fileRules (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/util/List;)V
+	public fun unknownRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/util/Set;)V
 }
 
 public final class dev/s7a/sqldelight/check/core/AnalysisTrace$DefaultImpls {
 	public static fun deprecatedRule (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;Z)V
+	public static fun deprecatedRuleOption (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)V
+	public static fun unknownRuleOption (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/util/Set;)V
 }
 
 public final class dev/s7a/sqldelight/check/core/AnalysisTrace$None : dev/s7a/sqldelight/check/core/AnalysisTrace {
 	public static final field INSTANCE Ldev/s7a/sqldelight/check/core/AnalysisTrace$None;
 	public fun databaseFiles (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)V
 	public fun deprecatedRule (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;Z)V
+	public fun deprecatedRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun fileRules (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/util/List;)V
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public fun unknownRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/util/Set;)V
 }
 
 public final class dev/s7a/sqldelight/check/core/CheckConfig {
@@ -105,10 +111,10 @@ public final class dev/s7a/sqldelight/check/core/ReporterRegistry$Companion {
 }
 
 public final class dev/s7a/sqldelight/check/core/RuleConfig {
-	public fun <init> (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;Ljava/util/Map;)V
-	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/api/Enablement;Ldev/s7a/sqldelight/check/api/Severity;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/Boolean;Ldev/s7a/sqldelight/check/api/Severity;Ljava/util/Map;)V
+	public synthetic fun <init> (Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/Boolean;Ldev/s7a/sqldelight/check/api/Severity;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun getEnablement ()Ljava/lang/Boolean;
 	public final fun getId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
 	public final fun getOptions ()Ljava/util/Map;
 	public final fun getSeverity ()Ldev/s7a/sqldelight/check/api/Severity;
@@ -128,9 +134,10 @@ public final class dev/s7a/sqldelight/check/core/RuleRegistry$Companion {
 }
 
 public final class dev/s7a/sqldelight/check/core/RuleSetConfig {
-	public synthetic fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/Enablement;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Boolean;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/Boolean;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getEnablement ()Ldev/s7a/sqldelight/check/api/Enablement;
+	public final fun getEnablement ()Ljava/lang/Boolean;
 	public final fun getId-wigqPlY ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
