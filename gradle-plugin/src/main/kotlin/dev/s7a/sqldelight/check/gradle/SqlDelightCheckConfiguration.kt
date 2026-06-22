@@ -4,6 +4,7 @@ import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.RuleSetId
+import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.DatabaseConfig
 import dev.s7a.sqldelight.check.core.RuleConfig
@@ -12,7 +13,10 @@ import dev.s7a.sqldelight.check.core.RuleSetConfig
 /**
  * Converts the Gradle extension model into the immutable core configuration used during task execution.
  */
-internal fun SqlDelightCheckExtension.toCheckConfig(logLevel: LogLevel = this.logLevel.get()): CheckConfig =
+internal fun SqlDelightCheckExtension.toCheckConfig(
+    logLevel: LogLevel = this.logLevel.get(),
+    baseline: Baseline = Baseline.Empty,
+): CheckConfig =
     CheckConfig(
         ruleSets = ruleSets.toRuleSetConfigs(),
         rules = rules.toRuleConfigs(),
@@ -27,6 +31,7 @@ internal fun SqlDelightCheckExtension.toCheckConfig(logLevel: LogLevel = this.lo
                 database.name to config
         },
         allowUnsafeFixes = fix.unsafe.get(),
+        baseline = baseline,
         logLevel = logLevel,
     )
 

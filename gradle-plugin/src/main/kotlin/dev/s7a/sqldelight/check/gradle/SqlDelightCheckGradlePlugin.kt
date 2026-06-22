@@ -115,9 +115,11 @@ private fun Project.configureReportOutputs(task: SqlDelightCheckTask) {
 }
 
 private fun Project.configureTaskInputs(task: SqlDelightCheckTask) {
+    val extension = extensions.getByType(SqlDelightCheckExtension::class.java)
     configureSqlDelightSourceInputs(task)
     configureProviderInputs(task)
     configureReportOutputs(task)
+    task.baselineFile.convention(extension.baselineFile)
 }
 
 /**

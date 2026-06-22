@@ -705,6 +705,60 @@ class SqlDelightCheckEngineTest {
         assertEquals(emptyList(), diagnostics)
     }
 
+    @Test
+    fun `baseline suppresses matching diagnostics`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput()),
+                ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 1))),
+                config =
+                    CheckConfig(
+                        baseline =
+                            Baseline(
+                                setOf(
+                                    BaselineEntry(
+                                        database = "Database",
+                                        ruleId = ruleId,
+                                        path = "src/main/sqldelight/Test.sq",
+                                        line = 1,
+                                        column = 1,
+                                        message = "test diagnostic",
+                                    ),
+                                ),
+                            ),
+                    ),
+            )
+
+        assertEquals(emptyList(), diagnostics)
+    }
+
+    @Test
+    fun `baseline does not suppress diagnostics with different messages`() {
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(testInput()),
+                ruleSetProviders = listOf(testRuleSet(testRule(rangeLine = 1))),
+                config =
+                    CheckConfig(
+                        baseline =
+                            Baseline(
+                                setOf(
+                                    BaselineEntry(
+                                        database = "Database",
+                                        ruleId = ruleId,
+                                        path = "src/main/sqldelight/Test.sq",
+                                        line = 1,
+                                        column = 1,
+                                        message = "stale diagnostic",
+                                    ),
+                                ),
+                            ),
+                    ),
+            )
+
+        assertEquals(listOf(ruleId), diagnostics.map { diagnostic -> diagnostic.ruleId })
+    }
+
     private fun testRuleSet(rule: Rule = testRule()): RuleSetProvider =
         object : RuleSetProvider {
             override val id: RuleSetId = ruleSetId

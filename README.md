@@ -116,6 +116,8 @@ sqldelightCheck {
         unsafe.set(false)
     }
 
+    baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
+
     logLevel.set(LogLevel.Verbose)
 }
 ```
@@ -176,6 +178,27 @@ Unused disable directives are reported as `core:no-redundant-suppression`. This 
 sqldelight-check applies suppressions, so it can identify directives that did not suppress any rule diagnostics.
 
 See [Core diagnostics](core/README.md) for core diagnostic behavior and configuration.
+
+## Baseline File
+
+Use a baseline file when existing diagnostics should be ignored without adding SQL comments to source files:
+
+```kotlin
+sqldelightCheck {
+    baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
+}
+```
+
+The baseline file is UTF-8 text with one diagnostic per line. Empty lines and lines starting with `#` are ignored.
+Entries use six tab-separated columns:
+
+```text
+database	ruleId	path	line	column	message
+Database	standard:no-select-star	src/main/sqldelight/com/example/Player.sq	3	1	Avoid SELECT * in queries.
+```
+
+A baseline entry suppresses only diagnostics that match all six fields. Use `\t`, `\n`, `\r`, and `\\` to escape tabs,
+line breaks, carriage returns, and backslashes inside text fields.
 
 ## Rule Sets
 

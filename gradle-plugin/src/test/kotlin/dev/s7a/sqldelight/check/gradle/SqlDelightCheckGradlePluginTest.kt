@@ -142,6 +142,51 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `check task suppresses diagnostics from baseline file`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Severity
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
+                            rules {
+                                rule("sqlite:prefer-integer-primary-key") {
+                                    enabled.set(true)
+                                    severity.set(Severity.Error)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+                id INT PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+        )
+        project.write(
+            "sqldelight-check-baseline.txt",
+            listOf(
+                "# database\truleId\tpath\tline\tcolumn\tmessage",
+                "Database\tsqlite:prefer-integer-primary-key\tsrc/main/sqldelight/com/example/Player.sq\t2\t8\tUse INTEGER PRIMARY KEY for SQLite rowid primary keys.",
+            ).joinToString("\n") + "\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
+    }
+
+    @Test
     fun `check task enables github annotations report on GitHub Actions`() {
         val project =
             testProject(

@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.gradle
 import dev.s7a.sqldelight.check.api.LogLevel
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import javax.inject.Inject
@@ -68,6 +69,11 @@ public open class SqlDelightCheckExtension
          * Fix behavior shared by tasks that modify SQLDelight sources.
          */
         public val fix: FixExtension = objects.newInstance(FixExtension::class.java)
+
+        /**
+         * Optional baseline file containing known diagnostics to suppress.
+         */
+        public val baselineFile: RegularFileProperty = objects.fileProperty()
 
         /**
          * Controls how much execution detail the task emits.

@@ -7,6 +7,7 @@ import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.core.AnalysisTrace
+import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.DatabaseConfig
 import dev.s7a.sqldelight.check.core.FixApplier
@@ -25,10 +26,13 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -58,6 +62,14 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     public abstract val sqlDelightSources: ConfigurableFileCollection
+
+    /**
+     * Optional baseline file containing known diagnostics to suppress.
+     */
+    @get:Optional
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    public abstract val baselineFile: RegularFileProperty
 
     /**
      * Runtime classpath used to discover rule set providers.
@@ -90,7 +102,8 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public fun run() {
         val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
         val logLevel = logLevel.get()
-        val config = extension.toCheckConfig(logLevel)
+        val baseline = baselineFile.orNull?.asFile?.readSqldelightCheckBaseline()
+        val config = extension.toCheckConfig(logLevel, baseline = baseline ?: Baseline.Empty)
         val traceCollector = RuleTraceCollector()
         val trace = tracing(logLevel, traceCollector)
         var result = analyze(config, trace)

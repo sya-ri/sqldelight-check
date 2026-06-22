@@ -33,12 +33,47 @@ public final class dev/s7a/sqldelight/check/core/AnalysisTrace$None : dev/s7a/sq
 	public fun unknownRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/util/Set;)V
 }
 
+public final class dev/s7a/sqldelight/check/core/Baseline {
+	public static final field Companion Ldev/s7a/sqldelight/check/core/Baseline$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Set;)V
+	public synthetic fun <init> (Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEntries ()Ljava/util/Set;
+	public fun hashCode ()I
+	public final fun suppresses (Ldev/s7a/sqldelight/check/api/Diagnostic;)Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/Baseline$Companion {
+	public final fun getEmpty ()Ldev/s7a/sqldelight/check/core/Baseline;
+}
+
+public final class dev/s7a/sqldelight/check/core/BaselineEntry {
+	public static final field Companion Ldev/s7a/sqldelight/check/core/BaselineEntry$Companion;
+	public fun <init> (Ljava/lang/String;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;IILjava/lang/String;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColumn ()I
+	public final fun getDatabase ()Ljava/lang/String;
+	public final fun getLine ()I
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getRuleId ()Ldev/s7a/sqldelight/check/api/QualifiedRuleId;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/s7a/sqldelight/check/core/BaselineEntry$Companion {
+	public final fun from (Ldev/s7a/sqldelight/check/api/Diagnostic;)Ldev/s7a/sqldelight/check/core/BaselineEntry;
+}
+
 public final class dev/s7a/sqldelight/check/core/CheckConfig {
 	public fun <init> ()V
-	public fun <init> (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;ZLdev/s7a/sqldelight/check/api/LogLevel;)V
-	public synthetic fun <init> (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;ZLdev/s7a/sqldelight/check/api/LogLevel;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;ZLdev/s7a/sqldelight/check/api/LogLevel;Ldev/s7a/sqldelight/check/core/Baseline;)V
+	public synthetic fun <init> (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;ZLdev/s7a/sqldelight/check/api/LogLevel;Ldev/s7a/sqldelight/check/core/Baseline;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAllowUnsafeFixes ()Z
+	public final fun getBaseline ()Ldev/s7a/sqldelight/check/core/Baseline;
 	public final fun getDatabases ()Ljava/util/Map;
 	public final fun getLogLevel ()Ldev/s7a/sqldelight/check/api/LogLevel;
 	public final fun getRuleSets ()Ljava/util/Map;
