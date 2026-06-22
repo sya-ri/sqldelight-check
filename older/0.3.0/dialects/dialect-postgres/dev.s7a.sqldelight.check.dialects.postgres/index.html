@@ -1,0 +1,361 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>dev.s7a.sqldelight.check.dialects.postgres</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    sqldelight-check
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+<dokka-template-command data="{&quot;@class&quot;:&quot;org.jetbrains.dokka.base.templating.ReplaceVersionsCommand&quot;,&quot;location&quot;:&quot;dev.s7a.sqldelight.check.dialects.postgres/index.html&quot;}"><div class="dropdown versions-dropdown" data-role="dropdown">
+  <div class="button button_dropdown versions-dropdown-button" role="combobox" data-role="dropdown-toggle" aria-controls="versions-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select version" tabindex="0" title="0.3.0"><span class="versions-dropdown-button-text">0.3.0</span></div>
+  <div class="dropdown--list dropdown--list_positioned_left versions-dropdown-data" role="listbox" data-role="dropdown-listbox" aria-label="Versions" id="versions-listbox">
+    <div class="dropdown--header" data-remove-style="true" style="display: none"><span>Select version</span><button class="button" data-role="dropdown-toggle" aria-label="Close versions selection"><i class="ui-kit-icon ui-kit-icon_cross"></i></button></div>
+<a href="../../../../../dialects/dialect-postgres/dev.s7a.sqldelight.check.dialects.postgres/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.3.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.3.1</span></a><a href="index.html" class="dropdown--option dropdown--option_active dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.3.0"><span class="dropdown--option-icon dropdown--option-icon_selected"></span><span class="dropdown--option-text">0.3.0</span></a><a href="../../../../0.2.2/dialects/dialect-postgres/dev.s7a.sqldelight.check.dialects.postgres/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.2"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.2</span></a><a href="../../../../0.2.1/dialects/dialect-postgres/dev.s7a.sqldelight.check.dialects.postgres/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.1</span></a><a href="../../../../0.2.0/dialects/dialect-postgres/dev.s7a.sqldelight.check.dialects.postgres/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.0</span></a><a href="../../../../../not-found-version.html?v=0.1.1" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.1</span></a><a href="../../../../../not-found-version.html?v=0.1.0" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.0</span></a></div>
+  <div class="dropdown--overlay"></div>
+</div>
+</dokka-template-command>        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":dialects:dialect-postgres/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":dialects:dialect-postgres/main" data-filter=":dialects:dialect-postgres/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    sqldelight-check
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="sqldelight-check-dialect-postgres::dev.s7a.sqldelight.check.dialects.postgres////PointingToDeclaration//477534331">
+  <div class="breadcrumbs"><a href="../index.html">sqldelight-check-dialect-postgres</a><span class="delimiter">/</span><span class="current">dev.s7a.sqldelight.check.dialects.postgres</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-379559225%2FClasslikes%2F477534331" anchor-label="ColumnDropOperation" id="-379559225%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-column-drop-operation/index.html"><span>Column</span><wbr><span>Drop</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-379559225%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-column-drop-operation/index.html">ColumnDropOperation</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Drops a column from an existing table.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1816618026%2FClasslikes%2F477534331" anchor-label="ColumnRenameOperation" id="-1816618026%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-column-rename-operation/index.html"><span>Column</span><wbr><span>Rename</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1816618026%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-column-rename-operation/index.html">ColumnRenameOperation</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Renames a column in an existing table.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-410339806%2FClasslikes%2F477534331" anchor-label="ColumnTypeChangeOperation" id="-410339806%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-column-type-change-operation/index.html"><span>Column</span><wbr><span>Type</span><wbr><span>Change</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-410339806%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-column-type-change-operation/index.html">ColumnTypeChangeOperation</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Changes an existing column type.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1144083290%2FClasslikes%2F477534331" anchor-label="ConcurrentlyClause" id="-1144083290%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-concurrently-clause/index.html"><span>Concurrently</span><wbr><span><span>Clause</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1144083290%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-concurrently-clause/index.html">ConcurrentlyClause</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a <code class="lang-kotlin">CONCURRENTLY</code> clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1248268663%2FClasslikes%2F477534331" anchor-label="CreateConcurrentIndexStatementStart" id="1248268663%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-create-concurrent-index-statement-start/index.html"><span>Create</span><wbr><span>Concurrent</span><wbr><span>Index</span><wbr><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1248268663%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-create-concurrent-index-statement-start/index.html">CreateConcurrentIndexStatementStart</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a concurrent <code class="lang-kotlin">CREATE INDEX</code> statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-387782588%2FClasslikes%2F477534331" anchor-label="NotValidConstraintClause" id="-387782588%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-not-valid-constraint-clause/index.html"><span>Not</span><wbr><span>Valid</span><wbr><span>Constraint</span><wbr><span><span>Clause</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-387782588%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-not-valid-constraint-clause/index.html">NotValidConstraintClause</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a <code class="lang-kotlin">NOT VALID</code> constraint clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1435170891%2FClasslikes%2F477534331" anchor-label="PostgresDialectProvider" id="1435170891%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-postgres-dialect-provider/index.html"><span>Postgres</span><wbr><span>Dialect</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1435170891%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-postgres-dialect-provider/index.html">PostgresDialectProvider</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-provider/index.html">SqlDialectProvider</a></div><div class="brief "><p class="paragraph">Resolves SQLDelight's PostgreSQL dialect artifact.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1010401865%2FClasslikes%2F477534331" anchor-label="ReindexStatementStart" id="-1010401865%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-reindex-statement-start/index.html"><span>Reindex</span><wbr><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1010401865%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-reindex-statement-start/index.html">ReindexStatementStart</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a <code class="lang-kotlin">REINDEX</code> statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1219832874%2FClasslikes%2F477534331" anchor-label="ReindexSystemTarget" id="1219832874%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-reindex-system-target/index.html"><span>Reindex</span><wbr><span>System</span><wbr><span><span>Target</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1219832874%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-reindex-system-target/index.html">ReindexSystemTarget</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a <code class="lang-kotlin">REINDEX SYSTEM</code> target.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="814144502%2FClasslikes%2F477534331" anchor-label="SerialDataTypeName" id="814144502%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-serial-data-type-name/index.html"><span>Serial</span><wbr><span>Data</span><wbr><span>Type</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="814144502%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-serial-data-type-name/index.html">SerialDataTypeName</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a serial-style generated integer type.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-978036322%2FClasslikes%2F477534331" anchor-label="TableRenameOperation" id="-978036322%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-table-rename-operation/index.html"><span>Table</span><wbr><span>Rename</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-978036322%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-table-rename-operation/index.html">TableRenameOperation</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Renames an existing table.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2039048532%2FClasslikes%2F477534331" anchor-label="VolatileDefaultFunction" id="-2039048532%2FClasslikes%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-volatile-default-function/index.html"><span>Volatile</span><wbr><span>Default</span><wbr><span><span>Function</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2039048532%2FClasslikes%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-volatile-default-function/index.html">VolatileDefaultFunction</a> : <a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a volatile default function.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1865511289%2FProperties%2F477534331" anchor-label="PostgresDialect" id="-1865511289%2FProperties%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-postgres-dialect.html"><span>Postgres</span><wbr><span><span>Dialect</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1865511289%2FProperties%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-postgres-dialect.html">PostgresDialect</a><span class="token operator">: </span><a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect/index.html">SqlDialect</a></div><div class="brief "><p class="paragraph">SQLDelight PostgreSQL dialect metadata.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1077853396%2FProperties%2F477534331" anchor-label="PostgresDialectId" id="-1077853396%2FProperties%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-postgres-dialect-id.html"><span>Postgres</span><wbr><span>Dialect</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1077853396%2FProperties%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-postgres-dialect-id.html">PostgresDialectId</a><span class="token operator">: </span><a href="../../../api/dev.s7a.sqldelight.check.api/-dialect-id/index.html">DialectId</a></div><div class="brief "><p class="paragraph">PostgreSQL dialect ID.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1449243273%2FProperties%2F477534331" anchor-label="PostgresDialectSourcePatterns" id="1449243273%2FProperties%2F477534331" data-filterable-set=":dialects:dialect-postgres/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":dialects:dialect-postgres/main" data-filterable-set=":dialects:dialect-postgres/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-postgres-dialect-source-patterns.html"><span>Postgres</span><wbr><span>Dialect</span><wbr><span>Source</span><wbr><span><span>Patterns</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1449243273%2FProperties%2F477534331"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dialects:dialect-postgres/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-postgres-dialect-source-patterns.html">PostgresDialectSourcePatterns</a><span class="token operator">: </span><a href="../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-patterns/index.html">SqlDialectSourcePatterns</a></div><div class="brief "><p class="paragraph">Source scanner patterns for SQLDelight's PostgreSQL dialect.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

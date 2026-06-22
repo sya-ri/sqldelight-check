@@ -1,0 +1,703 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SqlDialectSourcePatternRole</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    sqldelight-check
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+<dokka-template-command data="{&quot;@class&quot;:&quot;org.jetbrains.dokka.base.templating.ReplaceVersionsCommand&quot;,&quot;location&quot;:&quot;dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html&quot;}"><div class="dropdown versions-dropdown" data-role="dropdown">
+  <div class="button button_dropdown versions-dropdown-button" role="combobox" data-role="dropdown-toggle" aria-controls="versions-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select version" tabindex="0" title="0.3.0"><span class="versions-dropdown-button-text">0.3.0</span></div>
+  <div class="dropdown--list dropdown--list_positioned_left versions-dropdown-data" role="listbox" data-role="dropdown-listbox" aria-label="Versions" id="versions-listbox">
+    <div class="dropdown--header" data-remove-style="true" style="display: none"><span>Select version</span><button class="button" data-role="dropdown-toggle" aria-label="Close versions selection"><i class="ui-kit-icon ui-kit-icon_cross"></i></button></div>
+<a href="../../../../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.3.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.3.1</span></a><a href="index.html" class="dropdown--option dropdown--option_active dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.3.0"><span class="dropdown--option-icon dropdown--option-icon_selected"></span><span class="dropdown--option-text">0.3.0</span></a><a href="../../../../0.2.2/api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.2"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.2</span></a><a href="../../../../0.2.1/api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.1</span></a><a href="../../../../0.2.0/api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.0</span></a><a href="../../../../../not-found-version.html?v=0.1.1" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.1</span></a><a href="../../../../../not-found-version.html?v=0.1.0" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.0</span></a></div>
+  <div class="dropdown--overlay"></div>
+</div>
+</dokka-template-command>        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":api/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":api/main" data-filter=":api/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    sqldelight-check
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="sqldelight-check-api::dev.s7a.sqldelight.check.api/SqlDialectSourcePatternRole///PointingToDeclaration//1081350600">
+  <div class="breadcrumbs"><a href="../../index.html">sqldelight-check-api</a><span class="delimiter">/</span><a href="../index.html">dev.s7a.sqldelight.check.api</a><span class="delimiter">/</span><span class="current">SqlDialectSourcePatternRole</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Sql</span><wbr><span>Dialect</span><wbr><span>Source</span><wbr><span>Pattern</span><wbr><span><span>Role</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">SqlDialectSourcePatternRole</a></div><p class="paragraph">The source-scanner meaning attached to a dialect pattern.</p><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-alias-boundary/index.html">AliasBoundary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-table-reference-boundary/index.html">TableReferenceBoundary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-join-modifier/index.html">JoinModifier</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-statement-start/index.html">StatementStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-sql-delight-statement-start/index.html">SqlDelightStatementStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-sql-delight-executable-statement-start/index.html">SqlDelightExecutableStatementStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-statement-continuation/index.html">StatementContinuation</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-select-list-start/index.html">SelectListStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-clause-boundary/index.html">ClauseBoundary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-major-clause-start/index.html">MajorClauseStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-predicate-start/index.html">PredicateStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-predicate-boundary/index.html">PredicateBoundary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-join-condition-boundary/index.html">JoinConditionBoundary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-boolean-operator/index.html">BooleanOperator</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-set-operator/index.html">SetOperator</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-column-constraint-start/index.html">ColumnConstraintStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-table-constraint-start/index.html">TableConstraintStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-group-by-boundary/index.html">GroupByBoundary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-order-by-boundary/index.html">OrderByBoundary</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-keyword-case-target/index.html">KeywordCaseTarget</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-common-function-name/index.html">CommonFunctionName</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-coalesce-alternative-function/index.html">CoalesceAlternativeFunction</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-index-unfriendly-function/index.html">IndexUnfriendlyFunction</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-data-type-name/index.html">DataTypeName</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-alter-table-statement-start/index.html">AlterTableStatementStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-column-add-operation/index.html">ColumnAddOperation</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-column-alter-operation/index.html">ColumnAlterOperation</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-column-set-not-null-operation/index.html">ColumnSetNotNullOperation</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-constraint-add-operation/index.html">ConstraintAddOperation</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-create-index-statement-start/index.html">CreateIndexStatementStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-create-table-statement-start/index.html">CreateTableStatementStart</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-transaction-start-statement/index.html">TransactionStartStatement</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-transaction-end-statement/index.html">TransactionEndStatement</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-default-value-clause/index.html">DefaultValueClause</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-primary-key-constraint/index.html">PrimaryKeyConstraint</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-sql-delight-mappable-storage-type-name/index.html">SqlDelightMappableStorageTypeName</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-expression-continuation/index.html">ExpressionContinuation</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-parenthesized-expression-continuation/index.html">ParenthesizedExpressionContinuation</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-1141938166%2FClasslikes%2F1081350600" anchor-label="AliasBoundary" id="-1141938166%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-alias-boundary/index.html"><span>Alias</span><wbr><span><span>Boundary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1141938166%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-alias-boundary/index.html">AliasBoundary</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a term that cannot be a result alias.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1945241645%2FClasslikes%2F1081350600" anchor-label="AlterTableStatementStart" id="-1945241645%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-alter-table-statement-start/index.html"><span>Alter</span><wbr><span>Table</span><wbr><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1945241645%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-alter-table-statement-start/index.html">AlterTableStatementStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts an <code class="lang-kotlin">ALTER TABLE</code> statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1171781320%2FClasslikes%2F1081350600" anchor-label="BooleanOperator" id="-1171781320%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-boolean-operator/index.html"><span>Boolean</span><wbr><span><span>Operator</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1171781320%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-boolean-operator/index.html">BooleanOperator</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a boolean operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1664135365%2FClasslikes%2F1081350600" anchor-label="ClauseBoundary" id="1664135365%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-clause-boundary/index.html"><span>Clause</span><wbr><span><span>Boundary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1664135365%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-clause-boundary/index.html">ClauseBoundary</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts or ends a major SQL clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-397649306%2FClasslikes%2F1081350600" anchor-label="CoalesceAlternativeFunction" id="-397649306%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-coalesce-alternative-function/index.html"><span>Coalesce</span><wbr><span>Alternative</span><wbr><span><span>Function</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-397649306%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-coalesce-alternative-function/index.html">CoalesceAlternativeFunction</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a function that should be replaced with <code class="lang-kotlin">COALESCE</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-267059678%2FClasslikes%2F1081350600" anchor-label="ColumnAddOperation" id="-267059678%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-column-add-operation/index.html"><span>Column</span><wbr><span>Add</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-267059678%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-column-add-operation/index.html">ColumnAddOperation</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Adds a column to an existing table.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1788918121%2FClasslikes%2F1081350600" anchor-label="ColumnAlterOperation" id="-1788918121%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-column-alter-operation/index.html"><span>Column</span><wbr><span>Alter</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1788918121%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-column-alter-operation/index.html">ColumnAlterOperation</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Alters a column in an existing table.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="422924021%2FClasslikes%2F1081350600" anchor-label="ColumnConstraintStart" id="422924021%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-column-constraint-start/index.html"><span>Column</span><wbr><span>Constraint</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="422924021%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-column-constraint-start/index.html">ColumnConstraintStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a column constraint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-425559509%2FClasslikes%2F1081350600" anchor-label="ColumnSetNotNullOperation" id="-425559509%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-column-set-not-null-operation/index.html"><span>Column</span><wbr><span>Set</span><wbr><span>Not</span><wbr><span>Null</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-425559509%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-column-set-not-null-operation/index.html">ColumnSetNotNullOperation</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Changes an existing column to <code class="lang-kotlin">NOT NULL</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-239838576%2FClasslikes%2F1081350600" anchor-label="CommonFunctionName" id="-239838576%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-common-function-name/index.html"><span>Common</span><wbr><span>Function</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-239838576%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-common-function-name/index.html">CommonFunctionName</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a common SQL function name.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1825409669%2FClasslikes%2F1081350600" anchor-label="ConstraintAddOperation" id="-1825409669%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-constraint-add-operation/index.html"><span>Constraint</span><wbr><span>Add</span><wbr><span><span>Operation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1825409669%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-constraint-add-operation/index.html">ConstraintAddOperation</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Adds a table constraint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="571690491%2FClasslikes%2F1081350600" anchor-label="CreateIndexStatementStart" id="571690491%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-create-index-statement-start/index.html"><span>Create</span><wbr><span>Index</span><wbr><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="571690491%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-create-index-statement-start/index.html">CreateIndexStatementStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a <code class="lang-kotlin">CREATE INDEX</code> statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="809965439%2FClasslikes%2F1081350600" anchor-label="CreateTableStatementStart" id="809965439%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-create-table-statement-start/index.html"><span>Create</span><wbr><span>Table</span><wbr><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="809965439%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-create-table-statement-start/index.html">CreateTableStatementStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a <code class="lang-kotlin">CREATE TABLE</code> statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1846871857%2FClasslikes%2F1081350600" anchor-label="DataTypeName" id="-1846871857%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-data-type-name/index.html"><span>Data</span><wbr><span>Type</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1846871857%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-data-type-name/index.html">DataTypeName</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a SQL data type name.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-249950593%2FClasslikes%2F1081350600" anchor-label="DefaultValueClause" id="-249950593%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-default-value-clause/index.html"><span>Default</span><wbr><span>Value</span><wbr><span><span>Clause</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-249950593%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-default-value-clause/index.html">DefaultValueClause</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a default-value clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="170933839%2FClasslikes%2F1081350600" anchor-label="ExpressionContinuation" id="170933839%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-expression-continuation/index.html"><span>Expression</span><wbr><span><span>Continuation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="170933839%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-expression-continuation/index.html">ExpressionContinuation</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Continues an expression at the same syntactic level.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1501714212%2FClasslikes%2F1081350600" anchor-label="GroupByBoundary" id="1501714212%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-group-by-boundary/index.html"><span>Group</span><wbr><span>By</span><wbr><span><span>Boundary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1501714212%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-group-by-boundary/index.html">GroupByBoundary</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Ends a <code class="lang-kotlin">GROUP BY</code> target list.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2035097270%2FClasslikes%2F1081350600" anchor-label="IndexUnfriendlyFunction" id="2035097270%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-index-unfriendly-function/index.html"><span>Index</span><wbr><span>Unfriendly</span><wbr><span><span>Function</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2035097270%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-index-unfriendly-function/index.html">IndexUnfriendlyFunction</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a function that can make index usage harder in predicates.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-16443287%2FClasslikes%2F1081350600" anchor-label="JoinConditionBoundary" id="-16443287%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-join-condition-boundary/index.html"><span>Join</span><wbr><span>Condition</span><wbr><span><span>Boundary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-16443287%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-join-condition-boundary/index.html">JoinConditionBoundary</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Ends a join condition segment.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="186826141%2FClasslikes%2F1081350600" anchor-label="JoinModifier" id="186826141%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-join-modifier/index.html"><span>Join</span><wbr><span><span>Modifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="186826141%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-join-modifier/index.html">JoinModifier</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a join type modifier.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="185326458%2FClasslikes%2F1081350600" anchor-label="KeywordCaseTarget" id="185326458%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-keyword-case-target/index.html"><span>Keyword</span><wbr><span>Case</span><wbr><span><span>Target</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="185326458%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-keyword-case-target/index.html">KeywordCaseTarget</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a token checked by keyword casing rules.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2015494492%2FClasslikes%2F1081350600" anchor-label="MajorClauseStart" id="-2015494492%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-major-clause-start/index.html"><span>Major</span><wbr><span>Clause</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2015494492%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-major-clause-start/index.html">MajorClauseStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a major clause that should appear on its own line.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1847174155%2FClasslikes%2F1081350600" anchor-label="OrderByBoundary" id="-1847174155%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-order-by-boundary/index.html"><span>Order</span><wbr><span>By</span><wbr><span><span>Boundary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1847174155%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-order-by-boundary/index.html">OrderByBoundary</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Ends an <code class="lang-kotlin">ORDER BY</code> target list.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1773694393%2FClasslikes%2F1081350600" anchor-label="ParenthesizedExpressionContinuation" id="1773694393%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-parenthesized-expression-continuation/index.html"><span>Parenthesized</span><wbr><span>Expression</span><wbr><span><span>Continuation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1773694393%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-parenthesized-expression-continuation/index.html">ParenthesizedExpressionContinuation</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Continues an expression inside parentheses.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1957547011%2FClasslikes%2F1081350600" anchor-label="PredicateBoundary" id="1957547011%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-predicate-boundary/index.html"><span>Predicate</span><wbr><span><span>Boundary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1957547011%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-predicate-boundary/index.html">PredicateBoundary</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Ends a predicate clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="149979859%2FClasslikes%2F1081350600" anchor-label="PredicateStart" id="149979859%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-predicate-start/index.html"><span>Predicate</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="149979859%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-predicate-start/index.html">PredicateStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a predicate clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="474238500%2FClasslikes%2F1081350600" anchor-label="PrimaryKeyConstraint" id="474238500%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-primary-key-constraint/index.html"><span>Primary</span><wbr><span>Key</span><wbr><span><span>Constraint</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="474238500%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-primary-key-constraint/index.html">PrimaryKeyConstraint</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a primary-key constraint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-47084324%2FClasslikes%2F1081350600" anchor-label="SelectListStart" id="-47084324%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-select-list-start/index.html"><span>Select</span><wbr><span>List</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-47084324%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-select-list-start/index.html">SelectListStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a select target list.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1931519554%2FClasslikes%2F1081350600" anchor-label="SetOperator" id="-1931519554%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-set-operator/index.html"><span>Set</span><wbr><span><span>Operator</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1931519554%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-set-operator/index.html">SetOperator</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a set operator.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-268427366%2FClasslikes%2F1081350600" anchor-label="SqlDelightExecutableStatementStart" id="-268427366%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-delight-executable-statement-start/index.html"><span>Sql</span><wbr><span>Delight</span><wbr><span>Executable</span><wbr><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-268427366%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-sql-delight-executable-statement-start/index.html">SqlDelightExecutableStatementStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a SQLDelight executable query statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2070931687%2FClasslikes%2F1081350600" anchor-label="SqlDelightMappableStorageTypeName" id="-2070931687%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-delight-mappable-storage-type-name/index.html"><span>Sql</span><wbr><span>Delight</span><wbr><span>Mappable</span><wbr><span>Storage</span><wbr><span>Type</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2070931687%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-sql-delight-mappable-storage-type-name/index.html">SqlDelightMappableStorageTypeName</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Marks a SQLDelight storage type that can be mapped to a Kotlin type.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1279561020%2FClasslikes%2F1081350600" anchor-label="SqlDelightStatementStart" id="-1279561020%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-delight-statement-start/index.html"><span>Sql</span><wbr><span>Delight</span><wbr><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1279561020%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-sql-delight-statement-start/index.html">SqlDelightStatementStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a SQLDelight statement or declaration body.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1599935522%2FClasslikes%2F1081350600" anchor-label="StatementContinuation" id="-1599935522%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-statement-continuation/index.html"><span>Statement</span><wbr><span><span>Continuation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1599935522%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-statement-continuation/index.html">StatementContinuation</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Continues a statement after a SQLDelight prefix.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-475484021%2FClasslikes%2F1081350600" anchor-label="StatementStart" id="-475484021%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-statement-start/index.html"><span>Statement</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-475484021%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-statement-start/index.html">StatementStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a SQL statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2050913113%2FClasslikes%2F1081350600" anchor-label="TableConstraintStart" id="-2050913113%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-table-constraint-start/index.html"><span>Table</span><wbr><span>Constraint</span><wbr><span><span>Start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2050913113%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-table-constraint-start/index.html">TableConstraintStart</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts a table constraint.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1863787479%2FClasslikes%2F1081350600" anchor-label="TableReferenceBoundary" id="1863787479%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-table-reference-boundary/index.html"><span>Table</span><wbr><span>Reference</span><wbr><span><span>Boundary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1863787479%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-table-reference-boundary/index.html">TableReferenceBoundary</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Ends a table reference segment.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-266242798%2FClasslikes%2F1081350600" anchor-label="TransactionEndStatement" id="-266242798%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-transaction-end-statement/index.html"><span>Transaction</span><wbr><span>End</span><wbr><span><span>Statement</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-266242798%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-transaction-end-statement/index.html">TransactionEndStatement</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Ends an explicit transaction.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1457384039%2FClasslikes%2F1081350600" anchor-label="TransactionStartStatement" id="-1457384039%2FClasslikes%2F1081350600" data-filterable-set=":api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":api/main" data-filterable-set=":api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-transaction-start-statement/index.html"><span>Transaction</span><wbr><span>Start</span><wbr><span><span>Statement</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1457384039%2FClasslikes%2F1081350600"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":api/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-transaction-start-statement/index.html">TransactionStartStatement</a> : <a href="index.html">SqlDialectSourcePatternRole</a></div><div class="brief "><p class="paragraph">Starts an explicit transaction.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
