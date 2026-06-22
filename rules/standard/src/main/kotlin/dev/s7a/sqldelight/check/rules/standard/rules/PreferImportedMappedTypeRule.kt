@@ -36,8 +36,8 @@ public class PreferImportedMappedTypeRule : Rule {
         val importedSimpleNames = importedNames.mapTo(mutableSetOf()) { import -> import.substringAfterLast('.') }
         val mappedTypes =
             content.mappedTypeNames(context.database.dialect.sourcePatterns)
-                .filter { type -> type.text.contains('.') }
-                .groupBy { type -> type.text }
+                .filter { type -> type.outerName.contains('.') }
+                .groupBy { type -> type.outerName }
 
         val candidates =
             mappedTypes.mapNotNull { (qualifiedName, occurrences) ->
@@ -59,7 +59,7 @@ public class PreferImportedMappedTypeRule : Rule {
                 candidates.flatMap { candidate ->
                     candidate.occurrences.map { occurrence ->
                         TextEdit(
-                            range = content.rangeAtOffsets(occurrence.startOffset, occurrence.endOffset),
+                            range = content.rangeAtOffsets(occurrence.startOffset, occurrence.outerEndOffset),
                             replacement = candidate.simpleName,
                         )
                     }
@@ -71,7 +71,7 @@ public class PreferImportedMappedTypeRule : Rule {
                 severity = defaultSeverity,
                 message = "Prefer importing SQLDelight mapped type names.",
                 file = context.file,
-                range = content.rangeAtOffsets(firstOccurrence.startOffset, firstOccurrence.endOffset),
+                range = content.rangeAtOffsets(firstOccurrence.startOffset, firstOccurrence.outerEndOffset),
                 database = context.database,
                 fixes =
                     listOf(

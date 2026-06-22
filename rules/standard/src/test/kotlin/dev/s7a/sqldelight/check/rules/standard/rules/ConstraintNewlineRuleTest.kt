@@ -126,4 +126,19 @@ class ConstraintNewlineRuleTest {
             0,
         )
     }
+
+    @Test
+    fun `accepts multiline generic mapped type column constraints`() {
+        ConstraintNewlineRule().assertDiagnosticCount(
+            """
+            CREATE TABLE example (
+                display_primary_codes TEXT[]
+                    AS kotlin.collections.List<com.example.domain.PrimaryCode> NOT NULL DEFAULT '{}',
+                display_secondary_codes TEXT[]
+                    AS kotlin.collections.Map<kotlin.String, kotlin.collections.List<com.example.domain.SecondaryCode>> NOT NULL
+            );
+            """.asSqlDelightFile(),
+            0,
+        )
+    }
 }
