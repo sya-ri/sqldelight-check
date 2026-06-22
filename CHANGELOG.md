@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.1
+
+### Fixed
+
+- Fixed false positives for SQLDelight mapped type bindings that use generic Kotlin types, including nested generic type
+  arguments and layouts where `AS` starts the mapped type line.
+
+### Maintenance
+
+- Updated Gradle to 9.6.0.
+- Updated maven-publish to 0.37.0.
+- Renamed contributor documentation.
+
 ## v0.3.0
 
 ### Breaking Changes
