@@ -23,7 +23,12 @@ public class SpaceAroundComparisonOperatorsRule : Rule {
             context = context,
             reporter = reporter,
             rule = this,
-            operators = content.sqlCharacters().mapNotNull { character -> content.comparisonOperatorAt(character.offset) },
+            operators =
+                content.sqlCharacters()
+                    .filterNot { character ->
+                        content.isInMappedTypeName(character.offset, context.database.dialect.sourcePatterns)
+                    }
+                    .mapNotNull { character -> content.comparisonOperatorAt(character.offset) },
             canNormalize = content::canNormalizeInlineSpacing,
             message = { operatorText -> "Comparison operator '$operatorText' should have one space on both sides." },
             fixTitle = "Normalize comparison operator spacing",
