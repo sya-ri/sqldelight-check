@@ -22,7 +22,7 @@ public class MappedTypeNameCaseRule : Rule {
     ) {
         val content = context.file.content
         content.mappedTypeNames(context.database.dialect.sourcePatterns).forEach { type ->
-            if (type.text.substringAfterLast('.').firstOrNull()?.isUpperCase() == true) return@forEach
+            if (type.outerName.substringAfterLast('.').firstOrNull()?.isUpperCase() == true) return@forEach
             reporter.report(
                 RuleDiagnostic(
                     severity = defaultSeverity,

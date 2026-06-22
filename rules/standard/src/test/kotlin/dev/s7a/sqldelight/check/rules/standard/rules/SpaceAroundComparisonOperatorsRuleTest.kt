@@ -130,4 +130,19 @@ class SpaceAroundComparisonOperatorsRuleTest {
 
         SpaceAroundComparisonOperatorsRule().assertDiagnosticCount(content, 0)
     }
+
+    @Test
+    fun `ignores generic SQLDelight mapped types`() {
+        val content =
+            """
+            CREATE TABLE example (
+                display_primary_codes TEXT[]
+                    AS kotlin.collections.List<com.example.domain.PrimaryCode> NOT NULL DEFAULT '{}',
+                display_secondary_codes TEXT[]
+                    AS kotlin.collections.Map<kotlin.String, kotlin.collections.List<com.example.domain.SecondaryCode>> NOT NULL
+            );
+            """.asSqlDelightFile()
+
+        SpaceAroundComparisonOperatorsRule().assertDiagnosticCount(content, 0)
+    }
 }

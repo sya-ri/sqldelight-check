@@ -274,4 +274,22 @@ class SourceIndentationRuleTest {
             SourceIndentationRule().diagnostics(input).map { diagnostic -> diagnostic.range },
         )
     }
+
+    @Test
+    fun `accepts multiline generic mapped types in create table columns`() {
+        val input =
+            """
+            CREATE TABLE example (
+                display_primary_codes TEXT[]
+                    AS kotlin.collections.List<com.example.domain.PrimaryCode> NOT NULL DEFAULT '{}',
+                display_secondary_codes TEXT[]
+                    AS kotlin.collections.Map<kotlin.String, kotlin.collections.List<com.example.domain.SecondaryCode>> NOT NULL
+            );
+            """.asSqlDelightFile()
+
+        assertEquals(
+            emptyList(),
+            SourceIndentationRule().diagnostics(input).map { diagnostic -> diagnostic.range },
+        )
+    }
 }

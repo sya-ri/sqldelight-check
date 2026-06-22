@@ -34,4 +34,24 @@ class MappedTypeNameCaseRuleTest {
             expected = 0,
         )
     }
+
+    @Test
+    fun `checks outer generic mapped type name`() {
+        MappedTypeNameCaseRule().assertDiagnosticCount(
+            """
+            CREATE TABLE user (
+              roles TEXT AS kotlin.collections.list<com.example.Role> NOT NULL
+            );
+            """.asSqlDelightFile(),
+            expected = 1,
+        )
+        MappedTypeNameCaseRule().assertDiagnosticCount(
+            """
+            CREATE TABLE user (
+              roles TEXT AS kotlin.collections.List<com.example.Role> NOT NULL
+            );
+            """.asSqlDelightFile(),
+            expected = 0,
+        )
+    }
 }

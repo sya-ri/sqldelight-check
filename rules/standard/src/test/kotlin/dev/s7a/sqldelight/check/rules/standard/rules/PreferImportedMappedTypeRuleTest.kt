@@ -88,6 +88,27 @@ class PreferImportedMappedTypeRuleTest {
     }
 
     @Test
+    fun `imports outer generic mapped type only`() {
+        val content =
+            """
+            CREATE TABLE event (
+              tags TEXT AS kotlin.collections.List<com.example.Tag> NOT NULL
+            );
+            """.asSqlDelightFile()
+
+        assertEquals(
+            """
+            import kotlin.collections.List;
+
+            CREATE TABLE event (
+              tags TEXT AS List<com.example.Tag> NOT NULL
+            );
+            """.asSqlDelightFile(),
+            PreferImportedMappedTypeRule().applyAllFixes(content),
+        )
+    }
+
+    @Test
     fun `accepts imported wildcard and conflicting simple names`() {
         PreferImportedMappedTypeRule().assertDiagnosticCount(
             """

@@ -49,6 +49,8 @@ public class SourceIndentationRule : Rule {
 
         lines.forEach { line ->
             val firstContentOffset = line.firstNonWhitespaceOffset ?: return@forEach
+            if (content.isMappedTypeBindingStart(firstContentOffset, context.database.dialect.sourcePatterns)) return@forEach
+            if (content.isInMappedTypeName(firstContentOffset, context.database.dialect.sourcePatterns)) return@forEach
             val tokenContext = structure.contextAtOffset(firstContentOffset) ?: return@forEach
             if (tokenContext.isCreateIndexOnContinuation(structure)) return@forEach
             val statementBlock = statementBlocks[tokenContext.statementIndex] ?: return@forEach

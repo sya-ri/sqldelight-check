@@ -87,7 +87,8 @@ private fun String.createTableConstraintTokens(
             if (
                 length != null &&
                 token.startOffset > firstLineEnd &&
-                sqlParenthesisDepthAt(token.startOffset) == itemDepth
+                sqlParenthesisDepthAt(token.startOffset) == itemDepth &&
+                !isOnMappedTypeNameLine(token.startOffset, sourcePatterns)
             ) {
                 add(token)
                 index += length
