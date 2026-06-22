@@ -88,6 +88,15 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
                 "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
             )
         }
+        tasks.register("sqldelightCheckBaseline", SqlDelightCheckBaselineTask::class.java) { task ->
+            task.group = taskGroup
+            task.description = "Generates a sqldelight-check baseline file from current diagnostics."
+            task.logLevel.convention(resolveLogLevelOverride(extension))
+            configureBaselineTaskInputs(task)
+            task.notCompatibleWithConfigurationCache(
+                "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
+            )
+        }
     }
 }
 
@@ -120,6 +129,33 @@ private fun Project.configureTaskInputs(task: SqlDelightCheckTask) {
     configureProviderInputs(task)
     configureReportOutputs(task)
     task.baselineFile.convention(extension.baselineFile)
+}
+
+private fun Project.configureSqlDelightSourceInputs(task: SqlDelightCheckBaselineTask) {
+    task.sqlDelightSources.from(
+        provider {
+            fileTree(rootProject.projectDir) { tree ->
+                tree.include("**/*.sq")
+                tree.include("**/*.sqm")
+                tree.exclude(".gradle/**")
+                tree.exclude("**/build/**")
+            }
+        },
+    )
+}
+
+private fun Project.configureProviderInputs(task: SqlDelightCheckBaselineTask) {
+    task.ruleSetClasspath.from(configurations.named("sqldelightCheckRuleSet"))
+    task.dialectClasspath.from(configurations.named("sqldelightCheckDialects"))
+}
+
+private fun Project.configureBaselineTaskInputs(task: SqlDelightCheckBaselineTask) {
+    val extension = extensions.getByType(SqlDelightCheckExtension::class.java)
+    configureSqlDelightSourceInputs(task)
+    configureProviderInputs(task)
+    task.baselineFile.convention(
+        extension.baselineFile.orElse(layout.projectDirectory.file("sqldelight-check-baseline.txt")),
+    )
 }
 
 /**

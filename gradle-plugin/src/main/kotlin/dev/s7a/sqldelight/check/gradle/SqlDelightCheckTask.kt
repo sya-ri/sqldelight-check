@@ -372,7 +372,7 @@ private fun Severity.logLabel(): String =
         Severity.Error -> "error"
     }
 
-private fun deprecatedRuleMessage(
+internal fun deprecatedRuleMessage(
     database: DatabaseContext,
     ruleId: QualifiedRuleId,
     deprecation: RuleDeprecation,
@@ -397,7 +397,7 @@ private fun deprecatedRuleMessage(
         }
     }
 
-private fun unknownRuleOptionMessage(
+internal fun unknownRuleOptionMessage(
     database: DatabaseContext,
     ruleId: QualifiedRuleId,
     optionName: String,
@@ -418,7 +418,7 @@ private fun unknownRuleOptionMessage(
         }
     }
 
-private fun deprecatedRuleOptionMessage(
+internal fun deprecatedRuleOptionMessage(
     database: DatabaseContext,
     ruleId: QualifiedRuleId,
     optionName: String,
@@ -499,7 +499,7 @@ internal data class FileRuleKey(
     val filePath: String,
 )
 
-private fun validateConfiguredRules(
+internal fun validateConfiguredRules(
     config: CheckConfig,
     registry: RuleRegistry,
 ) {

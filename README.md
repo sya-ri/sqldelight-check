@@ -35,10 +35,12 @@ Use the Gradle tasks installed by the plugin:
 
 ```shell
 ./gradlew sqldelightCheck
+./gradlew sqldelightCheckBaseline
 ./gradlew sqldelightFix
 ```
 
 - `sqldelightCheck`: run rules and reports without modifying files.
+- `sqldelightCheckBaseline`: generate a baseline file from current diagnostics.
 - `sqldelightFix`: apply allowed fixes, re-run rules, then write reports.
 
 The first rules are lint-style rules with safe fixes. Formatting rules can use the same check/fix task model when they
@@ -187,6 +189,12 @@ Use a baseline file when existing diagnostics should be ignored without adding S
 sqldelightCheck {
     baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
 }
+```
+
+Generate or refresh the configured baseline file from the current diagnostics:
+
+```shell
+./gradlew sqldelightCheckBaseline
 ```
 
 The baseline file is UTF-8 text with one diagnostic per line. Empty lines and lines starting with `#` are ignored.

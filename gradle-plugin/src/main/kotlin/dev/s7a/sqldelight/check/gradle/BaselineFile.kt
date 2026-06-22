@@ -14,6 +14,38 @@ internal fun File.readSqldelightCheckBaseline(): Baseline {
     return Baseline(entries)
 }
 
+internal fun File.writeSqldelightCheckBaseline(entries: Collection<BaselineEntry>) {
+    parentFile?.mkdirs()
+    val content =
+        buildString {
+            appendLine("# database\truleId\tpath\tline\tcolumn\tmessage")
+            entries
+                .sortedWith(
+                    compareBy<BaselineEntry> { it.database }
+                        .thenBy { it.path }
+                        .thenBy { it.line }
+                        .thenBy { it.column }
+                        .thenBy { it.ruleId.value }
+                        .thenBy { it.message },
+                )
+                .forEach { entry ->
+                    append(entry.database.escapeBaselineField())
+                    append('\t')
+                    append(entry.ruleId.value.escapeBaselineField())
+                    append('\t')
+                    append(entry.path.escapeBaselineField())
+                    append('\t')
+                    append(entry.line)
+                    append('\t')
+                    append(entry.column)
+                    append('\t')
+                    append(entry.message.escapeBaselineField())
+                    appendLine()
+                }
+        }
+    writeText(content, StandardCharsets.UTF_8)
+}
+
 private fun String.baselineEntryOrNull(
     lineNumber: Int,
     file: File,
@@ -69,3 +101,18 @@ private fun String.unescapeBaselineField(): String {
     if (escaping) builder.append('\\')
     return builder.toString()
 }
+
+private fun String.escapeBaselineField(): String =
+    buildString(length) {
+        this@escapeBaselineField.forEach { character ->
+            append(
+                when (character) {
+                    '\n' -> "\\n"
+                    '\r' -> "\\r"
+                    '\t' -> "\\t"
+                    '\\' -> "\\\\"
+                    else -> character.toString()
+                },
+            )
+        }
+    }
