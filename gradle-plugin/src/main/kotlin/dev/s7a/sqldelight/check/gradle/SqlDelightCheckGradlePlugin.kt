@@ -10,6 +10,7 @@ import java.util.Collections
 import java.util.Enumeration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 /**
@@ -88,11 +89,20 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
                 "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
             )
         }
+        tasks.register("sqldelightCheckBaseline", SqlDelightCheckBaselineTask::class.java) { task ->
+            task.group = taskGroup
+            task.description = "Generates a sqldelight-check baseline file from current diagnostics."
+            task.logLevel.convention(resolveLogLevelOverride(extension))
+            configureBaselineTaskInputs(task)
+            task.notCompatibleWithConfigurationCache(
+                "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
+            )
+        }
     }
 }
 
-private fun Project.configureSqlDelightSourceInputs(task: SqlDelightCheckTask) {
-    task.sqlDelightSources.from(
+private fun Project.configureSqlDelightSourceInputs(sources: ConfigurableFileCollection) {
+    sources.from(
         provider {
             fileTree(rootProject.projectDir) { tree ->
                 tree.include("**/*.sq")
@@ -104,10 +114,12 @@ private fun Project.configureSqlDelightSourceInputs(task: SqlDelightCheckTask) {
     )
 }
 
-private fun Project.configureProviderInputs(task: SqlDelightCheckTask) {
-    task.ruleSetClasspath.from(configurations.named("sqldelightCheckRuleSet"))
-    task.reporterClasspath.from(configurations.named("sqldelightCheckReporter"))
-    task.dialectClasspath.from(configurations.named("sqldelightCheckDialects"))
+private fun Project.configureRuleAndDialectInputs(
+    ruleSetClasspath: ConfigurableFileCollection,
+    dialectClasspath: ConfigurableFileCollection,
+) {
+    ruleSetClasspath.from(configurations.named("sqldelightCheckRuleSet"))
+    dialectClasspath.from(configurations.named("sqldelightCheckDialects"))
 }
 
 private fun Project.configureReportOutputs(task: SqlDelightCheckTask) {
@@ -115,9 +127,21 @@ private fun Project.configureReportOutputs(task: SqlDelightCheckTask) {
 }
 
 private fun Project.configureTaskInputs(task: SqlDelightCheckTask) {
-    configureSqlDelightSourceInputs(task)
-    configureProviderInputs(task)
+    val extension = extensions.getByType(SqlDelightCheckExtension::class.java)
+    configureSqlDelightSourceInputs(task.sqlDelightSources)
+    configureRuleAndDialectInputs(task.ruleSetClasspath, task.dialectClasspath)
+    task.reporterClasspath.from(configurations.named("sqldelightCheckReporter"))
     configureReportOutputs(task)
+    task.baselineFile.convention(extension.baselineFile)
+}
+
+private fun Project.configureBaselineTaskInputs(task: SqlDelightCheckBaselineTask) {
+    val extension = extensions.getByType(SqlDelightCheckExtension::class.java)
+    configureSqlDelightSourceInputs(task.sqlDelightSources)
+    configureRuleAndDialectInputs(task.ruleSetClasspath, task.dialectClasspath)
+    task.baselineFile.convention(
+        extension.baselineFile.orElse(layout.projectDirectory.file("sqldelight-check-baseline.txt")),
+    )
 }
 
 /**

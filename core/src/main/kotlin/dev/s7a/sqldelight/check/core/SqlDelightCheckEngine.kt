@@ -81,7 +81,7 @@ public class SqlDelightCheckEngine {
             }
             traceRuleOptionConfiguration(database, candidate.ruleId, candidate.rule, ruleConfig, trace)
         }
-        return files.flatMap { file -> runRulesForFile(database, file, rules, refinementsByRuleId, resolver, trace) }
+        return files.flatMap { file -> runRulesForFile(database, file, rules, refinementsByRuleId, resolver, config, trace) }
     }
 
     private fun runRulesForFile(
@@ -90,6 +90,7 @@ public class SqlDelightCheckEngine {
         rules: List<RuleCandidate>,
         refinementsByRuleId: Map<QualifiedRuleId, List<DiagnosticRefinement>>,
         resolver: ConfigurationResolver,
+        config: CheckConfig,
         trace: AnalysisTrace,
     ): List<Diagnostic> {
         val facts = SourceSqlFactsExtractor.extract(file, database.dialect)
@@ -125,7 +126,9 @@ public class SqlDelightCheckEngine {
                         ?.let(diagnostics::add)
                 }
                 diagnostics
-            }.filterNot(disableDirectives::suppresses)
+            }.filterNot { diagnostic ->
+                disableDirectives.suppresses(diagnostic) || config.baseline.suppresses(diagnostic)
+            }
         trace.fileRules(database, file, executedRuleIds)
         return diagnostics +
             coreRuleSeverity(resolver, database.name, coreRequireSuppressionReasonRuleId).orEmptyDiagnostics { severity ->
