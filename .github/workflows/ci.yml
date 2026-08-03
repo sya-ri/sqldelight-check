@@ -45,4 +45,4 @@ jobs:
           fetch-depth: 0
 
       - name: Qodana
-        uses: JetBrains/qodana-action@v2026.1.3
+        uses: JetBrains/qodana-action@v2026.2.0
