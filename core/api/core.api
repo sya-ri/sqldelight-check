@@ -7,28 +7,45 @@ public final class dev/s7a/sqldelight/check/core/AnalysisInput {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class dev/s7a/sqldelight/check/core/AnalysisPhase : java/lang/Enum {
+	public static final field FactExtraction Ldev/s7a/sqldelight/check/core/AnalysisPhase;
+	public static final field Tokenization Ldev/s7a/sqldelight/check/core/AnalysisPhase;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/s7a/sqldelight/check/core/AnalysisPhase;
+	public static fun values ()[Ldev/s7a/sqldelight/check/core/AnalysisPhase;
+}
+
 public abstract interface class dev/s7a/sqldelight/check/core/AnalysisTrace {
+	public fun analysisPhaseTiming (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/core/AnalysisPhase;J)V
 	public abstract fun databaseFiles (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)V
 	public fun deprecatedRule (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;Z)V
 	public fun deprecatedRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)V
 	public abstract fun fileRules (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/util/List;)V
+	public fun getCollectsPerformanceMetrics ()Z
+	public fun ruleTiming (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;J)V
 	public fun unknownRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/util/Set;)V
 }
 
 public final class dev/s7a/sqldelight/check/core/AnalysisTrace$DefaultImpls {
+	public static fun analysisPhaseTiming (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/core/AnalysisPhase;J)V
 	public static fun deprecatedRule (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;Z)V
 	public static fun deprecatedRuleOption (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)V
+	public static fun getCollectsPerformanceMetrics (Ldev/s7a/sqldelight/check/core/AnalysisTrace;)Z
+	public static fun ruleTiming (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;J)V
 	public static fun unknownRuleOption (Ldev/s7a/sqldelight/check/core/AnalysisTrace;Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/util/Set;)V
 }
 
 public final class dev/s7a/sqldelight/check/core/AnalysisTrace$None : dev/s7a/sqldelight/check/core/AnalysisTrace {
 	public static final field INSTANCE Ldev/s7a/sqldelight/check/core/AnalysisTrace$None;
+	public fun analysisPhaseTiming (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/core/AnalysisPhase;J)V
 	public fun databaseFiles (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ljava/util/List;)V
 	public fun deprecatedRule (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ldev/s7a/sqldelight/check/rule/api/RuleDeprecation;Z)V
 	public fun deprecatedRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ldev/s7a/sqldelight/check/rule/api/RuleOptionDeprecation;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun fileRules (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ljava/util/List;)V
+	public fun getCollectsPerformanceMetrics ()Z
 	public fun hashCode ()I
+	public fun ruleTiming (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/SourceFile;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;J)V
 	public fun toString ()Ljava/lang/String;
 	public fun unknownRuleOption (Ldev/s7a/sqldelight/check/api/DatabaseContext;Ldev/s7a/sqldelight/check/api/QualifiedRuleId;Ljava/lang/String;Ljava/util/Set;)V
 }

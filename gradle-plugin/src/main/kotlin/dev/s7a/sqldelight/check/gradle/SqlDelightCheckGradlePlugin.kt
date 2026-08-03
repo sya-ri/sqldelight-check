@@ -70,6 +70,7 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
             task.description = "Runs configured SQLDelight rules without modifying files."
             task.applyFixes.convention(false)
             task.logLevel.convention(resolveLogLevelOverride(extension))
+            task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
             configureTaskInputs(task)
             task.notCompatibleWithConfigurationCache(
                 "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
@@ -84,6 +85,7 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
             task.description = "Applies allowed SQLDelight fixes, re-runs rules, and writes reports."
             task.applyFixes.convention(true)
             task.logLevel.convention(resolveLogLevelOverride(extension))
+            task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
             configureTaskInputs(task)
             task.notCompatibleWithConfigurationCache(
                 "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
@@ -159,6 +161,21 @@ private fun Project.resolveLogLevelOverride(extension: SqlDelightCheckExtension)
             }
         }
         .orElse(extension.logLevel)
+
+/**
+ * Resolves the opt-in task performance metrics flag from the CLI or extension.
+ */
+private fun Project.resolvePerformanceMetricsOverride(extension: SqlDelightCheckExtension) =
+    providers
+        .gradleProperty("sqldelightCheck.performanceMetrics")
+        .map { value ->
+            when (value.lowercase()) {
+                "true" -> true
+                "false" -> false
+                else -> throw IllegalArgumentException(value)
+            }
+        }
+        .orElse(extension.performanceMetrics)
 
 /**
  * Returns the reporter registry attached to this project.

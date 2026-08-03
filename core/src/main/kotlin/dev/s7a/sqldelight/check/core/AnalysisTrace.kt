@@ -14,6 +14,14 @@ import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
  */
 public interface AnalysisTrace {
     /**
+     * Whether the engine should measure rule and shared analysis execution.
+     *
+     * Implementations should return `false` unless they consume timing events.
+     */
+    public val collectsPerformanceMetrics: Boolean
+        get() = false
+
+    /**
      * Signals the resolved SQLDelight files for a database before rules run.
      */
     public fun databaseFiles(
@@ -29,6 +37,28 @@ public interface AnalysisTrace {
         file: SourceFile,
         ruleIds: List<QualifiedRuleId>,
     )
+
+    /**
+     * Signals the measured duration of one executed rule.
+     */
+    public fun ruleTiming(
+        database: DatabaseContext,
+        file: SourceFile,
+        ruleId: QualifiedRuleId,
+        durationNanos: Long,
+    ) {
+    }
+
+    /**
+     * Signals the measured duration of a shared analysis phase.
+     */
+    public fun analysisPhaseTiming(
+        database: DatabaseContext,
+        file: SourceFile,
+        phase: AnalysisPhase,
+        durationNanos: Long,
+    ) {
+    }
 
     /**
      * Signals that user configuration explicitly mentions a deprecated rule.
