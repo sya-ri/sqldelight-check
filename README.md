@@ -11,7 +11,7 @@ resolves database source files and dialect metadata, then runs sqldelight-check 
 
 ## Status
 
-sqldelight-check is pre-release. The latest release is `v0.3.1`.
+sqldelight-check is pre-release. The latest release is `v0.3.2`.
 
 The initial release focuses on Gradle plugin usage. There is no standalone CLI.
 
@@ -21,7 +21,7 @@ Apply the sqldelight-check Gradle plugin to the Gradle project that already appl
 
 ```kotlin
 plugins {
-    id("dev.s7a.sqldelight.check") version "0.3.1"
+    id("dev.s7a.sqldelight.check") version "0.3.2"
 }
 ```
 
