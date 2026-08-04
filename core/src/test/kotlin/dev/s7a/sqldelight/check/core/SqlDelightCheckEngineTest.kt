@@ -25,6 +25,8 @@ import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.system.measureNanoTime
 
 /**
  * Tests for core rule execution.
@@ -409,6 +411,66 @@ class SqlDelightCheckEngineTest {
 
         assertEquals("Select:2:2:1:player.id,team.name,team.id,player.team_id", diagnostics.single().message)
         assertEquals(SqlStatementKind.Select, SqlStatementKind.valueOf(diagnostics.single().message.substringBefore(":")))
+    }
+
+    @Test
+    fun `performance trace measures copied files and executed rules`() {
+        val trace = PerformanceTrace()
+        val content = "SELECT player.id, team.name FROM player JOIN team ON team.id = player.team_id;"
+        val input =
+            AnalysisInput(
+                database = testInput().database,
+                files =
+                    listOf(
+                        SourceFile(path = "src/main/sqldelight/TestOne.sq", content = content),
+                        SourceFile(path = "src/main/sqldelight/TestTwo.sq", content = content),
+                    ),
+            )
+
+        val diagnostics =
+            SqlDelightCheckEngine().run(
+                inputs = listOf(input),
+                ruleSetProviders = listOf(testRuleSet()),
+                trace = trace,
+            )
+
+        assertEquals(2, diagnostics.size)
+        assertEquals(2, trace.ruleInvocations[ruleId])
+        assertEquals(2, trace.phaseInvocations[AnalysisPhase.Tokenization])
+        assertEquals(2, trace.phaseInvocations[AnalysisPhase.FactExtraction])
+        assertTrue(trace.ruleDurations.all { duration -> duration > 0 })
+        assertTrue(trace.phaseDurations.all { duration -> duration > 0 })
+    }
+
+    @Test
+    fun `copied files scale without superlinear analysis cost`() {
+        val content = "SELECT player.id, team.name FROM player JOIN team ON team.id = player.team_id;"
+        val oneFile =
+            testInput(
+                content = content,
+            )
+        val eightFiles =
+            AnalysisInput(
+                database = oneFile.database,
+                files =
+                    (1..8).map { index ->
+                        SourceFile(path = "src/main/sqldelight/Test$index.sq", content = content)
+                    },
+            )
+        val engine = SqlDelightCheckEngine()
+        val providers = listOf(testRuleSet())
+        repeat(2) {
+            engine.run(inputs = listOf(oneFile), ruleSetProviders = providers)
+            engine.run(inputs = listOf(eightFiles), ruleSetProviders = providers)
+        }
+
+        val oneFileNanos = measureNanoTime { engine.run(inputs = listOf(oneFile), ruleSetProviders = providers) }
+        val eightFilesNanos = measureNanoTime { engine.run(inputs = listOf(eightFiles), ruleSetProviders = providers) }
+
+        assertTrue(
+            eightFilesNanos < oneFileNanos * 16 + 100_000_000L,
+            "oneFile=${oneFileNanos / 1_000_000}ms eightFiles=${eightFilesNanos / 1_000_000}ms",
+        )
     }
 
     @Test
@@ -859,6 +921,47 @@ private class DeprecationTrace : AnalysisTrace {
                 if (enabled) "enabled" else "disabled",
                 deprecation.replacement?.value.orEmpty(),
             ).joinToString(":")
+    }
+}
+
+private class PerformanceTrace : AnalysisTrace {
+    override val collectsPerformanceMetrics: Boolean = true
+    val ruleInvocations = mutableMapOf<QualifiedRuleId, Int>()
+    val phaseInvocations = mutableMapOf<AnalysisPhase, Int>()
+    val ruleDurations = mutableListOf<Long>()
+    val phaseDurations = mutableListOf<Long>()
+
+    override fun databaseFiles(
+        database: DatabaseContext,
+        files: List<SourceFile>,
+    ) {
+    }
+
+    override fun fileRules(
+        database: DatabaseContext,
+        file: SourceFile,
+        ruleIds: List<QualifiedRuleId>,
+    ) {
+    }
+
+    override fun ruleTiming(
+        database: DatabaseContext,
+        file: SourceFile,
+        ruleId: QualifiedRuleId,
+        durationNanos: Long,
+    ) {
+        ruleInvocations[ruleId] = ruleInvocations.getOrDefault(ruleId, 0) + 1
+        ruleDurations += durationNanos
+    }
+
+    override fun analysisPhaseTiming(
+        database: DatabaseContext,
+        file: SourceFile,
+        phase: AnalysisPhase,
+        durationNanos: Long,
+    ) {
+        phaseInvocations[phase] = phaseInvocations.getOrDefault(phase, 0) + 1
+        phaseDurations += durationNanos
     }
 }
 

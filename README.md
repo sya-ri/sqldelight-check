@@ -121,6 +121,9 @@ sqldelightCheck {
     baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
 
     logLevel.set(LogLevel.Verbose)
+
+    // Opt in to per-rule and shared-analysis timing in task logs.
+    performanceMetrics.set(true)
 }
 ```
 
@@ -144,6 +147,16 @@ You can override the configured level temporarily from the command line:
 ```shell
 ./gradlew -PsqldelightCheck.logLevel=debug sqldelightCheck
 ```
+
+Performance metrics are disabled by default. Enable them in the Gradle DSL with
+`performanceMetrics.set(true)` or temporarily with:
+
+```shell
+./gradlew -PsqldelightCheck.performanceMetrics=true sqldelightCheck
+```
+
+The task prints rule timings aggregated by database and qualified rule ID, sorted by total duration, followed by
+shared tokenization and fact-extraction timings.
 
 ## Disable Diagnostics
 

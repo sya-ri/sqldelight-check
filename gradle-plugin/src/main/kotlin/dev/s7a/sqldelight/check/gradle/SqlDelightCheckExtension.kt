@@ -84,6 +84,14 @@ public open class SqlDelightCheckExtension
         public val logLevel: Property<LogLevel> =
             objects.property(LogLevel::class.java).convention(LogLevel.Info)
 
+        /**
+         * Enables per-rule and shared-analysis performance metrics in task logs.
+         *
+         * Metrics are disabled by default because timing itself adds overhead.
+         */
+        public val performanceMetrics: Property<Boolean> =
+            objects.property(Boolean::class.java).convention(false)
+
         private val ruleSetsDsl: RuleSetContainerExtension = RuleSetContainerExtension(ruleSets)
         private val rulesDsl: RuleContainerExtension = RuleContainerExtension(rules)
         private val reportsDsl: ReporterContainerExtension = ReporterContainerExtension(reports)

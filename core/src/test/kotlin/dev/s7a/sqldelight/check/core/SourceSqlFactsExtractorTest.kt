@@ -13,6 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.system.measureNanoTime
 
 /**
  * Tests for the source-only SQL fact extractor used before parser-backed facts
@@ -167,10 +168,45 @@ class SourceSqlFactsExtractorTest {
         assertEquals(listOf(null), statement.tableReferences.map { reference -> reference.alias })
     }
 
+    @Test
+    fun `large source facts extraction exposes the performance regression`() {
+        val small = performanceWorkload(16)
+        val large = performanceWorkload(64)
+
+        repeat(2) {
+            extract(small)
+            extract(large)
+        }
+        val smallNanos = measureNanoTime { extract(small) }
+        val largeNanos = measureNanoTime { extract(large) }
+
+        assertTrue(
+            actual = largeNanos < smallNanos * 8 + 50_000_000L,
+            message = "small=${smallNanos / 1_000_000}ms large=${largeNanos / 1_000_000}ms",
+        )
+    }
+
     private fun extract(
         content: String,
         dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
     ) = SourceSqlFactsExtractor.extract(SourceFile(path = "src/main/sqldelight/com/example/Test.sq", content = content), dialect)
+
+    private fun performanceWorkload(statementCount: Int): String =
+        buildString {
+            repeat(statementCount) { index ->
+                append(
+                    """
+                    query$index:
+                    SELECT player.id, team.name, (SELECT max(score) FROM scores WHERE scores.player_id = player.id) AS best_score, player.name
+                    FROM player
+                    LEFT OUTER JOIN team ON team.id = player.team_id
+                    WHERE player.id IN (SELECT player_id FROM roster WHERE active = 1)
+                      AND player.name IN (?, ?, ?, ?);
+                    """.trimIndent(),
+                )
+                append('\n')
+            }
+        }
 
     private fun String.textIn(range: SourceRange): String = substring(range.start.toOffsetIn(this), range.end.toOffsetIn(this))
 

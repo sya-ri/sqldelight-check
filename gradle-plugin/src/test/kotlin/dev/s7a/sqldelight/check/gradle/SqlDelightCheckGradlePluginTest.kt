@@ -87,6 +87,67 @@ class SqlDelightCheckGradlePluginTest {
     }
 
     @Test
+    fun `performance metrics are absent by default`() {
+        val project = testProject(sqlDelightBuildScript())
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            "CREATE TABLE player (id INTEGER PRIMARY KEY);\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(false, result.output.contains("sqldelight-check performance metrics"))
+    }
+
+    @Test
+    fun `performance metrics can be enabled through the Gradle DSL`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            performanceMetrics.set(true)
+                            ruleSets {
+                                standard {
+                                    enabled.set(false)
+                                }
+                            }
+                            rules {
+                                rule("standard:final-newline") {
+                                    enabled.set(true)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            "CREATE TABLE player (id INTEGER PRIMARY KEY);\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(true, result.output.contains("sqldelight-check performance metrics (slowest rules first):"))
+        assertEquals(true, result.output.contains("sqldelight-check performance rule [Database] standard:final-newline"))
+        assertEquals(true, result.output.contains("sqldelight-check performance phase [Database] tokenization"))
+    }
+
+    @Test
+    fun `performance metrics can be enabled through the Gradle property`() {
+        val project = testProject(sqlDelightBuildScript())
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            "CREATE TABLE player (id INTEGER PRIMARY KEY);\n",
+        )
+
+        val result = project.run("-PsqldelightCheck.performanceMetrics=true", "sqldelightCheck")
+
+        assertEquals(true, result.output.contains("sqldelight-check performance metrics (slowest rules first):"))
+    }
+
+    @Test
     fun `gradle check task runs sqldelight check task`() {
         val project =
             testProject(
