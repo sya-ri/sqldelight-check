@@ -1,0 +1,901 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>dev.s7a.sqldelight.check.rule.api</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
+                    sqldelight-check
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+<dokka-template-command data="{&quot;@class&quot;:&quot;org.jetbrains.dokka.base.templating.ReplaceVersionsCommand&quot;,&quot;location&quot;:&quot;dev.s7a.sqldelight.check.rule.api/index.html&quot;}"><div class="dropdown versions-dropdown" data-role="dropdown">
+  <div class="button button_dropdown versions-dropdown-button" role="combobox" data-role="dropdown-toggle" aria-controls="versions-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select version" tabindex="0" title="0.3.1"><span class="versions-dropdown-button-text">0.3.1</span></div>
+  <div class="dropdown--list dropdown--list_positioned_left versions-dropdown-data" role="listbox" data-role="dropdown-listbox" aria-label="Versions" id="versions-listbox">
+    <div class="dropdown--header" data-remove-style="true" style="display: none"><span>Select version</span><button class="button" data-role="dropdown-toggle" aria-label="Close versions selection"><i class="ui-kit-icon ui-kit-icon_cross"></i></button></div>
+<a href="../../../../rule-api/dev.s7a.sqldelight.check.rule.api/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.3.2"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.3.2</span></a><a href="index.html" class="dropdown--option dropdown--option_active dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.3.1"><span class="dropdown--option-icon dropdown--option-icon_selected"></span><span class="dropdown--option-text">0.3.1</span></a><a href="../../../0.3.0/rule-api/dev.s7a.sqldelight.check.rule.api/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.3.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.3.0</span></a><a href="../../../0.2.2/rule-api/dev.s7a.sqldelight.check.rule.api/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.2"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.2</span></a><a href="../../../0.2.1/rule-api/dev.s7a.sqldelight.check.rule.api/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.1</span></a><a href="../../../0.2.0/rule-api/dev.s7a.sqldelight.check.rule.api/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.2.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.2.0</span></a><a href="../../../0.1.1/rule-api/dev.s7a.sqldelight.check.rule.api/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.1"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.1</span></a><a href="../../../0.1.0/rule-api/dev.s7a.sqldelight.check.rule.api/index.html" class="dropdown--option dropdown--option-link" style="display: block; padding: 5px; color: #fff" data-remove-style="true" role="option" title="0.1.0"><span class="dropdown--option-icon"></span><span class="dropdown--option-text">0.1.0</span></a></div>
+  <div class="dropdown--overlay"></div>
+</div>
+</dokka-template-command>        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":rule-api/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":rule-api/main" data-filter=":rule-api/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    sqldelight-check
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="sqldelight-check-rule-api::dev.s7a.sqldelight.check.rule.api////PointingToDeclaration//1570137417">
+  <div class="breadcrumbs"><a href="../index.html">sqldelight-check-rule-api</a><span class="delimiter">/</span><span class="current">dev.s7a.sqldelight.check.rule.api</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-1235908005%2FClasslikes%2F1570137417" anchor-label="DiagnosticRefinement" id="-1235908005%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diagnostic-refinement/index.html"><span>Diagnostic</span><wbr><span><span>Refinement</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1235908005%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-diagnostic-refinement/index.html">DiagnosticRefinement</a></div><div class="brief "><p class="paragraph">Refines diagnostics emitted by a rule.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="565648234%2FClasslikes%2F1570137417" anchor-label="DiagnosticRefinementProvider" id="565648234%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diagnostic-refinement-provider/index.html"><span>Diagnostic</span><wbr><span>Refinement</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="565648234%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-diagnostic-refinement-provider/index.html">DiagnosticRefinementProvider</a></div><div class="brief "><p class="paragraph">Creates fresh diagnostic refinement instances for thread-safe analysis.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-340376379%2FClasslikes%2F1570137417" anchor-label="DiagnosticReporter" id="-340376379%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-diagnostic-reporter/index.html"><span>Diagnostic</span><wbr><span><span>Reporter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-340376379%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-diagnostic-reporter/index.html">DiagnosticReporter</a></div><div class="brief "><p class="paragraph">Receives diagnostics emitted by a rule.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1634657014%2FClasslikes%2F1570137417" anchor-label="KeyedEnum" id="1634657014%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-keyed-enum/index.html"><span>Keyed</span><wbr><span><span>Enum</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1634657014%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-keyed-enum/index.html">KeyedEnum</a></div><div class="brief "><p class="paragraph">Enum contract for rule options parsed by stable keys instead of enum names.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1367456497%2FClasslikes%2F1570137417" anchor-label="Rule" id="1367456497%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule/index.html"><span><span>Rule</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1367456497%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-rule/index.html">Rule</a></div><div class="brief "><p class="paragraph">Lint or formatting rule contributed by a rule set.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-138257726%2FClasslikes%2F1570137417" anchor-label="RuleContext" id="-138257726%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule-context/index.html"><span>Rule</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-138257726%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-rule-context/index.html">RuleContext</a></div><div class="brief "><p class="paragraph">Stable analysis view exposed to custom rules.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-637413731%2FClasslikes%2F1570137417" anchor-label="RuleDeprecation" id="-637413731%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule-deprecation/index.html"><span>Rule</span><wbr><span><span>Deprecation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-637413731%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-rule-deprecation/index.html">RuleDeprecation</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>replacement<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-qualified-rule-id/index.html">QualifiedRuleId</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Deprecation metadata for a rule that remains available for explicit users.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2098489348%2FClasslikes%2F1570137417" anchor-label="RuleOption" id="-2098489348%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule-option/index.html"><span>Rule</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2098489348%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="-rule-option/index.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Typed declaration for one rule option.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1923222350%2FClasslikes%2F1570137417" anchor-label="RuleOptionDeprecation" id="-1923222350%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule-option-deprecation/index.html"><span>Rule</span><wbr><span>Option</span><wbr><span><span>Deprecation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1923222350%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>replacement<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Deprecation metadata for a rule option that remains available for explicit users.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-709778253%2FClasslikes%2F1570137417" anchor-label="RuleOptions" id="-709778253%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule-options/index.html"><span>Rule</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-709778253%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-rule-options/index.html">RuleOptions</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">values<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyMap()</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Resolved options for the rule currently being executed.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2050206208%2FClasslikes%2F1570137417" anchor-label="RuleProvider" id="-2050206208%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule-provider/index.html"><span>Rule</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2050206208%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-rule-provider/index.html">RuleProvider</a></div><div class="brief "><p class="paragraph">Creates fresh rule instances for thread-safe analysis.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="717987966%2FClasslikes%2F1570137417" anchor-label="RuleSetProvider" id="717987966%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-rule-set-provider/index.html"><span>Rule</span><wbr><span>Set</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="717987966%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-rule-set-provider/index.html">RuleSetProvider</a></div><div class="brief "><p class="paragraph">Provides a named collection of rules.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="392604724%2FClasslikes%2F1570137417" anchor-label="SqlFacts" id="392604724%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-facts/index.html"><span>Sql</span><wbr><span><span>Facts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="392604724%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-facts/index.html">SqlFacts</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>statements<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-statement-facts/index.html">SqlStatementFacts</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyList()</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stable SQL structure facts exposed to custom rules.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1232385282%2FClasslikes%2F1570137417" anchor-label="SqlJoinFacts" id="-1232385282%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-join-facts/index.html"><span>Sql</span><wbr><span>Join</span><wbr><span><span>Facts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1232385282%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-join-facts/index.html">SqlJoinFacts</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>range<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-range/index.html">SourceRange</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>kind<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>table<span class="token operator">: </span><a href="-sql-table-reference-facts/index.html">SqlTableReferenceFacts</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stable facts for a JOIN clause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1553466461%2FClasslikes%2F1570137417" anchor-label="SqlQualifiedReferenceFacts" id="-1553466461%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-qualified-reference-facts/index.html"><span>Sql</span><wbr><span>Qualified</span><wbr><span>Reference</span><wbr><span><span>Facts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1553466461%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-qualified-reference-facts/index.html">SqlQualifiedReferenceFacts</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>range<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-range/index.html">SourceRange</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>qualifier<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stable facts for a qualified reference such as <code class="lang-kotlin">table.column</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1597139993%2FClasslikes%2F1570137417" anchor-label="SqlResultColumnFacts" id="-1597139993%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-result-column-facts/index.html"><span>Sql</span><wbr><span>Result</span><wbr><span>Column</span><wbr><span><span>Facts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1597139993%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-result-column-facts/index.html">SqlResultColumnFacts</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>range<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-range/index.html">SourceRange</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>alias<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>wildcard<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stable facts for a SELECT result column.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="87598288%2FClasslikes%2F1570137417" anchor-label="SqlSelectFacts" id="87598288%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-select-facts/index.html"><span>Sql</span><wbr><span>Select</span><wbr><span><span>Facts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="87598288%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-select-facts/index.html">SqlSelectFacts</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>selectListRange<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-range/index.html">SourceRange</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>resultColumns<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-result-column-facts/index.html">SqlResultColumnFacts</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stable facts for a SELECT statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1465337199%2FClasslikes%2F1570137417" anchor-label="SqlStatementFacts" id="1465337199%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-statement-facts/index.html"><span>Sql</span><wbr><span>Statement</span><wbr><span><span>Facts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1465337199%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-statement-facts/index.html">SqlStatementFacts</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>kind<span class="token operator">: </span><a href="-sql-statement-kind/index.html">SqlStatementKind</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>range<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-range/index.html">SourceRange</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>select<span class="token operator">: </span><a href="-sql-select-facts/index.html">SqlSelectFacts</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>tableReferences<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-table-reference-facts/index.html">SqlTableReferenceFacts</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyList()<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>joins<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-join-facts/index.html">SqlJoinFacts</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyList()<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>qualifiedReferences<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-qualified-reference-facts/index.html">SqlQualifiedReferenceFacts</a><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyList()</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stable facts for one top-level SQL statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1880152168%2FClasslikes%2F1570137417" anchor-label="SqlStatementKind" id="-1880152168%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-statement-kind/index.html"><span>Sql</span><wbr><span>Statement</span><wbr><span><span>Kind</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1880152168%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-sql-statement-kind/index.html">SqlStatementKind</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-sql-statement-kind/index.html">SqlStatementKind</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Coarse statement kinds used by parser-backed rules.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="808681777%2FClasslikes%2F1570137417" anchor-label="SqlTableReferenceFacts" id="808681777%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-table-reference-facts/index.html"><span>Sql</span><wbr><span>Table</span><wbr><span>Reference</span><wbr><span><span>Facts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="808681777%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-table-reference-facts/index.html">SqlTableReferenceFacts</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>range<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-range/index.html">SourceRange</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>alias<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>subquery<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stable facts for a table or derived-table reference.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2067780094%2FClasslikes%2F1570137417" anchor-label="SqlToken" id="-2067780094%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-token/index.html"><span>Sql</span><wbr><span><span>Token</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2067780094%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-token/index.html">SqlToken</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>startOffset<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>endOffset<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">SQL-like source token outside comments and quoted text.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2024307973%2FClasslikes%2F1570137417" anchor-label="SqlTokenMatch" id="-2024307973%2FClasslikes%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sql-token-match/index.html"><span>Sql</span><wbr><span>Token</span><wbr><span><span>Match</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2024307973%2FClasslikes%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sql-token-match/index.html">SqlTokenMatch</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>startToken<span class="token operator">: </span><a href="-sql-token/index.html">SqlToken</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>endToken<span class="token operator">: </span><a href="-sql-token/index.html">SqlToken</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">A matched range in a SQL token list.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1436690736%2FFunctions%2F1570137417" anchor-label="booleanOption" id="-1436690736%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="boolean-option.html"><span>boolean</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1436690736%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="boolean-option.html"><span class="token function">booleanOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a strict boolean rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="boolean-option.html"><span class="token function">booleanOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a strict boolean rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1675267204%2FFunctions%2F1570137417" anchor-label="containsSourcePattern" id="-1675267204%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="contains-source-pattern.html"><span>contains</span><wbr><span>Source</span><wbr><span><span>Pattern</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1675267204%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-token/index.html">SqlToken</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="contains-source-pattern.html"><span class="token function">containsSourcePattern</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">role<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a><span class="token punctuation">, </span></span><span class="parameter ">sourcePatterns<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-patterns/index.html">SqlDialectSourcePatterns</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Returns true when a source pattern match for <a href="contains-source-pattern.html">role</a> exists.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="516763019%2FFunctions%2F1570137417" anchor-label="enumListOption" id="516763019%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enum-list-option.html"><span>enum</span><wbr><span>List</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="516763019%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="enum-list-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="enum-list-option.html"><span class="token function">enumListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated enum list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="enum-list-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="enum-list-option.html"><span class="token function">enumListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated enum list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1615581013%2FFunctions%2F1570137417" anchor-label="enumOption" id="1615581013%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enum-option.html"><span>enum</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1615581013%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="enum-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="enum-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="enum-option.html"><span class="token function">enumOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="enum-option.html">T</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares an enum rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="enum-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="enum-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="enum-option.html"><span class="token function">enumOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="enum-option.html">T</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="enum-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares an enum rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1348651298%2FFunctions%2F1570137417" anchor-label="findSourcePattern" id="1348651298%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-source-pattern.html"><span>find</span><wbr><span>Source</span><wbr><span><span>Pattern</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1348651298%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-token/index.html">SqlToken</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="find-source-pattern.html"><span class="token function">findSourcePattern</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">role<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a><span class="token punctuation">, </span></span><span class="parameter ">sourcePatterns<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-patterns/index.html">SqlDialectSourcePatterns</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-sql-token-match/index.html">SqlTokenMatch</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Returns the first source pattern match for <a href="find-source-pattern.html">role</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1824716460%2FFunctions%2F1570137417" anchor-label="findSourcePatternsInOrder" id="-1824716460%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-source-patterns-in-order.html"><span>find</span><wbr><span>Source</span><wbr><span>Patterns</span><wbr><span>In</span><wbr><span><span>Order</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1824716460%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-token/index.html">SqlToken</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="find-source-patterns-in-order.html"><span class="token function">findSourcePatternsInOrder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sourcePatterns<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-patterns/index.html">SqlDialectSourcePatterns</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>roles<span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-sql-dialect-source-pattern-role/index.html">SqlDialectSourcePatternRole</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-sql-token-match/index.html">SqlTokenMatch</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Returns the first ordered sequence of source pattern matches.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="107627917%2FFunctions%2F1570137417" anchor-label="intListOption" id="107627917%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="int-list-option.html"><span>int</span><wbr><span>List</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="107627917%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="int-list-option.html"><span class="token function">intListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated integer list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="int-list-option.html"><span class="token function">intListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated integer list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1417596425%2FFunctions%2F1570137417" anchor-label="intOption" id="-1417596425%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="int-option.html"><span>int</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1417596425%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="int-option.html"><span class="token function">intOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares an integer rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="int-option.html"><span class="token function">intOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares an integer rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1349772045%2FFunctions%2F1570137417" anchor-label="isKeyword" id="1349772045%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-keyword.html"><span>is</span><wbr><span><span>Keyword</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1349772045%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-sql-token/index.html">SqlToken</a><span class="token punctuation">.</span><a href="is-keyword.html"><span class="token function">isKeyword</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Returns true when this token matches <a href="is-keyword.html">value</a> ignoring case.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="948967017%2FFunctions%2F1570137417" anchor-label="keyedEnumListOption" id="948967017%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="keyed-enum-list-option.html"><span>keyed</span><wbr><span>Enum</span><wbr><span>List</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="948967017%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="keyed-enum-list-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="keyed-enum-list-option.html">T</a><span class="token operator">&gt;</span>, <a href="-keyed-enum/index.html">KeyedEnum</a><span class="token operator">&gt; </span><a href="keyed-enum-list-option.html"><span class="token function">keyedEnumListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="keyed-enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated keyed enum list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="keyed-enum-list-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="keyed-enum-list-option.html">T</a><span class="token operator">&gt;</span>, <a href="-keyed-enum/index.html">KeyedEnum</a><span class="token operator">&gt; </span><a href="keyed-enum-list-option.html"><span class="token function">keyedEnumListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="keyed-enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="keyed-enum-list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated keyed enum list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="875096847%2FFunctions%2F1570137417" anchor-label="keyedEnumOption" id="875096847%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="keyed-enum-option.html"><span>keyed</span><wbr><span>Enum</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="875096847%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="keyed-enum-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="keyed-enum-option.html">T</a><span class="token operator">&gt;</span>, <a href="-keyed-enum/index.html">KeyedEnum</a><span class="token operator">&gt; </span><a href="keyed-enum-option.html"><span class="token function">keyedEnumOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="keyed-enum-option.html">T</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a keyed enum rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="keyed-enum-option.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="keyed-enum-option.html">T</a><span class="token operator">&gt;</span>, <a href="-keyed-enum/index.html">KeyedEnum</a><span class="token operator">&gt; </span><a href="keyed-enum-option.html"><span class="token function">keyedEnumOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="keyed-enum-option.html">T</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="keyed-enum-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a keyed enum rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1907154311%2FFunctions%2F1570137417" anchor-label="listOption" id="1907154311%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="list-option.html"><span>list</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1907154311%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="list-option.html">T</a><span class="token operator">&gt; </span><a href="list-option.html"><span class="token function">listOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">itemParser<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="list-option.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="list-option.html">T</a><span class="token operator">&gt; </span><a href="list-option.html"><span class="token function">listOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="list-option.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">itemParser<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="list-option.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="list-option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-894150822%2FFunctions%2F1570137417" anchor-label="longListOption" id="-894150822%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="long-list-option.html"><span>long</span><wbr><span>List</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-894150822%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="long-list-option.html"><span class="token function">longListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated long integer list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="long-list-option.html"><span class="token function">longListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated long integer list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1601403372%2FFunctions%2F1570137417" anchor-label="longOption" id="-1601403372%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="long-option.html"><span>long</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1601403372%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="long-option.html"><span class="token function">longOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a long integer rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="long-option.html"><span class="token function">longOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a long integer rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1982299197%2FFunctions%2F1570137417" anchor-label="maskSqlCommentsAndQuotedText" id="-1982299197%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mask-sql-comments-and-quoted-text.html"><span>mask</span><wbr><span>Sql</span><wbr><span>Comments</span><wbr><span>And</span><wbr><span>Quoted</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1982299197%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">.</span><a href="mask-sql-comments-and-quoted-text.html"><span class="token function">maskSqlCommentsAndQuotedText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">hashLineComments<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Replaces comments and quoted text with spaces while preserving offsets.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-256361295%2FFunctions%2F1570137417" anchor-label="nonBlankStringOption" id="-256361295%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="non-blank-string-option.html"><span>non</span><wbr><span>Blank</span><wbr><span>String</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-256361295%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="non-blank-string-option.html"><span class="token function">nonBlankStringOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a non-blank string rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="non-blank-string-option.html"><span class="token function">nonBlankStringOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a non-blank string rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1549205521%2FFunctions%2F1570137417" anchor-label="nonNegativeIntListOption" id="1549205521%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="non-negative-int-list-option.html"><span>non</span><wbr><span>Negative</span><wbr><span>Int</span><wbr><span>List</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1549205521%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="non-negative-int-list-option.html"><span class="token function">nonNegativeIntListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated non-negative integer list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="non-negative-int-list-option.html"><span class="token function">nonNegativeIntListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated non-negative integer list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1915692087%2FFunctions%2F1570137417" anchor-label="nonNegativeIntOption" id="1915692087%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="non-negative-int-option.html"><span>non</span><wbr><span>Negative</span><wbr><span>Int</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1915692087%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="non-negative-int-option.html"><span class="token function">nonNegativeIntOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a non-negative integer rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="non-negative-int-option.html"><span class="token function">nonNegativeIntOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a non-negative integer rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="535352129%2FFunctions%2F1570137417" anchor-label="option" id="535352129%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="option.html"><span><span>option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="535352129%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="option.html">T</a><span class="token operator">&gt; </span><a href="option.html"><span class="token function">option</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">parser<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="option.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="option.html">T</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a custom typed rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="option.html">T</a><span class="token operator">&gt; </span><a href="option.html"><span class="token function">option</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="option.html">T</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">parser<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="option.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="option.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a custom typed rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1940056290%2FFunctions%2F1570137417" anchor-label="positionAt" id="1940056290%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="position-at.html"><span>position</span><wbr><span><span>At</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1940056290%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">.</span><a href="position-at.html"><span class="token function">positionAt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offset<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-position/index.html">SourcePosition</a></div><div class="brief "><p class="paragraph">Converts a source offset into a 1-based line/column position.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1486522797%2FFunctions%2F1570137417" anchor-label="positiveIntListOption" id="1486522797%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="positive-int-list-option.html"><span>positive</span><wbr><span>Int</span><wbr><span>List</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1486522797%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="positive-int-list-option.html"><span class="token function">positiveIntListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated positive integer list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="positive-int-list-option.html"><span class="token function">positiveIntListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated positive integer list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1868935081%2FFunctions%2F1570137417" anchor-label="positiveIntOption" id="-1868935081%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="positive-int-option.html"><span>positive</span><wbr><span>Int</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1868935081%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="positive-int-option.html"><span class="token function">positiveIntOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a positive integer rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="positive-int-option.html"><span class="token function">positiveIntOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a positive integer rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1778734681%2FFunctions%2F1570137417" anchor-label="rangeAtOffsets" id="-1778734681%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="range-at-offsets.html"><span>range</span><wbr><span>At</span><wbr><span><span>Offsets</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1778734681%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">.</span><a href="range-at-offsets.html"><span class="token function">rangeAtOffsets</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">startOffset<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">endOffset<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../api/dev.s7a.sqldelight.check.api/-source-range/index.html">SourceRange</a></div><div class="brief "><p class="paragraph">Converts source offsets into a 1-based line/column range.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-473241767%2FFunctions%2F1570137417" anchor-label="reportSqlStatementMatches" id="-473241767%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="report-sql-statement-matches.html"><span>report</span><wbr><span>Sql</span><wbr><span>Statement</span><wbr><span><span>Matches</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-473241767%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-rule/index.html">Rule</a><span class="token punctuation">.</span><a href="report-sql-statement-matches.html"><span class="token function">reportSqlStatementMatches</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="-rule-context/index.html">RuleContext</a><span class="token punctuation">, </span></span><span class="parameter ">reporter<span class="token operator">: </span><a href="-diagnostic-reporter/index.html">DiagnosticReporter</a><span class="token punctuation">, </span></span><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">hashLineComments<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">findMatch<span class="token operator">: </span><span class="token punctuation">(</span>statement<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-token/index.html">SqlToken</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-sql-token-match/index.html">SqlTokenMatch</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Tokenizes the current file and reports matches found per statement.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-145046508%2FFunctions%2F1570137417" anchor-label="reportSqlTokenMatch" id="-145046508%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="report-sql-token-match.html"><span>report</span><wbr><span>Sql</span><wbr><span>Token</span><wbr><span><span>Match</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-145046508%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-rule/index.html">Rule</a><span class="token punctuation">.</span><a href="report-sql-token-match.html"><span class="token function">reportSqlTokenMatch</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="-rule-context/index.html">RuleContext</a><span class="token punctuation">, </span></span><span class="parameter ">reporter<span class="token operator">: </span><a href="-diagnostic-reporter/index.html">DiagnosticReporter</a><span class="token punctuation">, </span></span><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">match<span class="token operator">: </span><a href="-sql-token-match/index.html">SqlTokenMatch</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Reports a diagnostic for <a href="report-sql-token-match.html">match</a> using this rule's default severity.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-687465794%2FFunctions%2F1570137417" anchor-label="sqlStatements" id="-687465794%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sql-statements.html"><span>sql</span><wbr><span><span>Statements</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-687465794%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-token/index.html">SqlToken</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="sql-statements.html"><span class="token function">sqlStatements</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-sql-token/index.html">SqlToken</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Splits a token stream into statements at semicolon tokens.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-798457761%2FFunctions%2F1570137417" anchor-label="sqlTokens" id="-798457761%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sql-tokens.html"><span>sql</span><wbr><span><span>Tokens</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-798457761%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">.</span><a href="sql-tokens.html"><span class="token function">sqlTokens</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">hashLineComments<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.sequences/-sequence/index.html">Sequence</a><span class="token operator">&lt;</span><a href="-sql-token/index.html">SqlToken</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Tokenizes SQL-like identifiers, numbers, and semicolons outside comments and quoted text.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1820195377%2FFunctions%2F1570137417" anchor-label="stringListOption" id="-1820195377%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="string-list-option.html"><span>string</span><wbr><span>List</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1820195377%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="string-list-option.html"><span class="token function">stringListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated string list rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="string-list-option.html"><span class="token function">stringListOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a comma-separated string list rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2106394817%2FFunctions%2F1570137417" anchor-label="stringOption" id="-2106394817%2FFunctions%2F1570137417" data-filterable-set=":rule-api/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":rule-api/main" data-filterable-set=":rule-api/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="string-option.html"><span>string</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2106394817%2FFunctions%2F1570137417"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":rule-api/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="string-option.html"><span class="token function">stringOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a raw string rule option and exposes it as a property delegate.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="string-option.html"><span class="token function">stringOption</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">deprecation<span class="token operator">: </span><a href="-rule-option-deprecation/index.html">RuleOptionDeprecation</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="-rule/index.html">Rule</a><span class="token punctuation">, </span><a href="-rule-option/index.html">RuleOption</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Declares a raw string rule option with a default value and exposes it as a property delegate.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
