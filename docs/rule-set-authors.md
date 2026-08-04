@@ -9,7 +9,7 @@ Custom rule set projects should compile against the rule API:
 
 ```kotlin
 dependencies {
-    compileOnly("dev.s7a:sqldelight-check-rule-api:0.3.1")
+    compileOnly("dev.s7a:sqldelight-check-rule-api:0.3.2")
 }
 ```
 
