@@ -6,6 +6,7 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 
 internal data class MappedTypeName(
     val text: String,
+    val asOffset: Int,
     val startOffset: Int,
     val endOffset: Int,
 ) {
@@ -29,6 +30,7 @@ internal fun String.mappedTypeNames(sourcePatterns: SqlDialectSourcePatterns): S
             yield(
                 MappedTypeName(
                     text = substring(next.startOffset, endOffset),
+                    asOffset = token.startOffset,
                     startOffset = next.startOffset,
                     endOffset = endOffset,
                 ),
@@ -36,33 +38,19 @@ internal fun String.mappedTypeNames(sourcePatterns: SqlDialectSourcePatterns): S
         }
     }
 
-internal fun String.isInMappedTypeName(
-    offset: Int,
-    sourcePatterns: SqlDialectSourcePatterns,
-): Boolean =
-    mappedTypeNames(sourcePatterns).any { type -> offset in type.startOffset until type.endOffset }
+internal fun List<MappedTypeName>.containsOffset(offset: Int): Boolean =
+    any { type -> offset in type.startOffset until type.endOffset }
 
-internal fun String.isOnMappedTypeNameLine(
-    offset: Int,
-    sourcePatterns: SqlDialectSourcePatterns,
-): Boolean =
-    mappedTypeNames(sourcePatterns).any { type ->
-        offset >= type.endOffset && lineStartOffset(type.startOffset) == lineStartOffset(offset)
-    }
+internal fun List<MappedTypeName>.hasBindingStartAt(offset: Int): Boolean =
+    any { type -> type.asOffset == offset }
 
-internal fun String.isMappedTypeBindingStart(
+internal fun List<MappedTypeName>.hasTypeOnSameLine(
+    content: String,
     offset: Int,
-    sourcePatterns: SqlDialectSourcePatterns,
-): Boolean {
-    val tokens = sqlTokens().toList()
-    return tokens.withIndex().any { (index, token) ->
-        if (token.startOffset != offset || !token.isTerm(SqlDialectSourceTerm.As)) return@any false
-        val previous = tokens.getOrNull(index - 1) ?: return@any false
-        val next = tokens.getOrNull(index + 1) ?: return@any false
-        previous.matches(sourcePatterns, SqlDialectSourcePatternRole.SqlDelightMappableStorageTypeName) &&
-            !next.matches(sourcePatterns, SqlDialectSourcePatternRole.ColumnConstraintStart)
+): Boolean =
+    any { type ->
+        offset >= type.endOffset && content.lineStartOffset(type.startOffset) == content.lineStartOffset(offset)
     }
-}
 
 private fun String.mappedTypeEndOffset(startOffset: Int): Int {
     var index = startOffset
@@ -88,5 +76,5 @@ private fun String.mappedTypeEndOffset(startOffset: Int): Int {
 private fun Char.isMappedTypeBoundary(): Boolean =
     isWhitespace() || this == ',' || this == ')' || this == ';'
 
-private fun String.lineStartOffset(offset: Int): Int =
+internal fun String.lineStartOffset(offset: Int): Int =
     lastIndexOf('\n', startIndex = (offset - 1).coerceAtLeast(0)).let { index -> if (index == -1) 0 else index + 1 }
