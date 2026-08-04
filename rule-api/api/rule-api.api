@@ -39,6 +39,11 @@ public abstract interface class dev/s7a/sqldelight/check/rule/api/RuleContext {
 	public abstract fun getFacts ()Ldev/s7a/sqldelight/check/rule/api/SqlFacts;
 	public abstract fun getFile ()Ldev/s7a/sqldelight/check/api/SourceFile;
 	public abstract fun getOptions ()Ldev/s7a/sqldelight/check/rule/api/RuleOptions;
+	public fun getSourceStructure ()Ldev/s7a/sqldelight/check/api/SqlSourceStructure;
+}
+
+public final class dev/s7a/sqldelight/check/rule/api/RuleContext$DefaultImpls {
+	public static fun getSourceStructure (Ldev/s7a/sqldelight/check/rule/api/RuleContext;)Ldev/s7a/sqldelight/check/api/SqlSourceStructure;
 }
 
 public final class dev/s7a/sqldelight/check/rule/api/RuleDeprecation {

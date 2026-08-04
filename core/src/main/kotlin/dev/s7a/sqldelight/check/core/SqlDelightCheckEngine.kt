@@ -11,6 +11,7 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -117,6 +118,7 @@ public class SqlDelightCheckEngine {
         val facts = SourceSqlFactsExtractor.extract(file, database.dialect, phaseTrace)
         val disableDirectives = DisableDirectives.parse(file)
         val executedRuleIds = mutableListOf<QualifiedRuleId>()
+        val lazySourceStructure = lazy { SqlSourceStructure.parse(file.content, database.dialect.sourcePatterns) }
         val diagnostics =
             rules.flatMap { candidate ->
                 val ruleSetConfig = candidate.ruleSetConfig
@@ -127,6 +129,8 @@ public class SqlDelightCheckEngine {
                         override val file: SourceFile = file
                         override val options: RuleOptions = RuleOptions(ruleConfig.options)
                         override val facts: SqlFacts = facts
+                        override val sourceStructure: SqlSourceStructure
+                            get() = lazySourceStructure.value
                     }
                 val enablement =
                     ruleConfig.enablement ?: ruleSetConfig.enablement

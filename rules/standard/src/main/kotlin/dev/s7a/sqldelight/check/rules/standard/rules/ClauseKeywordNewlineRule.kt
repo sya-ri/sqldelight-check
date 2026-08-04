@@ -6,7 +6,6 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
-import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.api.SqlSourceTokenContext
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -27,7 +26,7 @@ public class ClauseKeywordNewlineRule : Rule {
     ) {
         val content = context.file.content
         val lines = content.linesWithRanges()
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
         structure.tokens.forEach { token ->
             if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEach
             if (token.parenthesisDepth != 0) return@forEach

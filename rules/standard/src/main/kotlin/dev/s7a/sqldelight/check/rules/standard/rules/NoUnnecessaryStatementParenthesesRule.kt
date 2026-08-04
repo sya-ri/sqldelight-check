@@ -25,7 +25,7 @@ public class NoUnnecessaryStatementParenthesesRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.Subquery }
             .filter { block -> structure.isRedundantStatementParenthesizedSubquery(content, block) }

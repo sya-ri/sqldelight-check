@@ -41,7 +41,7 @@ public class SourceIndentationRule : Rule {
         val content = context.file.content
         val indentSize = context.options[indentSizeOption]
         val lines = content.linesWithRanges()
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
         val mappedTypes = content.mappedTypeNames(context.database.dialect.sourcePatterns).toList()
         val statementBlocks =
             structure.blocks
