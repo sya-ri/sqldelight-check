@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.3.2
+
+### Added
+
+- Added baseline file support for suppressing known diagnostics without adding SQL comments to source files.
+- Added the `sqldelightCheckBaseline` task for generating baseline files from current diagnostics.
+- Added opt-in Gradle performance metrics for rule execution and shared tokenization and fact-extraction phases.
+
+### Changed
+
+- Improved source analysis scaling for projects with larger SQLDelight files and more statements or source files.
+
+### Maintenance
+
+- Updated Gradle to 9.6.1.
+- Updated Kotlin to 2.4.10, Kover to 0.9.9, and Kotlinter to 5.6.0.
+- Updated the Qodana action to v2026.2.0.
+
 ## v0.3.1
 
 ### Fixed
