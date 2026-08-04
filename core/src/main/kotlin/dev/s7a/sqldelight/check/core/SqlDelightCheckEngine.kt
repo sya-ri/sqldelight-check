@@ -61,14 +61,20 @@ public class SqlDelightCheckEngine {
                 .flatMap { provider -> provider.diagnosticRefinementProviders() }
                 .map { refinementProvider -> refinementProvider.create() }
                 .groupBy { refinement -> refinement.targetRuleId }
-        rules.forEach { candidate ->
-            val ruleConfig =
-                resolver.resolveRule(
-                    ruleId = candidate.ruleId,
-                    databaseName = database.name,
-                    defaultEnabled = candidate.rule.defaultEnabled,
-                    defaultSeverity = candidate.rule.defaultSeverity,
-                )
+        val resolvedRules =
+            rules.map { candidate ->
+                val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
+                val ruleConfig =
+                    resolver.resolveRule(
+                        ruleId = candidate.ruleId,
+                        databaseName = database.name,
+                        defaultEnabled = candidate.rule.defaultEnabled,
+                        defaultSeverity = candidate.rule.defaultSeverity,
+                    )
+                ResolvedRuleCandidate(candidate, ruleSetConfig, ruleConfig)
+            }
+        resolvedRules.forEach { candidate ->
+            val ruleConfig = candidate.ruleConfig
             candidate.rule.deprecation?.let { deprecation ->
                 if (ruleConfig.explicitlyConfigured && ruleConfig.enablement != null) {
                     trace.deprecatedRule(
@@ -81,30 +87,40 @@ public class SqlDelightCheckEngine {
             }
             traceRuleOptionConfiguration(database, candidate.ruleId, candidate.rule, ruleConfig, trace)
         }
-        return files.flatMap { file -> runRulesForFile(database, file, rules, refinementsByRuleId, resolver, trace) }
+        val coreSeverities =
+            CoreRuleSeverities(
+                requireSuppressionReason = coreRuleSeverity(resolver, database.name, coreRequireSuppressionReasonRuleId),
+                noRedundantSuppression = coreRuleSeverity(resolver, database.name, coreNoRedundantSuppressionRuleId),
+            )
+        return files.flatMap { file ->
+            runRulesForFile(database, file, resolvedRules, refinementsByRuleId, coreSeverities, config, trace)
+        }
     }
 
     private fun runRulesForFile(
         database: DatabaseContext,
         file: SourceFile,
-        rules: List<RuleCandidate>,
+        rules: List<ResolvedRuleCandidate>,
         refinementsByRuleId: Map<QualifiedRuleId, List<DiagnosticRefinement>>,
-        resolver: ConfigurationResolver,
+        coreSeverities: CoreRuleSeverities,
+        config: CheckConfig,
         trace: AnalysisTrace,
     ): List<Diagnostic> {
-        val facts = SourceSqlFactsExtractor.extract(file, database.dialect)
+        val phaseTrace =
+            if (trace.collectsPerformanceMetrics) {
+                { phase: AnalysisPhase, durationNanos: Long ->
+                    trace.analysisPhaseTiming(database, file, phase, durationNanos)
+                }
+            } else {
+                null
+            }
+        val facts = SourceSqlFactsExtractor.extract(file, database.dialect, phaseTrace)
         val disableDirectives = DisableDirectives.parse(file)
         val executedRuleIds = mutableListOf<QualifiedRuleId>()
         val diagnostics =
             rules.flatMap { candidate ->
-                val ruleSetConfig = resolver.resolveRuleSet(candidate.ruleSetId, database.name)
-                val ruleConfig =
-                    resolver.resolveRule(
-                        ruleId = candidate.ruleId,
-                        databaseName = database.name,
-                        defaultEnabled = candidate.rule.defaultEnabled,
-                        defaultSeverity = candidate.rule.defaultSeverity,
-                    )
+                val ruleSetConfig = candidate.ruleSetConfig
+                val ruleConfig = candidate.ruleConfig
                 val context =
                     object : RuleContext {
                         override val database: DatabaseContext = database
@@ -118,17 +134,26 @@ public class SqlDelightCheckEngine {
 
                 executedRuleIds += candidate.ruleId
                 val diagnostics = mutableListOf<Diagnostic>()
-                candidate.rule.run(context) { diagnostic ->
-                    diagnostic
-                        .withRuleIdentity(candidate.ruleId, ruleConfig.severity)
-                        .applyRefinements(context, refinementsByRuleId[candidate.ruleId].orEmpty())
-                        ?.let(diagnostics::add)
+                val startNanos = if (trace.collectsPerformanceMetrics) System.nanoTime() else 0L
+                try {
+                    candidate.rule.run(context) { diagnostic ->
+                        diagnostic
+                            .withRuleIdentity(candidate.ruleId, ruleConfig.severity)
+                            .applyRefinements(context, refinementsByRuleId[candidate.ruleId].orEmpty())
+                            ?.let(diagnostics::add)
+                    }
+                } finally {
+                    if (trace.collectsPerformanceMetrics) {
+                        trace.ruleTiming(database, file, candidate.ruleId, System.nanoTime() - startNanos)
+                    }
                 }
                 diagnostics
-            }.filterNot(disableDirectives::suppresses)
+            }.filterNot { diagnostic ->
+                disableDirectives.suppresses(diagnostic) || config.baseline.suppresses(diagnostic)
+            }
         trace.fileRules(database, file, executedRuleIds)
         return diagnostics +
-            coreRuleSeverity(resolver, database.name, coreRequireSuppressionReasonRuleId).orEmptyDiagnostics { severity ->
+            coreSeverities.requireSuppressionReason.orEmptyDiagnostics { severity ->
                 disableDirectives.suppressionReasonDiagnostics(
                     file = file,
                     ruleId = coreRequireSuppressionReasonRuleId,
@@ -136,7 +161,7 @@ public class SqlDelightCheckEngine {
                     database = database,
                 )
             } +
-            coreRuleSeverity(resolver, database.name, coreNoRedundantSuppressionRuleId).orEmptyDiagnostics { severity ->
+            coreSeverities.noRedundantSuppression.orEmptyDiagnostics { severity ->
                 disableDirectives.redundantDisableDiagnostics(
                     file = file,
                     ruleId = coreNoRedundantSuppressionRuleId,
@@ -219,6 +244,21 @@ private data class RuleCandidate(
     val ruleSetId: RuleSetId,
     val ruleId: QualifiedRuleId,
     val rule: Rule,
+)
+
+private data class ResolvedRuleCandidate(
+    val candidate: RuleCandidate,
+    val ruleSetConfig: ResolvedRuleSetConfig,
+    val ruleConfig: ResolvedRuleConfig,
+) {
+    val ruleSetId: RuleSetId get() = candidate.ruleSetId
+    val ruleId: QualifiedRuleId get() = candidate.ruleId
+    val rule: Rule get() = candidate.rule
+}
+
+private data class CoreRuleSeverities(
+    val requireSuppressionReason: Severity?,
+    val noRedundantSuppression: Severity?,
 )
 
 private fun coreRuleSeverity(

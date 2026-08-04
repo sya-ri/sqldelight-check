@@ -35,10 +35,12 @@ Use the Gradle tasks installed by the plugin:
 
 ```shell
 ./gradlew sqldelightCheck
+./gradlew sqldelightCheckBaseline
 ./gradlew sqldelightFix
 ```
 
 - `sqldelightCheck`: run rules and reports without modifying files.
+- `sqldelightCheckBaseline`: generate a baseline file from current diagnostics.
 - `sqldelightFix`: apply allowed fixes, re-run rules, then write reports.
 
 The first rules are lint-style rules with safe fixes. Formatting rules can use the same check/fix task model when they
@@ -116,7 +118,12 @@ sqldelightCheck {
         unsafe.set(false)
     }
 
+    baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
+
     logLevel.set(LogLevel.Verbose)
+
+    // Opt in to per-rule and shared-analysis timing in task logs.
+    performanceMetrics.set(true)
 }
 ```
 
@@ -140,6 +147,16 @@ You can override the configured level temporarily from the command line:
 ```shell
 ./gradlew -PsqldelightCheck.logLevel=debug sqldelightCheck
 ```
+
+Performance metrics are disabled by default. Enable them in the Gradle DSL with
+`performanceMetrics.set(true)` or temporarily with:
+
+```shell
+./gradlew -PsqldelightCheck.performanceMetrics=true sqldelightCheck
+```
+
+The task prints rule timings aggregated by database and qualified rule ID, sorted by total duration, followed by
+shared tokenization and fact-extraction timings.
 
 ## Disable Diagnostics
 
@@ -176,6 +193,33 @@ Unused disable directives are reported as `core:no-redundant-suppression`. This 
 sqldelight-check applies suppressions, so it can identify directives that did not suppress any rule diagnostics.
 
 See [Core diagnostics](core/README.md) for core diagnostic behavior and configuration.
+
+## Baseline File
+
+Use a baseline file when existing diagnostics should be ignored without adding SQL comments to source files:
+
+```kotlin
+sqldelightCheck {
+    baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
+}
+```
+
+Generate or refresh the configured baseline file from the current diagnostics:
+
+```shell
+./gradlew sqldelightCheckBaseline
+```
+
+The baseline file is UTF-8 text with one diagnostic per line. Empty lines and lines starting with `#` are ignored.
+Entries use six tab-separated columns:
+
+```text
+database	ruleId	path	line	column	message
+Database	standard:no-select-star	src/main/sqldelight/com/example/Player.sq	3	1	Avoid SELECT * in queries.
+```
+
+A baseline entry suppresses only diagnostics that match all six fields. Use `\t`, `\n`, `\r`, and `\\` to escape tabs,
+line breaks, carriage returns, and backslashes inside text fields.
 
 ## Rule Sets
 

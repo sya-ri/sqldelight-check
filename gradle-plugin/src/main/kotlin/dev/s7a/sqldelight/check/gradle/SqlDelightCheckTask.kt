@@ -6,7 +6,9 @@ import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.core.AnalysisPhase
 import dev.s7a.sqldelight.check.core.AnalysisTrace
+import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.DatabaseConfig
 import dev.s7a.sqldelight.check.core.FixApplier
@@ -25,10 +27,13 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -53,11 +58,25 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public abstract val logLevel: Property<LogLevel>
 
     /**
+     * Whether this task should collect and log rule execution metrics.
+     */
+    @get:Input
+    public abstract val performanceMetrics: Property<Boolean>
+
+    /**
      * SQLDelight source files that can influence diagnostics or fixes.
      */
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     public abstract val sqlDelightSources: ConfigurableFileCollection
+
+    /**
+     * Optional baseline file containing known diagnostics to suppress.
+     */
+    @get:Optional
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    public abstract val baselineFile: RegularFileProperty
 
     /**
      * Runtime classpath used to discover rule set providers.
@@ -90,9 +109,11 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public fun run() {
         val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
         val logLevel = logLevel.get()
-        val config = extension.toCheckConfig(logLevel)
+        val baseline = baselineFile.orNull?.asFile?.readSqldelightCheckBaseline()
+        val config = extension.toCheckConfig(logLevel, baseline = baseline ?: Baseline.Empty)
         val traceCollector = RuleTraceCollector()
-        val trace = tracing(logLevel, traceCollector)
+        val performanceMetricsCollector = PerformanceMetricsCollector()
+        val trace = tracing(logLevel, traceCollector, performanceMetrics.get(), performanceMetricsCollector)
         var result = analyze(config, trace)
         if (applyFixes.get()) {
             val fixResult = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeFixes)
@@ -112,6 +133,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         writeReports(extension, result.diagnostics)
         logDiagnostics(result.diagnostics)
         logRuleHits(logLevel, traceCollector.traces, result.diagnostics)
+        logPerformanceMetrics(performanceMetricsCollector)
         logger.lifecycle("sqldelight-check analyzed {} SQLDelight database(s).", result.databaseCount)
 
         val errorCount = result.diagnostics.count { diagnostic -> diagnostic.severity == Severity.Error }
@@ -140,8 +162,12 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     private fun tracing(
         logLevel: LogLevel,
         traceCollector: RuleTraceCollector,
+        performanceMetricsEnabled: Boolean,
+        performanceMetricsCollector: PerformanceMetricsCollector,
     ): AnalysisTrace =
         object : AnalysisTrace {
+            override val collectsPerformanceMetrics: Boolean = performanceMetricsEnabled
+
             override fun databaseFiles(
                 database: DatabaseContext,
                 files: List<SourceFile>,
@@ -160,6 +186,24 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
             ) {
                 if (!logLevel.logsRules) return
                 traceCollector.record(database.name, file.path, ruleIds)
+            }
+
+            override fun ruleTiming(
+                database: DatabaseContext,
+                file: SourceFile,
+                ruleId: QualifiedRuleId,
+                durationNanos: Long,
+            ) {
+                performanceMetricsCollector.recordRule(database.name, ruleId, durationNanos)
+            }
+
+            override fun analysisPhaseTiming(
+                database: DatabaseContext,
+                file: SourceFile,
+                phase: AnalysisPhase,
+                durationNanos: Long,
+            ) {
+                performanceMetricsCollector.recordPhase(database.name, phase, durationNanos)
             }
 
             override fun deprecatedRule(
@@ -216,6 +260,51 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 val marker = if (ruleId.value in hitRuleIds) "x" else " "
                 logger.lifecycle("sqldelight-check [{}] - [{}] {}", trace.databaseName, marker, ruleId.value)
             }
+        }
+    }
+
+    private fun logPerformanceMetrics(collector: PerformanceMetricsCollector) {
+        if (!performanceMetrics.get()) return
+
+        logger.lifecycle("sqldelight-check performance metrics (slowest rules first):")
+        collector.rules
+            .entries
+            .sortedWith(
+                compareByDescending<Map.Entry<RuleTimingKey, TimingAggregate>> { entry -> entry.value.totalNanos }
+                    .thenBy { entry -> entry.key.databaseName }
+                    .thenBy { entry -> entry.key.ruleId.value },
+            )
+            .forEach { (key, timing) ->
+                logger.lifecycle(
+                    "sqldelight-check performance rule [{}] {} invocations={} total={} avg={} max={}",
+                    key.databaseName,
+                    key.ruleId.value,
+                    timing.invocations,
+                    timing.totalNanos.formatDuration(),
+                    (timing.totalNanos / timing.invocations).formatDuration(),
+                    timing.maximumNanos.formatDuration(),
+                )
+            }
+        if (collector.phases.isNotEmpty()) {
+            logger.lifecycle("sqldelight-check performance metrics (shared phases):")
+            collector.phases
+                .entries
+                .sortedWith(
+                    compareByDescending<Map.Entry<PhaseTimingKey, TimingAggregate>> { entry -> entry.value.totalNanos }
+                        .thenBy { entry -> entry.key.databaseName }
+                        .thenBy { entry -> entry.key.phase.name },
+                )
+                .forEach { (key, timing) ->
+                    logger.lifecycle(
+                        "sqldelight-check performance phase [{}] {} invocations={} total={} avg={} max={}",
+                        key.databaseName,
+                        key.phase.name.lowercase(),
+                        timing.invocations,
+                        timing.totalNanos.formatDuration(),
+                        (timing.totalNanos / timing.invocations).formatDuration(),
+                        timing.maximumNanos.formatDuration(),
+                    )
+                }
         }
     }
 
@@ -359,7 +448,7 @@ private fun Severity.logLabel(): String =
         Severity.Error -> "error"
     }
 
-private fun deprecatedRuleMessage(
+internal fun deprecatedRuleMessage(
     database: DatabaseContext,
     ruleId: QualifiedRuleId,
     deprecation: RuleDeprecation,
@@ -384,7 +473,7 @@ private fun deprecatedRuleMessage(
         }
     }
 
-private fun unknownRuleOptionMessage(
+internal fun unknownRuleOptionMessage(
     database: DatabaseContext,
     ruleId: QualifiedRuleId,
     optionName: String,
@@ -405,7 +494,7 @@ private fun unknownRuleOptionMessage(
         }
     }
 
-private fun deprecatedRuleOptionMessage(
+internal fun deprecatedRuleOptionMessage(
     database: DatabaseContext,
     ruleId: QualifiedRuleId,
     optionName: String,
@@ -462,6 +551,55 @@ private data class RuleTraceCollector(
     }
 }
 
+private class PerformanceMetricsCollector {
+    val rules: MutableMap<RuleTimingKey, TimingAggregate> = linkedMapOf()
+    val phases: MutableMap<PhaseTimingKey, TimingAggregate> = linkedMapOf()
+
+    fun recordRule(
+        databaseName: String,
+        ruleId: QualifiedRuleId,
+        durationNanos: Long,
+    ) {
+        rules.getOrPut(RuleTimingKey(databaseName, ruleId), ::TimingAggregate).record(durationNanos)
+    }
+
+    fun recordPhase(
+        databaseName: String,
+        phase: AnalysisPhase,
+        durationNanos: Long,
+    ) {
+        phases.getOrPut(PhaseTimingKey(databaseName, phase), ::TimingAggregate).record(durationNanos)
+    }
+}
+
+private data class RuleTimingKey(
+    val databaseName: String,
+    val ruleId: QualifiedRuleId,
+)
+
+private data class PhaseTimingKey(
+    val databaseName: String,
+    val phase: AnalysisPhase,
+)
+
+private class TimingAggregate {
+    var invocations: Int = 0
+        private set
+    var totalNanos: Long = 0
+        private set
+    var maximumNanos: Long = 0
+        private set
+
+    fun record(durationNanos: Long) {
+        invocations++
+        totalNanos += durationNanos
+        maximumNanos = maxOf(maximumNanos, durationNanos)
+    }
+}
+
+private fun Long.formatDuration(): String =
+    "%.3fms".format(java.util.Locale.ROOT, this / 1_000_000.0)
+
 private data class FileRuleTrace(
     val databaseName: String,
     val filePath: String,
@@ -486,7 +624,7 @@ internal data class FileRuleKey(
     val filePath: String,
 )
 
-private fun validateConfiguredRules(
+internal fun validateConfiguredRules(
     config: CheckConfig,
     registry: RuleRegistry,
 ) {

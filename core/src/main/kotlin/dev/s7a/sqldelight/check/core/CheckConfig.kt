@@ -28,6 +28,10 @@ public class CheckConfig(
      * Logging verbosity for task execution.
      */
     public val logLevel: LogLevel = LogLevel.Info,
+    /**
+     * Known diagnostics that should be ignored without adding source comments.
+     */
+    public val baseline: Baseline = Baseline.Empty,
 ) {
     override fun equals(other: Any?): Boolean =
         this === other ||
@@ -36,6 +40,7 @@ public class CheckConfig(
             rules == other.rules &&
             databases == other.databases &&
             allowUnsafeFixes == other.allowUnsafeFixes &&
+            baseline == other.baseline &&
             logLevel == other.logLevel
 
     override fun hashCode(): Int {
@@ -43,10 +48,11 @@ public class CheckConfig(
         result = 31 * result + rules.hashCode()
         result = 31 * result + databases.hashCode()
         result = 31 * result + allowUnsafeFixes.hashCode()
+        result = 31 * result + baseline.hashCode()
         result = 31 * result + logLevel.hashCode()
         return result
     }
 
     override fun toString(): String =
-        "CheckConfig(ruleSets=$ruleSets, rules=$rules, databases=$databases, allowUnsafeFixes=$allowUnsafeFixes, logLevel=$logLevel)"
+        "CheckConfig(ruleSets=$ruleSets, rules=$rules, databases=$databases, allowUnsafeFixes=$allowUnsafeFixes, logLevel=$logLevel, baseline=$baseline)"
 }

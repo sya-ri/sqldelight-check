@@ -3,6 +3,7 @@ package dev.s7a.sqldelight.check.gradle
 import dev.s7a.sqldelight.check.api.LogLevel
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import javax.inject.Inject
@@ -70,6 +71,11 @@ public open class SqlDelightCheckExtension
         public val fix: FixExtension = objects.newInstance(FixExtension::class.java)
 
         /**
+         * Optional baseline file containing known diagnostics to suppress.
+         */
+        public val baselineFile: RegularFileProperty = objects.fileProperty()
+
+        /**
          * Controls how much execution detail the task emits.
          *
          * `Info` keeps the output to summaries, `Verbose` adds resolved files,
@@ -77,6 +83,14 @@ public open class SqlDelightCheckExtension
          */
         public val logLevel: Property<LogLevel> =
             objects.property(LogLevel::class.java).convention(LogLevel.Info)
+
+        /**
+         * Enables per-rule and shared-analysis performance metrics in task logs.
+         *
+         * Metrics are disabled by default because timing itself adds overhead.
+         */
+        public val performanceMetrics: Property<Boolean> =
+            objects.property(Boolean::class.java).convention(false)
 
         private val ruleSetsDsl: RuleSetContainerExtension = RuleSetContainerExtension(ruleSets)
         private val rulesDsl: RuleContainerExtension = RuleContainerExtension(rules)

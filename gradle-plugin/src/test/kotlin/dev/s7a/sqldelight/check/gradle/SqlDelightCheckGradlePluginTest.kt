@@ -37,6 +37,7 @@ class SqlDelightCheckGradlePluginTest {
                         println("hasDialectsConfiguration=" + (configurations.findByName("sqldelightCheckDialects") != null))
                         listOf(
                             "sqldelightCheck",
+                            "sqldelightCheckBaseline",
                             "sqldelightFix",
                         ).forEach { taskName ->
                             println("task." + taskName + "=" + (tasks.findByName(taskName) != null))
@@ -56,6 +57,7 @@ class SqlDelightCheckGradlePluginTest {
                 "hasReporterConfiguration=true",
                 "hasDialectsConfiguration=true",
                 "task.sqldelightCheck=true",
+                "task.sqldelightCheckBaseline=true",
                 "task.sqldelightFix=true",
             )
         assertContentEquals(expectedOutput, result.outputLinesMatching(expectedOutput))
@@ -82,6 +84,67 @@ class SqlDelightCheckGradlePluginTest {
         assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
         assertEquals(EMPTY_SARIF_REPORT, project.file("build/reports/sqldelight-check/report.sarif").readText())
         assertEquals("sqldelight-check diagnostics: 0\n", project.file("build/reports/sqldelight-check/report.text").readText())
+    }
+
+    @Test
+    fun `performance metrics are absent by default`() {
+        val project = testProject(sqlDelightBuildScript())
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            "CREATE TABLE player (id INTEGER PRIMARY KEY);\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(false, result.output.contains("sqldelight-check performance metrics"))
+    }
+
+    @Test
+    fun `performance metrics can be enabled through the Gradle DSL`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            performanceMetrics.set(true)
+                            ruleSets {
+                                standard {
+                                    enabled.set(false)
+                                }
+                            }
+                            rules {
+                                rule("standard:final-newline") {
+                                    enabled.set(true)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            "CREATE TABLE player (id INTEGER PRIMARY KEY);\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(true, result.output.contains("sqldelight-check performance metrics (slowest rules first):"))
+        assertEquals(true, result.output.contains("sqldelight-check performance rule [Database] standard:final-newline"))
+        assertEquals(true, result.output.contains("sqldelight-check performance phase [Database] tokenization"))
+    }
+
+    @Test
+    fun `performance metrics can be enabled through the Gradle property`() {
+        val project = testProject(sqlDelightBuildScript())
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            "CREATE TABLE player (id INTEGER PRIMARY KEY);\n",
+        )
+
+        val result = project.run("-PsqldelightCheck.performanceMetrics=true", "sqldelightCheck")
+
+        assertEquals(true, result.output.contains("sqldelight-check performance metrics (slowest rules first):"))
     }
 
     @Test
@@ -139,6 +202,99 @@ class SqlDelightCheckGradlePluginTest {
             sqlitePreferIntegerPrimaryKeyErrorJsonReport(),
             project.file("build/reports/sqldelight-check/report.json").readText(),
         )
+    }
+
+    @Test
+    fun `check task suppresses diagnostics from baseline file`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Severity
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
+                            rules {
+                                rule("sqlite:prefer-integer-primary-key") {
+                                    enabled.set(true)
+                                    severity.set(Severity.Error)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+                id INT PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+        )
+        project.write(
+            "sqldelight-check-baseline.txt",
+            listOf(
+                "# database\truleId\tpath\tline\tcolumn\tmessage",
+                "Database\tsqlite:prefer-integer-primary-key\tsrc/main/sqldelight/com/example/Player.sq\t2\t8\tUse INTEGER PRIMARY KEY for SQLite rowid primary keys.",
+            ).joinToString("\n") + "\n",
+        )
+
+        val result = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, result.task(":sqldelightCheck")?.outcome)
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
+    }
+
+    @Test
+    fun `baseline task writes current diagnostics`() {
+        val project =
+            testProject(
+                sqlDelightBuildScript(
+                    extraImports =
+                        """
+                        import dev.s7a.sqldelight.check.api.Severity
+                        """.trimIndent(),
+                    extraConfiguration =
+                        """
+                        sqldelightCheck {
+                            baselineFile.set(layout.projectDirectory.file("sqldelight-check-baseline.txt"))
+                            rules {
+                                rule("sqlite:prefer-integer-primary-key") {
+                                    enabled.set(true)
+                                    severity.set(Severity.Error)
+                                }
+                            }
+                        }
+                        """.trimIndent(),
+                ),
+            )
+        project.write(
+            "src/main/sqldelight/com/example/Player.sq",
+            """
+            CREATE TABLE player (
+                id INT PRIMARY KEY
+            );
+            """.trimIndent() + "\n",
+        )
+
+        val baselineResult = project.run("sqldelightCheckBaseline")
+        val checkResult = project.run("sqldelightCheck")
+
+        assertEquals(SUCCESS, baselineResult.task(":sqldelightCheckBaseline")?.outcome)
+        assertEquals(SUCCESS, checkResult.task(":sqldelightCheck")?.outcome)
+        assertEquals(
+            listOf(
+                "# database\truleId\tpath\tline\tcolumn\tmessage",
+                "Database\tsqlite:prefer-integer-primary-key\tsrc/main/sqldelight/com/example/Player.sq\t2\t8\tUse INTEGER PRIMARY KEY for SQLite rowid primary keys.",
+                "",
+            ).joinToString("\n"),
+            project.file("sqldelight-check-baseline.txt").readText(),
+        )
+        assertEquals(EMPTY_JSON_REPORT, project.file("build/reports/sqldelight-check/report.json").readText())
     }
 
     @Test
