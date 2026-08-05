@@ -11,17 +11,32 @@ public class SqlSourceStructure(
     public val tokens: List<SqlSourceTokenContext>,
     public val blocks: List<SqlSourceBlock>,
 ) {
+    private val tokensByStatement: Map<Int, List<SqlSourceTokenContext>> =
+        tokens.groupBy { it.statementIndex }
+
     /**
      * Returns tokens that belong to the statement with [statementIndex].
      */
     public fun tokensInStatement(statementIndex: Int): List<SqlSourceTokenContext> =
-        tokens.filter { context -> context.statementIndex == statementIndex }
+        tokensByStatement[statementIndex] ?: emptyList()
 
     /**
      * Returns the token context that covers [offset], if any.
      */
-    public fun contextAtOffset(offset: Int): SqlSourceTokenContext? =
-        tokens.firstOrNull { context -> offset in context.token.startOffset..<context.token.endOffset }
+    public fun contextAtOffset(offset: Int): SqlSourceTokenContext? {
+        var lo = 0
+        var hi = tokens.size - 1
+        while (lo <= hi) {
+            val mid = (lo + hi) ushr 1
+            val ctx = tokens[mid]
+            when {
+                offset < ctx.token.startOffset -> hi = mid - 1
+                offset >= ctx.token.endOffset -> lo = mid + 1
+                else -> return ctx
+            }
+        }
+        return null
+    }
 
     /**
      * Returns the smallest block that contains [token].
