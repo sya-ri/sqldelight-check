@@ -29,10 +29,11 @@ public class ExplicitInnerJoinRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
             if (tokens.hasJoinTypePrefix(index)) return@forEachIndexed
-            if (!tokens.hasJoinCondition(index, content, context.database.dialect.sourcePatterns)) return@forEachIndexed
+            if (!tokens.hasJoinCondition(index, content, parenthesisDepths, context.database.dialect.sourcePatterns)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(
@@ -72,16 +73,17 @@ private fun List<SqlToken>.hasJoinTypePrefix(joinIndex: Int): Boolean {
 private fun List<SqlToken>.hasJoinCondition(
     joinIndex: Int,
     content: String,
+    parenthesisDepths: IntArray,
     sourcePatterns: SqlDialectSourcePatterns,
 ): Boolean {
     val join = get(joinIndex)
-    val joinDepth = content.sqlParenthesisDepthAt(join.startOffset)
+    val joinDepth = parenthesisDepths[join.startOffset]
     val statementEnd = content.statementEndAfter(join.startOffset)
-    val segmentEnd = conditionedJoinSegmentEnd(joinIndex + 1, statementEnd, joinDepth, content, sourcePatterns)
+    val segmentEnd = conditionedJoinSegmentEnd(joinIndex + 1, statementEnd, joinDepth, parenthesisDepths, sourcePatterns)
     return asSequence()
         .drop(joinIndex + 1)
         .takeWhile { token -> token.startOffset < segmentEnd }
-        .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == joinDepth }
+        .filter { token -> parenthesisDepths[token.startOffset] == joinDepth }
         .any { token -> token.isTerm(SqlDialectSourceTerm.On) || token.isTerm(SqlDialectSourceTerm.Using) }
 }
 
@@ -89,7 +91,7 @@ private fun List<SqlToken>.conditionedJoinSegmentEnd(
     startIndex: Int,
     statementEnd: Int,
     joinDepth: Int,
-    content: String,
+    parenthesisDepths: IntArray,
     sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     asSequence()
@@ -97,7 +99,7 @@ private fun List<SqlToken>.conditionedJoinSegmentEnd(
         .withIndex()
         .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
-                content.sqlParenthesisDepthAt(token.startOffset) == joinDepth &&
+                parenthesisDepths[token.startOffset] == joinDepth &&
                 (
                     token.isTerm(SqlDialectSourceTerm.Join) ||
                         sourcePatterns.matches(

@@ -26,10 +26,11 @@ public class OrderByTargetNewlineRule : Rule {
         val content = context.file.content
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Order)) return@forEachIndexed
             val by = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.By) } ?: return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            val depth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
             val clauseEnd =
                 tokens.firstBoundaryOffsetAfterAtDepth(
@@ -39,8 +40,9 @@ public class OrderByTargetNewlineRule : Rule {
                     depth = depth,
                     sourcePatterns = context.database.dialect.sourcePatterns,
                     role = SqlDialectSourcePatternRole.OrderByBoundary,
+                    parenthesisDepths = parenthesisDepths,
                 )
-            val items = content.commaSeparatedClauseItems(by.endOffset, clauseEnd, depth)
+            val items = content.commaSeparatedClauseItems(by.endOffset, clauseEnd, depth, parenthesisDepths)
             if (!content.isMultilineItemList(items)) return@forEachIndexed
             if (lines.itemStartsAreOnOwnLines(items)) return@forEachIndexed
             val misplacedItemStarts = lines.misplacedItemStarts(items)

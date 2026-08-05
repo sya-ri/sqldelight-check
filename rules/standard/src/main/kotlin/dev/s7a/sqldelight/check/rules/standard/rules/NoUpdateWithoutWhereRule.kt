@@ -24,12 +24,13 @@ public class NoUpdateWithoutWhereRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Update)) return@forEachIndexed
-            if (content.isUpsertUpdateAction(tokens, index)) return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            if (isUpsertUpdateAction(tokens, index, parenthesisDepths)) return@forEachIndexed
+            val depth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
-            if (content.hasWhereClauseAfter(tokens, index, statementEnd, depth)) return@forEachIndexed
+            if (hasWhereClauseAfter(tokens, index, statementEnd, depth, parenthesisDepths)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(
@@ -44,12 +45,13 @@ public class NoUpdateWithoutWhereRule : Rule {
     }
 }
 
-private fun String.isUpsertUpdateAction(
+private fun isUpsertUpdateAction(
     tokens: List<SqlToken>,
     updateIndex: Int,
+    parenthesisDepths: IntArray,
 ): Boolean {
     val previous = tokens.getOrNull(updateIndex - 1) ?: return false
     val update = tokens[updateIndex]
     return previous.isTerm(SqlDialectSourceTerm.Do) &&
-        sqlParenthesisDepthAt(previous.startOffset) == sqlParenthesisDepthAt(update.startOffset)
+        parenthesisDepths[previous.startOffset] == parenthesisDepths[update.startOffset]
 }

@@ -56,8 +56,9 @@ private data class CteDefinition(
 
 private fun String.cteBlocks(): List<CteBlock> {
     val tokens = sqlTokens().toList()
+    val parenthesisDepths = computeParenthesisDepths()
     return tokens
-        .filter { token -> token.isTerm(SqlDialectSourceTerm.With) && sqlParenthesisDepthAt(token.startOffset) == 0 }
+        .filter { token -> token.isTerm(SqlDialectSourceTerm.With) && parenthesisDepths[token.startOffset] == 0 }
         .mapNotNull { withToken -> cteBlockAfter(withToken, tokens) }
 }
 

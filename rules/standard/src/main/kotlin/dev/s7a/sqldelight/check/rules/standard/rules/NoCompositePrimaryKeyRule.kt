@@ -23,9 +23,10 @@ public class NoCompositePrimaryKeyRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
-        content.createTableBodies(tokens).forEach { body ->
-            content.commaSeparatedClauseItems(body.openOffset + 1, body.closeOffset, body.itemDepth)
-                .mapNotNull { item -> content.compositePrimaryKeyToken(item, body.itemDepth) }
+        val parenthesisDepths = content.computeParenthesisDepths()
+        content.createTableBodies(tokens, parenthesisDepths).forEach { body ->
+            content.commaSeparatedClauseItems(body.openOffset + 1, body.closeOffset, body.itemDepth, parenthesisDepths)
+                .mapNotNull { item -> content.compositePrimaryKeyToken(item, body.itemDepth, parenthesisDepths) }
                 .forEach { primary ->
                     reporter.report(
                         RuleDiagnostic(
@@ -44,12 +45,13 @@ public class NoCompositePrimaryKeyRule : Rule {
 private fun String.compositePrimaryKeyToken(
     item: ClauseItem,
     itemDepth: Int,
+    parenthesisDepths: IntArray,
 ): SqlToken? {
     val itemTokens =
         sqlTokens()
             .dropWhile { token -> token.startOffset < item.startOffset }
             .takeWhile { token -> token.startOffset < item.endOffset }
-            .filter { token -> sqlParenthesisDepthAt(token.startOffset) == itemDepth }
+            .filter { token -> parenthesisDepths[token.startOffset] == itemDepth }
             .toList()
     val primary =
         itemTokens
@@ -65,15 +67,15 @@ private fun String.compositePrimaryKeyToken(
             .dropWhile { character -> character.offset < key.endOffset }
             .takeWhile { character -> character.offset < item.endOffset }
             .firstOrNull {
-                it.value == '(' && sqlParenthesisDepthAt(it.offset) == itemDepth
+                it.value == '(' && parenthesisDepths[it.offset] == itemDepth
             }
             ?: return null
     val close = matchingClosingParenthesisOffset(open.offset)?.takeIf { it <= item.endOffset } ?: return null
-    val columnDepth = sqlParenthesisDepthAt(open.offset) + 1
+    val columnDepth = parenthesisDepths[open.offset] + 1
     val hasMultipleColumns =
         sqlCharacters()
             .dropWhile { character -> character.offset <= open.offset }
             .takeWhile { character -> character.offset < close }
-            .any { character -> character.value == ',' && sqlParenthesisDepthAt(character.offset) == columnDepth }
+            .any { character -> character.value == ',' && parenthesisDepths[character.offset] == columnDepth }
     return if (hasMultipleColumns) primary else null
 }

@@ -25,8 +25,9 @@ public class QueryLabelMatchesOperationRule : Rule {
         if (context.file.kind != SourceFileKind.Query) return
 
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         content.sharedSqlDelightLabels().forEach { label ->
-            val operation = content.operationAfter(label.bodyStartOffset) ?: return@forEach
+            val operation = content.operationAfter(label.bodyStartOffset, parenthesisDepths) ?: return@forEach
             if (label.name.startsWithAny(operation.expectedPrefixes)) return@forEach
 
             reporter.report(
@@ -47,12 +48,12 @@ private data class SqlDelightOperation(
     val expectedPrefixes: Set<String>,
 )
 
-private fun String.operationAfter(offset: Int): SqlDelightOperation? =
+private fun String.operationAfter(offset: Int, parenthesisDepths: IntArray): SqlDelightOperation? =
     sqlTokens()
         .dropWhile { token -> token.startOffset < offset }
         .firstNotNullOfOrNull { token ->
             val term = operationPrefixTerms.keys.firstOrNull { term -> token.isTerm(term) }
-            if (term == null || sqlParenthesisDepthAt(token.startOffset) != 0) {
+            if (term == null || parenthesisDepths[token.startOffset] != 0) {
                 null
             } else {
                 SqlDelightOperation(term = term, expectedPrefixes = operationPrefixTerms.getValue(term))

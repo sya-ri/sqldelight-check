@@ -27,13 +27,14 @@ public class RequireQueryLabelRule : Rule {
 
         val content = context.file.content
         val lines = content.linesWithRanges()
+        val parenthesisDepths = content.computeParenthesisDepths()
         lines.forEachIndexed { index, line ->
             val first = line.firstNonWhitespaceOffset ?: return@forEachIndexed
             val token = content.identifierTokenAt(first) ?: return@forEachIndexed
             if (!token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.SqlDelightExecutableStatementStart)) {
                 return@forEachIndexed
             }
-            if (content.sqlParenthesisDepthAt(token.startOffset) > 0) return@forEachIndexed
+            if (parenthesisDepths[token.startOffset] > 0) return@forEachIndexed
             val previousLine = lines.previousSignificantLine(index)
             if (previousLine?.isSqlDelightLabelOrGroupStart() == true) return@forEachIndexed
             if (!content.isExecutableStatementStart(token.startOffset)) return@forEachIndexed

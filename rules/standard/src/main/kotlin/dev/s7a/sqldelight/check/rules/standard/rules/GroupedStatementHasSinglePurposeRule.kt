@@ -27,12 +27,13 @@ public class GroupedStatementHasSinglePurposeRule : Rule {
         if (context.file.kind != SourceFileKind.Query) return
 
         val content = context.file.content
-        content.groupedStatementRanges().forEach { group ->
+        val parenthesisDepths = content.computeParenthesisDepths()
+        content.groupedStatementRanges(parenthesisDepths).forEach { group ->
             val verbs =
                 content
                     .sqlTokens()
                     .filter { token -> token.startOffset in group.bodyStartOffset until group.bodyEndOffset }
-                    .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == group.bodyDepth }
+                    .filter { token -> parenthesisDepths[token.startOffset] == group.bodyDepth }
                     .filter { token ->
                         token.matches(
                             context.database.dialect.sourcePatterns,
@@ -66,7 +67,7 @@ private data class GroupedStatementRange(
 
 private val writeStatementTerms = setOf(SqlDialectSourceTerm.Delete, SqlDialectSourceTerm.Insert, SqlDialectSourceTerm.Update)
 
-private fun String.groupedStatementRanges(): Sequence<GroupedStatementRange> =
+private fun String.groupedStatementRanges(parenthesisDepths: IntArray): Sequence<GroupedStatementRange> =
     sequence {
         linesWithRanges().forEach { line ->
             val first = line.firstNonWhitespaceOffset ?: return@forEach
@@ -80,7 +81,7 @@ private fun String.groupedStatementRanges(): Sequence<GroupedStatementRange> =
                     nameEndOffset = name.endOffset,
                     bodyStartOffset = openOffset + 1,
                     bodyEndOffset = closeOffset,
-                    bodyDepth = sqlParenthesisDepthAt(openOffset),
+                    bodyDepth = parenthesisDepths[openOffset],
                 ),
             )
         }

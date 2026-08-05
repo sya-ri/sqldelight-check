@@ -24,11 +24,12 @@ public class WhereConditionNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Where)) return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            val depth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
             val clauseEnd =
                 tokens.firstBoundaryOffsetAfterAtDepth(
@@ -38,6 +39,7 @@ public class WhereConditionNewlineRule : Rule {
                     depth = depth,
                     sourcePatterns = context.database.dialect.sourcePatterns,
                     role = SqlDialectSourcePatternRole.PredicateBoundary,
+                    parenthesisDepths = parenthesisDepths,
                 )
             if (!content.substring(token.endOffset, clauseEnd).contains('\n')) return@forEachIndexed
 
@@ -45,7 +47,7 @@ public class WhereConditionNewlineRule : Rule {
             tokens
                 .drop(index + 1)
                 .takeWhile { candidate -> candidate.startOffset < clauseEnd }
-                .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == depth }
+                .filter { candidate -> parenthesisDepths[candidate.startOffset] == depth }
                 .forEach { candidate ->
                     when {
                         candidate.isTerm(SqlDialectSourceTerm.Between) -> pendingBetween = true

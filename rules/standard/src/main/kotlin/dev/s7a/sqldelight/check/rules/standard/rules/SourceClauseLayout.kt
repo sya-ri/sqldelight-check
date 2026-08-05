@@ -12,6 +12,7 @@ internal fun String.commaSeparatedClauseItems(
     startOffset: Int,
     endOffset: Int,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): List<ClauseItem> {
     val items = mutableListOf<ClauseItem>()
     var itemStart = startOffset
@@ -19,7 +20,7 @@ internal fun String.commaSeparatedClauseItems(
         .dropWhile { character -> character.offset < startOffset }
         .takeWhile { character -> character.offset < endOffset }
         .forEach { character ->
-            if (character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth) {
+            if (character.value == ',' && parenthesisDepths[character.offset] == depth) {
                 trimmedClauseItem(itemStart, character.offset)?.let(items::add)
                 itemStart = character.offset + 1
             }
@@ -57,8 +58,9 @@ internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
     depth: Int,
     sourcePatterns: SqlDialectSourcePatterns,
     role: SqlDialectSourcePatternRole,
+    parenthesisDepths: IntArray,
 ): Int =
-    firstBoundaryOffsetAfterAtDepth(content, startIndex, statementEnd, depth, sourcePatterns, setOf(role))
+    firstBoundaryOffsetAfterAtDepth(content, startIndex, statementEnd, depth, sourcePatterns, setOf(role), parenthesisDepths)
 
 internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
     content: String,
@@ -67,13 +69,14 @@ internal fun List<SqlToken>.firstBoundaryOffsetAfterAtDepth(
     depth: Int,
     sourcePatterns: SqlDialectSourcePatterns,
     roles: Set<SqlDialectSourcePatternRole>,
+    parenthesisDepths: IntArray,
 ): Int =
     asSequence()
         .drop(startIndex)
         .withIndex()
         .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
-                content.sqlParenthesisDepthAt(token.startOffset) == depth &&
+                parenthesisDepths[token.startOffset] == depth &&
                 roles.any { role -> sourcePatterns.matches(role, normalizedTextsFrom(startIndex + relativeIndex)) }
         }
         ?.value
