@@ -3,7 +3,6 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
-import dev.s7a.sqldelight.check.api.SourceRange
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -25,12 +24,21 @@ public class NoUnknownQualifierRule : Rule {
         context: RuleContext,
         reporter: DiagnosticReporter,
     ) {
+        val content = context.file.content
         context.facts.statements.forEach { statement ->
             val visibleQualifiers = statement.visibleQualifiers()
             if (visibleQualifiers.isEmpty()) return@forEach
 
+            val tableRanges = statement.tableReferences.map { ref ->
+                ref.range.start.toOffsetIn(content) to ref.range.end.toOffsetIn(content)
+            }
+
             statement.qualifiedReferences
-                .filterNot { reference -> statement.isInsideTableReference(reference.range, context.file.content) }
+                .filterNot { reference ->
+                    val start = reference.range.start.toOffsetIn(content)
+                    val end = reference.range.end.toOffsetIn(content)
+                    tableRanges.any { (ts, te) -> start >= ts && end <= te }
+                }
                 .filterNot { reference -> reference.qualifier.lowercase() in visibleQualifiers }
                 .forEach { reference ->
                     reporter.report(
@@ -53,15 +61,3 @@ private fun SqlStatementFacts.visibleQualifiers(): Set<String> =
         .map { name -> name.lowercase() }
         .toSet()
 
-private fun SqlStatementFacts.isInsideTableReference(
-    range: SourceRange,
-    content: String,
-): Boolean {
-    val start = range.start.toOffsetIn(content)
-    val end = range.end.toOffsetIn(content)
-    return tableReferences.any { reference ->
-        val tableStart = reference.range.start.toOffsetIn(content)
-        val tableEnd = reference.range.end.toOffsetIn(content)
-        start >= tableStart && end <= tableEnd
-    }
-}
