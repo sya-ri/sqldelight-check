@@ -36,7 +36,7 @@ public class JoinNewlineRule : Rule {
             val statementStart =
                 tokens.statementStartOffsetBefore(index, content, context.database.dialect.sourcePatterns, parenthesisDepths)
                     ?: return@forEachIndexed
-            if (!content.substring(statementStart, statementEnd).contains('\n')) return@forEachIndexed
+            if (!content.hasNewlineBetween(statementStart, statementEnd)) return@forEachIndexed
 
             val clauseStart = tokens.joinClauseStartOffset(index, depth, content, context.database.dialect.sourcePatterns, parenthesisDepths)
             val line = lines.lineContaining(clauseStart) ?: return@forEachIndexed

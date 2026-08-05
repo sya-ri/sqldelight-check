@@ -78,7 +78,7 @@ private fun String.createTableConstraintTokens(
     if (sourcePatterns.matches(SqlDialectSourcePatternRole.TableConstraintStart, itemTokens.normalizedTextsFrom(0))) {
         return listOf(first)
     }
-    if (!substring(item.startOffset, item.endOffset).contains('\n')) return emptyList()
+    if (!hasNewlineBetween(item.startOffset, item.endOffset)) return emptyList()
     val firstLineEnd =
         indexOf('\n', item.startOffset).takeIf { offset -> offset in item.startOffset until item.endOffset }
             ?: return emptyList()

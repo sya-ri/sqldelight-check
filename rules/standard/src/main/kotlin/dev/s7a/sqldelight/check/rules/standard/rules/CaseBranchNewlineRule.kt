@@ -29,7 +29,7 @@ public class CaseBranchNewlineRule : Rule {
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.CaseExpression }
             .forEach { block ->
-                if (!content.substring(block.startOffset, block.endOffset).contains('\n')) return@forEach
+                if (!content.hasNewlineBetween(block.startOffset, block.endOffset)) return@forEach
 
                 val directBranchDepth = structure.tokens[block.startTokenIndex].caseDepth + 1
 

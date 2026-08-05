@@ -45,7 +45,7 @@ public class CteNewlineRule : Rule {
                 ?: return@forEachIndexed
             val cteStarts = tokens.cteStartTokens(index + 1, mainStatementIndex, depth, content, parenthesisDepths)
             if (cteStarts.size < 2) return@forEachIndexed
-            if (!content.substring(token.endOffset, tokens[mainStatementIndex].startOffset).contains('\n')) return@forEachIndexed
+            if (!content.hasNewlineBetween(token.endOffset, tokens[mainStatementIndex].startOffset)) return@forEachIndexed
             if (cteStarts.all { cte ->
                     lines.lineContaining(cte.startOffset)?.firstNonWhitespaceOffset == cte.startOffset
                 }

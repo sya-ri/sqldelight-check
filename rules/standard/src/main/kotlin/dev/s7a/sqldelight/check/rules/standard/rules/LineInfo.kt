@@ -9,11 +9,10 @@ internal data class LineInfo(
     val newlineEndOffset: Int,
     val text: String,
 ) {
-    val firstNonWhitespaceOffset: Int?
-        get() {
-            val index = text.indexOfFirst { character -> character != ' ' && character != '\t' }
-            return if (index == -1) null else startOffset + index
-        }
+    val firstNonWhitespaceOffset: Int? = run {
+        val index = text.indexOfFirst { character -> character != ' ' && character != '\t' }
+        if (index == -1) null else startOffset + index
+    }
 }
 
 private val linesWithRangesCache =
@@ -55,5 +54,12 @@ private fun String.buildLinesWithRanges(): List<LineInfo> {
     return lines
 }
 
-internal fun List<LineInfo>.lineContaining(offset: Int): LineInfo? =
-    lastOrNull { line -> line.startOffset <= offset }
+internal fun List<LineInfo>.lineContaining(offset: Int): LineInfo? {
+    val idx = binarySearchBy(offset) { it.startOffset }
+    return if (idx >= 0) this[idx] else getOrNull(-idx - 2)
+}
+
+internal fun String.hasNewlineBetween(startOffset: Int, endOffset: Int): Boolean {
+    val idx = indexOf('\n', startOffset)
+    return idx != -1 && idx < endOffset
+}

@@ -41,7 +41,7 @@ public class WhereConditionNewlineRule : Rule {
                     role = SqlDialectSourcePatternRole.PredicateBoundary,
                     parenthesisDepths = parenthesisDepths,
                 )
-            if (!content.substring(token.endOffset, clauseEnd).contains('\n')) return@forEachIndexed
+            if (!content.hasNewlineBetween(token.endOffset, clauseEnd)) return@forEachIndexed
 
             var pendingBetween = false
             tokens

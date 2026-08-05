@@ -33,7 +33,7 @@ public class ClauseKeywordNewlineRule : Rule {
 
             val statementTokens = structure.tokensInStatement(token.statementIndex)
             val statementEnd = statementTokens.lastOrNull()?.token?.endOffset ?: return@forEach
-            if (!content.substring(token.token.startOffset, statementEnd).contains('\n')) return@forEach
+            if (!content.hasNewlineBetween(token.token.startOffset, statementEnd)) return@forEach
 
             statementTokens
                 .asSequence()
