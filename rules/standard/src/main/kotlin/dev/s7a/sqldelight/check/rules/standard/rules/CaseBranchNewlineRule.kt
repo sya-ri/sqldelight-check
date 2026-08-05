@@ -7,7 +7,6 @@ import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.api.SqlSourceBlockKind
-import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -26,7 +25,7 @@ public class CaseBranchNewlineRule : Rule {
     ) {
         val content = context.file.content
         val lines = content.linesWithRanges()
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.CaseExpression }
             .forEach { block ->

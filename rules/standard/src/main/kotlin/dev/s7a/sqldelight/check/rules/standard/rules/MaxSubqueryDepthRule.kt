@@ -31,7 +31,7 @@ public class MaxSubqueryDepthRule : Rule {
     ) {
         val maxDepth = context.options[maxSubqueryDepthOption]
         val content = context.file.content
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
         val depths = structure.subqueryDepths()
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.Subquery }
