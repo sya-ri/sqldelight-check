@@ -50,22 +50,9 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         val taskGroup = "sqldelight-check"
 
         tasks.register("sqldelightCheck", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
             task.description = "Runs configured SQLDelight rules without modifying files."
             task.applyFixes.convention(false)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-            task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
-            configureTaskClasspaths(task)
-            task.reportOutputDirectory.convention(layout.buildDirectory.dir("reports/sqldelight-check"))
-            task.baselineFile.convention(extension.baselineFile)
-            task.rootProjectDir.set(rootProject.layout.projectDirectory.asFile.absolutePath)
-            task.projectDir.set(layout.projectDirectory.asFile.absolutePath)
-            task.reportRoot.set(
-                providers
-                    .gradleProperty("sqldelightCheck.reportRoot")
-                    .orElse(providers.environmentVariable("GITHUB_WORKSPACE"))
-                    .orElse(""),
-            )
+            configureCheckFixTaskDefaults(task, extension, taskGroup)
         }.also { sqldelightCheck ->
             tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) { task ->
                 task.dependsOn(sqldelightCheck)
@@ -73,22 +60,9 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         }
 
         tasks.register("sqldelightFix", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
             task.description = "Applies allowed SQLDelight fixes, re-runs rules, and writes reports."
             task.applyFixes.convention(true)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-            task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
-            configureTaskClasspaths(task)
-            task.reportOutputDirectory.convention(layout.buildDirectory.dir("reports/sqldelight-check"))
-            task.baselineFile.convention(extension.baselineFile)
-            task.rootProjectDir.set(rootProject.layout.projectDirectory.asFile.absolutePath)
-            task.projectDir.set(layout.projectDirectory.asFile.absolutePath)
-            task.reportRoot.set(
-                providers
-                    .gradleProperty("sqldelightCheck.reportRoot")
-                    .orElse(providers.environmentVariable("GITHUB_WORKSPACE"))
-                    .orElse(""),
-            )
+            configureCheckFixTaskDefaults(task, extension, taskGroup)
         }
 
         tasks.register("sqldelightCheckBaseline", SqlDelightCheckBaselineTask::class.java) { task ->
@@ -101,12 +75,7 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
                 extension.baselineFile.orElse(layout.projectDirectory.file("sqldelight-check-baseline.txt")),
             )
             task.rootProjectDir.set(rootProject.layout.projectDirectory.asFile.absolutePath)
-            task.reportRoot.set(
-                providers
-                    .gradleProperty("sqldelightCheck.reportRoot")
-                    .orElse(providers.environmentVariable("GITHUB_WORKSPACE"))
-                    .orElse(""),
-            )
+            configureReportRoot(task)
         }
 
         // After all build scripts are evaluated, snapshot extension state and SQLDelight
@@ -119,40 +88,57 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
 
             val databases = discoverDatabases()
 
-            checkTask.configure { task ->
-                populateDatabaseSpecs(task.databases, databases)
-                populateRuleConfigSpecs(
-                    globalRuleSets = task.globalRuleSets,
-                    globalRules = task.globalRules,
-                    databaseConfigs = task.databaseConfigs,
-                    extension = extension,
-                )
-                task.allowUnsafeFixes.set(extension.fix.unsafe.get())
-                populateReporterSpecs(task.reporters, extension)
-            }
-
-            fixTask.configure { task ->
-                populateDatabaseSpecs(task.databases, databases)
-                populateRuleConfigSpecs(
-                    globalRuleSets = task.globalRuleSets,
-                    globalRules = task.globalRules,
-                    databaseConfigs = task.databaseConfigs,
-                    extension = extension,
-                )
-                task.allowUnsafeFixes.set(extension.fix.unsafe.get())
-                populateReporterSpecs(task.reporters, extension)
+            listOf(checkTask, fixTask).forEach { taskProvider ->
+                taskProvider.configure { task ->
+                    populateSharedTaskSpecs(task, databases, extension)
+                    task.allowUnsafeFixes.set(extension.fix.unsafe.get())
+                    populateReporterSpecs(task.reporters, extension)
+                }
             }
 
             baselineTask.configure { task ->
-                populateDatabaseSpecs(task.databases, databases)
-                populateRuleConfigSpecs(
-                    globalRuleSets = task.globalRuleSets,
-                    globalRules = task.globalRules,
-                    databaseConfigs = task.databaseConfigs,
-                    extension = extension,
-                )
+                populateSharedTaskSpecs(task, databases, extension)
             }
         }
+    }
+
+    private fun Project.configureCheckFixTaskDefaults(
+        task: SqlDelightCheckTask,
+        extension: SqlDelightCheckExtension,
+        taskGroup: String,
+    ) {
+        task.group = taskGroup
+        task.logLevel.convention(resolveLogLevelOverride(extension))
+        task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
+        configureTaskClasspaths(task)
+        task.reportOutputDirectory.convention(layout.buildDirectory.dir("reports/sqldelight-check"))
+        task.baselineFile.convention(extension.baselineFile)
+        task.rootProjectDir.set(rootProject.layout.projectDirectory.asFile.absolutePath)
+        task.projectDir.set(layout.projectDirectory.asFile.absolutePath)
+        configureReportRoot(task)
+    }
+
+    private fun Project.configureReportRoot(task: AbstractSqlDelightCheckBaseTask) {
+        task.reportRoot.set(
+            providers
+                .gradleProperty("sqldelightCheck.reportRoot")
+                .orElse(providers.environmentVariable("GITHUB_WORKSPACE"))
+                .orElse(""),
+        )
+    }
+
+    private fun Project.populateSharedTaskSpecs(
+        task: AbstractSqlDelightCheckBaseTask,
+        databases: Map<String, DatabaseDiscovery>,
+        extension: SqlDelightCheckExtension,
+    ) {
+        populateDatabaseSpecs(task.databases, databases)
+        populateRuleConfigSpecs(
+            globalRuleSets = task.globalRuleSets,
+            globalRules = task.globalRules,
+            databaseConfigs = task.databaseConfigs,
+            extension = extension,
+        )
     }
 
     /**
