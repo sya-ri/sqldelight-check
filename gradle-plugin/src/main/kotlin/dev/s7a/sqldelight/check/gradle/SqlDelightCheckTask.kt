@@ -24,11 +24,8 @@ import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import java.io.File
 import java.io.OutputStream
-import java.net.URLClassLoader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import java.util.Collections
-import java.util.Enumeration
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
@@ -230,14 +227,9 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
 
     // ── private helpers ───────────────────────────────────────────────────────
 
-    private fun buildRuleRegistry(): RuleRegistry = RuleRegistry.load(buildClassLoader(ruleSetClasspath))
+    private fun buildRuleRegistry(): RuleRegistry = buildRuleRegistry(ruleSetClasspath)
 
-    private fun buildDialectRegistry(): DialectRegistry = DialectRegistry.load(buildClassLoader(dialectClasspath))
-
-    private fun buildClassLoader(classpath: ConfigurableFileCollection): ClassLoader {
-        val urls = classpath.files.map { it.toURI().toURL() }.toTypedArray()
-        return TaskProviderClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
-    }
+    private fun buildDialectRegistry(): DialectRegistry = buildDialectRegistry(dialectClasspath)
 
     private fun buildAnalysisInputs(dialectRegistry: DialectRegistry): List<AnalysisInput> =
         buildAnalysisInputs(
@@ -450,7 +442,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
 
     private fun writeReports(diagnostics: List<Diagnostic>) {
         val report = Report(diagnostics)
-        val registry = ReporterRegistry.load(buildClassLoader(reporterClasspath))
+        val registry = ReporterRegistry.load(buildPluginClassLoader(reporterClasspath))
 
         reporters.get()
             .filter { it.required.get() }
@@ -480,21 +472,6 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 Severity.Error -> logger.error(message)
             }
         }
-    }
-}
-
-// ── private classloader ───────────────────────────────────────────────────────
-
-private class TaskProviderClassLoader(
-    urls: Array<java.net.URL>,
-    parent: ClassLoader,
-) : URLClassLoader(urls, parent) {
-    override fun getResource(name: String): java.net.URL? = findResource(name) ?: parent.getResource(name)
-
-    override fun getResources(name: String): Enumeration<java.net.URL> {
-        val localResources = findResources(name).iterator().asSequence().toList()
-        val parentResources = parent.getResources(name).iterator().asSequence().toList()
-        return Collections.enumeration(localResources + parentResources)
     }
 }
 

@@ -12,9 +12,6 @@ import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
-import java.net.URLClassLoader
-import java.util.Collections
-import java.util.Enumeration
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -132,14 +129,9 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
         }
     }
 
-    private fun buildRuleRegistry(): RuleRegistry = RuleRegistry.load(buildClassLoader(ruleSetClasspath))
+    private fun buildRuleRegistry(): RuleRegistry = buildRuleRegistry(ruleSetClasspath)
 
-    private fun buildDialectRegistry(): DialectRegistry = DialectRegistry.load(buildClassLoader(dialectClasspath))
-
-    private fun buildClassLoader(classpath: ConfigurableFileCollection): ClassLoader {
-        val urls = classpath.files.map { it.toURI().toURL() }.toTypedArray()
-        return BaselineProviderClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
-    }
+    private fun buildDialectRegistry(): DialectRegistry = buildDialectRegistry(dialectClasspath)
 
     /**
      * Absolute path of the root project directory, for path relativization.
@@ -220,15 +212,3 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
         }
 }
 
-private class BaselineProviderClassLoader(
-    urls: Array<java.net.URL>,
-    parent: ClassLoader,
-) : URLClassLoader(urls, parent) {
-    override fun getResource(name: String): java.net.URL? = findResource(name) ?: parent.getResource(name)
-
-    override fun getResources(name: String): Enumeration<java.net.URL> {
-        val localResources = findResources(name).iterator().asSequence().toList()
-        val parentResources = parent.getResources(name).iterator().asSequence().toList()
-        return Collections.enumeration(localResources + parentResources)
-    }
-}

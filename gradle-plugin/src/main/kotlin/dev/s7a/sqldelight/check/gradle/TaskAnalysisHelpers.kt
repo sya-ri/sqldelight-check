@@ -5,8 +5,25 @@ import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.DialectRegistry
+import dev.s7a.sqldelight.check.core.RuleRegistry
 import java.io.File
+import java.net.URL
+import java.net.URLClassLoader
 import java.nio.charset.StandardCharsets
+import java.util.Collections
+import java.util.Enumeration
+import org.gradle.api.file.ConfigurableFileCollection
+
+internal fun buildRuleRegistry(classpath: ConfigurableFileCollection): RuleRegistry =
+    RuleRegistry.load(buildPluginClassLoader(classpath))
+
+internal fun buildDialectRegistry(classpath: ConfigurableFileCollection): DialectRegistry =
+    DialectRegistry.load(buildPluginClassLoader(classpath))
+
+internal fun buildPluginClassLoader(classpath: ConfigurableFileCollection): ClassLoader {
+    val urls = classpath.files.map { it.toURI().toURL() }.toTypedArray()
+    return SqlDelightPluginClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
+}
 
 internal fun buildAnalysisInputs(
     databases: List<SqlDelightDatabaseSpec>,
@@ -66,4 +83,17 @@ internal fun resolveReportPath(
     }
     val rootDir = File(rootProjectDir).toPath().toAbsolutePath().normalize()
     return rootDir.relativize(filePath).toString().replace(File.separatorChar, '/')
+}
+
+internal class SqlDelightPluginClassLoader(
+    urls: Array<URL>,
+    parent: ClassLoader,
+) : URLClassLoader(urls, parent) {
+    override fun getResource(name: String): URL? = findResource(name) ?: parent.getResource(name)
+
+    override fun getResources(name: String): Enumeration<URL> {
+        val localResources = findResources(name).iterator().asSequence().toList()
+        val parentResources = parent.getResources(name).iterator().asSequence().toList()
+        return Collections.enumeration(localResources + parentResources)
+    }
 }
