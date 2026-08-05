@@ -37,13 +37,17 @@ private fun String.selectTargetsWithCommas(
 ): List<SourceSelectTarget> {
     val targets = mutableListOf<SourceSelectTarget>()
     var targetStart = startOffset
+    var currentDepth = 0
     sqlCharacters()
-        .dropWhile { character -> character.offset < startOffset }
         .takeWhile { character -> character.offset < endOffset }
         .forEach { character ->
-            if (character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth) {
-                trimmedSelectTarget(targetStart, character.offset, character.offset)?.let(targets::add)
-                targetStart = character.offset + 1
+            when (character.value) {
+                '(' -> currentDepth++
+                ')' -> if (currentDepth > 0) currentDepth--
+                ',' -> if (character.offset >= startOffset && currentDepth == depth) {
+                    trimmedSelectTarget(targetStart, character.offset, character.offset)?.let(targets::add)
+                    targetStart = character.offset + 1
+                }
             }
         }
     trimmedSelectTarget(targetStart, endOffset, commaOffset = null)?.let(targets::add)

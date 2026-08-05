@@ -25,14 +25,15 @@ internal fun String.tableReferences(
     sourcePatterns: SqlDialectSourcePatterns = SqlDialectSourcePatterns.SourceScannerDefault,
 ): List<TableReference> {
     val tokens = sqlTokens().toList()
+    val parenthesisDepths = computeParenthesisDepths()
     val references = mutableListOf<TableReference>()
     tokens.forEachIndexed { index, token ->
         if (!token.isTerm(SqlDialectSourceTerm.From) && !token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
 
-        val depth = sqlParenthesisDepthAt(token.startOffset)
+        val depth = parenthesisDepths[token.startOffset]
         val statementStart = statementStartBefore(token.startOffset)
         val statementEnd = statementEndAfter(token.startOffset)
-        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth, sourcePatterns)
+        val boundary = firstReferenceBoundaryAfter(tokens, index + 1, statementEnd, depth, sourcePatterns, parenthesisDepths)
         references +=
             tableReferencesAfterKeyword(
                 tokens = tokens,
@@ -41,6 +42,7 @@ internal fun String.tableReferences(
                 depth = depth,
                 statementStart = statementStart,
                 introducedBy = if (token.isTerm(SqlDialectSourceTerm.Join)) TableReferenceIntroducer.Join else TableReferenceIntroducer.From,
+                parenthesisDepths = parenthesisDepths,
             )
     }
     return references
@@ -53,6 +55,7 @@ private fun String.tableReferencesAfterKeyword(
     depth: Int,
     statementStart: Int,
     introducedBy: TableReferenceIntroducer,
+    parenthesisDepths: IntArray,
 ): List<TableReference> {
     val references = mutableListOf<TableReference>()
     var segmentStart = startOffset
@@ -60,12 +63,12 @@ private fun String.tableReferencesAfterKeyword(
         .dropWhile { character -> character.offset < segmentStart }
         .takeWhile { character -> character.offset < boundaryOffset }
         .forEach { character ->
-            if (character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth) {
-                tableReferenceInSegment(tokens, segmentStart, character.offset, depth, statementStart, introducedBy)?.let(references::add)
+            if (character.value == ',' && parenthesisDepths[character.offset] == depth) {
+                tableReferenceInSegment(tokens, segmentStart, character.offset, depth, statementStart, introducedBy, parenthesisDepths)?.let(references::add)
                 segmentStart = character.offset + 1
             }
         }
-    tableReferenceInSegment(tokens, segmentStart, boundaryOffset, depth, statementStart, introducedBy)?.let(references::add)
+    tableReferenceInSegment(tokens, segmentStart, boundaryOffset, depth, statementStart, introducedBy, parenthesisDepths)?.let(references::add)
     return references
 }
 
@@ -76,6 +79,7 @@ private fun String.tableReferenceInSegment(
     depth: Int,
     statementStart: Int,
     introducedBy: TableReferenceIntroducer,
+    parenthesisDepths: IntArray,
 ): TableReference? {
     val open = nextSqlCharacterAfter(startOffset)
     if (open?.value == '(' && open.offset < endOffset) {
@@ -86,11 +90,11 @@ private fun String.tableReferenceInSegment(
                     token.startOffset > open.offset &&
                         token.startOffset < closeOffset &&
                     token.isTerm(SqlDialectSourceTerm.Select) &&
-                        sqlParenthesisDepthAt(token.startOffset) == depth + 1
+                        parenthesisDepths[token.startOffset] == depth + 1
             } ?: return null
         if (tokens.any { token -> token.startOffset in (open.offset + 1)..<select.startOffset }) return null
 
-        val alias = aliasAfterSource(tokens, closeOffset + 1, endOffset, depth)
+        val alias = aliasAfterSource(tokens, closeOffset + 1, endOffset, depth, parenthesisDepths)
         return TableReference(
             statementStartOffset = statementStart,
             depth = depth,
@@ -108,13 +112,13 @@ private fun String.tableReferenceInSegment(
         tokens.filter { token ->
             token.startOffset >= startOffset &&
                 token.endOffset <= endOffset &&
-                sqlParenthesisDepthAt(token.startOffset) == depth
+                parenthesisDepths[token.startOffset] == depth
         }
     val firstToken = segmentTokens.firstOrNull() ?: return null
 
     val sourceTokens = qualifiedIdentifierTokens(segmentTokens)
     val tableName = sourceTokens.last().text
-    val alias = aliasAfterSource(tokens, sourceTokens.last().endOffset, endOffset, depth)
+    val alias = aliasAfterSource(tokens, sourceTokens.last().endOffset, endOffset, depth, parenthesisDepths)
     return TableReference(
         statementStartOffset = statementStart,
         depth = depth,
@@ -145,17 +149,18 @@ private data class AliasToken(
     val usesAs: Boolean,
 )
 
-private fun String.aliasAfterSource(
+private fun aliasAfterSource(
     tokens: List<SqlToken>,
     startOffset: Int,
     endOffset: Int,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): AliasToken? {
     val aliasTokens =
         tokens.filter { token ->
             token.startOffset >= startOffset &&
                 token.endOffset <= endOffset &&
-                sqlParenthesisDepthAt(token.startOffset) == depth
+                parenthesisDepths[token.startOffset] == depth
         }
     if (aliasTokens.isEmpty()) return null
     val first = aliasTokens.first()
@@ -166,12 +171,13 @@ private fun String.aliasAfterSource(
     }
 }
 
-private fun String.firstReferenceBoundaryAfter(
+private fun firstReferenceBoundaryAfter(
     tokens: List<SqlToken>,
     startIndex: Int,
     statementEnd: Int,
     depth: Int,
     sourcePatterns: SqlDialectSourcePatterns,
+    parenthesisDepths: IntArray,
 ): Int =
     tokens
         .asSequence()
@@ -179,7 +185,7 @@ private fun String.firstReferenceBoundaryAfter(
         .withIndex()
         .firstOrNull { (relativeIndex, token) ->
                 token.startOffset < statementEnd &&
-                sqlParenthesisDepthAt(token.startOffset) == depth &&
+                parenthesisDepths[token.startOffset] == depth &&
                 sourcePatterns.matches(TableReferenceBoundary, tokens.normalizedTextsFrom(startIndex + relativeIndex))
         }?.value?.startOffset
         ?: statementEnd
