@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.3
+
+### Added
+
+- Added configuration cache compatibility for Gradle plugin tasks.
+
+### Changed
+
+- Significantly improved analysis performance through precomputed lookups, single-pass scanners, and O(N log N) or better algorithms for statement scanning, token lookup, CASE block depth, subquery depth, mapped type resolution, line position mapping, table reference offsets, and parenthesis depth queries.
+
 ## v0.3.2
 
 ### Added
