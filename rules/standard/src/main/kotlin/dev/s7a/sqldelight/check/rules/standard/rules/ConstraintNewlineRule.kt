@@ -26,6 +26,7 @@ public class ConstraintNewlineRule : Rule {
         val content = context.file.content
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
+        val mappedTypes = content.mappedTypeNames(context.database.dialect.sourcePatterns).toList()
         content.createTableBodies(tokens).forEach bodyLoop@{ body ->
             val items = content.commaSeparatedClauseItems(body.openOffset + 1, body.closeOffset, body.itemDepth)
             if (!content.isMultilineItemList(items)) return@bodyLoop
@@ -33,7 +34,7 @@ public class ConstraintNewlineRule : Rule {
             items.forEach { item ->
                 val itemLine = lines.lineContaining(item.startOffset) ?: return@forEach
                 val indentation = itemLine.text.takeWhile { character -> character == ' ' || character == '\t' }
-                content.createTableConstraintTokens(item, body.itemDepth, context.database.dialect.sourcePatterns).forEach { constraint ->
+                content.createTableConstraintTokens(item, body.itemDepth, context.database.dialect.sourcePatterns, mappedTypes).forEach { constraint ->
                     val line = lines.lineContaining(constraint.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == constraint.startOffset) return@forEach
                     reporter.report(
@@ -63,6 +64,7 @@ private fun String.createTableConstraintTokens(
     item: ClauseItem,
     itemDepth: Int,
     sourcePatterns: SqlDialectSourcePatterns,
+    mappedTypes: List<MappedTypeName>,
 ): List<SqlToken> {
     val itemTokens =
         sqlTokens()
@@ -78,6 +80,7 @@ private fun String.createTableConstraintTokens(
     val firstLineEnd =
         indexOf('\n', item.startOffset).takeIf { offset -> offset in item.startOffset until item.endOffset }
             ?: return emptyList()
+    val content = this
     return buildList {
         var index = 1
         while (index < itemTokens.size) {
@@ -88,7 +91,7 @@ private fun String.createTableConstraintTokens(
                 length != null &&
                 token.startOffset > firstLineEnd &&
                 sqlParenthesisDepthAt(token.startOffset) == itemDepth &&
-                !isOnMappedTypeNameLine(token.startOffset, sourcePatterns)
+                !mappedTypes.hasTypeOnSameLine(content, token.startOffset)
             ) {
                 add(token)
                 index += length
