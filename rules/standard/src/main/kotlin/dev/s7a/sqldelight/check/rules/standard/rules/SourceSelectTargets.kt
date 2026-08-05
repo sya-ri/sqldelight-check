@@ -41,10 +41,10 @@ private fun String.selectTargetsWithCommas(
     sqlCharacters()
         .takeWhile { character -> character.offset < endOffset }
         .forEach { character ->
-            when {
-                character.value == '(' -> currentDepth++
-                character.value == ')' -> if (currentDepth > 0) currentDepth--
-                character.value == ',' && character.offset >= startOffset && currentDepth == depth -> {
+            when (character.value) {
+                '(' -> currentDepth++
+                ')' -> if (currentDepth > 0) currentDepth--
+                ',' -> if (character.offset >= startOffset && currentDepth == depth) {
                     trimmedSelectTarget(targetStart, character.offset, character.offset)?.let(targets::add)
                     targetStart = character.offset + 1
                 }

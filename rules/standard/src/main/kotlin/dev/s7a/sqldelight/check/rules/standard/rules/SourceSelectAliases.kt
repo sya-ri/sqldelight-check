@@ -90,10 +90,10 @@ private fun String.selectTargets(
     sqlCharacters()
         .takeWhile { character -> character.offset < endOffset }
         .forEach { character ->
-            when {
-                character.value == '(' -> currentDepth++
-                character.value == ')' -> if (currentDepth > 0) currentDepth--
-                character.value == ',' && character.offset >= startOffset && currentDepth == depth -> {
+            when (character.value) {
+                '(' -> currentDepth++
+                ')' -> if (currentDepth > 0) currentDepth--
+                ',' -> if (character.offset >= startOffset && currentDepth == depth) {
                     targets += AliasSelectTarget(targetStart, character.offset).trimmedIn(this)
                     targetStart = character.offset + 1
                 }

@@ -149,7 +149,7 @@ private data class AliasToken(
     val usesAs: Boolean,
 )
 
-private fun String.aliasAfterSource(
+private fun aliasAfterSource(
     tokens: List<SqlToken>,
     startOffset: Int,
     endOffset: Int,
@@ -171,7 +171,7 @@ private fun String.aliasAfterSource(
     }
 }
 
-private fun String.firstReferenceBoundaryAfter(
+private fun firstReferenceBoundaryAfter(
     tokens: List<SqlToken>,
     startIndex: Int,
     statementEnd: Int,
