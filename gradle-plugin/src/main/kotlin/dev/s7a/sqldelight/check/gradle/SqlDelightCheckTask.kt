@@ -261,19 +261,8 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         performanceMetricsEnabled: Boolean,
         performanceMetricsCollector: PerformanceMetricsCollector,
     ): AnalysisTrace =
-        object : AnalysisTrace {
+        object : LoggingAnalysisTrace(logLevel, logger) {
             override val collectsPerformanceMetrics: Boolean = performanceMetricsEnabled
-
-            override fun databaseFiles(
-                database: DatabaseContext,
-                files: List<SourceFile>,
-            ) {
-                if (!logLevel.logsFiles) return
-                logger.lifecycle("sqldelight-check [{}] files ({}):", database.name, files.size)
-                files.forEach { file ->
-                    logger.lifecycle("sqldelight-check [{}]   - {}", database.name, file.path)
-                }
-            }
 
             override fun fileRules(
                 database: DatabaseContext,
@@ -300,33 +289,6 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 durationNanos: Long,
             ) {
                 performanceMetricsCollector.recordPhase(database.name, phase, durationNanos)
-            }
-
-            override fun deprecatedRule(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                deprecation: RuleDeprecation,
-                enabled: Boolean,
-            ) {
-                logger.warn(deprecatedRuleMessage(database, ruleId, deprecation, enabled))
-            }
-
-            override fun unknownRuleOption(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                optionName: String,
-                knownOptionNames: Set<String>,
-            ) {
-                logger.warn(unknownRuleOptionMessage(database, ruleId, optionName, knownOptionNames))
-            }
-
-            override fun deprecatedRuleOption(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                optionName: String,
-                deprecation: RuleOptionDeprecation,
-            ) {
-                logger.warn(deprecatedRuleOptionMessage(database, ruleId, optionName, deprecation))
             }
         }
 

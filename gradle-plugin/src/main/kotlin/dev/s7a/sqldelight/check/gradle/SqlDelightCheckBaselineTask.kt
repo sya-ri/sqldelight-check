@@ -10,8 +10,6 @@ import dev.s7a.sqldelight.check.core.BaselineEntry
 import dev.s7a.sqldelight.check.core.DialectRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
-import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
-import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -155,18 +153,7 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
         )
 
     private fun tracing(logLevel: LogLevel): AnalysisTrace =
-        object : AnalysisTrace {
-            override fun databaseFiles(
-                database: DatabaseContext,
-                files: List<SourceFile>,
-            ) {
-                if (!logLevel.logsFiles) return
-                logger.lifecycle("sqldelight-check [{}] files ({}):", database.name, files.size)
-                files.forEach { file ->
-                    logger.lifecycle("sqldelight-check [{}]   - {}", database.name, file.path)
-                }
-            }
-
+        object : LoggingAnalysisTrace(logLevel, logger) {
             override fun fileRules(
                 database: DatabaseContext,
                 file: SourceFile,
@@ -181,33 +168,6 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
                 ruleIds.forEach { ruleId ->
                     logger.lifecycle("sqldelight-check [{}]   - {}", database.name, ruleId.value)
                 }
-            }
-
-            override fun deprecatedRule(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                deprecation: RuleDeprecation,
-                enabled: Boolean,
-            ) {
-                logger.warn(deprecatedRuleMessage(database, ruleId, deprecation, enabled))
-            }
-
-            override fun unknownRuleOption(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                optionName: String,
-                knownOptionNames: Set<String>,
-            ) {
-                logger.warn(unknownRuleOptionMessage(database, ruleId, optionName, knownOptionNames))
-            }
-
-            override fun deprecatedRuleOption(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                optionName: String,
-                deprecation: RuleOptionDeprecation,
-            ) {
-                logger.warn(deprecatedRuleOptionMessage(database, ruleId, optionName, deprecation))
             }
         }
 }
