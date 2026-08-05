@@ -2,7 +2,7 @@ package dev.s7a.sqldelight.check.rules.standard.rules
 
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 
-internal fun String.hasWhereClauseAfter(
+internal fun hasWhereClauseAfter(
     tokens: List<SqlToken>,
     startIndex: Int,
     statementEnd: Int,

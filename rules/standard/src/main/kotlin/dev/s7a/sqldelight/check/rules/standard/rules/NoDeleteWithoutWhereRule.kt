@@ -27,10 +27,10 @@ public class NoDeleteWithoutWhereRule : Rule {
         val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Delete)) return@forEachIndexed
-            if (content.isReferentialDeleteAction(tokens, index, parenthesisDepths)) return@forEachIndexed
+            if (isReferentialDeleteAction(tokens, index, parenthesisDepths)) return@forEachIndexed
             val depth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
-            if (content.hasWhereClauseAfter(tokens, index, statementEnd, depth, parenthesisDepths)) return@forEachIndexed
+            if (hasWhereClauseAfter(tokens, index, statementEnd, depth, parenthesisDepths)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(
@@ -45,7 +45,7 @@ public class NoDeleteWithoutWhereRule : Rule {
     }
 }
 
-private fun String.isReferentialDeleteAction(
+private fun isReferentialDeleteAction(
     tokens: List<SqlToken>,
     deleteIndex: Int,
     parenthesisDepths: IntArray,
