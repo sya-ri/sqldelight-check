@@ -4,27 +4,40 @@ import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
+import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.BaselineEntry
+import dev.s7a.sqldelight.check.core.DialectRegistry
+import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
+import java.net.URLClassLoader
+import java.nio.charset.StandardCharsets
+import java.util.Collections
+import java.util.Enumeration
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 
 /**
  * Generates a sqldelight-check baseline file from the current diagnostics.
+ *
+ * All project state is captured into task properties at configuration time so that
+ * the task action runs without any `project` access, enabling configuration cache
+ * compatibility.
  */
 @DisableCachingByDefault(because = "The task snapshots current diagnostics into a user-maintained baseline file.")
 public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
@@ -33,13 +46,6 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
      */
     @get:Input
     public abstract val logLevel: Property<LogLevel>
-
-    /**
-     * SQLDelight source files that can influence diagnostics.
-     */
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    public abstract val sqlDelightSources: ConfigurableFileCollection
 
     /**
      * Baseline file to write.
@@ -59,20 +65,56 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
     @get:Classpath
     public abstract val dialectClasspath: ConfigurableFileCollection
 
+    // ── database and config inputs ──────────────────────────────────────────
+
+    /**
+     * Per-database source files and dialect coordinates, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val databases: ListProperty<SqlDelightDatabaseSpec>
+
+    /**
+     * Global rule set configuration, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val globalRuleSets: ListProperty<RuleSetConfigSpec>
+
+    /**
+     * Global rule configuration, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val globalRules: ListProperty<RuleConfigSpec>
+
+    /**
+     * Database-specific configuration overrides, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val databaseConfigs: ListProperty<DatabaseConfigSpec>
+
     /**
      * Runs rules and writes the current diagnostics to the configured baseline file.
      */
     @TaskAction
     public fun run() {
-        val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
         val logLevel = logLevel.get()
-        val config = extension.toCheckConfig(logLevel, baseline = Baseline.Empty)
-        val inputs = SqlDelightProjectResolver(project, project.sqldelightCheckDialectsRegistry()).resolve()
-        val ruleRegistry = project.sqldelightCheckRuleRegistry()
+        val config =
+            buildCheckConfig(
+                globalRuleSets = globalRuleSets.get(),
+                globalRules = globalRules.get(),
+                databaseConfigs = databaseConfigs.get(),
+                allowUnsafeFixes = false,
+                logLevel = logLevel,
+                baseline = Baseline.Empty,
+            )
+
+        val dialectRegistry = buildDialectRegistry()
+        val analysisInputs = buildAnalysisInputs(dialectRegistry)
+        val ruleRegistry = buildRuleRegistry()
         validateConfiguredRules(config, ruleRegistry)
+
         val diagnostics =
             SqlDelightCheckEngine().run(
-                inputs = inputs.map { input -> input.analysisInput },
+                inputs = analysisInputs,
                 ruleSetProviders = ruleRegistry.providers(),
                 config = config,
                 trace = tracing(logLevel),
@@ -91,6 +133,77 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
                 skippedCount,
             )
         }
+    }
+
+    private fun buildRuleRegistry(): RuleRegistry = RuleRegistry.load(buildClassLoader(ruleSetClasspath))
+
+    private fun buildDialectRegistry(): DialectRegistry = DialectRegistry.load(buildClassLoader(dialectClasspath))
+
+    private fun buildClassLoader(classpath: ConfigurableFileCollection): ClassLoader {
+        val urls = classpath.files.map { it.toURI().toURL() }.toTypedArray()
+        return BaselineProviderClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
+    }
+
+    /**
+     * Absolute path of the root project directory, for path relativization.
+     */
+    @get:Internal
+    public abstract val rootProjectDir: Property<String>
+
+    /**
+     * Override root for report paths. Empty string means "not set".
+     */
+    @get:Input
+    @get:Optional
+    public abstract val reportRoot: Property<String>
+
+    private fun buildAnalysisInputs(dialectRegistry: DialectRegistry): List<AnalysisInput> =
+        databases.get().map { spec ->
+            val coord = spec.dialectCoordinate.get()
+            val dialect =
+                if (coord.isEmpty()) {
+                    dialectRegistry.resolve(SqlDialectCoordinate(group = "", module = "", version = null))
+                } else {
+                    val parts = coord.split(':')
+                    dialectRegistry.resolve(
+                        SqlDialectCoordinate(
+                            group = parts.getOrElse(0) { "" },
+                            module = parts.getOrElse(1) { "" },
+                            version = parts.getOrNull(2)?.takeIf { it.isNotEmpty() },
+                        ),
+                    )
+                }
+            AnalysisInput(
+                database = dev.s7a.sqldelight.check.api.DatabaseContext(name = spec.name.get(), dialect = dialect),
+                files =
+                    spec.sourceFiles.files
+                        .filter { it.isFile }
+                        .sortedBy { it.path }
+                        .distinctBy { it.path }
+                        .map { file ->
+                            SourceFile(
+                                path = resolveReportPath(file),
+                                content = file.readText(StandardCharsets.UTF_8),
+                            )
+                        },
+            )
+        }
+
+    private fun resolveReportPath(file: java.io.File): String {
+        val filePath = file.toPath().toAbsolutePath().normalize().let {
+            runCatching { it.toRealPath() }.getOrDefault(it)
+        }
+        val reportRootStr = reportRoot.orNull?.takeIf { it.isNotBlank() }
+        if (reportRootStr != null) {
+            val reportRootPath = java.io.File(reportRootStr).toPath().toAbsolutePath().normalize().let {
+                runCatching { it.toRealPath() }.getOrDefault(it)
+            }
+            if (filePath.startsWith(reportRootPath)) {
+                return reportRootPath.relativize(filePath).toString().replace(java.io.File.separatorChar, '/')
+            }
+        }
+        val rootDir = java.io.File(rootProjectDir.get()).toPath().toAbsolutePath().normalize()
+        return rootDir.relativize(filePath).toString().replace(java.io.File.separatorChar, '/')
     }
 
     private fun tracing(logLevel: LogLevel): AnalysisTrace =
@@ -149,4 +262,17 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
                 logger.warn(deprecatedRuleOptionMessage(database, ruleId, optionName, deprecation))
             }
         }
+}
+
+private class BaselineProviderClassLoader(
+    urls: Array<java.net.URL>,
+    parent: ClassLoader,
+) : URLClassLoader(urls, parent) {
+    override fun getResource(name: String): java.net.URL? = findResource(name) ?: parent.getResource(name)
+
+    override fun getResources(name: String): Enumeration<java.net.URL> {
+        val localResources = findResources(name).iterator().asSequence().toList()
+        val parentResources = parent.getResources(name).iterator().asSequence().toList()
+        return Collections.enumeration(localResources + parentResources)
+    }
 }

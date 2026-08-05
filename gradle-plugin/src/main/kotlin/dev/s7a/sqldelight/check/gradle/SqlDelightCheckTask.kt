@@ -1,18 +1,22 @@
 package dev.s7a.sqldelight.check.gradle
 
-import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DatabaseContext
+import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
+import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.AnalysisPhase
 import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.DatabaseConfig
+import dev.s7a.sqldelight.check.core.DialectRegistry
 import dev.s7a.sqldelight.check.core.FixApplier
 import dev.s7a.sqldelight.check.core.FixSkipReason
+import dev.s7a.sqldelight.check.core.ReporterRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
@@ -21,18 +25,23 @@ import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import java.io.File
 import java.io.OutputStream
+import java.net.URLClassLoader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.util.Collections
+import java.util.Enumeration
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -42,6 +51,10 @@ import org.gradle.work.DisableCachingByDefault
 
 /**
  * Base task for sqldelight-check operations.
+ *
+ * All project state is captured into task properties at configuration time so that
+ * the task action runs without any `project` access, enabling configuration cache
+ * compatibility.
  */
 @DisableCachingByDefault(because = "The fix task can rewrite source files, and reporters may write configurable outputs.")
 public abstract class SqlDelightCheckTask : DefaultTask() {
@@ -64,19 +77,14 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public abstract val performanceMetrics: Property<Boolean>
 
     /**
-     * SQLDelight source files that can influence diagnostics or fixes.
-     */
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    public abstract val sqlDelightSources: ConfigurableFileCollection
-
-    /**
      * Optional baseline file containing known diagnostics to suppress.
      */
     @get:Optional
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     public abstract val baselineFile: RegularFileProperty
+
+    // ── classpath inputs ────────────────────────────────────────────────────
 
     /**
      * Runtime classpath used to discover rule set providers.
@@ -96,30 +104,109 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     @get:Classpath
     public abstract val dialectClasspath: ConfigurableFileCollection
 
+    // ── database and config inputs ──────────────────────────────────────────
+
+    /**
+     * Per-database source files and dialect coordinates, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val databases: ListProperty<SqlDelightDatabaseSpec>
+
+    /**
+     * Global rule set configuration, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val globalRuleSets: ListProperty<RuleSetConfigSpec>
+
+    /**
+     * Global rule configuration, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val globalRules: ListProperty<RuleConfigSpec>
+
+    /**
+     * Database-specific configuration overrides, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val databaseConfigs: ListProperty<DatabaseConfigSpec>
+
+    /**
+     * Whether fix tasks may apply unsafe fixes.
+     */
+    @get:Input
+    public abstract val allowUnsafeFixes: Property<Boolean>
+
+    // ── reporter outputs ─────────────────────────────────────────────────────
+
+    /**
+     * Reporter configurations, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val reporters: ListProperty<SqlDelightReporterTaskSpec>
+
     /**
      * Default directory where built-in reports are written.
      */
     @get:OutputDirectory
     public abstract val reportOutputDirectory: DirectoryProperty
 
+    // ── path resolution inputs ───────────────────────────────────────────────
+
     /**
-     * Runs SQLDelight project detection, rules, and report writing.
+     * Absolute path of the root project directory, for fix-mode file resolution.
      */
+    @get:Internal
+    public abstract val rootProjectDir: Property<String>
+
+    /**
+     * Absolute path of this project's directory, for fix-mode file resolution.
+     */
+    @get:Internal
+    public abstract val projectDir: Property<String>
+
+    /**
+     * Override root for report paths (from `sqldelightCheck.reportRoot` Gradle property
+     * or `GITHUB_WORKSPACE` env var). Empty string means "not set".
+     */
+    @get:Input
+    @get:Optional
+    public abstract val reportRoot: Property<String>
+
+    // ── task action ───────────────────────────────────────────────────────────
+
     @TaskAction
     public fun run() {
-        val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
         val logLevel = logLevel.get()
-        val baseline = baselineFile.orNull?.asFile?.readSqldelightCheckBaseline()
-        val config = extension.toCheckConfig(logLevel, baseline = baseline ?: Baseline.Empty)
+        val baseline = baselineFile.orNull?.asFile?.readSqldelightCheckBaseline() ?: Baseline.Empty
+        val config =
+            buildCheckConfig(
+                globalRuleSets = globalRuleSets.get(),
+                globalRules = globalRules.get(),
+                databaseConfigs = databaseConfigs.get(),
+                allowUnsafeFixes = allowUnsafeFixes.get(),
+                logLevel = logLevel,
+                baseline = baseline,
+            )
+
         val traceCollector = RuleTraceCollector()
         val performanceMetricsCollector = PerformanceMetricsCollector()
         val trace = tracing(logLevel, traceCollector, performanceMetrics.get(), performanceMetricsCollector)
-        var result = analyze(config, trace)
+
+        val ruleRegistry = buildRuleRegistry()
+        val dialectRegistry = buildDialectRegistry()
+        val analysisInputs = buildAnalysisInputs(dialectRegistry)
+
+        validateConfiguredRules(config, ruleRegistry)
+
+        var result = runAnalysis(config, trace, ruleRegistry, analysisInputs)
+
         if (applyFixes.get()) {
             val fixResult = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeFixes)
             if (fixResult.changedFiles > 0) {
                 logger.lifecycle("Applied sqldelight-check fixes to {} file(s).", fixResult.changedFiles)
-                result = analyze(config, trace)
+                // Re-read file contents after fixes and re-analyze.
+                val refreshedInputs = buildAnalysisInputs(dialectRegistry)
+                result = runAnalysis(config, trace, ruleRegistry, refreshedInputs)
             }
             if (fixResult.skippedReasons.isNotEmpty()) {
                 val skippedSummary =
@@ -130,28 +217,87 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
             }
         }
 
-        writeReports(extension, result.diagnostics)
+        writeReports(result.diagnostics)
         logDiagnostics(result.diagnostics)
         logRuleHits(logLevel, traceCollector.traces, result.diagnostics)
         logPerformanceMetrics(performanceMetricsCollector)
         logger.lifecycle("sqldelight-check analyzed {} SQLDelight database(s).", result.databaseCount)
 
-        val errorCount = result.diagnostics.count { diagnostic -> diagnostic.severity == Severity.Error }
+        val errorCount = result.diagnostics.count { it.severity == Severity.Error }
         if (errorCount > 0) {
             throw GradleException("sqldelight-check found $errorCount error diagnostic(s).")
         }
     }
 
-    private fun analyze(
+    // ── private helpers ───────────────────────────────────────────────────────
+
+    private fun buildRuleRegistry(): RuleRegistry = RuleRegistry.load(buildClassLoader(ruleSetClasspath))
+
+    private fun buildDialectRegistry(): DialectRegistry = DialectRegistry.load(buildClassLoader(dialectClasspath))
+
+    private fun buildClassLoader(classpath: ConfigurableFileCollection): ClassLoader {
+        val urls = classpath.files.map { it.toURI().toURL() }.toTypedArray()
+        return TaskProviderClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
+    }
+
+    private fun buildAnalysisInputs(dialectRegistry: DialectRegistry): List<AnalysisInput> =
+        databases.get().map { spec ->
+            val coord = spec.dialectCoordinate.get()
+            val dialect =
+                if (coord.isEmpty()) {
+                    dialectRegistry.resolve(SqlDialectCoordinate(group = "", module = "", version = null))
+                } else {
+                    val parts = coord.split(':')
+                    dialectRegistry.resolve(
+                        SqlDialectCoordinate(
+                            group = parts.getOrElse(0) { "" },
+                            module = parts.getOrElse(1) { "" },
+                            version = parts.getOrNull(2)?.takeIf { it.isNotEmpty() },
+                        ),
+                    )
+                }
+            AnalysisInput(
+                database = DatabaseContext(name = spec.name.get(), dialect = dialect),
+                files =
+                    spec.sourceFiles.files
+                        .filter { it.isFile }
+                        .sortedBy { it.path }
+                        .distinctBy { it.path }
+                        .map { file ->
+                            SourceFile(
+                                path = resolveReportPath(file),
+                                content = file.readText(StandardCharsets.UTF_8),
+                            )
+                        },
+            )
+        }
+
+    private fun resolveReportPath(file: File): String {
+        val filePath = file.toPath().toAbsolutePath().normalize().let {
+            runCatching { it.toRealPath() }.getOrDefault(it)
+        }
+        val reportRootStr = reportRoot.orNull?.takeIf { it.isNotBlank() }
+        if (reportRootStr != null) {
+            val reportRootPath = File(reportRootStr).toPath().toAbsolutePath().normalize().let {
+                runCatching { it.toRealPath() }.getOrDefault(it)
+            }
+            if (filePath.startsWith(reportRootPath)) {
+                return reportRootPath.relativize(filePath).toString().replace(File.separatorChar, '/')
+            }
+        }
+        val rootDir = File(rootProjectDir.get()).toPath().toAbsolutePath().normalize()
+        return rootDir.relativize(filePath).toString().replace(File.separatorChar, '/')
+    }
+
+    private fun runAnalysis(
         config: CheckConfig,
         trace: AnalysisTrace,
+        ruleRegistry: RuleRegistry,
+        inputs: List<AnalysisInput>,
     ): AnalysisRunResult {
-        val inputs = SqlDelightProjectResolver(project, project.sqldelightCheckDialectsRegistry()).resolve()
-        val ruleRegistry = project.sqldelightCheckRuleRegistry()
-        validateConfiguredRules(config, ruleRegistry)
         val diagnostics =
             SqlDelightCheckEngine().run(
-                inputs = inputs.map { input -> input.analysisInput },
+                inputs = inputs,
                 ruleSetProviders = ruleRegistry.providers(),
                 config = config,
                 trace = trace,
@@ -316,10 +462,10 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         var changedFiles = 0
         val skippedReasons = linkedMapOf<FixSkipReason, Int>()
         diagnostics
-            .filter { diagnostic -> diagnostic.file != null }
-            .groupBy { diagnostic -> diagnostic.file?.path.orEmpty() }
+            .filter { it.file != null }
+            .groupBy { it.file?.path.orEmpty() }
             .forEach { (path, fileDiagnostics) ->
-                val file = sourceFile(path) ?: return@forEach
+                val file = resolveSourceFile(path) ?: return@forEach
 
                 val original = file.readText(StandardCharsets.UTF_8)
                 val result = applier.apply(original, fileDiagnostics, allowUnsafe)
@@ -334,52 +480,35 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         return FixApplySummary(changedFiles = changedFiles, skippedReasons = skippedReasons)
     }
 
-    private fun sourceFile(path: String): File? {
+    private fun resolveSourceFile(path: String): File? {
         val relativePath = path.normalizedRelativePath() ?: return null
+        val reportRootFile = reportRoot.orNull?.takeIf { it.isNotBlank() }?.let { File(it) }
         return sequenceOf(
-            reportRootPath()?.resolve(relativePath)?.normalize()?.toFile(),
-            project.rootProject.file(relativePath.toString()),
-            project.file(relativePath.toString()),
+            reportRootFile?.resolve(relativePath.toString())?.normalize(),
+            File(rootProjectDir.get()).resolve(relativePath.toString()).normalize(),
+            File(projectDir.get()).resolve(relativePath.toString()).normalize(),
         ).firstOrNull { file -> file?.isFile == true }
     }
 
-    private fun reportRootPath(): Path? =
-        project.providers
-            .gradleProperty("sqldelightCheck.reportRoot")
-            .orNull
-            ?.takeIf { value -> value.isNotBlank() }
-            ?.let { value -> project.file(value).toPath().toAbsolutePath().normalize() }
-            ?: project.providers
-                .environmentVariable("GITHUB_WORKSPACE")
-                .orNull
-                ?.takeIf { value -> value.isNotBlank() }
-                ?.let { value -> File(value).toPath().toAbsolutePath().normalize() }
-
-    private fun writeReports(
-        extension: SqlDelightCheckExtension,
-        diagnostics: List<Diagnostic>,
-    ) {
+    private fun writeReports(diagnostics: List<Diagnostic>) {
         val report = Report(diagnostics)
-        val registry = project.sqldelightCheckReporterRegistry()
+        val registry = ReporterRegistry.load(buildClassLoader(reporterClasspath))
 
-        extension.reports
-            .filter { reporter -> reporter.required.get() }
-            .forEach { reporter ->
+        reporters.get()
+            .filter { it.required.get() }
+            .forEach { spec ->
                 val provider =
-                    registry.find(reporter.name)
-                        ?: throw GradleException("sqldelight-check reporter '${reporter.name}' was not found on the runtime classpath.")
-                val outputFile = reporter.outputFile.get().asFile
-                val outputDirectory = reporter.outputDirectory.get().asFile
+                    registry.find(spec.name.get())
+                        ?: throw GradleException("sqldelight-check reporter '${spec.name.get()}' was not found on the runtime classpath.")
+                val outputFile = spec.primaryOutputFileAsFile()
+                val outputDirectory = spec.outputDirectoryAsFile()
                 provider
-                    .create(reporter.resolvedOptions())
+                    .create(spec.options.get())
                     .write(
                         report,
-                        GradleReportOutput(
-                            primaryFile = outputFile,
-                            outputDirectory = outputDirectory,
-                        ),
+                        GradleReportOutput(primaryFile = outputFile, outputDirectory = outputDirectory),
                     )
-                logger.lifecycle("Wrote sqldelight-check {} report to {}", reporter.name, outputFile)
+                logger.lifecycle("Wrote sqldelight-check {} report to {}", spec.name.get(), outputFile)
             }
     }
 
@@ -395,6 +524,23 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         }
     }
 }
+
+// ── private classloader ───────────────────────────────────────────────────────
+
+private class TaskProviderClassLoader(
+    urls: Array<java.net.URL>,
+    parent: ClassLoader,
+) : URLClassLoader(urls, parent) {
+    override fun getResource(name: String): java.net.URL? = findResource(name) ?: parent.getResource(name)
+
+    override fun getResources(name: String): Enumeration<java.net.URL> {
+        val localResources = findResources(name).iterator().asSequence().toList()
+        val parentResources = parent.getResources(name).iterator().asSequence().toList()
+        return Collections.enumeration(localResources + parentResources)
+    }
+}
+
+// ── private output helper ─────────────────────────────────────────────────────
 
 private class GradleReportOutput(
     private val primaryFile: File,
@@ -422,6 +568,8 @@ private class GradleReportOutput(
         return outputFile.outputStream()
     }
 }
+
+// ── private data classes ──────────────────────────────────────────────────────
 
 private data class AnalysisRunResult(
     val databaseCount: Int,
@@ -539,10 +687,7 @@ private fun String.normalizedRelativePath(): Path? {
 private data class RuleTraceCollector(
     val traces: MutableList<FileRuleTrace> = mutableListOf(),
 ) {
-    /**
-     * Records the rule IDs that were considered for one file.
-     */
-    public fun record(
+    fun record(
         databaseName: String,
         filePath: String,
         ruleIds: List<QualifiedRuleId>,
@@ -608,7 +753,7 @@ private data class FileRuleTrace(
 
 internal fun diagnosticRuleHitsByFile(diagnostics: List<Diagnostic>): Map<FileRuleKey, Set<String>> =
     diagnostics
-        .filter { diagnostic -> diagnostic.file != null && diagnostic.database != null }
+        .filter { it.file != null && it.database != null }
         .groupBy { diagnostic ->
             FileRuleKey(
                 databaseName = diagnostic.database!!.name,
