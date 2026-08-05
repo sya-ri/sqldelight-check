@@ -75,11 +75,26 @@ private fun SqlResultColumnFacts.referenceQualificationStyle(
 }
 
 private fun SqlResultColumnFacts.expressionText(content: String): String {
-    var text = content.substring(range.start.toOffsetIn(content), range.end.toOffsetIn(content)).trim()
+    val text = content.substring(range.start.toOffsetIn(content), range.end.toOffsetIn(content)).trim()
     val aliasText = alias ?: return text
-    text = text.replace(Regex("""(?i)\s+as\s+${Regex.escape(aliasText)}\s*$"""), "")
-    text = text.replace(Regex("""\s+${Regex.escape(aliasText)}\s*$"""), "")
-    return text.trim()
+
+    if (!text.endsWith(aliasText, ignoreCase = true)) return text
+
+    val beforeAlias = text.dropLast(aliasText.length).trimEnd()
+
+    if (beforeAlias.endsWith("as", ignoreCase = true)) {
+        val withoutAs = beforeAlias.dropLast(2)
+        if (withoutAs.isEmpty() || withoutAs.last().isWhitespace()) {
+            return withoutAs.trimEnd()
+        }
+    }
+
+    // Alias attached with whitespace only (no AS keyword)
+    if (beforeAlias.length < text.dropLast(aliasText.length).length) {
+        return beforeAlias
+    }
+
+    return text
 }
 
 private val simpleIdentifierRegex = Regex("""[A-Za-z_][A-Za-z0-9_]*""")
