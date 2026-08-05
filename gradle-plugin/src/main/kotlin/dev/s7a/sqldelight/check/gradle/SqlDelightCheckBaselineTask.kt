@@ -7,19 +7,8 @@ import dev.s7a.sqldelight.check.api.SourceFile
 import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.BaselineEntry
-import dev.s7a.sqldelight.check.core.DialectRegistry
-import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
-import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Classpath
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
@@ -32,56 +21,12 @@ import org.gradle.work.DisableCachingByDefault
  * compatibility.
  */
 @DisableCachingByDefault(because = "The task snapshots current diagnostics into a user-maintained baseline file.")
-public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
-    /**
-     * Log output detail for this task execution.
-     */
-    @get:Input
-    public abstract val logLevel: Property<LogLevel>
-
+public abstract class SqlDelightCheckBaselineTask : AbstractSqlDelightCheckBaseTask() {
     /**
      * Baseline file to write.
      */
     @get:OutputFile
     public abstract val baselineFile: RegularFileProperty
-
-    /**
-     * Runtime classpath used to discover rule set providers.
-     */
-    @get:Classpath
-    public abstract val ruleSetClasspath: ConfigurableFileCollection
-
-    /**
-     * Runtime classpath used to discover dialect metadata providers.
-     */
-    @get:Classpath
-    public abstract val dialectClasspath: ConfigurableFileCollection
-
-    // ── database and config inputs ──────────────────────────────────────────
-
-    /**
-     * Per-database source files and dialect coordinates, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val databases: ListProperty<SqlDelightDatabaseSpec>
-
-    /**
-     * Global rule set configuration, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val globalRuleSets: ListProperty<RuleSetConfigSpec>
-
-    /**
-     * Global rule configuration, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val globalRules: ListProperty<RuleConfigSpec>
-
-    /**
-     * Database-specific configuration overrides, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val databaseConfigs: ListProperty<DatabaseConfigSpec>
 
     /**
      * Runs rules and writes the current diagnostics to the configured baseline file.
@@ -127,31 +72,6 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
         }
     }
 
-    private fun buildRuleRegistry(): RuleRegistry = buildRuleRegistry(ruleSetClasspath)
-
-    private fun buildDialectRegistry(): DialectRegistry = buildDialectRegistry(dialectClasspath)
-
-    /**
-     * Absolute path of the root project directory, for path relativization.
-     */
-    @get:Internal
-    public abstract val rootProjectDir: Property<String>
-
-    /**
-     * Override root for report paths. Empty string means "not set".
-     */
-    @get:Input
-    @get:Optional
-    public abstract val reportRoot: Property<String>
-
-    private fun buildAnalysisInputs(dialectRegistry: DialectRegistry) =
-        buildAnalysisInputs(
-            databases = databases.get(),
-            reportRoot = reportRoot.orNull,
-            rootProjectDir = rootProjectDir.get(),
-            dialectRegistry = dialectRegistry,
-        )
-
     private fun tracing(logLevel: LogLevel): AnalysisTrace =
         object : LoggingAnalysisTrace(logLevel, logger) {
             override fun fileRules(
@@ -171,4 +91,3 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
             }
         }
 }
-

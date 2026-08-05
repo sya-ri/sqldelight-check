@@ -12,7 +12,6 @@ import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.DatabaseConfig
-import dev.s7a.sqldelight.check.core.DialectRegistry
 import dev.s7a.sqldelight.check.core.FixApplier
 import dev.s7a.sqldelight.check.core.FixSkipReason
 import dev.s7a.sqldelight.check.core.ReporterRegistry
@@ -26,7 +25,6 @@ import java.io.File
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -53,18 +51,12 @@ import org.gradle.work.DisableCachingByDefault
  * compatibility.
  */
 @DisableCachingByDefault(because = "The fix task can rewrite source files, and reporters may write configurable outputs.")
-public abstract class SqlDelightCheckTask : DefaultTask() {
+public abstract class SqlDelightCheckTask : AbstractSqlDelightCheckBaseTask() {
     /**
      * Whether this task should apply allowed fixes to source files.
      */
     @get:Input
     public abstract val applyFixes: Property<Boolean>
-
-    /**
-     * Log output detail for this task execution.
-     */
-    @get:Input
-    public abstract val logLevel: Property<LogLevel>
 
     /**
      * Whether this task should collect and log rule execution metrics.
@@ -83,48 +75,10 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     // ── classpath inputs ────────────────────────────────────────────────────
 
     /**
-     * Runtime classpath used to discover rule set providers.
-     */
-    @get:Classpath
-    public abstract val ruleSetClasspath: ConfigurableFileCollection
-
-    /**
      * Runtime classpath used to discover reporter providers.
      */
     @get:Classpath
     public abstract val reporterClasspath: ConfigurableFileCollection
-
-    /**
-     * Runtime classpath used to discover dialect metadata providers.
-     */
-    @get:Classpath
-    public abstract val dialectClasspath: ConfigurableFileCollection
-
-    // ── database and config inputs ──────────────────────────────────────────
-
-    /**
-     * Per-database source files and dialect coordinates, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val databases: ListProperty<SqlDelightDatabaseSpec>
-
-    /**
-     * Global rule set configuration, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val globalRuleSets: ListProperty<RuleSetConfigSpec>
-
-    /**
-     * Global rule configuration, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val globalRules: ListProperty<RuleConfigSpec>
-
-    /**
-     * Database-specific configuration overrides, captured at configuration time.
-     */
-    @get:Nested
-    public abstract val databaseConfigs: ListProperty<DatabaseConfigSpec>
 
     /**
      * Whether fix tasks may apply unsafe fixes.
@@ -149,24 +103,10 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     // ── path resolution inputs ───────────────────────────────────────────────
 
     /**
-     * Absolute path of the root project directory, for fix-mode file resolution.
-     */
-    @get:Internal
-    public abstract val rootProjectDir: Property<String>
-
-    /**
      * Absolute path of this project's directory, for fix-mode file resolution.
      */
     @get:Internal
     public abstract val projectDir: Property<String>
-
-    /**
-     * Override root for report paths (from `sqldelightCheck.reportRoot` Gradle property
-     * or `GITHUB_WORKSPACE` env var). Empty string means "not set".
-     */
-    @get:Input
-    @get:Optional
-    public abstract val reportRoot: Property<String>
 
     // ── task action ───────────────────────────────────────────────────────────
 
@@ -226,18 +166,6 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     }
 
     // ── private helpers ───────────────────────────────────────────────────────
-
-    private fun buildRuleRegistry(): RuleRegistry = buildRuleRegistry(ruleSetClasspath)
-
-    private fun buildDialectRegistry(): DialectRegistry = buildDialectRegistry(dialectClasspath)
-
-    private fun buildAnalysisInputs(dialectRegistry: DialectRegistry): List<AnalysisInput> =
-        buildAnalysisInputs(
-            databases = databases.get(),
-            reportRoot = reportRoot.orNull,
-            rootProjectDir = rootProjectDir.get(),
-            dialectRegistry = dialectRegistry,
-        )
 
     private fun runAnalysis(
         config: CheckConfig,
