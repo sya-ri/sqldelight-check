@@ -34,7 +34,7 @@ public class MaxCaseDepthRule : Rule {
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.CaseExpression }
             .forEach { block ->
-                val depth = structure.depthOf(block, SqlSourceBlockKind.CaseExpression)
+                val depth = structure.tokens[block.startTokenIndex].caseDepth + 1
                 if (depth <= maxDepth) return@forEach
                 val token = structure.tokens[block.startTokenIndex].token
                 reporter.report(

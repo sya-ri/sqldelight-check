@@ -20,32 +20,6 @@ internal fun SqlSourceTokenContext.isSourceTerm(term: SqlDialectSourceTerm): Boo
 internal fun SqlSourceStructure.parentBlock(block: SqlSourceBlock): SqlSourceBlock? =
     block.parentBlockIndex?.let(blocks::getOrNull)
 
-internal fun SqlSourceStructure.innermostBlockContaining(
-    context: SqlSourceTokenContext,
-    kind: SqlSourceBlockKind,
-): SqlSourceBlock? {
-    var result: SqlSourceBlock? = null
-    blocks.forEach { block ->
-        val current = result
-        if (
-            block.kind == kind &&
-            block.contains(context) &&
-            (current == null || block.size < current.size)
-        ) {
-            result = block
-        }
-    }
-    return result
-}
-
-internal fun SqlSourceStructure.depthOf(
-    block: SqlSourceBlock,
-    kind: SqlSourceBlockKind,
-): Int =
-    blocks.count { candidate ->
-        candidate.kind == kind && candidate.contains(block)
-    }
-
 internal fun SqlSourceStructure.topLevelSubqueryTableReferences(
     content: String,
     sourcePatterns: SqlDialectSourcePatterns,
