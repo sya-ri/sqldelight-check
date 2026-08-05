@@ -203,44 +203,31 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         databaseConfigs: org.gradle.api.provider.ListProperty<DatabaseConfigSpec>,
         extension: SqlDelightCheckExtension,
     ) {
-        extension.ruleSets.forEach { ruleSetExt ->
-            val spec = objects.newInstance(RuleSetConfigSpec::class.java)
-            spec.id.set(ruleSetExt.name)
-            ruleSetExt.enabled.orNull?.let { spec.enabled.set(it) }
-            globalRuleSets.add(spec)
-        }
-
-        extension.rules.forEach { ruleExt ->
-            val spec = objects.newInstance(RuleConfigSpec::class.java)
-            spec.id.set(ruleExt.name)
-            ruleExt.enabled.orNull?.let { spec.enabled.set(it) }
-            spec.severity.set(ruleExt.severity.get().name)
-            spec.options.set(ruleExt.options.get())
-            globalRules.add(spec)
-        }
-
+        extension.ruleSets.forEach { globalRuleSets.add(toRuleSetConfigSpec(it)) }
+        extension.rules.forEach { globalRules.add(toRuleConfigSpec(it)) }
         extension.databases.forEach { dbExt ->
             val dbSpec = objects.newInstance(DatabaseConfigSpec::class.java)
             dbSpec.name.set(dbExt.name)
-
-            dbExt.ruleSets.forEach { ruleSetExt ->
-                val ruleSetSpec = objects.newInstance(RuleSetConfigSpec::class.java)
-                ruleSetSpec.id.set(ruleSetExt.name)
-                ruleSetExt.enabled.orNull?.let { ruleSetSpec.enabled.set(it) }
-                dbSpec.ruleSets.add(ruleSetSpec)
-            }
-
-            dbExt.rules.forEach { ruleExt ->
-                val ruleSpec = objects.newInstance(RuleConfigSpec::class.java)
-                ruleSpec.id.set(ruleExt.name)
-                ruleExt.enabled.orNull?.let { ruleSpec.enabled.set(it) }
-                ruleSpec.severity.set(ruleExt.severity.get().name)
-                ruleSpec.options.set(ruleExt.options.get())
-                dbSpec.rules.add(ruleSpec)
-            }
-
+            dbExt.ruleSets.forEach { dbSpec.ruleSets.add(toRuleSetConfigSpec(it)) }
+            dbExt.rules.forEach { dbSpec.rules.add(toRuleConfigSpec(it)) }
             databaseConfigs.add(dbSpec)
         }
+    }
+
+    private fun Project.toRuleSetConfigSpec(ruleSetExt: RuleSetExtension): RuleSetConfigSpec {
+        val spec = objects.newInstance(RuleSetConfigSpec::class.java)
+        spec.id.set(ruleSetExt.name)
+        ruleSetExt.enabled.orNull?.let { spec.enabled.set(it) }
+        return spec
+    }
+
+    private fun Project.toRuleConfigSpec(ruleExt: RuleExtension): RuleConfigSpec {
+        val spec = objects.newInstance(RuleConfigSpec::class.java)
+        spec.id.set(ruleExt.name)
+        ruleExt.enabled.orNull?.let { spec.enabled.set(it) }
+        spec.severity.set(ruleExt.severity.get().name)
+        spec.options.set(ruleExt.options.get())
+        return spec
     }
 
     private fun Project.populateReporterSpecs(
