@@ -73,3 +73,18 @@ internal fun String.hasNewlineBetween(startOffset: Int, endOffset: Int): Boolean
     val idx = indexOf('\n', startOffset)
     return idx != -1 && idx < endOffset
 }
+
+/**
+ * Returns true when [offset] is the first non-whitespace character on its line.
+ * Avoids building linesWithRanges() and lineContaining() for this common pattern.
+ */
+internal fun String.isFirstNonWhitespaceAt(offset: Int): Boolean {
+    var i = offset - 1
+    while (i >= 0) {
+        val c = this[i]
+        if (c == '\n') return true
+        if (c != ' ' && c != '\t') return false
+        i--
+    }
+    return true
+}

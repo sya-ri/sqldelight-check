@@ -25,7 +25,6 @@ public class CteNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
         val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
@@ -46,15 +45,12 @@ public class CteNewlineRule : Rule {
             val cteStarts = tokens.cteStartTokens(index + 1, mainStatementIndex, depth, content, parenthesisDepths)
             if (cteStarts.size < 2) return@forEachIndexed
             if (!content.hasNewlineBetween(token.endOffset, tokens[mainStatementIndex].startOffset)) return@forEachIndexed
-            if (cteStarts.all { cte ->
-                    lines.lineContaining(cte.startOffset)?.firstNonWhitespaceOffset == cte.startOffset
-                }
-            ) {
+            if (cteStarts.all { cte -> content.isFirstNonWhitespaceAt(cte.startOffset) }) {
                 return@forEachIndexed
             }
             val misplacedCteStarts =
                 cteStarts
-                    .filter { cte -> lines.lineContaining(cte.startOffset)?.firstNonWhitespaceOffset != cte.startOffset }
+                    .filter { cte -> !content.isFirstNonWhitespaceAt(cte.startOffset) }
                     .map { cte -> cte.startOffset }
 
             reporter.report(
