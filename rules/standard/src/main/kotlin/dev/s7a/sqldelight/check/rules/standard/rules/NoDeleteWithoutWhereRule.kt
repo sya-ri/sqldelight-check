@@ -24,12 +24,13 @@ public class NoDeleteWithoutWhereRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Delete)) return@forEachIndexed
-            if (content.isReferentialDeleteAction(tokens, index)) return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            if (content.isReferentialDeleteAction(tokens, index, parenthesisDepths)) return@forEachIndexed
+            val depth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
-            if (content.hasWhereClauseAfter(tokens, index, statementEnd, depth)) return@forEachIndexed
+            if (content.hasWhereClauseAfter(tokens, index, statementEnd, depth, parenthesisDepths)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(
@@ -47,9 +48,10 @@ public class NoDeleteWithoutWhereRule : Rule {
 private fun String.isReferentialDeleteAction(
     tokens: List<SqlToken>,
     deleteIndex: Int,
+    parenthesisDepths: IntArray,
 ): Boolean {
     val previous = tokens.getOrNull(deleteIndex - 1) ?: return false
     val delete = tokens[deleteIndex]
     return previous.isTerm(SqlDialectSourceTerm.On) &&
-        sqlParenthesisDepthAt(previous.startOffset) == sqlParenthesisDepthAt(delete.startOffset)
+        parenthesisDepths[previous.startOffset] == parenthesisDepths[delete.startOffset]
 }

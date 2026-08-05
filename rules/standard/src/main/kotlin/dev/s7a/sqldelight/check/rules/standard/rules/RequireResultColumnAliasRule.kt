@@ -25,10 +25,11 @@ public class RequireResultColumnAliasRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         content.sourceSelectClauseTargets().forEach { clause ->
             clause.targets.forEach { target ->
                 if (!target.requiresAlias(content)) return@forEach
-                if (target.hasAlias(content, context.database.dialect.sourcePatterns)) return@forEach
+                if (target.hasAlias(content, context.database.dialect.sourcePatterns, parenthesisDepths)) return@forEach
 
                 reporter.report(
                     RuleDiagnostic(
@@ -55,6 +56,7 @@ private fun SourceSelectTarget.requiresAlias(content: String): Boolean {
 private fun SourceSelectTarget.hasAlias(
     content: String,
     sourcePatterns: SqlDialectSourcePatterns,
+    parenthesisDepths: IntArray,
 ): Boolean {
     val text = content.substring(startOffset, endOffset)
     val tokens = text.sqlTokens().toList()
@@ -64,7 +66,7 @@ private fun SourceSelectTarget.hasAlias(
     val aliasOffset = startOffset + last.startOffset
     val previousSqlCharacter = content.sqlCharacters().takeWhile { character -> character.offset < aliasOffset }.lastOrNull()
     return last.text.isIdentifierLike() &&
-        content.sqlParenthesisDepthAt(aliasOffset) == content.sqlParenthesisDepthAt(startOffset) &&
+        parenthesisDepths[aliasOffset] == parenthesisDepths[startOffset] &&
         previousSqlCharacter?.value?.isWhitespace() == true &&
         previousSqlCharacter.previousNonWhitespaceIn(content)?.value !in setOf('+', '-', '*', '/', '|', '<', '>', '=') &&
         !sourcePatterns.matches(AliasBoundary, listOf(last.normalizedText))

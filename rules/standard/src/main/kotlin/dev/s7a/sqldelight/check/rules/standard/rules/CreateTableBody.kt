@@ -8,7 +8,7 @@ internal data class CreateTableBody(
     val itemDepth: Int,
 )
 
-internal fun String.createTableBodies(tokens: List<SqlToken>): Sequence<CreateTableBody> =
+internal fun String.createTableBodies(tokens: List<SqlToken>, parenthesisDepths: IntArray): Sequence<CreateTableBody> =
     sequence {
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Create)) return@forEachIndexed
@@ -25,7 +25,7 @@ internal fun String.createTableBodies(tokens: List<SqlToken>): Sequence<CreateTa
                 CreateTableBody(
                     openOffset = open.offset,
                     closeOffset = close,
-                    itemDepth = sqlParenthesisDepthAt(open.offset) + 1,
+                    itemDepth = parenthesisDepths[open.offset] + 1,
                 ),
             )
         }

@@ -22,11 +22,12 @@ public class NoSelectStarRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         content.selectFromRanges().forEach { select ->
             content.sqlCharacters()
                 .dropWhile { character -> character.offset <= select.selectEndOffset }
                 .takeWhile { character -> character.offset < select.fromStartOffset }
-                .filter { character -> character.value == '*' && content.sqlParenthesisDepthAt(character.offset) == select.depth }
+                .filter { character -> character.value == '*' && parenthesisDepths[character.offset] == select.depth }
                 .forEach { character ->
                     reporter.report(
                         RuleDiagnostic(

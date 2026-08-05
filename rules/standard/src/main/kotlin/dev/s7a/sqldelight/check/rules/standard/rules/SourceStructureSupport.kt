@@ -23,18 +23,21 @@ internal fun SqlSourceStructure.parentBlock(block: SqlSourceBlock): SqlSourceBlo
 internal fun SqlSourceStructure.topLevelSubqueryTableReferences(
     content: String,
     sourcePatterns: SqlDialectSourcePatterns,
-): List<SourceSubqueryTableReference> =
-    blocks
+): List<SourceSubqueryTableReference> {
+    val parenthesisDepths = content.computeParenthesisDepths()
+    return blocks
         .asSequence()
         .filter { block -> block.kind == SqlSourceBlockKind.Subquery }
-        .mapNotNull { block -> subqueryTableReference(content, sourcePatterns, block) }
+        .mapNotNull { block -> subqueryTableReference(content, sourcePatterns, block, parenthesisDepths) }
         .filter { reference -> reference.introducer.parenthesisDepth == 0 }
         .toList()
+}
 
 private fun SqlSourceStructure.subqueryTableReference(
     content: String,
     sourcePatterns: SqlDialectSourcePatterns,
     block: SqlSourceBlock,
+    parenthesisDepths: IntArray,
 ): SourceSubqueryTableReference? {
     val clause = parentBlock(block)?.takeIf { parent -> parent.kind == SqlSourceBlockKind.Clause } ?: return null
     val beforeSubquery = tokensInBlock(clause).filter { context -> context.index < block.startTokenIndex }
@@ -45,7 +48,7 @@ private fun SqlSourceStructure.subqueryTableReference(
     return SourceSubqueryTableReference(
         block = block,
         introducer = introducer,
-        alias = aliasAfterSubquery(content, sourcePatterns, clause, block, introducer.parenthesisDepth),
+        alias = aliasAfterSubquery(content, sourcePatterns, clause, block, introducer.parenthesisDepth, parenthesisDepths),
     )
 }
 
@@ -55,6 +58,7 @@ private fun SqlSourceStructure.aliasAfterSubquery(
     clause: SqlSourceBlock,
     block: SqlSourceBlock,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): SqlSourceTokenContext? {
     val afterSubquery =
         tokensInBlock(clause)
@@ -63,9 +67,9 @@ private fun SqlSourceStructure.aliasAfterSubquery(
             .filter { context -> context.parenthesisDepth == depth }
             .filter { context -> context.token.text.isIdentifierLike() }
             .toList()
-    val first = afterSubquery.aliasTokenOrNull(content, sourcePatterns, block.endOffset, 0, depth) ?: return null
+    val first = afterSubquery.aliasTokenOrNull(content, sourcePatterns, block.endOffset, 0, depth, parenthesisDepths) ?: return null
     return if (first.isSourceTerm(SqlDialectSourceTerm.As)) {
-        afterSubquery.aliasTokenOrNull(content, sourcePatterns, first.token.endOffset, 1, depth)
+        afterSubquery.aliasTokenOrNull(content, sourcePatterns, first.token.endOffset, 1, depth, parenthesisDepths)
     } else {
         first
     }
@@ -77,9 +81,10 @@ private fun List<SqlSourceTokenContext>.aliasTokenOrNull(
     previousOffset: Int,
     index: Int,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): SqlSourceTokenContext? {
     val token = getOrNull(index) ?: return null
-    if (content.hasTableReferenceSeparator(previousOffset, token.token.startOffset, depth)) return null
+    if (content.hasTableReferenceSeparator(previousOffset, token.token.startOffset, depth, parenthesisDepths)) return null
     if (sourcePatterns.matches(TableReferenceBoundary, normalizedTextsFrom(index))) return null
     return token
 }
@@ -91,11 +96,12 @@ private fun String.hasTableReferenceSeparator(
     startOffset: Int,
     endOffset: Int,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): Boolean =
     sqlCharacters()
         .dropWhile { character -> character.offset < startOffset }
         .takeWhile { character -> character.offset < endOffset }
-        .any { character -> character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth }
+        .any { character -> character.value == ',' && parenthesisDepths[character.offset] == depth }
 
 private fun List<SqlSourceTokenContext>.normalizedTextsFrom(index: Int): List<String> =
     drop(index).map { context -> context.token.normalizedText }

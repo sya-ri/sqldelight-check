@@ -7,8 +7,9 @@ internal fun String.hasWhereClauseAfter(
     startIndex: Int,
     statementEnd: Int,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): Boolean =
     tokens
         .drop(startIndex + 1)
         .takeWhile { candidate -> candidate.startOffset < statementEnd }
-        .any { candidate -> candidate.isTerm(SqlDialectSourceTerm.Where) && sqlParenthesisDepthAt(candidate.startOffset) == depth }
+        .any { candidate -> candidate.isTerm(SqlDialectSourceTerm.Where) && parenthesisDepths[candidate.startOffset] == depth }

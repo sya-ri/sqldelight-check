@@ -28,9 +28,10 @@ public class NoUnboundedSelectRule : Rule {
 
         val content = context.file.content
         val tokens = content.sourceSqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.matches(SqlDialectSourceTerm.Select)) return@forEachIndexed
-            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
+            if (parenthesisDepths[token.startOffset] != 0) return@forEachIndexed
             if (!content.hasQueryLabelBefore(token.startOffset)) return@forEachIndexed
 
             val statementEnd = content.statementEndAfter(token.startOffset)
@@ -38,7 +39,7 @@ public class NoUnboundedSelectRule : Rule {
                 tokens
                     .drop(index + 1)
                     .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                    .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == 0 }
+                    .filter { candidate -> parenthesisDepths[candidate.startOffset] == 0 }
             if (statementTokens.any { candidate -> candidate.matches(SqlDialectSourceTerm.Where) }) return@forEachIndexed
             if (statementTokens.any { candidate -> candidate.matches(SqlDialectSourceTerm.Limit) }) return@forEachIndexed
             if (content.isAggregateOnlySelect(token, statementTokens, statementEnd)) return@forEachIndexed

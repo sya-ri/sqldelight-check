@@ -30,9 +30,10 @@ public class MaxJoinsRule : Rule {
         val max = context.options[maxJoinsOption]
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
-            val selectDepth = content.sqlParenthesisDepthAt(token.startOffset)
+            val selectDepth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
             val joins =
                 tokens
@@ -40,7 +41,7 @@ public class MaxJoinsRule : Rule {
                     .takeWhile { candidate -> candidate.startOffset < statementEnd }
                     .filter { candidate ->
                         candidate.isTerm(SqlDialectSourceTerm.Join) &&
-                            content.sqlParenthesisDepthAt(candidate.startOffset) == selectDepth
+                            parenthesisDepths[candidate.startOffset] == selectDepth
                     }
             if (joins.size <= max) return@forEachIndexed
 
