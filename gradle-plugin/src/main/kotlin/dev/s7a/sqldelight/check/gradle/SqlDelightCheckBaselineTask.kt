@@ -4,8 +4,6 @@ import dev.s7a.sqldelight.check.api.DatabaseContext
 import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.SourceFile
-import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
-import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.Baseline
 import dev.s7a.sqldelight.check.core.BaselineEntry
@@ -15,7 +13,6 @@ import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import java.net.URLClassLoader
-import java.nio.charset.StandardCharsets
 import java.util.Collections
 import java.util.Enumeration
 import org.gradle.api.DefaultTask
@@ -157,54 +154,13 @@ public abstract class SqlDelightCheckBaselineTask : DefaultTask() {
     @get:Optional
     public abstract val reportRoot: Property<String>
 
-    private fun buildAnalysisInputs(dialectRegistry: DialectRegistry): List<AnalysisInput> =
-        databases.get().map { spec ->
-            val coord = spec.dialectCoordinate.get()
-            val dialect =
-                if (coord.isEmpty()) {
-                    dialectRegistry.resolve(SqlDialectCoordinate(group = "", module = "", version = null))
-                } else {
-                    val parts = coord.split(':')
-                    dialectRegistry.resolve(
-                        SqlDialectCoordinate(
-                            group = parts.getOrElse(0) { "" },
-                            module = parts.getOrElse(1) { "" },
-                            version = parts.getOrNull(2)?.takeIf { it.isNotEmpty() },
-                        ),
-                    )
-                }
-            AnalysisInput(
-                database = dev.s7a.sqldelight.check.api.DatabaseContext(name = spec.name.get(), dialect = dialect),
-                files =
-                    spec.sourceFiles.files
-                        .filter { it.isFile }
-                        .sortedBy { it.path }
-                        .distinctBy { it.path }
-                        .map { file ->
-                            SourceFile(
-                                path = resolveReportPath(file),
-                                content = file.readText(StandardCharsets.UTF_8),
-                            )
-                        },
-            )
-        }
-
-    private fun resolveReportPath(file: java.io.File): String {
-        val filePath = file.toPath().toAbsolutePath().normalize().let {
-            runCatching { it.toRealPath() }.getOrDefault(it)
-        }
-        val reportRootStr = reportRoot.orNull?.takeIf { it.isNotBlank() }
-        if (reportRootStr != null) {
-            val reportRootPath = java.io.File(reportRootStr).toPath().toAbsolutePath().normalize().let {
-                runCatching { it.toRealPath() }.getOrDefault(it)
-            }
-            if (filePath.startsWith(reportRootPath)) {
-                return reportRootPath.relativize(filePath).toString().replace(java.io.File.separatorChar, '/')
-            }
-        }
-        val rootDir = java.io.File(rootProjectDir.get()).toPath().toAbsolutePath().normalize()
-        return rootDir.relativize(filePath).toString().replace(java.io.File.separatorChar, '/')
-    }
+    private fun buildAnalysisInputs(dialectRegistry: DialectRegistry) =
+        buildAnalysisInputs(
+            databases = databases.get(),
+            reportRoot = reportRoot.orNull,
+            rootProjectDir = rootProjectDir.get(),
+            dialectRegistry = dialectRegistry,
+        )
 
     private fun tracing(logLevel: LogLevel): AnalysisTrace =
         object : AnalysisTrace {

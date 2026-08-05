@@ -6,7 +6,6 @@ import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
-import dev.s7a.sqldelight.check.api.SqlDialectCoordinate
 import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.AnalysisPhase
 import dev.s7a.sqldelight.check.core.AnalysisTrace
@@ -241,53 +240,12 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     }
 
     private fun buildAnalysisInputs(dialectRegistry: DialectRegistry): List<AnalysisInput> =
-        databases.get().map { spec ->
-            val coord = spec.dialectCoordinate.get()
-            val dialect =
-                if (coord.isEmpty()) {
-                    dialectRegistry.resolve(SqlDialectCoordinate(group = "", module = "", version = null))
-                } else {
-                    val parts = coord.split(':')
-                    dialectRegistry.resolve(
-                        SqlDialectCoordinate(
-                            group = parts.getOrElse(0) { "" },
-                            module = parts.getOrElse(1) { "" },
-                            version = parts.getOrNull(2)?.takeIf { it.isNotEmpty() },
-                        ),
-                    )
-                }
-            AnalysisInput(
-                database = DatabaseContext(name = spec.name.get(), dialect = dialect),
-                files =
-                    spec.sourceFiles.files
-                        .filter { it.isFile }
-                        .sortedBy { it.path }
-                        .distinctBy { it.path }
-                        .map { file ->
-                            SourceFile(
-                                path = resolveReportPath(file),
-                                content = file.readText(StandardCharsets.UTF_8),
-                            )
-                        },
-            )
-        }
-
-    private fun resolveReportPath(file: File): String {
-        val filePath = file.toPath().toAbsolutePath().normalize().let {
-            runCatching { it.toRealPath() }.getOrDefault(it)
-        }
-        val reportRootStr = reportRoot.orNull?.takeIf { it.isNotBlank() }
-        if (reportRootStr != null) {
-            val reportRootPath = File(reportRootStr).toPath().toAbsolutePath().normalize().let {
-                runCatching { it.toRealPath() }.getOrDefault(it)
-            }
-            if (filePath.startsWith(reportRootPath)) {
-                return reportRootPath.relativize(filePath).toString().replace(File.separatorChar, '/')
-            }
-        }
-        val rootDir = File(rootProjectDir.get()).toPath().toAbsolutePath().normalize()
-        return rootDir.relativize(filePath).toString().replace(File.separatorChar, '/')
-    }
+        buildAnalysisInputs(
+            databases = databases.get(),
+            reportRoot = reportRoot.orNull,
+            rootProjectDir = rootProjectDir.get(),
+            dialectRegistry = dialectRegistry,
+        )
 
     private fun runAnalysis(
         config: CheckConfig,
