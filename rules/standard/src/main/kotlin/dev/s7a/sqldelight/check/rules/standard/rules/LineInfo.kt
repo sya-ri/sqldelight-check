@@ -1,5 +1,7 @@
 package dev.s7a.sqldelight.check.rules.standard.rules
 
+import java.util.WeakHashMap
+
 internal data class LineInfo(
     val number: Int,
     val startOffset: Int,
@@ -14,7 +16,13 @@ internal data class LineInfo(
         }
 }
 
-internal fun String.linesWithRanges(): List<LineInfo> {
+private val linesWithRangesCache =
+    ThreadLocal.withInitial<WeakHashMap<String, List<LineInfo>>> { WeakHashMap() }
+
+internal fun String.linesWithRanges(): List<LineInfo> =
+    linesWithRangesCache.get().getOrPut(this) { buildLinesWithRanges() }
+
+private fun String.buildLinesWithRanges(): List<LineInfo> {
     val lines = mutableListOf<LineInfo>()
     var lineNumber = 1
     var lineStart = 0
