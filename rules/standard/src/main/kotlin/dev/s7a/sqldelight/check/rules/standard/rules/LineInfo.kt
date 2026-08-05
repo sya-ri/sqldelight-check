@@ -55,8 +55,18 @@ private fun String.buildLinesWithRanges(): List<LineInfo> {
 }
 
 internal fun List<LineInfo>.lineContaining(offset: Int): LineInfo? {
-    val idx = binarySearchBy(offset) { it.startOffset }
-    return if (idx >= 0) this[idx] else getOrNull(-idx - 2)
+    var lo = 0
+    var hi = size - 1
+    while (lo <= hi) {
+        val mid = (lo + hi).ushr(1)
+        val midStart = this[mid].startOffset
+        when {
+            midStart == offset -> return this[mid]
+            midStart < offset -> lo = mid + 1
+            else -> hi = mid - 1
+        }
+    }
+    return getOrNull(lo - 1)
 }
 
 internal fun String.hasNewlineBetween(startOffset: Int, endOffset: Int): Boolean {
