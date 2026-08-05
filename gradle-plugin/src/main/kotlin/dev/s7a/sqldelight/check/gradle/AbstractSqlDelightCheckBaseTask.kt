@@ -13,6 +13,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Shared base for sqldelight-check tasks.
@@ -21,6 +22,7 @@ import org.gradle.api.tasks.Optional
  * check/baseline task, and provides protected helpers that forward to the
  * package-level functions in TaskAnalysisHelpers.kt.
  */
+@DisableCachingByDefault(because = "Subclasses declare their own caching strategy.")
 public abstract class AbstractSqlDelightCheckBaseTask : DefaultTask() {
     /**
      * Log output detail for this task execution.
