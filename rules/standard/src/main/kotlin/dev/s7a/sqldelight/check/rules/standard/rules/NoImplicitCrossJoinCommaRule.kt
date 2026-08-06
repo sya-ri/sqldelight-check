@@ -26,18 +26,19 @@ public class NoImplicitCrossJoinCommaRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.From)) return@forEachIndexed
 
-            val fromDepth = content.sqlParenthesisDepthAt(token.startOffset)
+            val fromDepth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
             val segmentEnd =
-                tokens.fromSegmentEnd(index + 1, statementEnd, fromDepth, content, context.database.dialect.sourcePatterns)
+                tokens.fromSegmentEnd(index + 1, statementEnd, fromDepth, parenthesisDepths, context.database.dialect.sourcePatterns)
             content
                 .sqlCharacters()
                 .dropWhile { character -> character.offset <= token.endOffset }
                 .takeWhile { character -> character.offset < segmentEnd }
-                .filter { character -> character.value == ',' && content.sqlParenthesisDepthAt(character.offset) == fromDepth }
+                .filter { character -> character.value == ',' && parenthesisDepths[character.offset] == fromDepth }
                 .forEach { comma ->
                     val replacementEnd = content.inlineWhitespaceEndAfter(comma.offset + 1)
                     reporter.report(
@@ -59,7 +60,7 @@ private fun List<SqlToken>.fromSegmentEnd(
     startIndex: Int,
     statementEnd: Int,
     fromDepth: Int,
-    content: String,
+    parenthesisDepths: IntArray,
     sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     asSequence()
@@ -67,7 +68,7 @@ private fun List<SqlToken>.fromSegmentEnd(
         .withIndex()
         .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
-                content.sqlParenthesisDepthAt(token.startOffset) == fromDepth &&
+                parenthesisDepths[token.startOffset] == fromDepth &&
                 sourcePatterns.matches(SqlDialectSourcePatternRole.TableReferenceBoundary, normalizedTextsFrom(startIndex + relativeIndex))
         }
         ?.value

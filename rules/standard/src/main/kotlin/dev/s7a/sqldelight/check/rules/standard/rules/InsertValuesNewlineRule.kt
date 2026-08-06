@@ -25,20 +25,21 @@ public class InsertValuesNewlineRule : Rule {
         val content = context.file.content
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Insert)) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
             val values = tokens.firstTermAfter(index + 1, statementEnd, SqlDialectSourceTerm.Values) ?: return@forEachIndexed
 
             content.insertColumnListBetween(token.endOffset, values.startOffset)?.let { list ->
-                content.reportMisalignedInsertList(list, lines, reporter, context)
+                content.reportMisalignedInsertList(list, lines, reporter, context, parenthesisDepths)
             }
 
-            val valuesDepth = content.sqlParenthesisDepthAt(values.startOffset)
+            val valuesDepth = parenthesisDepths[values.startOffset]
             content.sqlCharacters()
                 .dropWhile { character -> character.offset < values.endOffset }
                 .takeWhile { character -> character.offset < statementEnd }
-                .filter { character -> character.value == '(' && content.sqlParenthesisDepthAt(character.offset) == valuesDepth }
+                .filter { character -> character.value == '(' && parenthesisDepths[character.offset] == valuesDepth }
                 .forEach { open ->
                     val close = content.matchingClosingParenthesisOffset(open.offset) ?: return@forEach
                     content.reportMisalignedInsertList(
@@ -46,6 +47,7 @@ public class InsertValuesNewlineRule : Rule {
                         lines,
                         reporter,
                         context,
+                        parenthesisDepths,
                     )
                 }
         }
@@ -56,9 +58,10 @@ public class InsertValuesNewlineRule : Rule {
         lines: List<LineInfo>,
         reporter: DiagnosticReporter,
         context: RuleContext,
+        parenthesisDepths: IntArray,
     ) {
-        val itemDepth = sqlParenthesisDepthAt(list.openOffset) + 1
-        val items = commaSeparatedClauseItems(list.openOffset + 1, list.closeOffset, itemDepth)
+        val itemDepth = parenthesisDepths[list.openOffset] + 1
+        val items = commaSeparatedClauseItems(list.openOffset + 1, list.closeOffset, itemDepth, parenthesisDepths)
         if (!isMultilineItemList(items)) return
         if (lines.itemStartsAreOnOwnLines(items)) return
         val misplacedItemStarts = lines.misplacedItemStarts(items)

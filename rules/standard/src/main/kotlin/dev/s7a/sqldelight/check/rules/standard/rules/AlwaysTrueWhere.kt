@@ -17,15 +17,16 @@ internal fun Rule.reportAlwaysTrueWhere(
 ) {
     val content = context.file.content
     val tokens = content.sourceSqlTokens().toList()
+    val parenthesisDepths = content.computeParenthesisDepths()
     tokens.forEachIndexed { index, token ->
         if (!token.matches(statementTerm)) return@forEachIndexed
-        val depth = content.sqlParenthesisDepthAt(token.startOffset)
+        val depth = parenthesisDepths[token.startOffset]
         val statementEnd = content.statementEndAfter(token.startOffset)
         val statementTokens =
             tokens
                 .drop(index + 1)
                 .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == depth }
+                .filter { candidate -> parenthesisDepths[candidate.startOffset] == depth }
         val where = statementTokens.firstOrNull { candidate -> candidate.matches(SqlDialectSourceTerm.Where) } ?: return@forEachIndexed
         if (!content.hasAlwaysTrueConditionAfter(statementTokens, where, statementEnd)) return@forEachIndexed
 

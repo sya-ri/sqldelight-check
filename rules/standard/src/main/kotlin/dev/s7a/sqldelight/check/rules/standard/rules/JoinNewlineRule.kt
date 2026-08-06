@@ -25,21 +25,20 @@ public class JoinNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            val depth = parenthesisDepths[token.startOffset]
             if (depth != 0) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
             val statementStart =
-                tokens.statementStartOffsetBefore(index, content, context.database.dialect.sourcePatterns)
+                tokens.statementStartOffsetBefore(index, content, context.database.dialect.sourcePatterns, parenthesisDepths)
                     ?: return@forEachIndexed
-            if (!content.substring(statementStart, statementEnd).contains('\n')) return@forEachIndexed
+            if (!content.hasNewlineBetween(statementStart, statementEnd)) return@forEachIndexed
 
-            val clauseStart = tokens.joinClauseStartOffset(index, depth, content, context.database.dialect.sourcePatterns)
-            val line = lines.lineContaining(clauseStart) ?: return@forEachIndexed
-            if (line.firstNonWhitespaceOffset == clauseStart) return@forEachIndexed
+            val clauseStart = tokens.joinClauseStartOffset(index, depth, content, context.database.dialect.sourcePatterns, parenthesisDepths)
+            if (content.isFirstNonWhitespaceAt(clauseStart)) return@forEachIndexed
 
             reporter.report(
                 RuleDiagnostic(
@@ -60,12 +59,13 @@ private fun List<SqlToken>.joinClauseStartOffset(
     depth: Int,
     content: String,
     sourcePatterns: SqlDialectSourcePatterns,
+    parenthesisDepths: IntArray,
 ): Int {
     val previous = getOrNull(joinIndex - 1)
     return if (
         previous != null &&
         previous.matches(sourcePatterns, SqlDialectSourcePatternRole.JoinModifier) &&
-        content.sqlParenthesisDepthAt(previous.startOffset) == depth &&
+        parenthesisDepths[previous.startOffset] == depth &&
         content.onlyInlineWhitespaceBetween(previous.endOffset, this[joinIndex].startOffset)
     ) {
         previous.startOffset
@@ -78,11 +78,12 @@ private fun List<SqlToken>.statementStartOffsetBefore(
     tokenIndex: Int,
     content: String,
     sourcePatterns: SqlDialectSourcePatterns,
+    parenthesisDepths: IntArray,
 ): Int? =
     asSequence()
         .take(tokenIndex + 1)
         .filter { token -> token.matches(sourcePatterns, SqlDialectSourcePatternRole.SqlDelightStatementStart) }
-        .lastOrNull { token -> content.sqlParenthesisDepthAt(token.startOffset) == 0 }
+        .lastOrNull { token -> parenthesisDepths[token.startOffset] == 0 }
         ?.startOffset
 
 private fun String.onlyInlineWhitespaceBetween(

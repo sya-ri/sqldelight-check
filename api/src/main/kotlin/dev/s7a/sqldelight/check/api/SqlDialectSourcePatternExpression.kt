@@ -11,10 +11,9 @@ public class SqlDialectSourcePatternExpression(
      * Returns the number of input terms consumed when [terms] match this expression from the start.
      */
     public fun matchPrefix(terms: List<String>): Int? {
-        val normalized = terms.map { term -> term.lowercase() }
         var inputIndex = 0
         parts.forEach { part ->
-            val input = normalized.getOrNull(inputIndex)
+            val input = terms.getOrNull(inputIndex)?.lowercase()
             if (input in part.alternatives) {
                 inputIndex++
             } else if (!part.optional) {

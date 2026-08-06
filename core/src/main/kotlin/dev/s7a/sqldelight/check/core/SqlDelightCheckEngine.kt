@@ -11,9 +11,12 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleSetId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.rule.api.DiagnosticRefinement
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
+import dev.s7a.sqldelight.check.rule.api.RuleDeprecation
+import dev.s7a.sqldelight.check.rule.api.RuleOptionDeprecation
 import dev.s7a.sqldelight.check.rule.api.RuleOptions
 import dev.s7a.sqldelight.check.rule.api.RuleSetProvider
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
@@ -92,9 +95,14 @@ public class SqlDelightCheckEngine {
                 requireSuppressionReason = coreRuleSeverity(resolver, database.name, coreRequireSuppressionReasonRuleId),
                 noRedundantSuppression = coreRuleSeverity(resolver, database.name, coreNoRedundantSuppressionRuleId),
             )
-        return files.flatMap { file ->
-            runRulesForFile(database, file, resolvedRules, refinementsByRuleId, coreSeverities, config, trace)
-        }
+        // Wrap trace so that callbacks invoked from parallel worker threads are serialised.
+        val concurrentTrace = ConcurrentAnalysisTrace(trace)
+        return files.parallelStream()
+            .flatMap { file ->
+                runRulesForFile(database, file, resolvedRules, refinementsByRuleId, coreSeverities, config, concurrentTrace)
+                    .stream()
+            }
+            .toList()
     }
 
     private fun runRulesForFile(
@@ -116,41 +124,50 @@ public class SqlDelightCheckEngine {
             }
         val facts = SourceSqlFactsExtractor.extract(file, database.dialect, phaseTrace)
         val disableDirectives = DisableDirectives.parse(file)
-        val executedRuleIds = mutableListOf<QualifiedRuleId>()
-        val diagnostics =
-            rules.flatMap { candidate ->
-                val ruleSetConfig = candidate.ruleSetConfig
-                val ruleConfig = candidate.ruleConfig
-                val context =
-                    object : RuleContext {
-                        override val database: DatabaseContext = database
-                        override val file: SourceFile = file
-                        override val options: RuleOptions = RuleOptions(ruleConfig.options)
-                        override val facts: SqlFacts = facts
-                    }
-                val enablement =
-                    ruleConfig.enablement ?: ruleSetConfig.enablement
-                if (!candidate.rule.shouldRun(context, enablement)) return@flatMap emptyList()
+        val lazySourceStructure = lazy { SqlSourceStructure.parse(file.content, database.dialect.sourcePatterns) }
+        // Run rules in parallel; encounter order is preserved by parallelStream on an ordered source.
+        // Rules must be stateless: rule instances are shared across files within the same engine run.
+        val outcomes =
+            rules.parallelStream()
+                .map { candidate ->
+                    val ruleSetConfig = candidate.ruleSetConfig
+                    val ruleConfig = candidate.ruleConfig
+                    val context =
+                        object : RuleContext {
+                            override val database: DatabaseContext = database
+                            override val file: SourceFile = file
+                            override val options: RuleOptions = RuleOptions(ruleConfig.options)
+                            override val facts: SqlFacts = facts
+                            override val sourceStructure: SqlSourceStructure
+                                get() = lazySourceStructure.value
+                        }
+                    val enablement = ruleConfig.enablement ?: ruleSetConfig.enablement
+                    if (!candidate.rule.shouldRun(context, enablement)) return@map RuleOutcome(null, emptyList())
 
-                executedRuleIds += candidate.ruleId
-                val diagnostics = mutableListOf<Diagnostic>()
-                val startNanos = if (trace.collectsPerformanceMetrics) System.nanoTime() else 0L
-                try {
-                    candidate.rule.run(context) { diagnostic ->
-                        diagnostic
-                            .withRuleIdentity(candidate.ruleId, ruleConfig.severity)
-                            .applyRefinements(context, refinementsByRuleId[candidate.ruleId].orEmpty())
-                            ?.let(diagnostics::add)
+                    val diagnostics = mutableListOf<Diagnostic>()
+                    val startNanos = if (trace.collectsPerformanceMetrics) System.nanoTime() else 0L
+                    try {
+                        candidate.rule.run(context) { diagnostic ->
+                            diagnostic
+                                .withRuleIdentity(candidate.ruleId, ruleConfig.severity)
+                                .applyRefinements(context, refinementsByRuleId[candidate.ruleId].orEmpty())
+                                ?.let(diagnostics::add)
+                        }
+                    } finally {
+                        if (trace.collectsPerformanceMetrics) {
+                            trace.ruleTiming(database, file, candidate.ruleId, System.nanoTime() - startNanos)
+                        }
                     }
-                } finally {
-                    if (trace.collectsPerformanceMetrics) {
-                        trace.ruleTiming(database, file, candidate.ruleId, System.nanoTime() - startNanos)
-                    }
+                    RuleOutcome(candidate.ruleId, diagnostics)
                 }
-                diagnostics
-            }.filterNot { diagnostic ->
-                disableDirectives.suppresses(diagnostic) || config.baseline.suppresses(diagnostic)
-            }
+                .toList()
+        val executedRuleIds = outcomes.mapNotNull { it.ruleId }
+        val diagnostics =
+            outcomes
+                .flatMap { it.diagnostics }
+                .filterNot { diagnostic ->
+                    disableDirectives.suppresses(diagnostic) || config.baseline.suppresses(diagnostic)
+                }
         trace.fileRules(database, file, executedRuleIds)
         return diagnostics +
             coreSeverities.requireSuppressionReason.orEmptyDiagnostics { severity ->
@@ -240,6 +257,11 @@ private fun Diagnostic.applyRefinements(
         current?.let { diagnostic -> refinement.refine(context, diagnostic) }
     }
 
+private data class RuleOutcome(
+    val ruleId: QualifiedRuleId?,
+    val diagnostics: List<Diagnostic>,
+)
+
 private data class RuleCandidate(
     val ruleSetId: RuleSetId,
     val ruleId: QualifiedRuleId,
@@ -283,6 +305,42 @@ private val Rule.defaultEnabled: Boolean?
 
 private inline fun Severity?.orEmptyDiagnostics(block: (Severity) -> List<Diagnostic>): List<Diagnostic> =
     this?.let(block).orEmpty()
+
+/**
+ * Wraps an [AnalysisTrace] so that callbacks invoked from parallel worker threads are serialised,
+ * letting callers implement [AnalysisTrace] without worrying about concurrent access.
+ *
+ * Only the callbacks called during parallel execution ([fileRules], [ruleTiming],
+ * [analysisPhaseTiming]) are synchronised; the rest are called sequentially before and after the
+ * parallel region and are forwarded directly.
+ */
+private class ConcurrentAnalysisTrace(private val delegate: AnalysisTrace) : AnalysisTrace {
+    override val collectsPerformanceMetrics: Boolean = delegate.collectsPerformanceMetrics
+
+    override fun databaseFiles(database: DatabaseContext, files: List<SourceFile>) =
+        delegate.databaseFiles(database, files)
+
+    @Synchronized
+    override fun fileRules(database: DatabaseContext, file: SourceFile, ruleIds: List<QualifiedRuleId>) =
+        delegate.fileRules(database, file, ruleIds)
+
+    @Synchronized
+    override fun ruleTiming(database: DatabaseContext, file: SourceFile, ruleId: QualifiedRuleId, durationNanos: Long) =
+        delegate.ruleTiming(database, file, ruleId, durationNanos)
+
+    @Synchronized
+    override fun analysisPhaseTiming(database: DatabaseContext, file: SourceFile, phase: AnalysisPhase, durationNanos: Long) =
+        delegate.analysisPhaseTiming(database, file, phase, durationNanos)
+
+    override fun deprecatedRule(database: DatabaseContext, ruleId: QualifiedRuleId, deprecation: RuleDeprecation, enabled: Boolean) =
+        delegate.deprecatedRule(database, ruleId, deprecation, enabled)
+
+    override fun unknownRuleOption(database: DatabaseContext, ruleId: QualifiedRuleId, optionName: String, knownOptionNames: Set<String>) =
+        delegate.unknownRuleOption(database, ruleId, optionName, knownOptionNames)
+
+    override fun deprecatedRuleOption(database: DatabaseContext, ruleId: QualifiedRuleId, optionName: String, deprecation: RuleOptionDeprecation) =
+        delegate.deprecatedRuleOption(database, ruleId, optionName, deprecation)
+}
 
 private val coreRuleSetId = RuleSetId("core")
 

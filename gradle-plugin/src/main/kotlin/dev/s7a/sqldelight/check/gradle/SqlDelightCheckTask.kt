@@ -1,11 +1,12 @@
 package dev.s7a.sqldelight.check.gradle
 
-import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.DatabaseContext
+import dev.s7a.sqldelight.check.api.Diagnostic
 import dev.s7a.sqldelight.check.api.LogLevel
 import dev.s7a.sqldelight.check.api.QualifiedRuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SourceFile
+import dev.s7a.sqldelight.check.core.AnalysisInput
 import dev.s7a.sqldelight.check.core.AnalysisPhase
 import dev.s7a.sqldelight.check.core.AnalysisTrace
 import dev.s7a.sqldelight.check.core.Baseline
@@ -13,6 +14,7 @@ import dev.s7a.sqldelight.check.core.CheckConfig
 import dev.s7a.sqldelight.check.core.DatabaseConfig
 import dev.s7a.sqldelight.check.core.FixApplier
 import dev.s7a.sqldelight.check.core.FixSkipReason
+import dev.s7a.sqldelight.check.core.ReporterRegistry
 import dev.s7a.sqldelight.check.core.RuleRegistry
 import dev.s7a.sqldelight.check.core.SqlDelightCheckEngine
 import dev.s7a.sqldelight.check.reporter.api.Report
@@ -23,16 +25,21 @@ import java.io.File
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import org.gradle.api.DefaultTask
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -42,9 +49,13 @@ import org.gradle.work.DisableCachingByDefault
 
 /**
  * Base task for sqldelight-check operations.
+ *
+ * All project state is captured into task properties at configuration time so that
+ * the task action runs without any `project` access, enabling configuration cache
+ * compatibility.
  */
 @DisableCachingByDefault(because = "The fix task can rewrite source files, and reporters may write configurable outputs.")
-public abstract class SqlDelightCheckTask : DefaultTask() {
+public abstract class SqlDelightCheckTask : AbstractSqlDelightCheckBaseTask() {
     /**
      * Whether this task should apply allowed fixes to source files.
      */
@@ -52,23 +63,10 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public abstract val applyFixes: Property<Boolean>
 
     /**
-     * Log output detail for this task execution.
-     */
-    @get:Input
-    public abstract val logLevel: Property<LogLevel>
-
-    /**
      * Whether this task should collect and log rule execution metrics.
      */
     @get:Input
     public abstract val performanceMetrics: Property<Boolean>
-
-    /**
-     * SQLDelight source files that can influence diagnostics or fixes.
-     */
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    public abstract val sqlDelightSources: ConfigurableFileCollection
 
     /**
      * Optional baseline file containing known diagnostics to suppress.
@@ -78,11 +76,7 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     public abstract val baselineFile: RegularFileProperty
 
-    /**
-     * Runtime classpath used to discover rule set providers.
-     */
-    @get:Classpath
-    public abstract val ruleSetClasspath: ConfigurableFileCollection
+    // ── classpath inputs ────────────────────────────────────────────────────
 
     /**
      * Runtime classpath used to discover reporter providers.
@@ -91,10 +85,18 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     public abstract val reporterClasspath: ConfigurableFileCollection
 
     /**
-     * Runtime classpath used to discover dialect metadata providers.
+     * Whether fix tasks may apply unsafe fixes.
      */
-    @get:Classpath
-    public abstract val dialectClasspath: ConfigurableFileCollection
+    @get:Input
+    public abstract val allowUnsafeFixes: Property<Boolean>
+
+    // ── reporter outputs ─────────────────────────────────────────────────────
+
+    /**
+     * Reporter configurations, captured at configuration time.
+     */
+    @get:Nested
+    public abstract val reporters: ListProperty<SqlDelightReporterTaskSpec>
 
     /**
      * Default directory where built-in reports are written.
@@ -102,24 +104,49 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
     @get:OutputDirectory
     public abstract val reportOutputDirectory: DirectoryProperty
 
+    // ── path resolution inputs ───────────────────────────────────────────────
+
     /**
-     * Runs SQLDelight project detection, rules, and report writing.
+     * Absolute path of this project's directory, for fix-mode file resolution.
      */
+    @get:Internal
+    public abstract val projectDir: Property<String>
+
+    // ── task action ───────────────────────────────────────────────────────────
+
     @TaskAction
     public fun run() {
-        val extension = project.extensions.getByType(SqlDelightCheckExtension::class.java)
         val logLevel = logLevel.get()
-        val baseline = baselineFile.orNull?.asFile?.readSqldelightCheckBaseline()
-        val config = extension.toCheckConfig(logLevel, baseline = baseline ?: Baseline.Empty)
+        val baseline = baselineFile.orNull?.asFile?.readSqldelightCheckBaseline() ?: Baseline.Empty
+        val config =
+            buildCheckConfig(
+                globalRuleSets = globalRuleSets.get(),
+                globalRules = globalRules.get(),
+                databaseConfigs = databaseConfigs.get(),
+                allowUnsafeFixes = allowUnsafeFixes.get(),
+                logLevel = logLevel,
+                baseline = baseline,
+            )
+
         val traceCollector = RuleTraceCollector()
         val performanceMetricsCollector = PerformanceMetricsCollector()
         val trace = tracing(logLevel, traceCollector, performanceMetrics.get(), performanceMetricsCollector)
-        var result = analyze(config, trace)
+
+        val ruleRegistry = buildRuleRegistry()
+        val dialectRegistry = buildDialectRegistry()
+        val analysisInputs = buildAnalysisInputs(dialectRegistry)
+
+        validateConfiguredRules(config, ruleRegistry)
+
+        var result = runAnalysis(config, trace, ruleRegistry, analysisInputs)
+
         if (applyFixes.get()) {
             val fixResult = applyDiagnosticFixes(result.diagnostics, config.allowUnsafeFixes)
             if (fixResult.changedFiles > 0) {
                 logger.lifecycle("Applied sqldelight-check fixes to {} file(s).", fixResult.changedFiles)
-                result = analyze(config, trace)
+                // Re-read file contents after fixes and re-analyze.
+                val refreshedInputs = buildAnalysisInputs(dialectRegistry)
+                result = runAnalysis(config, trace, ruleRegistry, refreshedInputs)
             }
             if (fixResult.skippedReasons.isNotEmpty()) {
                 val skippedSummary =
@@ -130,28 +157,29 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
             }
         }
 
-        writeReports(extension, result.diagnostics)
+        writeReports(result.diagnostics)
         logDiagnostics(result.diagnostics)
         logRuleHits(logLevel, traceCollector.traces, result.diagnostics)
         logPerformanceMetrics(performanceMetricsCollector)
         logger.lifecycle("sqldelight-check analyzed {} SQLDelight database(s).", result.databaseCount)
 
-        val errorCount = result.diagnostics.count { diagnostic -> diagnostic.severity == Severity.Error }
+        val errorCount = result.diagnostics.count { it.severity == Severity.Error }
         if (errorCount > 0) {
             throw GradleException("sqldelight-check found $errorCount error diagnostic(s).")
         }
     }
 
-    private fun analyze(
+    // ── private helpers ───────────────────────────────────────────────────────
+
+    private fun runAnalysis(
         config: CheckConfig,
         trace: AnalysisTrace,
+        ruleRegistry: RuleRegistry,
+        inputs: List<AnalysisInput>,
     ): AnalysisRunResult {
-        val inputs = SqlDelightProjectResolver(project, project.sqldelightCheckDialectsRegistry()).resolve()
-        val ruleRegistry = project.sqldelightCheckRuleRegistry()
-        validateConfiguredRules(config, ruleRegistry)
         val diagnostics =
             SqlDelightCheckEngine().run(
-                inputs = inputs.map { input -> input.analysisInput },
+                inputs = inputs,
                 ruleSetProviders = ruleRegistry.providers(),
                 config = config,
                 trace = trace,
@@ -165,19 +193,8 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         performanceMetricsEnabled: Boolean,
         performanceMetricsCollector: PerformanceMetricsCollector,
     ): AnalysisTrace =
-        object : AnalysisTrace {
+        object : LoggingAnalysisTrace(logLevel, logger) {
             override val collectsPerformanceMetrics: Boolean = performanceMetricsEnabled
-
-            override fun databaseFiles(
-                database: DatabaseContext,
-                files: List<SourceFile>,
-            ) {
-                if (!logLevel.logsFiles) return
-                logger.lifecycle("sqldelight-check [{}] files ({}):", database.name, files.size)
-                files.forEach { file ->
-                    logger.lifecycle("sqldelight-check [{}]   - {}", database.name, file.path)
-                }
-            }
 
             override fun fileRules(
                 database: DatabaseContext,
@@ -204,33 +221,6 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
                 durationNanos: Long,
             ) {
                 performanceMetricsCollector.recordPhase(database.name, phase, durationNanos)
-            }
-
-            override fun deprecatedRule(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                deprecation: RuleDeprecation,
-                enabled: Boolean,
-            ) {
-                logger.warn(deprecatedRuleMessage(database, ruleId, deprecation, enabled))
-            }
-
-            override fun unknownRuleOption(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                optionName: String,
-                knownOptionNames: Set<String>,
-            ) {
-                logger.warn(unknownRuleOptionMessage(database, ruleId, optionName, knownOptionNames))
-            }
-
-            override fun deprecatedRuleOption(
-                database: DatabaseContext,
-                ruleId: QualifiedRuleId,
-                optionName: String,
-                deprecation: RuleOptionDeprecation,
-            ) {
-                logger.warn(deprecatedRuleOptionMessage(database, ruleId, optionName, deprecation))
             }
         }
 
@@ -316,10 +306,10 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         var changedFiles = 0
         val skippedReasons = linkedMapOf<FixSkipReason, Int>()
         diagnostics
-            .filter { diagnostic -> diagnostic.file != null }
-            .groupBy { diagnostic -> diagnostic.file?.path.orEmpty() }
+            .filter { it.file != null }
+            .groupBy { it.file?.path.orEmpty() }
             .forEach { (path, fileDiagnostics) ->
-                val file = sourceFile(path) ?: return@forEach
+                val file = resolveSourceFile(path) ?: return@forEach
 
                 val original = file.readText(StandardCharsets.UTF_8)
                 val result = applier.apply(original, fileDiagnostics, allowUnsafe)
@@ -334,52 +324,35 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         return FixApplySummary(changedFiles = changedFiles, skippedReasons = skippedReasons)
     }
 
-    private fun sourceFile(path: String): File? {
+    private fun resolveSourceFile(path: String): File? {
         val relativePath = path.normalizedRelativePath() ?: return null
+        val reportRootFile = reportRoot.orNull?.takeIf { it.isNotBlank() }?.let { File(it) }
         return sequenceOf(
-            reportRootPath()?.resolve(relativePath)?.normalize()?.toFile(),
-            project.rootProject.file(relativePath.toString()),
-            project.file(relativePath.toString()),
+            reportRootFile?.resolve(relativePath.toString())?.normalize(),
+            File(rootProjectDir.get()).resolve(relativePath.toString()).normalize(),
+            File(projectDir.get()).resolve(relativePath.toString()).normalize(),
         ).firstOrNull { file -> file?.isFile == true }
     }
 
-    private fun reportRootPath(): Path? =
-        project.providers
-            .gradleProperty("sqldelightCheck.reportRoot")
-            .orNull
-            ?.takeIf { value -> value.isNotBlank() }
-            ?.let { value -> project.file(value).toPath().toAbsolutePath().normalize() }
-            ?: project.providers
-                .environmentVariable("GITHUB_WORKSPACE")
-                .orNull
-                ?.takeIf { value -> value.isNotBlank() }
-                ?.let { value -> File(value).toPath().toAbsolutePath().normalize() }
-
-    private fun writeReports(
-        extension: SqlDelightCheckExtension,
-        diagnostics: List<Diagnostic>,
-    ) {
+    private fun writeReports(diagnostics: List<Diagnostic>) {
         val report = Report(diagnostics)
-        val registry = project.sqldelightCheckReporterRegistry()
+        val registry = ReporterRegistry.load(buildPluginClassLoader(reporterClasspath))
 
-        extension.reports
-            .filter { reporter -> reporter.required.get() }
-            .forEach { reporter ->
+        reporters.get()
+            .filter { it.required.get() }
+            .forEach { spec ->
                 val provider =
-                    registry.find(reporter.name)
-                        ?: throw GradleException("sqldelight-check reporter '${reporter.name}' was not found on the runtime classpath.")
-                val outputFile = reporter.outputFile.get().asFile
-                val outputDirectory = reporter.outputDirectory.get().asFile
+                    registry.find(spec.name.get())
+                        ?: throw GradleException("sqldelight-check reporter '${spec.name.get()}' was not found on the runtime classpath.")
+                val outputFile = spec.primaryOutputFileAsFile()
+                val outputDirectory = spec.outputDirectoryAsFile()
                 provider
-                    .create(reporter.resolvedOptions())
+                    .create(spec.options.get())
                     .write(
                         report,
-                        GradleReportOutput(
-                            primaryFile = outputFile,
-                            outputDirectory = outputDirectory,
-                        ),
+                        GradleReportOutput(primaryFile = outputFile, outputDirectory = outputDirectory),
                     )
-                logger.lifecycle("Wrote sqldelight-check {} report to {}", reporter.name, outputFile)
+                logger.lifecycle("Wrote sqldelight-check {} report to {}", spec.name.get(), outputFile)
             }
     }
 
@@ -395,6 +368,8 @@ public abstract class SqlDelightCheckTask : DefaultTask() {
         }
     }
 }
+
+// ── private output helper ─────────────────────────────────────────────────────
 
 private class GradleReportOutput(
     private val primaryFile: File,
@@ -422,6 +397,8 @@ private class GradleReportOutput(
         return outputFile.outputStream()
     }
 }
+
+// ── private data classes ──────────────────────────────────────────────────────
 
 private data class AnalysisRunResult(
     val databaseCount: Int,
@@ -536,13 +513,10 @@ private fun String.normalizedRelativePath(): Path? {
     return path
 }
 
-private data class RuleTraceCollector(
-    val traces: MutableList<FileRuleTrace> = mutableListOf(),
-) {
-    /**
-     * Records the rule IDs that were considered for one file.
-     */
-    public fun record(
+private class RuleTraceCollector {
+    val traces: CopyOnWriteArrayList<FileRuleTrace> = CopyOnWriteArrayList()
+
+    fun record(
         databaseName: String,
         filePath: String,
         ruleIds: List<QualifiedRuleId>,
@@ -552,15 +526,15 @@ private data class RuleTraceCollector(
 }
 
 private class PerformanceMetricsCollector {
-    val rules: MutableMap<RuleTimingKey, TimingAggregate> = linkedMapOf()
-    val phases: MutableMap<PhaseTimingKey, TimingAggregate> = linkedMapOf()
+    val rules: ConcurrentHashMap<RuleTimingKey, TimingAggregate> = ConcurrentHashMap()
+    val phases: ConcurrentHashMap<PhaseTimingKey, TimingAggregate> = ConcurrentHashMap()
 
     fun recordRule(
         databaseName: String,
         ruleId: QualifiedRuleId,
         durationNanos: Long,
     ) {
-        rules.getOrPut(RuleTimingKey(databaseName, ruleId), ::TimingAggregate).record(durationNanos)
+        rules.computeIfAbsent(RuleTimingKey(databaseName, ruleId)) { TimingAggregate() }.record(durationNanos)
     }
 
     fun recordPhase(
@@ -568,7 +542,7 @@ private class PerformanceMetricsCollector {
         phase: AnalysisPhase,
         durationNanos: Long,
     ) {
-        phases.getOrPut(PhaseTimingKey(databaseName, phase), ::TimingAggregate).record(durationNanos)
+        phases.computeIfAbsent(PhaseTimingKey(databaseName, phase)) { TimingAggregate() }.record(durationNanos)
     }
 }
 
@@ -583,17 +557,18 @@ private data class PhaseTimingKey(
 )
 
 private class TimingAggregate {
-    var invocations: Int = 0
-        private set
-    var totalNanos: Long = 0
-        private set
-    var maximumNanos: Long = 0
-        private set
+    private val _invocations = AtomicInteger(0)
+    private val _totalNanos = AtomicLong(0L)
+    private val _maximumNanos = AtomicLong(0L)
+
+    val invocations: Int get() = _invocations.get()
+    val totalNanos: Long get() = _totalNanos.get()
+    val maximumNanos: Long get() = _maximumNanos.get()
 
     fun record(durationNanos: Long) {
-        invocations++
-        totalNanos += durationNanos
-        maximumNanos = maxOf(maximumNanos, durationNanos)
+        _invocations.incrementAndGet()
+        _totalNanos.addAndGet(durationNanos)
+        _maximumNanos.accumulateAndGet(durationNanos, ::maxOf)
     }
 }
 
@@ -608,7 +583,7 @@ private data class FileRuleTrace(
 
 internal fun diagnosticRuleHitsByFile(diagnostics: List<Diagnostic>): Map<FileRuleKey, Set<String>> =
     diagnostics
-        .filter { diagnostic -> diagnostic.file != null && diagnostic.database != null }
+        .filter { it.file != null && it.database != null }
         .groupBy { diagnostic ->
             FileRuleKey(
                 databaseName = diagnostic.database!!.name,

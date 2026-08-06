@@ -31,11 +31,12 @@ public class MaxSubqueryDepthRule : Rule {
     ) {
         val maxDepth = context.options[maxSubqueryDepthOption]
         val content = context.file.content
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
+        val depths = structure.subqueryDepths()
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.Subquery }
             .forEach { block ->
-                val depth = structure.subqueryDepth(block)
+                val depth = depths[block] ?: return@forEach
                 if (depth <= maxDepth) return@forEach
                 val token =
                     structure
@@ -56,7 +57,27 @@ public class MaxSubqueryDepthRule : Rule {
     }
 }
 
-private fun SqlSourceStructure.subqueryDepth(block: SqlSourceBlock): Int =
-    blocks.count { candidate ->
-        candidate.kind == SqlSourceBlockKind.Subquery && candidate.contains(block)
+private fun SqlSourceStructure.subqueryDepths(): Map<SqlSourceBlock, Int> {
+    val subqueryBlocks = blocks.filter { it.kind == SqlSourceBlockKind.Subquery }
+    if (subqueryBlocks.isEmpty()) return emptyMap()
+    data class Event(val tokenIndex: Int, val isClose: Boolean, val block: SqlSourceBlock)
+    val events = subqueryBlocks
+        .flatMap { block ->
+            listOf(
+                Event(block.startTokenIndex, false, block),
+                Event(block.endTokenIndex, true, block),
+            )
+        }
+        .sortedWith(compareBy({ it.tokenIndex }, { if (it.isClose) 0 else 1 }))
+    val depths = HashMap<SqlSourceBlock, Int>(subqueryBlocks.size)
+    var depth = 0
+    for (event in events) {
+        if (event.isClose) {
+            depth--
+        } else {
+            depths[event.block] = depth + 1
+            depth++
+        }
     }
+    return depths
+}

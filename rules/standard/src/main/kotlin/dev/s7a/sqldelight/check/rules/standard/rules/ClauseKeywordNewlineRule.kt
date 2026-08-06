@@ -6,7 +6,6 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole
-import dev.s7a.sqldelight.check.api.SqlSourceStructure
 import dev.s7a.sqldelight.check.api.SqlSourceTokenContext
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
@@ -26,15 +25,14 @@ public class ClauseKeywordNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
         structure.tokens.forEach { token ->
             if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEach
             if (token.parenthesisDepth != 0) return@forEach
 
             val statementTokens = structure.tokensInStatement(token.statementIndex)
             val statementEnd = statementTokens.lastOrNull()?.token?.endOffset ?: return@forEach
-            if (!content.substring(token.token.startOffset, statementEnd).contains('\n')) return@forEach
+            if (!content.hasNewlineBetween(token.token.startOffset, statementEnd)) return@forEach
 
             statementTokens
                 .asSequence()
@@ -42,8 +40,7 @@ public class ClauseKeywordNewlineRule : Rule {
                 .filter { candidate -> candidate.parenthesisDepth == 0 }
                 .majorClauseKeywords(structure.tokens)
                 .forEach { clause ->
-                    val line = lines.lineContaining(clause.startOffset) ?: return@forEach
-                    if (line.firstNonWhitespaceOffset == clause.startOffset) return@forEach
+                    if (content.isFirstNonWhitespaceAt(clause.startOffset)) return@forEach
 
                     reporter.report(
                         RuleDiagnostic(

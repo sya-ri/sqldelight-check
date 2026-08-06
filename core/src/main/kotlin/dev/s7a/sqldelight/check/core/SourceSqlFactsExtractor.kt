@@ -8,8 +8,6 @@ import dev.s7a.sqldelight.check.api.SqlDialectSourcePatterns
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.AliasBoundary
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.JoinModifier
 import dev.s7a.sqldelight.check.api.SqlDialectSourcePatternRole.TableReferenceBoundary
-import dev.s7a.sqldelight.check.api.skipSqlBracketQuoted
-import dev.s7a.sqldelight.check.api.skipSqlQuoted
 import dev.s7a.sqldelight.check.rule.api.SqlFacts
 import dev.s7a.sqldelight.check.rule.api.SqlJoinFacts
 import dev.s7a.sqldelight.check.rule.api.SqlQualifiedReferenceFacts
@@ -18,6 +16,7 @@ import dev.s7a.sqldelight.check.rule.api.SqlSelectFacts
 import dev.s7a.sqldelight.check.rule.api.SqlStatementFacts
 import dev.s7a.sqldelight.check.rule.api.SqlStatementKind
 import dev.s7a.sqldelight.check.rule.api.SqlTableReferenceFacts
+import java.util.ArrayDeque
 
 /**
  * Conservative source scanner that populates stable SQL facts.
@@ -33,9 +32,8 @@ internal object SourceSqlFactsExtractor {
         phaseTrace: ((AnalysisPhase, Long) -> Unit)? = null,
     ): SqlFacts {
         val content = file.content
-        val scanner = SqlSourceScanner(content)
-        val tokens = measurePhase(phaseTrace, AnalysisPhase.Tokenization) { scanner.sqlTokens() }
-        if (tokens.isEmpty()) return SqlFacts()
+        val scanner = measurePhase(phaseTrace, AnalysisPhase.Tokenization) { SqlSourceScanner(content) }
+        if (scanner.sqlTokens().isEmpty()) return SqlFacts()
 
         val statements =
             measurePhase(phaseTrace, AnalysisPhase.FactExtraction) {
@@ -244,11 +242,9 @@ internal object SourceSqlFactsExtractor {
     private fun SqlSourceScanner.statementRanges(): Sequence<OffsetRange> =
         sequence {
             var start = 0
-            characters.forEach { character ->
-                if (character.value == ';') {
-                    content.trimmedRange(start, character.offset + 1)?.let { range -> yield(range) }
-                    start = character.offset + 1
-                }
+            semicolonOffsets.forEach { offset ->
+                content.trimmedRange(start, offset + 1)?.let { range -> yield(range) }
+                start = offset + 1
             }
             content.trimmedRange(start, content.length)?.let { range -> yield(range) }
         }
@@ -260,39 +256,25 @@ internal object SourceSqlFactsExtractor {
     ): List<OffsetRange> {
         val ranges = mutableListOf<OffsetRange>()
         var start = startOffset
-        characters
-            .asSequence()
-            .dropWhile { character -> character.offset < startOffset }
-            .takeWhile { character -> character.offset < endOffset }
-            .forEach { character ->
-                if (character.value == ',' && parenthesisDepthAt(character.offset) == depth) {
-                    content.trimmedRange(start, character.offset)?.let(ranges::add)
-                    start = character.offset + 1
-                }
+        val startIndex = characters.binarySearchFirstAtLeast(startOffset) { it.offset }
+        for (index in startIndex until characters.size) {
+            val character = characters[index]
+            if (character.offset >= endOffset) break
+            if (character.value == ',' && parenthesisDepthAt(character.offset) == depth) {
+                content.trimmedRange(start, character.offset)?.let(ranges::add)
+                start = character.offset + 1
             }
+        }
         content.trimmedRange(start, endOffset)?.let(ranges::add)
         return ranges
     }
 
     private fun SqlSourceScanner.tokensIn(range: OffsetRange): List<SqlToken> {
         val allTokens = sqlTokens()
-        var low = 0
-        var high = allTokens.size
-        while (low < high) {
-            val middle = (low + high).ushr(1)
-            if (allTokens[middle].startOffset < range.startOffset) {
-                low = middle + 1
-            } else {
-                high = middle
-            }
-        }
-        val tokens = mutableListOf<SqlToken>()
-        for (index in low until allTokens.size) {
-            val token = allTokens[index]
-            if (token.startOffset >= range.endOffset) break
-            tokens += token
-        }
-        return tokens
+        val low = allTokens.binarySearchFirstAtLeast(range.startOffset) { it.startOffset }
+        var high = low
+        while (high < allTokens.size && allTokens[high].startOffset < range.endOffset) high++
+        return allTokens.subList(low, high)
     }
 
     private fun String.trimmedRange(
@@ -363,50 +345,161 @@ private data class SqlCharacter(
     val offset: Int,
 )
 
-private class SqlSourceScanner(
-    val content: String,
-) {
-    val characters: List<SqlCharacter> by lazy { content.sqlCharacters().toList() }
+private class SqlSourceScanner(val content: String) {
+    val characters: List<SqlCharacter>
+    private val tokens: List<SqlToken>
+    private val parenthesisDepths: IntArray
+    private val matchingClosingParentheses: Map<Int, Int>
+    private val lineStarts: IntArray
+    val semicolonOffsets: IntArray
 
-    private val tokens: List<SqlToken> by lazy { content.sqlTokens().toList() }
+    init {
+        val characterList = ArrayList<SqlCharacter>()
+        val tokenList = ArrayList<SqlToken>()
+        val depths = IntArray(content.length + 1)
+        val openParenOffsets = ArrayDeque<Int>()
+        val closingParenMap = HashMap<Int, Int>()
+        val lineStartList = ArrayList<Int>()
+        lineStartList.add(0)
+        val semicolonList = ArrayList<Int>()
+        var parenDepth = 0
+        var index = 0
 
-    private val parenthesisDepths: IntArray by lazy {
-        IntArray(content.length + 1).also { depths ->
-            var depth = 0
-            var nextOffset = 0
-            characters.forEach { character ->
-                while (nextOffset <= character.offset) {
-                    depths[nextOffset++] = depth
+        while (index < content.length) {
+            val ch = content[index]
+            when {
+                ch == '-' && index + 1 < content.length && content[index + 1] == '-' -> {
+                    depths[index] = parenDepth
+                    depths[index + 1] = parenDepth
+                    index += 2
+                    while (index < content.length) {
+                        depths[index] = parenDepth
+                        if (content[index] == '\n') {
+                            lineStartList.add(index + 1)
+                            index++
+                            break
+                        }
+                        index++
+                    }
                 }
-                when (character.value) {
-                    '(' -> depth++
-                    ')' -> if (depth > 0) depth--
+                ch == '/' && index + 1 < content.length && content[index + 1] == '*' -> {
+                    depths[index] = parenDepth
+                    depths[index + 1] = parenDepth
+                    index += 2
+                    while (index < content.length) {
+                        depths[index] = parenDepth
+                        if (content[index] == '\n') lineStartList.add(index + 1)
+                        if (content[index] == '*' && index + 1 < content.length && content[index + 1] == '/') {
+                            depths[index + 1] = parenDepth
+                            index += 2
+                            break
+                        }
+                        index++
+                    }
+                }
+                ch == '\'' || ch == '"' -> {
+                    depths[index] = parenDepth
+                    val quote = ch
+                    index++
+                    while (index < content.length) {
+                        depths[index] = parenDepth
+                        if (content[index] == '\n') lineStartList.add(index + 1)
+                        if (content[index] == quote) {
+                            index++
+                            if (index < content.length && content[index] == quote) {
+                                depths[index] = parenDepth
+                                index++
+                            } else {
+                                break
+                            }
+                        } else {
+                            index++
+                        }
+                    }
+                }
+                ch == '`' -> {
+                    depths[index] = parenDepth
+                    index++
+                    while (index < content.length) {
+                        depths[index] = parenDepth
+                        if (content[index] == '\n') lineStartList.add(index + 1)
+                        if (content[index] == '`') {
+                            index++
+                            break
+                        }
+                        index++
+                    }
+                }
+                ch == '[' -> {
+                    depths[index] = parenDepth
+                    index++
+                    while (index < content.length) {
+                        depths[index] = parenDepth
+                        if (content[index] == '\n') lineStartList.add(index + 1)
+                        if (content[index] == ']') {
+                            index++
+                            if (index < content.length && content[index] == ']') {
+                                depths[index] = parenDepth
+                                index++
+                            } else {
+                                break
+                            }
+                        } else {
+                            index++
+                        }
+                    }
+                }
+                ch.isIdentifierStart() -> {
+                    val start = index
+                    depths[index] = parenDepth
+                    index++
+                    while (index < content.length && content[index].isIdentifierPart()) {
+                        depths[index] = parenDepth
+                        index++
+                    }
+                    tokenList.add(SqlToken(text = content.substring(start, index), startOffset = start, endOffset = index))
+                }
+                ch == '(' -> {
+                    depths[index] = parenDepth
+                    openParenOffsets.addLast(index)
+                    parenDepth++
+                    characterList.add(SqlCharacter('(', index))
+                    index++
+                }
+                ch == ')' -> {
+                    depths[index] = parenDepth
+                    if (parenDepth > 0) parenDepth--
+                    if (openParenOffsets.isNotEmpty()) closingParenMap[openParenOffsets.removeLast()] = index
+                    characterList.add(SqlCharacter(')', index))
+                    index++
+                }
+                ch == '\n' -> {
+                    depths[index] = parenDepth
+                    lineStartList.add(index + 1)
+                    characterList.add(SqlCharacter('\n', index))
+                    index++
+                }
+                ch == ';' -> {
+                    depths[index] = parenDepth
+                    semicolonList.add(index)
+                    characterList.add(SqlCharacter(';', index))
+                    index++
+                }
+                else -> {
+                    depths[index] = parenDepth
+                    characterList.add(SqlCharacter(ch, index))
+                    index++
                 }
             }
-            while (nextOffset <= content.length) {
-                depths[nextOffset++] = depth
-            }
         }
-    }
+        depths[content.length] = parenDepth
 
-    private val matchingClosingParentheses: Map<Int, Int> by lazy {
-        val openParentheses = java.util.ArrayDeque<Int>()
-        buildMap {
-            characters.forEach { character ->
-                when (character.value) {
-                    '(' -> openParentheses.addLast(character.offset)
-                    ')' -> if (openParentheses.isNotEmpty()) put(openParentheses.removeLast(), character.offset)
-                }
-            }
-        }
-    }
-
-    private val lineStarts: IntArray by lazy {
-        val starts = mutableListOf(0)
-        content.forEachIndexed { index, character ->
-            if (character == '\n') starts += index + 1
-        }
-        starts.toIntArray()
+        characters = characterList
+        tokens = tokenList
+        parenthesisDepths = depths
+        matchingClosingParentheses = closingParenMap
+        lineStarts = lineStartList.toIntArray()
+        semicolonOffsets = semicolonList.toIntArray()
     }
 
     fun sqlTokens(): List<SqlToken> = tokens
@@ -414,17 +507,8 @@ private class SqlSourceScanner(
     fun parenthesisDepthAt(offset: Int): Int = parenthesisDepths[offset.coerceIn(0, content.length)]
 
     fun nextSqlCharacterAfter(offset: Int): SqlCharacter? {
-        var low = 0
-        var high = characters.size
-        while (low < high) {
-            val middle = (low + high).ushr(1)
-            if (characters[middle].offset < offset) {
-                low = middle + 1
-            } else {
-                high = middle
-            }
-        }
-        for (index in low until characters.size) {
+        val startIndex = characters.binarySearchFirstAtLeast(offset) { it.offset }
+        for (index in startIndex until characters.size) {
             val character = characters[index]
             if (!character.value.isWhitespace()) return character
         }
@@ -469,64 +553,20 @@ private class SqlSourceScanner(
     }
 }
 
-private fun String.sqlTokens(): Sequence<SqlToken> =
-    sequence {
-        var index = 0
-        while (index < length) {
-            index =
-                when {
-                    startsWith("--", index) -> skipLineComment(index)
-                    startsWith("/*", index) -> skipBlockComment(index)
-                    this@sqlTokens[index] == '\'' -> skipSqlQuoted(index, '\'')
-                    this@sqlTokens[index] == '"' -> skipSqlQuoted(index, '"')
-                    this@sqlTokens[index] == '`' -> skipSqlQuoted(index, '`')
-                    this@sqlTokens[index] == '[' -> skipSqlBracketQuoted(index)
-                    this@sqlTokens[index].isIdentifierStart() -> {
-                        val start = index
-                        index++
-                        while (index < length && this@sqlTokens[index].isIdentifierPart()) index++
-                        yield(SqlToken(text = substring(start, index), startOffset = start, endOffset = index))
-                        index
-                    }
-                    else -> index + 1
-                }
-        }
-    }
-
-private fun String.sqlCharacters(): Sequence<SqlCharacter> =
-    sequence {
-        var index = 0
-        while (index < length) {
-            index =
-                when {
-                    startsWith("--", index) -> skipLineComment(index)
-                    startsWith("/*", index) -> skipBlockComment(index)
-                    this@sqlCharacters[index] == '\'' -> skipSqlQuoted(index, '\'')
-                    this@sqlCharacters[index] == '"' -> skipSqlQuoted(index, '"')
-                    this@sqlCharacters[index] == '`' -> skipSqlQuoted(index, '`')
-                    this@sqlCharacters[index] == '[' -> skipSqlBracketQuoted(index)
-                    else -> {
-                        yield(SqlCharacter(value = this@sqlCharacters[index], offset = index))
-                        index + 1
-                    }
-                }
-        }
-    }
-
 private fun String.nextNonWhitespaceOffset(offset: Int): Int? {
     var index = offset
     while (index < length && this[index].isWhitespace()) index++
     return if (index < length) index else null
 }
 
-private fun String.skipLineComment(start: Int): Int {
-    val newline = indexOf('\n', startIndex = start + 2)
-    return if (newline == -1) length else newline + 1
-}
-
-private fun String.skipBlockComment(start: Int): Int {
-    val end = indexOf("*/", startIndex = start + 2)
-    return if (end == -1) length else end + 2
+private inline fun <T> List<T>.binarySearchFirstAtLeast(targetOffset: Int, crossinline getOffset: (T) -> Int): Int {
+    var low = 0
+    var high = size
+    while (low < high) {
+        val mid = (low + high).ushr(1)
+        if (getOffset(this[mid]) < targetOffset) low = mid + 1 else high = mid
+    }
+    return low
 }
 
 private fun SqlToken.isKeyword(value: String): Boolean = text.equals(value, ignoreCase = true)

@@ -26,19 +26,20 @@ public class ExplicitCrossJoinRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Join)) return@forEachIndexed
             if (tokens.isExplicitConditionlessJoin(index)) return@forEachIndexed
 
-            val joinDepth = content.sqlParenthesisDepthAt(token.startOffset)
+            val joinDepth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
             val segmentEnd =
-                tokens.joinSegmentEnd(index + 1, statementEnd, joinDepth, content, context.database.dialect.sourcePatterns)
+                tokens.joinSegmentEnd(index + 1, statementEnd, joinDepth, parenthesisDepths, context.database.dialect.sourcePatterns)
             val segmentTokens =
                 tokens
                     .drop(index + 1)
                     .takeWhile { candidate -> candidate.startOffset < segmentEnd }
-                    .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == joinDepth }
+                    .filter { candidate -> parenthesisDepths[candidate.startOffset] == joinDepth }
             if (segmentTokens.any { candidate -> candidate.isTerm(SqlDialectSourceTerm.On) || candidate.isTerm(SqlDialectSourceTerm.Using) }) {
                 return@forEachIndexed
             }
@@ -91,7 +92,7 @@ private fun List<SqlToken>.joinSegmentEnd(
     startIndex: Int,
     statementEnd: Int,
     joinDepth: Int,
-    content: String,
+    parenthesisDepths: IntArray,
     sourcePatterns: SqlDialectSourcePatterns,
 ): Int =
     asSequence()
@@ -99,7 +100,7 @@ private fun List<SqlToken>.joinSegmentEnd(
         .withIndex()
         .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
-                content.sqlParenthesisDepthAt(token.startOffset) == joinDepth &&
+                parenthesisDepths[token.startOffset] == joinDepth &&
                 (
                     token.isTerm(SqlDialectSourceTerm.Join) ||
                         sourcePatterns.matches(

@@ -25,6 +25,7 @@ public class RequireParenthesesForMixedBooleanOperatorsRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.PredicateStart)) {
@@ -35,13 +36,14 @@ public class RequireParenthesesForMixedBooleanOperatorsRule : Rule {
                 content = content,
                 startIndex = index + 1,
                 statementEnd = content.statementEndAfter(token.startOffset),
-                depth = content.sqlParenthesisDepthAt(token.startOffset),
+                depth = parenthesisDepths[token.startOffset],
                 sourcePatterns = context.database.dialect.sourcePatterns,
                 role = token.predicateBoundaryRole(),
+                parenthesisDepths = parenthesisDepths,
             )
             tokens
                 .subList(index + 1, tokens.indexAfterOffset(index + 1, clauseEnd))
-                .mixedBooleanOperators(content, clauseEnd, context.database.dialect.sourcePatterns)
+                .mixedBooleanOperators(content, clauseEnd, context.database.dialect.sourcePatterns, parenthesisDepths)
                 .forEach { mixed ->
                     reporter.report(
                         RuleDiagnostic(
@@ -71,6 +73,7 @@ private fun List<SqlToken>.mixedBooleanOperators(
     content: String,
     clauseEnd: Int,
     sourcePatterns: SqlDialectSourcePatterns,
+    parenthesisDepths: IntArray,
 ): List<MixedBooleanOperators> {
     val statesByDepth = mutableMapOf<Int, BooleanOperatorState>()
     val reportedDepths = mutableSetOf<Int>()
@@ -79,7 +82,7 @@ private fun List<SqlToken>.mixedBooleanOperators(
 
     filter { token -> token.startOffset < clauseEnd }
         .forEach { token ->
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            val depth = parenthesisDepths[token.startOffset]
             when {
                 token.isTerm(SqlDialectSourceTerm.Between) -> pendingBetweenDepths += depth
                 token.isTerm(SqlDialectSourceTerm.And) && depth in pendingBetweenDepths -> pendingBetweenDepths -= depth
@@ -114,13 +117,14 @@ private fun List<SqlToken>.predicateBoundaryOffsetAfter(
     depth: Int,
     sourcePatterns: SqlDialectSourcePatterns,
     role: SqlDialectSourcePatternRole,
+    parenthesisDepths: IntArray,
 ): Int =
     asSequence()
         .drop(startIndex)
         .withIndex()
         .firstOrNull { (relativeIndex, token) ->
             token.startOffset < statementEnd &&
-                content.sqlParenthesisDepthAt(token.startOffset) == depth &&
+                parenthesisDepths[token.startOffset] == depth &&
                 sourcePatterns.matches(role, normalizedTextsFrom(startIndex + relativeIndex))
         }
         ?.value

@@ -186,10 +186,42 @@ class SourceSqlFactsExtractorTest {
         )
     }
 
+    @Test
+    fun `wide select facts extraction scales proportionally with file size`() {
+        val small = wideSelectWorkload(32)
+        val large = wideSelectWorkload(256)
+
+        repeat(3) {
+            extract(small)
+            extract(large)
+        }
+        val smallNanos = measureNanoTime { extract(small) }
+        val largeNanos = measureNanoTime { extract(large) }
+
+        // 8x more statements: O(N) → 8x, O(N²) → 64x.
+        // Allow up to 16x to absorb JVM variability while still catching quadratic growth.
+        assertTrue(
+            actual = largeNanos < smallNanos * 16,
+            message = "small=${smallNanos / 1_000_000}ms large=${largeNanos / 1_000_000}ms",
+        )
+    }
+
     private fun extract(
         content: String,
         dialect: SqlDialect = SqlDialect(ids = setOf(DialectId("default"))),
     ) = SourceSqlFactsExtractor.extract(SourceFile(path = "src/main/sqldelight/com/example/Test.sq", content = content), dialect)
+
+    private fun wideSelectWorkload(statementCount: Int): String =
+        buildString {
+            repeat(statementCount) { index ->
+                append("query$index:\n")
+                append("SELECT ")
+                append((1..20).joinToString(", ") { col -> "t.col${col}_field AS alias${col}" })
+                append("\nFROM some_large_table AS t\n")
+                append("JOIN other_table AS o ON o.id = t.other_id\n")
+                append("JOIN third_table AS r ON r.t_id = t.id;\n")
+            }
+        }
 
     private fun performanceWorkload(statementCount: Int): String =
         buildString {

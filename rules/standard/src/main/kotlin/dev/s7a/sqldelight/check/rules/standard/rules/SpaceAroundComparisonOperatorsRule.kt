@@ -19,15 +19,14 @@ public class SpaceAroundComparisonOperatorsRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val mappedTypes = content.mappedTypeNames(context.database.dialect.sourcePatterns).toList()
         content.reportOperatorSpacing(
             context = context,
             reporter = reporter,
             rule = this,
             operators =
                 content.sqlCharacters()
-                    .filterNot { character ->
-                        content.isInMappedTypeName(character.offset, context.database.dialect.sourcePatterns)
-                    }
+                    .filterNot { character -> mappedTypes.containsOffset(character.offset) }
                     .mapNotNull { character -> content.comparisonOperatorAt(character.offset) },
             canNormalize = content::canNormalizeInlineSpacing,
             message = { operatorText -> "Comparison operator '$operatorText' should have one space on both sides." },

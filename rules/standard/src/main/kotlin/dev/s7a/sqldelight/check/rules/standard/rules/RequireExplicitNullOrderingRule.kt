@@ -24,6 +24,7 @@ public class RequireExplicitNullOrderingRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Order)) return@forEachIndexed
@@ -34,7 +35,7 @@ public class RequireExplicitNullOrderingRule : Rule {
                 .drop(index + 2)
                 .takeWhile { candidate -> candidate.startOffset < boundary }
                 .filter { candidate -> candidate.isTerm(SqlDialectSourceTerm.Asc) || candidate.isTerm(SqlDialectSourceTerm.Desc) }
-                .filterNot { direction -> tokens.hasNullOrderingAfter(direction, boundary, content) }
+                .filterNot { direction -> tokens.hasNullOrderingAfter(direction, boundary, content, parenthesisDepths) }
                 .forEach { direction ->
                     reporter.report(
                         RuleDiagnostic(
@@ -54,16 +55,17 @@ private fun List<SqlToken>.hasNullOrderingAfter(
     direction: SqlToken,
     boundary: Int,
     content: String,
+    parenthesisDepths: IntArray,
 ): Boolean {
-    val directionDepth = content.sqlParenthesisDepthAt(direction.startOffset)
-    val itemEnd = content.orderByItemEndAfter(direction.endOffset, boundary, directionDepth)
+    val directionDepth = parenthesisDepths[direction.startOffset]
+    val itemEnd = content.orderByItemEndAfter(direction.endOffset, boundary, directionDepth, parenthesisDepths)
     return asSequence()
         .dropWhile { token -> token.startOffset <= direction.startOffset }
         .takeWhile { token ->
             token.startOffset < itemEnd &&
                 token.startOffset < boundary
         }
-        .filter { token -> content.sqlParenthesisDepthAt(token.startOffset) == directionDepth }
+        .filter { token -> parenthesisDepths[token.startOffset] == directionDepth }
         .any { token -> token.isTerm(SqlDialectSourceTerm.Nulls) }
 }
 
@@ -71,10 +73,11 @@ private fun String.orderByItemEndAfter(
     offset: Int,
     boundary: Int,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): Int {
     var index = offset
     while (index < length && index < boundary) {
-        if (this[index] == ',' && sqlParenthesisDepthAt(index) == depth) return index
+        if (this[index] == ',' && parenthesisDepths[index] == depth) return index
         index++
     }
     return boundary

@@ -60,6 +60,37 @@ internal fun String.sqlParenthesisDepthAt(offset: Int): Int {
     return depth
 }
 
+/**
+ * Computes the parenthesis depth at every position in a single O(N) pass.
+ *
+ * The returned array has size `length + 1`. `result[i]` equals the number of unmatched `(`
+ * characters that appear before offset `i` in non-quoted, non-comment SQL text — the same
+ * value that [sqlParenthesisDepthAt] would return for that offset.
+ * Positions inside quoted strings or block comments retain the depth current at the start
+ * of the quoted section.
+ *
+ * Pre-computing once and using O(1) array lookups is preferable to repeated
+ * [sqlParenthesisDepthAt] calls inside loops.
+ */
+internal fun String.computeParenthesisDepths(): IntArray {
+    val depths = IntArray(length + 1)
+    var depth = 0
+    var nextIndex = 0
+    sqlCharacters().forEach { character ->
+        while (nextIndex <= character.offset) {
+            depths[nextIndex++] = depth
+        }
+        when (character.value) {
+            '(' -> depth++
+            ')' -> if (depth > 0) depth--
+        }
+    }
+    while (nextIndex <= length) {
+        depths[nextIndex++] = depth
+    }
+    return depths
+}
+
 internal fun String.previousSqlCharacterBefore(offset: Int): SqlCharacter? =
     sqlCharacters()
         .takeWhile { character -> character.offset < offset }

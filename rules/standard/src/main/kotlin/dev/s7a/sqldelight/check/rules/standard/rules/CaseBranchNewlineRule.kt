@@ -6,10 +6,7 @@ import dev.s7a.sqldelight.check.api.RuleDiagnostic
 import dev.s7a.sqldelight.check.api.RuleId
 import dev.s7a.sqldelight.check.api.Severity
 import dev.s7a.sqldelight.check.api.SqlDialectSourceTerm
-import dev.s7a.sqldelight.check.api.SqlSourceBlock
 import dev.s7a.sqldelight.check.api.SqlSourceBlockKind
-import dev.s7a.sqldelight.check.api.SqlSourceStructure
-import dev.s7a.sqldelight.check.api.SqlSourceTokenContext
 import dev.s7a.sqldelight.check.rule.api.DiagnosticReporter
 import dev.s7a.sqldelight.check.rule.api.Rule
 import dev.s7a.sqldelight.check.rule.api.RuleContext
@@ -27,21 +24,27 @@ public class CaseBranchNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.CaseExpression }
             .forEach { block ->
-                if (!content.substring(block.startOffset, block.endOffset).contains('\n')) return@forEach
+                if (!content.hasNewlineBetween(block.startOffset, block.endOffset)) return@forEach
+
+                val caseToken = structure.tokens[block.startTokenIndex]
+                val directBranchDepth = caseToken.caseDepth + 1
+                val caseParenthesisDepth = caseToken.parenthesisDepth
 
                 structure
                     .tokensInBlock(block)
                     .asSequence()
                     .drop(1)
-                    .filter { token -> token.isDirectBranchOf(structure, block) }
+                    .filter { token ->
+                        token.parenthesisDepth == caseParenthesisDepth &&
+                            token.caseDepth == directBranchDepth &&
+                            caseBranchTerms.any { term -> token.isSourceTerm(term) }
+                    }
                     .forEach { branch ->
-                        val line = lines.lineContaining(branch.token.startOffset) ?: return@forEach
-                        if (line.firstNonWhitespaceOffset == branch.token.startOffset) return@forEach
+                        if (content.isFirstNonWhitespaceAt(branch.token.startOffset)) return@forEach
                         reporter.report(
                             RuleDiagnostic(
                                 severity = defaultSeverity,
@@ -56,13 +59,6 @@ public class CaseBranchNewlineRule : Rule {
             }
     }
 }
-
-private fun SqlSourceTokenContext.isDirectBranchOf(
-    structure: SqlSourceStructure,
-    block: SqlSourceBlock,
-): Boolean =
-    caseBranchTerms.any { term -> isSourceTerm(term) } &&
-        structure.innermostBlockContaining(this, SqlSourceBlockKind.CaseExpression) == block
 
 private val caseBranchTerms =
     setOf(

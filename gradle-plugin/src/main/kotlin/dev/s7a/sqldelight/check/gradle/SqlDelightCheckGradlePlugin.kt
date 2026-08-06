@@ -1,16 +1,11 @@
 package dev.s7a.sqldelight.check.gradle
 
+import app.cash.sqldelight.gradle.SqlDelightTask
 import dev.s7a.sqldelight.check.api.LogLevel
-import dev.s7a.sqldelight.check.core.DialectRegistry
-import dev.s7a.sqldelight.check.core.ReporterRegistry
-import dev.s7a.sqldelight.check.core.RuleRegistry
-import java.net.URL
-import java.net.URLClassLoader
-import java.util.Collections
-import java.util.Enumeration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 /**
@@ -27,9 +22,6 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         target.registerSqlDelightCheckTasks(extension)
     }
 
-    /**
-     * Registers the dependency bucket for external rule set providers.
-     */
     private fun Project.createRuleSetConfiguration() {
         configurations.create("sqldelightCheckRuleSet") { configuration ->
             configuration.isCanBeConsumed = false
@@ -38,9 +30,6 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         }
     }
 
-    /**
-     * Registers the dependency bucket for external reporter providers.
-     */
     private fun Project.createReporterConfiguration() {
         configurations.create("sqldelightCheckReporter") { configuration ->
             configuration.isCanBeConsumed = false
@@ -49,9 +38,6 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         }
     }
 
-    /**
-     * Registers the dependency bucket for external dialects.
-     */
     private fun Project.createDialectsConfiguration() {
         configurations.create("sqldelightCheckDialects") { configuration ->
             configuration.isCanBeConsumed = false
@@ -60,95 +46,214 @@ public class SqlDelightCheckGradlePlugin : Plugin<Project> {
         }
     }
 
-    /**
-     * Registers check and fix tasks for SQLDelight sources.
-     */
     private fun Project.registerSqlDelightCheckTasks(extension: SqlDelightCheckExtension) {
         val taskGroup = "sqldelight-check"
+
         tasks.register("sqldelightCheck", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
             task.description = "Runs configured SQLDelight rules without modifying files."
             task.applyFixes.convention(false)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-            task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
-            configureTaskInputs(task)
-            task.notCompatibleWithConfigurationCache(
-                "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
-            )
+            configureCheckFixTaskDefaults(task, extension, taskGroup)
         }.also { sqldelightCheck ->
             tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) { task ->
                 task.dependsOn(sqldelightCheck)
             }
         }
+
         tasks.register("sqldelightFix", SqlDelightCheckTask::class.java) { task ->
-            task.group = taskGroup
             task.description = "Applies allowed SQLDelight fixes, re-runs rules, and writes reports."
             task.applyFixes.convention(true)
-            task.logLevel.convention(resolveLogLevelOverride(extension))
-            task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
-            configureTaskInputs(task)
-            task.notCompatibleWithConfigurationCache(
-                "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
-            )
+            configureCheckFixTaskDefaults(task, extension, taskGroup)
         }
+
         tasks.register("sqldelightCheckBaseline", SqlDelightCheckBaselineTask::class.java) { task ->
             task.group = taskGroup
             task.description = "Generates a sqldelight-check baseline file from current diagnostics."
             task.logLevel.convention(resolveLogLevelOverride(extension))
-            configureBaselineTaskInputs(task)
-            task.notCompatibleWithConfigurationCache(
-                "sqldelight-check resolves the SQLDelight Gradle task model and extension state at execution time.",
+            task.ruleSetClasspath.from(configurations.named("sqldelightCheckRuleSet"))
+            task.dialectClasspath.from(configurations.named("sqldelightCheckDialects"))
+            task.baselineFile.convention(
+                extension.baselineFile.orElse(layout.projectDirectory.file("sqldelight-check-baseline.txt")),
             )
+            task.rootProjectDir.set(rootProject.layout.projectDirectory.asFile.absolutePath)
+            configureReportRoot(task)
         }
+
+        // After all build scripts are evaluated, snapshot extension state and SQLDelight
+        // task model into task properties. This captures everything the task action needs
+        // so task actions run with no project access (configuration cache compatibility).
+        afterEvaluate {
+            val checkTask = tasks.named("sqldelightCheck", SqlDelightCheckTask::class.java)
+            val fixTask = tasks.named("sqldelightFix", SqlDelightCheckTask::class.java)
+            val baselineTask = tasks.named("sqldelightCheckBaseline", SqlDelightCheckBaselineTask::class.java)
+
+            val databases = discoverDatabases()
+
+            listOf(checkTask, fixTask).forEach { taskProvider ->
+                taskProvider.configure { task ->
+                    populateSharedTaskSpecs(task, databases, extension)
+                    task.allowUnsafeFixes.set(extension.fix.unsafe.get())
+                    populateReporterSpecs(task.reporters, extension)
+                }
+            }
+
+            baselineTask.configure { task ->
+                populateSharedTaskSpecs(task, databases, extension)
+            }
+        }
+    }
+
+    private fun Project.configureCheckFixTaskDefaults(
+        task: SqlDelightCheckTask,
+        extension: SqlDelightCheckExtension,
+        taskGroup: String,
+    ) {
+        task.group = taskGroup
+        task.logLevel.convention(resolveLogLevelOverride(extension))
+        task.performanceMetrics.convention(resolvePerformanceMetricsOverride(extension))
+        configureTaskClasspaths(task)
+        task.reportOutputDirectory.convention(layout.buildDirectory.dir("reports/sqldelight-check"))
+        task.baselineFile.convention(extension.baselineFile)
+        task.rootProjectDir.set(rootProject.layout.projectDirectory.asFile.absolutePath)
+        task.projectDir.set(layout.projectDirectory.asFile.absolutePath)
+        configureReportRoot(task)
+    }
+
+    private fun Project.configureReportRoot(task: AbstractSqlDelightCheckBaseTask) {
+        task.reportRoot.set(
+            providers
+                .gradleProperty("sqldelightCheck.reportRoot")
+                .orElse(providers.environmentVariable("GITHUB_WORKSPACE"))
+                .orElse(""),
+        )
+    }
+
+    private fun Project.populateSharedTaskSpecs(
+        task: AbstractSqlDelightCheckBaseTask,
+        databases: Map<String, DatabaseDiscovery>,
+        extension: SqlDelightCheckExtension,
+    ) {
+        populateDatabaseSpecs(task.databases, databases)
+        populateRuleConfigSpecs(
+            globalRuleSets = task.globalRuleSets,
+            globalRules = task.globalRules,
+            databaseConfigs = task.databaseConfigs,
+            extension = extension,
+        )
+    }
+
+    /**
+     * Reads SQLDelight task model and returns per-database metadata.
+     * Called at configuration time (afterEvaluate); does not trigger dependency resolution.
+     */
+    private fun Project.discoverDatabases(): Map<String, DatabaseDiscovery> {
+        val result = linkedMapOf<String, DatabaseDiscovery>()
+
+        tasks.withType(SqlDelightTask::class.java).all { sqlDelightTask ->
+            val properties = runCatching { sqlDelightTask.properties.get() }.getOrNull() ?: return@all
+            val databaseName = properties.className
+
+            val compilationUnit =
+                runCatching {
+                    sqlDelightTask.compilationUnit.orNull ?: properties.compilationUnits.firstOrNull()
+                }.getOrNull() ?: return@all
+
+            val sourceFolders =
+                compilationUnit.sourceFolders
+                    .filterNot { it.dependency }
+                    .map { it.folder }
+
+            val dialectConfig = configurations.findByName("${databaseName}DialectClasspath")
+            val dialectCoord = dialectConfig?.declaredDialectCoordinate() ?: ""
+
+            val existing = result[databaseName]
+            if (existing != null) {
+                result[databaseName] = existing.copy(sourceFolders = existing.sourceFolders + sourceFolders)
+            } else {
+                result[databaseName] = DatabaseDiscovery(
+                    dialectCoordinate = dialectCoord,
+                    sourceFolders = sourceFolders,
+                )
+            }
+        }
+
+        return result
+    }
+
+    private fun Project.populateDatabaseSpecs(
+        listProperty: org.gradle.api.provider.ListProperty<SqlDelightDatabaseSpec>,
+        databases: Map<String, DatabaseDiscovery>,
+    ) {
+        databases.forEach { (name, discovery) ->
+            val spec = objects.newInstance(SqlDelightDatabaseSpec::class.java)
+            spec.name.set(name)
+            spec.dialectCoordinate.set(discovery.dialectCoordinate)
+            discovery.sourceFolders.forEach { folder ->
+                spec.sourceFiles.from(fileTree(folder) { tree ->
+                    tree.include("**/*.sq")
+                    tree.include("**/*.sqm")
+                })
+            }
+            listProperty.add(spec)
+        }
+    }
+
+    private fun Project.populateRuleConfigSpecs(
+        globalRuleSets: org.gradle.api.provider.ListProperty<RuleSetConfigSpec>,
+        globalRules: org.gradle.api.provider.ListProperty<RuleConfigSpec>,
+        databaseConfigs: org.gradle.api.provider.ListProperty<DatabaseConfigSpec>,
+        extension: SqlDelightCheckExtension,
+    ) {
+        extension.ruleSets.forEach { globalRuleSets.add(toRuleSetConfigSpec(it)) }
+        extension.rules.forEach { globalRules.add(toRuleConfigSpec(it)) }
+        extension.databases.forEach { dbExt ->
+            val dbSpec = objects.newInstance(DatabaseConfigSpec::class.java)
+            dbSpec.name.set(dbExt.name)
+            dbExt.ruleSets.forEach { dbSpec.ruleSets.add(toRuleSetConfigSpec(it)) }
+            dbExt.rules.forEach { dbSpec.rules.add(toRuleConfigSpec(it)) }
+            databaseConfigs.add(dbSpec)
+        }
+    }
+
+    private fun Project.toRuleSetConfigSpec(ruleSetExt: RuleSetExtension): RuleSetConfigSpec {
+        val spec = objects.newInstance(RuleSetConfigSpec::class.java)
+        spec.id.set(ruleSetExt.name)
+        ruleSetExt.enabled.orNull?.let { spec.enabled.set(it) }
+        return spec
+    }
+
+    private fun Project.toRuleConfigSpec(ruleExt: RuleExtension): RuleConfigSpec {
+        val spec = objects.newInstance(RuleConfigSpec::class.java)
+        spec.id.set(ruleExt.name)
+        ruleExt.enabled.orNull?.let { spec.enabled.set(it) }
+        spec.severity.set(ruleExt.severity.get().name)
+        spec.options.set(ruleExt.options.get())
+        return spec
+    }
+
+    private fun Project.populateReporterSpecs(
+        reporters: org.gradle.api.provider.ListProperty<SqlDelightReporterTaskSpec>,
+        extension: SqlDelightCheckExtension,
+    ) {
+        extension.reports.forEach { reporter ->
+            val spec = objects.newInstance(SqlDelightReporterTaskSpec::class.java)
+            spec.name.set(reporter.name)
+            spec.required.set(reporter.required.get())
+            spec.primaryOutputFile.set(reporter.outputFile.orNull?.asFile?.absolutePath ?: "")
+            spec.outputDirectory.set(reporter.outputDirectory.orNull?.asFile?.absolutePath ?: "")
+            spec.options.set(reporter.resolvedOptions())
+            reporters.add(spec)
+        }
+    }
+
+    private fun Project.configureTaskClasspaths(task: SqlDelightCheckTask) {
+        task.ruleSetClasspath.from(configurations.named("sqldelightCheckRuleSet"))
+        task.reporterClasspath.from(configurations.named("sqldelightCheckReporter"))
+        task.dialectClasspath.from(configurations.named("sqldelightCheckDialects"))
     }
 }
 
-private fun Project.configureSqlDelightSourceInputs(sources: ConfigurableFileCollection) {
-    sources.from(
-        provider {
-            fileTree(rootProject.projectDir) { tree ->
-                tree.include("**/*.sq")
-                tree.include("**/*.sqm")
-                tree.exclude(".gradle/**")
-                tree.exclude("**/build/**")
-            }
-        },
-    )
-}
+// ── extension state helpers ───────────────────────────────────────────────────
 
-private fun Project.configureRuleAndDialectInputs(
-    ruleSetClasspath: ConfigurableFileCollection,
-    dialectClasspath: ConfigurableFileCollection,
-) {
-    ruleSetClasspath.from(configurations.named("sqldelightCheckRuleSet"))
-    dialectClasspath.from(configurations.named("sqldelightCheckDialects"))
-}
-
-private fun Project.configureReportOutputs(task: SqlDelightCheckTask) {
-    task.reportOutputDirectory.convention(layout.buildDirectory.dir("reports/sqldelight-check"))
-}
-
-private fun Project.configureTaskInputs(task: SqlDelightCheckTask) {
-    val extension = extensions.getByType(SqlDelightCheckExtension::class.java)
-    configureSqlDelightSourceInputs(task.sqlDelightSources)
-    configureRuleAndDialectInputs(task.ruleSetClasspath, task.dialectClasspath)
-    task.reporterClasspath.from(configurations.named("sqldelightCheckReporter"))
-    configureReportOutputs(task)
-    task.baselineFile.convention(extension.baselineFile)
-}
-
-private fun Project.configureBaselineTaskInputs(task: SqlDelightCheckBaselineTask) {
-    val extension = extensions.getByType(SqlDelightCheckExtension::class.java)
-    configureSqlDelightSourceInputs(task.sqlDelightSources)
-    configureRuleAndDialectInputs(task.ruleSetClasspath, task.dialectClasspath)
-    task.baselineFile.convention(
-        extension.baselineFile.orElse(layout.projectDirectory.file("sqldelight-check-baseline.txt")),
-    )
-}
-
-/**
- * Resolves the effective task log level from the CLI override or extension default.
- */
 private fun Project.resolveLogLevelOverride(extension: SqlDelightCheckExtension) =
     providers
         .gradleProperty("sqldelightCheck.logLevel")
@@ -162,9 +267,6 @@ private fun Project.resolveLogLevelOverride(extension: SqlDelightCheckExtension)
         }
         .orElse(extension.logLevel)
 
-/**
- * Resolves the opt-in task performance metrics flag from the CLI or extension.
- */
 private fun Project.resolvePerformanceMetricsOverride(extension: SqlDelightCheckExtension) =
     providers
         .gradleProperty("sqldelightCheck.performanceMetrics")
@@ -177,15 +279,6 @@ private fun Project.resolvePerformanceMetricsOverride(extension: SqlDelightCheck
         }
         .orElse(extension.performanceMetrics)
 
-/**
- * Returns the reporter registry attached to this project.
- */
-internal fun Project.sqldelightCheckReporterRegistry(): ReporterRegistry =
-    ReporterRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckReporter"))
-
-/**
- * Registers default reporters and output locations.
- */
 private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension) {
     val isGitHubActions =
         providers
@@ -211,37 +304,28 @@ private fun Project.configureDefaultReports(extension: SqlDelightCheckExtension)
     extension.reports.maybeCreate("github-annotations").required.convention(isGitHubActions)
 }
 
-/**
- * Returns the rule registry attached to this project.
- */
-internal fun Project.sqldelightCheckRuleRegistry(): RuleRegistry =
-    RuleRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckRuleSet"))
+// ── dialect coordinate extraction (no dependency resolution) ─────────────────
 
 /**
- * Returns the dialect registry attached to this project.
+ * Returns the declared dialect artifact coordinate as "group:module:version", or an empty
+ * string when no direct dialect dependency is found.
+ *
+ * Reads only declared (not resolved) dependencies to avoid triggering resolution at
+ * configuration time.
  */
-internal fun Project.sqldelightCheckDialectsRegistry(): DialectRegistry =
-    DialectRegistry.load(sqldelightCheckProviderClassLoader("sqldelightCheckDialects"))
-
-private fun Project.sqldelightCheckProviderClassLoader(configurationName: String): ClassLoader {
-    val urls =
-        configurations
-            .getByName(configurationName)
-            .files
-            .map { file -> file.toURI().toURL() }
-            .toTypedArray()
-    return ProviderClassLoader(urls, SqlDelightCheckGradlePlugin::class.java.classLoader)
+private fun Configuration.declaredDialectCoordinate(): String {
+    val dep =
+        dependencies
+            .filterIsInstance<ModuleDependency>()
+            .firstOrNull { it.group != null }
+        ?: return ""
+    return "${dep.group.orEmpty()}:${dep.name}:${dep.version.orEmpty()}"
 }
 
-private class ProviderClassLoader(
-    urls: Array<URL>,
-    parent: ClassLoader,
-) : URLClassLoader(urls, parent) {
-    override fun getResource(name: String): URL? = findResource(name) ?: parent.getResource(name)
+// ── internal discovery model ──────────────────────────────────────────────────
 
-    override fun getResources(name: String): Enumeration<URL> {
-        val localResources = findResources(name).iterator().asSequence().toList()
-        val parentResources = parent.getResources(name).iterator().asSequence().toList()
-        return Collections.enumeration(localResources + parentResources)
-    }
-}
+private data class DatabaseDiscovery(
+    val dialectCoordinate: String,
+    val sourceFolders: List<java.io.File>,
+)
+

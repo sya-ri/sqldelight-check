@@ -41,7 +41,8 @@ public class SourceIndentationRule : Rule {
         val content = context.file.content
         val indentSize = context.options[indentSizeOption]
         val lines = content.linesWithRanges()
-        val structure = SqlSourceStructure.parse(content, context.database.dialect.sourcePatterns)
+        val structure = context.sourceStructure
+        val mappedTypes = content.mappedTypeNames(context.database.dialect.sourcePatterns).toList()
         val statementBlocks =
             structure.blocks
                 .filter { block -> block.kind == SqlSourceBlockKind.Statement }
@@ -49,12 +50,12 @@ public class SourceIndentationRule : Rule {
 
         lines.forEach { line ->
             val firstContentOffset = line.firstNonWhitespaceOffset ?: return@forEach
-            if (content.isMappedTypeBindingStart(firstContentOffset, context.database.dialect.sourcePatterns)) return@forEach
-            if (content.isInMappedTypeName(firstContentOffset, context.database.dialect.sourcePatterns)) return@forEach
+            if (mappedTypes.hasBindingStartAt(firstContentOffset)) return@forEach
+            if (mappedTypes.containsOffset(firstContentOffset)) return@forEach
             val tokenContext = structure.contextAtOffset(firstContentOffset) ?: return@forEach
             if (tokenContext.isCreateIndexOnContinuation(structure)) return@forEach
             val statementBlock = statementBlocks[tokenContext.statementIndex] ?: return@forEach
-            if (!content.substring(statementBlock.startOffset, statementBlock.endOffset).contains('\n')) return@forEach
+            if (!content.hasNewlineBetween(statementBlock.startOffset, statementBlock.endOffset)) return@forEach
 
             val expectedIndentation = " ".repeat(tokenContext.expectedIndentationLevel(structure) * indentSize)
             val actualIndentation = line.text.takeWhile { character -> character == ' ' || character == '\t' }

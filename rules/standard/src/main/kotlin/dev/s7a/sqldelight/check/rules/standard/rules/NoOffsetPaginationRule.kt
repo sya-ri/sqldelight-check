@@ -23,10 +23,11 @@ public class NoOffsetPaginationRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         content.sqlTokens()
             .filter { token ->
                 token.isTerm(SqlDialectSourceTerm.Offset) &&
-                    content.sqlParenthesisDepthAt(token.startOffset) == 0 &&
+                    parenthesisDepths[token.startOffset] == 0 &&
                     content.previousSqlCharacterBefore(token.startOffset)?.value != ':'
             }
             .forEach { token ->

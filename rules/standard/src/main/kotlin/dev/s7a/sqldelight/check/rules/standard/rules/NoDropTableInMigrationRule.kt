@@ -27,11 +27,12 @@ public class NoDropTableInMigrationRule : Rule {
 
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.zipWithNext()
             .filter { (drop, table) ->
                 drop.isTerm(SqlDialectSourceTerm.Drop) &&
                     table.isTerm(SqlDialectSourceTerm.Table) &&
-                    content.sqlParenthesisDepthAt(drop.startOffset) == 0
+                    parenthesisDepths[drop.startOffset] == 0
             }
             .forEach { (drop, table) ->
                 reporter.report(

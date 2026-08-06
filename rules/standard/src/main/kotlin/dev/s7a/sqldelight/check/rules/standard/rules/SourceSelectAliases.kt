@@ -23,16 +23,17 @@ internal data class SelectFromRange(
 internal fun String.selectFromRanges(): Sequence<SelectFromRange> =
     sequence {
         val tokens = sqlTokens().toList()
+        val parenthesisDepths = computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
-            val selectDepth = sqlParenthesisDepthAt(token.startOffset)
+            val selectDepth = parenthesisDepths[token.startOffset]
             val statementEnd = statementEndAfter(token.startOffset)
             val fromToken =
                 tokens
                     .drop(index + 1)
                     .firstOrNull { candidate ->
                         candidate.startOffset < statementEnd &&
-                            sqlParenthesisDepthAt(candidate.startOffset) == selectDepth &&
+                            parenthesisDepths[candidate.startOffset] == selectDepth &&
                             candidate.isTerm(SqlDialectSourceTerm.From)
                     } ?: return@forEachIndexed
             yield(
@@ -85,13 +86,17 @@ private fun String.selectTargets(
 ): List<AliasSelectTarget> {
     val targets = mutableListOf<AliasSelectTarget>()
     var targetStart = startOffset
+    var currentDepth = 0
     sqlCharacters()
-        .dropWhile { character -> character.offset < startOffset }
         .takeWhile { character -> character.offset < endOffset }
         .forEach { character ->
-            if (character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth) {
-                targets += AliasSelectTarget(targetStart, character.offset).trimmedIn(this)
-                targetStart = character.offset + 1
+            when (character.value) {
+                '(' -> currentDepth++
+                ')' -> if (currentDepth > 0) currentDepth--
+                ',' -> if (character.offset >= startOffset && currentDepth == depth) {
+                    targets += AliasSelectTarget(targetStart, character.offset).trimmedIn(this)
+                    targetStart = character.offset + 1
+                }
             }
         }
     targets += AliasSelectTarget(targetStart, endOffset).trimmedIn(this)

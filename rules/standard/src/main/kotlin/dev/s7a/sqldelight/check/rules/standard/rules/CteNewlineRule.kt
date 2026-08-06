@@ -25,11 +25,11 @@ public class CteNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.With)) return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            val depth = parenthesisDepths[token.startOffset]
             if (depth != 0) return@forEachIndexed
             val statementEnd = content.statementEndAfter(token.startOffset)
             val mainStatementIndex =
@@ -38,21 +38,19 @@ public class CteNewlineRule : Rule {
                     statementEnd = statementEnd,
                     depth = depth,
                     content = content,
+                    parenthesisDepths = parenthesisDepths,
                     sourcePatterns = context.database.dialect.sourcePatterns,
                 )
                 ?: return@forEachIndexed
-            val cteStarts = tokens.cteStartTokens(index + 1, mainStatementIndex, depth, content)
+            val cteStarts = tokens.cteStartTokens(index + 1, mainStatementIndex, depth, content, parenthesisDepths)
             if (cteStarts.size < 2) return@forEachIndexed
-            if (!content.substring(token.endOffset, tokens[mainStatementIndex].startOffset).contains('\n')) return@forEachIndexed
-            if (cteStarts.all { cte ->
-                    lines.lineContaining(cte.startOffset)?.firstNonWhitespaceOffset == cte.startOffset
-                }
-            ) {
+            if (!content.hasNewlineBetween(token.endOffset, tokens[mainStatementIndex].startOffset)) return@forEachIndexed
+            if (cteStarts.all { cte -> content.isFirstNonWhitespaceAt(cte.startOffset) }) {
                 return@forEachIndexed
             }
             val misplacedCteStarts =
                 cteStarts
-                    .filter { cte -> lines.lineContaining(cte.startOffset)?.firstNonWhitespaceOffset != cte.startOffset }
+                    .filter { cte -> !content.isFirstNonWhitespaceAt(cte.startOffset) }
                     .map { cte -> cte.startOffset }
 
             reporter.report(
@@ -74,13 +72,14 @@ private fun List<SqlToken>.mainStatementIndexAfterWith(
     statementEnd: Int,
     depth: Int,
     content: String,
+    parenthesisDepths: IntArray,
     sourcePatterns: SqlDialectSourcePatterns,
 ): Int? {
     var sawCteBody = false
     for (index in startIndex until size) {
         val token = this[index]
         if (token.startOffset >= statementEnd) return null
-        if (content.sqlParenthesisDepthAt(token.startOffset) != depth) continue
+        if (parenthesisDepths[token.startOffset] != depth) continue
         if (token.isTerm(SqlDialectSourceTerm.As)) continue
         if (content.previousSqlCharacterBefore(token.startOffset)?.value == ')') {
             sawCteBody = true
@@ -95,12 +94,13 @@ private fun List<SqlToken>.cteStartTokens(
     endIndex: Int,
     depth: Int,
     content: String,
+    parenthesisDepths: IntArray,
 ): List<SqlToken> {
     val starts = mutableListOf<SqlToken>()
     getOrNull(startIndex)?.let(starts::add)
     for (index in startIndex until endIndex) {
         val token = this[index]
-        if (content.sqlParenthesisDepthAt(token.startOffset) != depth) continue
+        if (parenthesisDepths[token.startOffset] != depth) continue
         if (content.previousSqlCharacterBefore(token.startOffset)?.value == ',') {
             starts += token
         }

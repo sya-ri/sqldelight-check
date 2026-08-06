@@ -26,14 +26,16 @@ public class ConstraintNewlineRule : Rule {
         val content = context.file.content
         val lines = content.linesWithRanges()
         val tokens = content.sqlTokens().toList()
-        content.createTableBodies(tokens).forEach bodyLoop@{ body ->
-            val items = content.commaSeparatedClauseItems(body.openOffset + 1, body.closeOffset, body.itemDepth)
+        val parenthesisDepths = content.computeParenthesisDepths()
+        val mappedTypes = content.mappedTypeNames(context.database.dialect.sourcePatterns).toList()
+        content.createTableBodies(tokens, parenthesisDepths).forEach bodyLoop@{ body ->
+            val items = content.commaSeparatedClauseItems(body.openOffset + 1, body.closeOffset, body.itemDepth, parenthesisDepths)
             if (!content.isMultilineItemList(items)) return@bodyLoop
 
             items.forEach { item ->
                 val itemLine = lines.lineContaining(item.startOffset) ?: return@forEach
                 val indentation = itemLine.text.takeWhile { character -> character == ' ' || character == '\t' }
-                content.createTableConstraintTokens(item, body.itemDepth, context.database.dialect.sourcePatterns).forEach { constraint ->
+                content.createTableConstraintTokens(item, body.itemDepth, context.database.dialect.sourcePatterns, mappedTypes, parenthesisDepths).forEach { constraint ->
                     val line = lines.lineContaining(constraint.startOffset) ?: return@forEach
                     if (line.firstNonWhitespaceOffset == constraint.startOffset) return@forEach
                     reporter.report(
@@ -63,21 +65,24 @@ private fun String.createTableConstraintTokens(
     item: ClauseItem,
     itemDepth: Int,
     sourcePatterns: SqlDialectSourcePatterns,
+    mappedTypes: List<MappedTypeName>,
+    parenthesisDepths: IntArray,
 ): List<SqlToken> {
     val itemTokens =
         sqlTokens()
             .dropWhile { token -> token.startOffset < item.startOffset }
             .takeWhile { token -> token.startOffset < item.endOffset }
-            .filter { token -> sqlParenthesisDepthAt(token.startOffset) == itemDepth }
+            .filter { token -> parenthesisDepths[token.startOffset] == itemDepth }
             .toList()
     val first = itemTokens.firstOrNull() ?: return emptyList()
     if (sourcePatterns.matches(SqlDialectSourcePatternRole.TableConstraintStart, itemTokens.normalizedTextsFrom(0))) {
         return listOf(first)
     }
-    if (!substring(item.startOffset, item.endOffset).contains('\n')) return emptyList()
+    if (!hasNewlineBetween(item.startOffset, item.endOffset)) return emptyList()
     val firstLineEnd =
         indexOf('\n', item.startOffset).takeIf { offset -> offset in item.startOffset until item.endOffset }
             ?: return emptyList()
+    val content = this
     return buildList {
         var index = 1
         while (index < itemTokens.size) {
@@ -87,8 +92,8 @@ private fun String.createTableConstraintTokens(
             if (
                 length != null &&
                 token.startOffset > firstLineEnd &&
-                sqlParenthesisDepthAt(token.startOffset) == itemDepth &&
-                !isOnMappedTypeNameLine(token.startOffset, sourcePatterns)
+                parenthesisDepths[token.startOffset] == itemDepth &&
+                !mappedTypes.hasTypeOnSameLine(content, token.startOffset)
             ) {
                 add(token)
                 index += length

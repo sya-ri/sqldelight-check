@@ -23,17 +23,18 @@ public class RequireOrderByWithLimitRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
+        val parenthesisDepths = content.computeParenthesisDepths()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEachIndexed
-            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
+            if (parenthesisDepths[token.startOffset] != 0) return@forEachIndexed
 
             val statementEnd = content.statementEndAfter(token.startOffset)
             val statementTokens =
                 tokens
                     .drop(index + 1)
                     .takeWhile { candidate -> candidate.startOffset < statementEnd }
-                    .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == 0 }
+                    .filter { candidate -> parenthesisDepths[candidate.startOffset] == 0 }
             val limitOrOffset =
                 statementTokens.firstOrNull { candidate ->
                     candidate.isTerm(SqlDialectSourceTerm.Limit) || candidate.isTerm(SqlDialectSourceTerm.Offset)

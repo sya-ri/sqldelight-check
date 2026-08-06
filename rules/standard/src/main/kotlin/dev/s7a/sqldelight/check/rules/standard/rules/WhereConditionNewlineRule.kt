@@ -24,11 +24,11 @@ public class WhereConditionNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
+        val parenthesisDepths = content.computeParenthesisDepths()
         val tokens = content.sqlTokens().toList()
         tokens.forEachIndexed { index, token ->
             if (!token.isTerm(SqlDialectSourceTerm.Where)) return@forEachIndexed
-            val depth = content.sqlParenthesisDepthAt(token.startOffset)
+            val depth = parenthesisDepths[token.startOffset]
             val statementEnd = content.statementEndAfter(token.startOffset)
             val clauseEnd =
                 tokens.firstBoundaryOffsetAfterAtDepth(
@@ -38,21 +38,21 @@ public class WhereConditionNewlineRule : Rule {
                     depth = depth,
                     sourcePatterns = context.database.dialect.sourcePatterns,
                     role = SqlDialectSourcePatternRole.PredicateBoundary,
+                    parenthesisDepths = parenthesisDepths,
                 )
-            if (!content.substring(token.endOffset, clauseEnd).contains('\n')) return@forEachIndexed
+            if (!content.hasNewlineBetween(token.endOffset, clauseEnd)) return@forEachIndexed
 
             var pendingBetween = false
             tokens
                 .drop(index + 1)
                 .takeWhile { candidate -> candidate.startOffset < clauseEnd }
-                .filter { candidate -> content.sqlParenthesisDepthAt(candidate.startOffset) == depth }
+                .filter { candidate -> parenthesisDepths[candidate.startOffset] == depth }
                 .forEach { candidate ->
                     when {
                         candidate.isTerm(SqlDialectSourceTerm.Between) -> pendingBetween = true
                         candidate.isTerm(SqlDialectSourceTerm.And) && pendingBetween -> pendingBetween = false
                         candidate.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.BooleanOperator) -> {
-                            val line = lines.lineContaining(candidate.startOffset) ?: return@forEach
-                            if (line.firstNonWhitespaceOffset == candidate.startOffset) return@forEach
+                            if (content.isFirstNonWhitespaceAt(candidate.startOffset)) return@forEach
                             reporter.report(
                                 RuleDiagnostic(
                                     severity = defaultSeverity,

@@ -24,6 +24,7 @@ public class ConsistentColumnReferencesRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens.forEachIndexed { index, token ->
             val clause =
                 when {
@@ -33,7 +34,7 @@ public class ConsistentColumnReferencesRule : Rule {
                 }
             val by = tokens.getOrNull(index + 1)?.takeIf { it.isTerm(SqlDialectSourceTerm.By) }
                 ?: return@forEachIndexed
-            if (content.sqlParenthesisDepthAt(token.startOffset) != 0) return@forEachIndexed
+            if (parenthesisDepths[token.startOffset] != 0) return@forEachIndexed
 
             val clauseName = "${token.text.uppercase()} ${by.text.uppercase()}"
             val boundaryRole =

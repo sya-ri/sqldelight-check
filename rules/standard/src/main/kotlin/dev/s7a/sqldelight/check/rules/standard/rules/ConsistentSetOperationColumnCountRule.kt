@@ -30,12 +30,13 @@ public class ConsistentSetOperationColumnCountRule : Rule {
     ) {
         val content = context.file.content
         val tokens = content.sqlTokens().toList()
+        val parenthesisDepths = content.computeParenthesisDepths()
         tokens
             .filter { token -> token.matches(context.database.dialect.sourcePatterns, SqlDialectSourcePatternRole.SetOperator) }
             .forEach { operator ->
-                val left = content.selectColumnCountBefore(operator, tokens) ?: return@forEach
+                val left = content.selectColumnCountBefore(operator, tokens, parenthesisDepths) ?: return@forEach
                 val right =
-                    content.selectColumnCountAfter(operator, tokens, context.database.dialect.sourcePatterns)
+                    content.selectColumnCountAfter(operator, tokens, context.database.dialect.sourcePatterns, parenthesisDepths)
                         ?: return@forEach
                 if (left.count == null || right.count == null) return@forEach
                 if (left.count == right.count) return@forEach
@@ -65,8 +66,9 @@ private data class SelectTargetRange(
 private fun String.selectColumnCountBefore(
     operator: SqlToken,
     tokens: List<SqlToken>,
+    parenthesisDepths: IntArray,
 ): SelectColumnCount? {
-    val depth = sqlParenthesisDepthAt(operator.startOffset)
+    val depth = parenthesisDepths[operator.startOffset]
     val start = previousStatementBoundaryBefore(operator.startOffset)
     val select =
         tokens
@@ -75,17 +77,18 @@ private fun String.selectColumnCountBefore(
                     token.startOffset >= start &&
                         token.startOffset < operator.startOffset &&
                     token.isTerm(SqlDialectSourceTerm.Select) &&
-                    sqlParenthesisDepthAt(token.startOffset) == depth
+                    parenthesisDepths[token.startOffset] == depth
             } ?: return null
-    return selectColumnCount(select, operator.startOffset, depth, tokens)
+    return selectColumnCount(select, operator.startOffset, depth, tokens, parenthesisDepths)
 }
 
 private fun String.selectColumnCountAfter(
     operator: SqlToken,
     tokens: List<SqlToken>,
     sourcePatterns: SqlDialectSourcePatterns,
+    parenthesisDepths: IntArray,
 ): SelectColumnCount? {
-    val depth = sqlParenthesisDepthAt(operator.startOffset)
+    val depth = parenthesisDepths[operator.startOffset]
     val end = statementEndAfter(operator.startOffset)
     val select =
         tokens
@@ -93,7 +96,7 @@ private fun String.selectColumnCountAfter(
                     token.startOffset > operator.endOffset &&
                         token.startOffset < end &&
                     token.isTerm(SqlDialectSourceTerm.Select) &&
-                    sqlParenthesisDepthAt(token.startOffset) == depth
+                    parenthesisDepths[token.startOffset] == depth
             } ?: return null
     val nextOperator =
         tokens
@@ -101,9 +104,9 @@ private fun String.selectColumnCountAfter(
                 token.startOffset > select.endOffset &&
                     token.startOffset < end &&
                     token.matches(sourcePatterns, SqlDialectSourcePatternRole.SetOperator) &&
-                    sqlParenthesisDepthAt(token.startOffset) == depth
+                    parenthesisDepths[token.startOffset] == depth
             }
-    return selectColumnCount(select, nextOperator?.startOffset ?: end, depth, tokens)
+    return selectColumnCount(select, nextOperator?.startOffset ?: end, depth, tokens, parenthesisDepths)
 }
 
 private fun String.selectColumnCount(
@@ -111,6 +114,7 @@ private fun String.selectColumnCount(
     segmentEndOffset: Int,
     depth: Int,
     tokens: List<SqlToken>,
+    parenthesisDepths: IntArray,
 ): SelectColumnCount {
     val from =
         tokens
@@ -118,10 +122,10 @@ private fun String.selectColumnCount(
                     token.startOffset > select.endOffset &&
                         token.startOffset < segmentEndOffset &&
                     token.isTerm(SqlDialectSourceTerm.From) &&
-                    sqlParenthesisDepthAt(token.startOffset) == depth
+                    parenthesisDepths[token.startOffset] == depth
             }
     val listEnd = from?.startOffset ?: segmentEndOffset
-    val targets = selectTargets(select.endOffset, listEnd, depth)
+    val targets = selectTargets(select.endOffset, listEnd, depth, parenthesisDepths)
     return if (targets.any { target -> target.isWildcardIn(this) }) {
         SelectColumnCount(count = null)
     } else {
@@ -133,6 +137,7 @@ private fun String.selectTargets(
     startOffset: Int,
     endOffset: Int,
     depth: Int,
+    parenthesisDepths: IntArray,
 ): List<SelectTargetRange> {
     val targets = mutableListOf<SelectTargetRange>()
     var start = startOffset
@@ -140,7 +145,7 @@ private fun String.selectTargets(
         .dropWhile { character -> character.offset < startOffset }
         .takeWhile { character -> character.offset < endOffset }
         .forEach { character ->
-            if (character.value == ',' && sqlParenthesisDepthAt(character.offset) == depth) {
+            if (character.value == ',' && parenthesisDepths[character.offset] == depth) {
                 trimmedTarget(start, character.offset)?.let(targets::add)
                 start = character.offset + 1
             }
