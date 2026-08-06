@@ -328,7 +328,7 @@ private fun List<PendingSqlSourceBlock>.computeParentIndices(): Array<Int?> {
     val result = arrayOfNulls<Int>(size)
     if (isEmpty()) return result
     val sorted =
-        (0 until size).sortedWith(
+        indices.sortedWith(
             compareBy<Int> { this[it].startTokenIndex }
                 .thenByDescending { this[it].endTokenIndex }
                 .thenBy { if (this[it].kind == SqlSourceBlockKind.Statement) 0 else 1 },
