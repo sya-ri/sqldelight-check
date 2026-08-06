@@ -10,7 +10,7 @@ Custom dialect projects should compile against the public API:
 
 ```kotlin
 dependencies {
-    compileOnly("dev.s7a:sqldelight-check-api:0.3.2")
+    compileOnly("dev.s7a:sqldelight-check-api:0.3.3")
 }
 ```
 
