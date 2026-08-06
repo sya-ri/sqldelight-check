@@ -30,14 +30,17 @@ public class CaseBranchNewlineRule : Rule {
             .forEach { block ->
                 if (!content.hasNewlineBetween(block.startOffset, block.endOffset)) return@forEach
 
-                val directBranchDepth = structure.tokens[block.startTokenIndex].caseDepth + 1
+                val caseToken = structure.tokens[block.startTokenIndex]
+                val directBranchDepth = caseToken.caseDepth + 1
+                val caseParenthesisDepth = caseToken.parenthesisDepth
 
                 structure
                     .tokensInBlock(block)
                     .asSequence()
                     .drop(1)
                     .filter { token ->
-                        token.caseDepth == directBranchDepth &&
+                        token.parenthesisDepth == caseParenthesisDepth &&
+                            token.caseDepth == directBranchDepth &&
                             caseBranchTerms.any { term -> token.isSourceTerm(term) }
                     }
                     .forEach { branch ->
