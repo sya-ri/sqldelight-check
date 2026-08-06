@@ -9,6 +9,8 @@
 ### Changed
 
 - Significantly improved analysis performance through precomputed lookups, single-pass scanners, and O(N log N) or better algorithms for statement scanning, token lookup, CASE block depth, subquery depth, mapped type resolution, line position mapping, table reference offsets, and parenthesis depth queries.
+- Further reduced per-file overhead with additional precomputed parenthesis depth arrays, backward-scan token utilities, lazy match-prefix evaluation, and an O(B log B) parent-block index.
+- Introduced file-level and rule-level parallel execution using Java parallel streams, significantly reducing wall-clock analysis time on multi-core machines.
 
 ## v0.3.2
 
