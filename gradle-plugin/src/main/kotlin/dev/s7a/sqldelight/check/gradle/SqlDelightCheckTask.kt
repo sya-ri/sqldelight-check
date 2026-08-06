@@ -25,6 +25,10 @@ import java.io.File
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
@@ -509,9 +513,9 @@ private fun String.normalizedRelativePath(): Path? {
     return path
 }
 
-private data class RuleTraceCollector(
-    val traces: MutableList<FileRuleTrace> = mutableListOf(),
-) {
+private class RuleTraceCollector {
+    val traces: CopyOnWriteArrayList<FileRuleTrace> = CopyOnWriteArrayList()
+
     fun record(
         databaseName: String,
         filePath: String,
@@ -522,15 +526,15 @@ private data class RuleTraceCollector(
 }
 
 private class PerformanceMetricsCollector {
-    val rules: MutableMap<RuleTimingKey, TimingAggregate> = linkedMapOf()
-    val phases: MutableMap<PhaseTimingKey, TimingAggregate> = linkedMapOf()
+    val rules: ConcurrentHashMap<RuleTimingKey, TimingAggregate> = ConcurrentHashMap()
+    val phases: ConcurrentHashMap<PhaseTimingKey, TimingAggregate> = ConcurrentHashMap()
 
     fun recordRule(
         databaseName: String,
         ruleId: QualifiedRuleId,
         durationNanos: Long,
     ) {
-        rules.getOrPut(RuleTimingKey(databaseName, ruleId), ::TimingAggregate).record(durationNanos)
+        rules.computeIfAbsent(RuleTimingKey(databaseName, ruleId)) { TimingAggregate() }.record(durationNanos)
     }
 
     fun recordPhase(
@@ -538,7 +542,7 @@ private class PerformanceMetricsCollector {
         phase: AnalysisPhase,
         durationNanos: Long,
     ) {
-        phases.getOrPut(PhaseTimingKey(databaseName, phase), ::TimingAggregate).record(durationNanos)
+        phases.computeIfAbsent(PhaseTimingKey(databaseName, phase)) { TimingAggregate() }.record(durationNanos)
     }
 }
 
@@ -553,17 +557,18 @@ private data class PhaseTimingKey(
 )
 
 private class TimingAggregate {
-    var invocations: Int = 0
-        private set
-    var totalNanos: Long = 0
-        private set
-    var maximumNanos: Long = 0
-        private set
+    private val _invocations = AtomicInteger(0)
+    private val _totalNanos = AtomicLong(0L)
+    private val _maximumNanos = AtomicLong(0L)
+
+    val invocations: Int get() = _invocations.get()
+    val totalNanos: Long get() = _totalNanos.get()
+    val maximumNanos: Long get() = _maximumNanos.get()
 
     fun record(durationNanos: Long) {
-        invocations++
-        totalNanos += durationNanos
-        maximumNanos = maxOf(maximumNanos, durationNanos)
+        _invocations.incrementAndGet()
+        _totalNanos.addAndGet(durationNanos)
+        _maximumNanos.accumulateAndGet(durationNanos, ::maxOf)
     }
 }
 
