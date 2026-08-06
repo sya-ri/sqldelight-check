@@ -44,7 +44,7 @@ internal object SqlSourceStructureParser {
             }
         return SqlSourceStructure(
             tokens = contexts,
-            blocks = contexts.sourceBlocks(blockPatterns),
+            blocks = contexts.sourceBlocks(blockPatterns, normalizedTerms),
         )
     }
 
@@ -61,12 +61,15 @@ internal object SqlSourceStructureParser {
     }
 }
 
-private fun List<SqlSourceTokenContext>.sourceBlocks(blockPatterns: SqlDialectSourceBlockPatterns): List<SqlSourceBlock> {
+private fun List<SqlSourceTokenContext>.sourceBlocks(
+    blockPatterns: SqlDialectSourceBlockPatterns,
+    normalizedTerms: List<String>,
+): List<SqlSourceBlock> {
     if (isEmpty()) return emptyList()
     val pending = mutableListOf<PendingSqlSourceBlock>()
     addStatementBlocksTo(pending)
     addParenthesizedBlocksTo(pending, blockPatterns.parenthesizedBlocks)
-    addPairedBlocksTo(pending, blockPatterns.pairedBlocks)
+    addPairedBlocksTo(pending, blockPatterns.pairedBlocks, normalizedTerms)
     addClauseBlocksTo(pending, blockPatterns.clauseStartRoles)
     return pending.toSourceBlocks(this)
 }
@@ -186,9 +189,9 @@ private class PairedBlockStart(
 private fun List<SqlSourceTokenContext>.addPairedBlocksTo(
     blocks: MutableList<PendingSqlSourceBlock>,
     patterns: Set<SqlDialectSourcePairedBlockPattern>,
+    normalizedTerms: List<String>,
 ) {
     val starts = mutableListOf<PairedBlockStart>()
-    val normalizedTerms = map { context -> context.token.normalizedText }
     forEachIndexed { index, context ->
         val remainingTerms = normalizedTerms.subList(index, normalizedTerms.size)
         patterns.forEach { pattern ->
@@ -299,8 +302,9 @@ private fun List<SqlSourceTokenContext>.statementEndTokenIndex(statementIndex: I
     return size
 }
 
-private fun List<PendingSqlSourceBlock>.toSourceBlocks(tokens: List<SqlSourceTokenContext>): List<SqlSourceBlock> =
-    buildList {
+private fun List<PendingSqlSourceBlock>.toSourceBlocks(tokens: List<SqlSourceTokenContext>): List<SqlSourceBlock> {
+    val parentIndices = computeParentIndices()
+    return buildList {
         this@toSourceBlocks.forEachIndexed { index, block ->
             val start = tokens[block.startTokenIndex]
             val end = tokens[block.endTokenIndex - 1]
@@ -312,23 +316,42 @@ private fun List<PendingSqlSourceBlock>.toSourceBlocks(tokens: List<SqlSourceTok
                     startOffset = start.token.startOffset,
                     endOffset = end.token.endOffset,
                     statementIndex = start.statementIndex,
-                    parentBlockIndex = parentBlockIndex(index),
+                    parentBlockIndex = parentIndices[index],
                     sourcePatternMatch = block.sourcePatternMatch,
                 ),
             )
         }
     }
+}
 
-private fun List<PendingSqlSourceBlock>.parentBlockIndex(blockIndex: Int): Int? {
-    val block = this[blockIndex]
-    var result: Int? = null
-    forEachIndexed { index, candidate ->
-        if (index != blockIndex && candidate.canContain(block)) {
-            val current = result
-            if (current == null || candidate.size < this[current].size) {
-                result = index
+private fun List<PendingSqlSourceBlock>.computeParentIndices(): Array<Int?> {
+    val result = arrayOfNulls<Int>(size)
+    if (isEmpty()) return result
+    val sorted =
+        (0 until size).sortedWith(
+            compareBy<Int> { this[it].startTokenIndex }
+                .thenByDescending { this[it].endTokenIndex }
+                .thenBy { if (this[it].kind == SqlSourceBlockKind.Statement) 0 else 1 },
+        )
+    val stack = ArrayDeque<Int>()
+    for (origIndex in sorted) {
+        val block = this[origIndex]
+        while (stack.isNotEmpty() && this[stack.last()].endTokenIndex <= block.startTokenIndex) {
+            stack.removeLast()
+        }
+        var parentIdx: Int? = null
+        var parentSize = Int.MAX_VALUE
+        for (candidateIdx in stack) {
+            val candidate = this[candidateIdx]
+            if (!candidate.canContain(block)) continue
+            val sz = candidate.size
+            if (sz < parentSize || (sz == parentSize && candidateIdx < (parentIdx ?: Int.MAX_VALUE))) {
+                parentIdx = candidateIdx
+                parentSize = sz
             }
         }
+        result[origIndex] = parentIdx
+        stack.addLast(origIndex)
     }
     return result
 }
