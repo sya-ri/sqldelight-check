@@ -41,7 +41,7 @@ private fun String.trimmedClauseItem(
 }
 
 internal fun String.isMultilineItemList(items: List<ClauseItem>): Boolean =
-    items.size > 1 && substring(items.first().startOffset, items.last().endOffset).contains('\n')
+    items.size > 1 && hasNewlineBetween(items.first().startOffset, items.last().endOffset)
 
 internal fun List<LineInfo>.itemStartsAreOnOwnLines(items: List<ClauseItem>): Boolean =
     items.all { item -> lineContaining(item.startOffset)?.firstNonWhitespaceOffset == item.startOffset }

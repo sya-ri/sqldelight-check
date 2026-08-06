@@ -24,13 +24,11 @@ public class NoLeadingCommaRule : Rule {
         val content = context.file.content
         if (!content.contains('\n')) return
 
-        val lines = content.linesWithRanges()
         content
             .sqlCharacters()
             .filter { character -> character.value == ',' }
             .forEach { comma ->
-                val line = lines.lineContaining(comma.offset) ?: return@forEach
-                if (line.firstNonWhitespaceOffset != comma.offset) return@forEach
+                if (!content.isFirstNonWhitespaceAt(comma.offset)) return@forEach
 
                 reporter.report(
                     RuleDiagnostic(

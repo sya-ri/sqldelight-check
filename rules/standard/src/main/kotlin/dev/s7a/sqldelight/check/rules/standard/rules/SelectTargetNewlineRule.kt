@@ -22,16 +22,15 @@ public class SelectTargetNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
         content.sourceSelectClauseTargets().forEach { clause ->
             if (clause.targets.size < 2) return@forEach
             if (!content.selectTargetListText(clause).contains('\n')) return@forEach
-            if (clause.targets.all { target -> lines.lineContaining(target.startOffset)?.firstNonWhitespaceOffset == target.startOffset }) {
+            if (clause.targets.all { target -> content.isFirstNonWhitespaceAt(target.startOffset) }) {
                 return@forEach
             }
             val misplacedTargetStarts =
                 clause.targets
-                    .filter { target -> lines.lineContaining(target.startOffset)?.firstNonWhitespaceOffset != target.startOffset }
+                    .filter { target -> !content.isFirstNonWhitespaceAt(target.startOffset) }
                     .map { target -> target.startOffset }
 
             reporter.report(

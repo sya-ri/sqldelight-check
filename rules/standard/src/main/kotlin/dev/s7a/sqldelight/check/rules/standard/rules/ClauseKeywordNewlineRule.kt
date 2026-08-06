@@ -25,7 +25,6 @@ public class ClauseKeywordNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
         val structure = context.sourceStructure
         structure.tokens.forEach { token ->
             if (!token.isTerm(SqlDialectSourceTerm.Select)) return@forEach
@@ -33,7 +32,7 @@ public class ClauseKeywordNewlineRule : Rule {
 
             val statementTokens = structure.tokensInStatement(token.statementIndex)
             val statementEnd = statementTokens.lastOrNull()?.token?.endOffset ?: return@forEach
-            if (!content.substring(token.token.startOffset, statementEnd).contains('\n')) return@forEach
+            if (!content.hasNewlineBetween(token.token.startOffset, statementEnd)) return@forEach
 
             statementTokens
                 .asSequence()
@@ -41,8 +40,7 @@ public class ClauseKeywordNewlineRule : Rule {
                 .filter { candidate -> candidate.parenthesisDepth == 0 }
                 .majorClauseKeywords(structure.tokens)
                 .forEach { clause ->
-                    val line = lines.lineContaining(clause.startOffset) ?: return@forEach
-                    if (line.firstNonWhitespaceOffset == clause.startOffset) return@forEach
+                    if (content.isFirstNonWhitespaceAt(clause.startOffset)) return@forEach
 
                     reporter.report(
                         RuleDiagnostic(

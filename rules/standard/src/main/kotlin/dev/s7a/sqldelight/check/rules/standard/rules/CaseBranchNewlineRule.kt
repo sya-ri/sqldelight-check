@@ -24,12 +24,11 @@ public class CaseBranchNewlineRule : Rule {
         reporter: DiagnosticReporter,
     ) {
         val content = context.file.content
-        val lines = content.linesWithRanges()
         val structure = context.sourceStructure
         structure.blocks
             .filter { block -> block.kind == SqlSourceBlockKind.CaseExpression }
             .forEach { block ->
-                if (!content.substring(block.startOffset, block.endOffset).contains('\n')) return@forEach
+                if (!content.hasNewlineBetween(block.startOffset, block.endOffset)) return@forEach
 
                 val directBranchDepth = structure.tokens[block.startTokenIndex].caseDepth + 1
 
@@ -42,8 +41,7 @@ public class CaseBranchNewlineRule : Rule {
                             caseBranchTerms.any { term -> token.isSourceTerm(term) }
                     }
                     .forEach { branch ->
-                        val line = lines.lineContaining(branch.token.startOffset) ?: return@forEach
-                        if (line.firstNonWhitespaceOffset == branch.token.startOffset) return@forEach
+                        if (content.isFirstNonWhitespaceAt(branch.token.startOffset)) return@forEach
                         reporter.report(
                             RuleDiagnostic(
                                 severity = defaultSeverity,

@@ -55,7 +55,7 @@ public class SourceIndentationRule : Rule {
             val tokenContext = structure.contextAtOffset(firstContentOffset) ?: return@forEach
             if (tokenContext.isCreateIndexOnContinuation(structure)) return@forEach
             val statementBlock = statementBlocks[tokenContext.statementIndex] ?: return@forEach
-            if (!content.substring(statementBlock.startOffset, statementBlock.endOffset).contains('\n')) return@forEach
+            if (!content.hasNewlineBetween(statementBlock.startOffset, statementBlock.endOffset)) return@forEach
 
             val expectedIndentation = " ".repeat(tokenContext.expectedIndentationLevel(structure) * indentSize)
             val actualIndentation = line.text.takeWhile { character -> character == ' ' || character == '\t' }
