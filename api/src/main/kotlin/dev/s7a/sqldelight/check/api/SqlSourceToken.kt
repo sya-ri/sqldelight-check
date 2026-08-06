@@ -14,8 +14,7 @@ public class SqlSourceToken(
     /**
      * Lowercase token text used for dialect pattern matching.
      */
-    public val normalizedText: String
-        get() = text.lowercase()
+    public val normalizedText: String = text.lowercase()
 
     override fun equals(other: Any?): Boolean =
         this === other ||
